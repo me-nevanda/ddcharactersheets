@@ -80,6 +80,7 @@ export interface TranslationDictionary {
         healing: string
         deception: string
         perception: string
+        endurance: string
         dungeoneering: string
         nature: string
         religion: string

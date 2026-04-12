@@ -81,6 +81,7 @@ export const en: TranslationDictionary = {
         healing: 'Heal',
         deception: 'Bluff',
         perception: 'Perception',
+        endurance: 'Endurance',
         dungeoneering: 'Dungeoneering',
         nature: 'Nature',
         religion: 'Religion',

@@ -52,6 +52,11 @@ export const trainingDefinitions: SkillDefinition[] = [
     translationKey: 'pages.characterEdit.fields.perception',
   },
   {
+    key: 'endurance',
+    attributeKey: 'constitution',
+    translationKey: 'pages.characterEdit.fields.endurance',
+  },
+  {
     key: 'dungeoneering',
     attributeKey: 'intelligence',
     translationKey: 'pages.characterEdit.fields.dungeoneering',

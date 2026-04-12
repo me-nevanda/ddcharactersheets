@@ -63,6 +63,7 @@ export interface CharacterSkillBonuses {
   healing: number
   deception: number
   perception: number
+  endurance: number
   dungeoneering: number
   nature: number
   religion: number
@@ -89,6 +90,7 @@ export interface CharacterTraining {
   healing: boolean
   deception: boolean
   perception: boolean
+  endurance: boolean
   dungeoneering: boolean
   nature: boolean
   religion: boolean

@@ -56,6 +56,7 @@ const emptyForm: CharacterEditFormData = {
     healing: false,
     deception: false,
     perception: false,
+    endurance: false,
     dungeoneering: false,
     nature: false,
     religion: false,
@@ -103,31 +104,6 @@ function buildAttributeModifierMap(attributes: CharacterAttributes): CharacterAt
     acc[key] = getAttributeModifier(attributes[key])
     return acc
   }, {} as CharacterAttributeBonuses)
-}
-
-function buildSkillBonuses(
-  attributeModifiers: CharacterAttributeBonuses,
-  levelBonus: number,
-  training: CharacterTraining,
-  race: CharacterRace,
-): CharacterSkillBonuses {
-  const racialSkillBonuses: Partial<Record<keyof CharacterSkillBonuses, number>> = {
-    deception: race === CharacterRace.Tiefling ? 2 : 0,
-    stealth: race === CharacterRace.Tiefling ? 2 : 0,
-    history: race === CharacterRace.Eladrin || race === CharacterRace.Dragonborn ? 2 : 0,
-    intimidation: race === CharacterRace.Dragonborn ? 2 : 0,
-    arcana: race === CharacterRace.Eladrin ? 2 : 0,
-    perception: race === CharacterRace.Elf ? 2 : 0,
-    nature: race === CharacterRace.Elf ? 2 : 0,
-  }
-
-  return trainingDefinitions.reduce((acc, definition) => {
-    const racialBonus = racialSkillBonuses[definition.key] ?? 0
-
-    acc[definition.key] =
-      attributeModifiers[definition.attributeKey] + levelBonus + racialBonus + (training[definition.key] ? 5 : 0)
-    return acc
-  }, {} as CharacterSkillBonuses)
 }
 
 function buildDefenseValues(
@@ -232,6 +208,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
               healing: character.training.healing,
               deception: character.training.deception,
               perception: character.training.perception,
+              endurance: character.training.endurance ?? false,
               dungeoneering: character.training.dungeoneering,
               nature: character.training.nature,
               religion: character.training.religion,
@@ -339,7 +316,39 @@ export function useCharacterEditPage(): CharacterEditPageState {
   const levelBonusValue = getLevelBonus(form.level)
   const levelBonusLabel = formatModifier(levelBonusValue)
   const defenseValues = buildDefenseValues(attributeModifierMap, levelBonusValue, form.race)
-  const skillBonuses = buildSkillBonuses(attributeModifierMap, levelBonusValue, form.training, form.race)
+  const dwarfSkillBonus = form.race === CharacterRace.Dwarf ? 2 : 0
+  const halflingSkillBonus = form.race === CharacterRace.Halfling ? 2 : 0
+  const halfElfSkillBonus = form.race === CharacterRace.HalfElf ? 2 : 0
+  const racialSkillBonuses: Partial<Record<keyof CharacterSkillBonuses, number>> = {
+    acrobatics: form.race === CharacterRace.Halfling ? 2 : 0,
+    arcana: form.race === CharacterRace.Eladrin ? 2 : 0,
+    athletics: 0,
+    diplomacy: halfElfSkillBonus,
+    history: form.race === CharacterRace.Eladrin || form.race === CharacterRace.Dragonborn ? 2 : 0,
+    healing: 0,
+    deception: form.race === CharacterRace.Tiefling ? 2 : 0,
+    perception: form.race === CharacterRace.Elf ? 2 : 0,
+    endurance: dwarfSkillBonus,
+    dungeoneering: dwarfSkillBonus,
+    nature: form.race === CharacterRace.Elf ? 2 : 0,
+    religion: 0,
+    insight: 0,
+    stealth: form.race === CharacterRace.Tiefling ? 2 : 0,
+    streetwise: halfElfSkillBonus,
+    intimidation: form.race === CharacterRace.Dragonborn ? 2 : 0,
+    thievery: halflingSkillBonus,
+  }
+
+  const skillBonuses: CharacterSkillBonuses = trainingDefinitions.reduce((acc, definition) => {
+    const racialBonus = racialSkillBonuses[definition.key] ?? 0
+
+    acc[definition.key] =
+      attributeModifierMap[definition.attributeKey] +
+      levelBonusValue +
+      racialBonus +
+      (form.training[definition.key] ? 5 : 0)
+    return acc
+  }, {} as CharacterSkillBonuses)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
