@@ -61,6 +61,8 @@ export const pl: TranslationDictionary = {
         name: 'Imię',
         level: 'Poziom',
         speed: 'Szybkość',
+        hp: 'HP',
+        surge: 'Przypływ sił',
         race: 'Rasa',
         class: 'Klasa',
         strength: 'Siła',

@@ -5,7 +5,7 @@ import { classOptions, raceOptions } from '@dictionaries/characterEditDefinition
 
 export function GeneralSection() {
   const { t } = useI18n()
-  const { form, levelBonusLabel, handleGeneralChange } = useCharacterEditPageContext()
+  const { form, levelBonusLabel, handleGeneralChange, hpValue, surgeValue } = useCharacterEditPageContext()
 
   return (
     <section className={styles.section}>
@@ -93,6 +93,16 @@ export function GeneralSection() {
               )
             })}
           </select>
+        </div>
+
+        <div className={styles.generalValueCard}>
+          <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.hp')}</span>
+          <span className={styles.modifierBadge}>{hpValue}</span>
+        </div>
+
+        <div className={styles.generalValueCard}>
+          <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.surge')}</span>
+          <span className={styles.modifierBadge}>{surgeValue}</span>
         </div>
       </div>
     </section>

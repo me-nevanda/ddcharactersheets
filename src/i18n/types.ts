@@ -60,6 +60,8 @@ export interface TranslationDictionary {
         name: string
         level: string
         speed: string
+        hp: string
+        surge: string
         race: string
         class: string
         strength: string

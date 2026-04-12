@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { AppIcon } from '../../components/AppIcon'
 import { DeleteCharacterDialog } from '../../components/DeleteCharacterDialog'
 import { getIntlLocale, useI18n } from '../../i18n'
+import { CharacterClass, CharacterRace } from '../../types/character'
 import type { Character } from '../../types/character'
 import styles from './style.module.scss'
 import type { CharacterListPageState } from './types'
@@ -20,6 +21,22 @@ function formatUpdatedAt(value: string, locale: string, t: (key: string) => stri
 
 function getCharacterLabel(character: Character | null, t: (key: string) => string): string {
   return character?.name || t('pages.characterList.unnamedCharacter')
+}
+
+function getRaceLabel(character: Character, t: (key: string) => string): string {
+  if (!Object.values(CharacterRace).includes(character.race)) {
+    return t('pages.characterList.missingRace')
+  }
+
+  return t(`pages.characterEdit.options.race.${character.race}`)
+}
+
+function getClassLabel(character: Character, t: (key: string) => string): string {
+  if (!Object.values(CharacterClass).includes(character.class)) {
+    return t('pages.characterList.missingClass')
+  }
+
+  return t(`pages.characterEdit.options.class.${character.class}`)
 }
 
 function CharacterListPageContent({
@@ -79,10 +96,10 @@ function CharacterListPageContent({
                   <h2 className={styles.characterName}>{getCharacterLabel(character, t)}</h2>
                   <div className={styles.cardMeta}>
                     <span className={styles.cardMetaItem}>
-                      {character.race || t('pages.characterList.missingRace')}
+                      {getRaceLabel(character, t)}
                     </span>
                     <span className={styles.cardMetaItem}>
-                      {character.class || t('pages.characterList.missingClass')}
+                      {getClassLabel(character, t)}
                     </span>
                     <span className={styles.cardMetaItem}>
                       {formatUpdatedAt(character.updatedAt, locale, t)}

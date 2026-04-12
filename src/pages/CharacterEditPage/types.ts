@@ -41,6 +41,8 @@ export interface CharacterEditPageState {
   skillModifiers: SkillModifierMap
   levelBonusLabel: string
   defenseValues: DefenseValues
+  hpValue: number
+  surgeValue: number
 }
 
 export interface DefenseValues {

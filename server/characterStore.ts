@@ -62,6 +62,14 @@ function normalizeSpeedValue(value: unknown): number {
   return Math.min(12, Math.max(1, Math.trunc(value)))
 }
 
+function normalizeReadOnlyValue(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return 0
+  }
+
+  return Math.max(0, Math.trunc(value))
+}
+
 function normalizeAttributes(
   data: Partial<Record<keyof CharacterAttributes, unknown>> = {},
 ): CharacterAttributes {
@@ -341,6 +349,8 @@ function normalizeCharacter(
     level,
     race,
     class: clazz,
+    hp: normalizeReadOnlyValue(data.hp),
+    surge: normalizeReadOnlyValue(data.surge),
     speed,
     attributes,
     attributesPlus: normalizeAttributeBonuses(attributesPlusData, buildZeroAttributeBonuses()),

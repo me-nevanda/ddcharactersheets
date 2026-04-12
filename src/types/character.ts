@@ -106,6 +106,8 @@ export interface CharacterData {
   level: number
   race: CharacterRace
   class: CharacterClass
+  hp: number
+  surge: number
   attributes: CharacterAttributes
   attributesPlus: CharacterAttributeBonuses
   bonuses?: CharacterBonuses

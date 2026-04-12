@@ -3,7 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getCharacter, saveCharacter } from '../../lib/api'
 import { useI18n } from '../../i18n'
 import { getErrorMessage } from '../../lib/errors'
-import { emptyForm, zeroAttributeBonuses, zeroDefenses, zeroDefenseBonuses } from './characterEditPageDefaults'
+import {
+  emptyForm,
+  emptyTraining,
+  zeroAttributeBonuses,
+  zeroDefenses,
+  zeroDefenseBonuses,
+} from './characterEditPageDefaults'
 import {
   buildAttributeModifierMap,
   buildAttributeRows,
@@ -15,6 +21,8 @@ import { buildDefenseValues, normalizeDefenses } from './sections/DefensesSectio
 import { buildSkillBonuses, buildSkillModifiers } from './sections/SkillSection/skillSectionLogic'
 import {
   buildRaceAttributeBonuses,
+  buildCharacterHp,
+  buildCharacterSurge,
   clampLevelValue,
   clampSpeedValue,
   formatModifier,
@@ -22,6 +30,7 @@ import {
   normalizeClassValue,
   normalizeRaceValue,
 } from './sections/GeneralSection/generalSectionLogic'
+import { CharacterClass, type CharacterBonuses } from '../../types/character'
 import type {
   AttributeRow,
   CharacterAttributeFieldName,
@@ -32,7 +41,6 @@ import type {
   CharacterSkillFieldName,
   SkillModifierMap,
 } from './types'
-import type { CharacterBonuses } from '../../types/character'
 
 export function useCharacterEditPage(): CharacterEditPageState {
   const { t } = useI18n()
@@ -57,6 +65,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
             ...characterData,
             level: clampLevelValue(character.level),
             speed: clampSpeedValue(character.speed),
+            hp: character.hp ?? 0,
+            surge: character.surge ?? 0,
             attributes: buildNormalizedAttributes(character.attributes),
             attributesPlus: buildRaceAttributeBonuses(character.race),
             defenses: character.defenses ?? zeroDefenses,
@@ -91,6 +101,58 @@ export function useCharacterEditPage(): CharacterEditPageState {
     }
   }, [characterId, t])
 
+  useEffect(() => {
+    if (
+      form.class !== CharacterClass.Rogue &&
+      form.class !== CharacterClass.Ranger &&
+      form.class !== CharacterClass.Paladin &&
+      form.class !== CharacterClass.Cleric &&
+      form.class !== CharacterClass.Wizard
+    ) {
+      return
+    }
+
+    setForm((currentForm) => {
+      const shouldForceRogueSkills =
+        currentForm.class === CharacterClass.Rogue &&
+        currentForm.training.stealth &&
+        currentForm.training.thievery
+      const shouldForceRangerSkill =
+        currentForm.class === CharacterClass.Ranger && currentForm.training.nature
+      const shouldForcePaladinSkill =
+        currentForm.class === CharacterClass.Paladin && currentForm.training.religion
+      const shouldForceClericSkill =
+        currentForm.class === CharacterClass.Cleric && currentForm.training.religion
+      const shouldForceWizardSkill =
+        currentForm.class === CharacterClass.Wizard && currentForm.training.arcana
+
+      if (
+        shouldForceRogueSkills ||
+        shouldForceRangerSkill ||
+        shouldForcePaladinSkill ||
+        shouldForceClericSkill ||
+        shouldForceWizardSkill
+      ) {
+        return currentForm
+      }
+
+      return {
+        ...currentForm,
+        training: {
+          ...currentForm.training,
+          stealth: currentForm.class === CharacterClass.Rogue ? true : currentForm.training.stealth,
+          thievery: currentForm.class === CharacterClass.Rogue ? true : currentForm.training.thievery,
+          nature: currentForm.class === CharacterClass.Ranger ? true : currentForm.training.nature,
+          religion:
+            currentForm.class === CharacterClass.Paladin || currentForm.class === CharacterClass.Cleric
+              ? true
+              : currentForm.training.religion,
+          arcana: currentForm.class === CharacterClass.Wizard ? true : currentForm.training.arcana,
+        },
+      }
+    })
+  }, [form.class])
+
   function handleGeneralChange(event: CharacterGeneralChangeEvent) {
     const { name, value } = event.target
     const fieldName = name as CharacterGeneralFieldName
@@ -118,6 +180,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
       setForm((currentForm) => ({
         ...currentForm,
         class: normalizeClassValue(value),
+        training: emptyTraining,
       }))
       return
     }
@@ -168,7 +231,9 @@ export function useCharacterEditPage(): CharacterEditPageState {
   const attributeModifierMap = buildAttributeModifierMap(effectiveAttributes)
   const levelBonusValue = getLevelBonus(form.level)
   const levelBonusLabel = formatModifier(levelBonusValue)
-  const defenseValues = buildDefenseValues(attributeModifierMap, levelBonusValue, form.race)
+  const hpValue = buildCharacterHp(form.class, form.level, effectiveAttributes.constitution)
+  const surgeValue = buildCharacterSurge(form.class, attributeModifierMap.constitution)
+  const defenseValues = buildDefenseValues(attributeModifierMap, levelBonusValue, form.race, form.class)
   const skillBonuses = buildSkillBonuses(form.level, attributeModifierMap, form.training, form.race)
   const skillModifiers = buildSkillModifiers(skillBonuses)
 
@@ -190,6 +255,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
         name: form.name.trim(),
         level: clampLevelValue(form.level),
         speed: clampSpeedValue(form.speed),
+        hp: hpValue,
+        surge: surgeValue,
         attributes: normalizedAttributes,
         attributesPlus: form.attributesPlus,
         defenses: normalizeDefenses(
@@ -228,5 +295,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
     levelBonusLabel,
     skillModifiers,
     defenseValues,
+    hpValue,
+    surgeValue,
   }
 }

@@ -88,6 +88,8 @@ export const emptyForm: CharacterEditFormData = {
   level: 1,
   race: CharacterRace.Human,
   class: CharacterClass.Warlock,
+  hp: 0,
+  surge: 0,
   speed: 6,
   attributes: {
     strength: 10,
