@@ -1,0 +1,4 @@
+interface:
+  display_name: "DID i18n"
+  short_description: "Enforce i18n for all UI text in DID"
+  default_prompt: "Use $did-i18n to modify this project while routing every user-facing string through src/i18n."

@@ -1,0 +1,341 @@
+﻿import { randomUUID } from 'node:crypto'
+import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
+import path from 'node:path'
+import type {
+  Character,
+  CharacterAttributeBonuses,
+  CharacterAttributes,
+  CharacterBonuses,
+  CharacterData,
+  CharacterDefenses,
+  CharacterSkillBonuses,
+  CharacterTraining,
+  CharacterDefenseBonuses,
+} from '../src/types/character'
+import {
+  CharacterClass as CharacterClassValue,
+  CharacterRace as CharacterRaceValue,
+} from '../src/types/character'
+import { CharacterClass, CharacterRace } from '../src/types/character'
+
+interface ApiError extends Error {
+  code?: string
+  statusCode?: number
+}
+
+const charactersDirectory = path.resolve(process.cwd(), 'data', 'characters')
+const safeCharacterIdPattern = /^[a-z0-9-]+$/i
+
+function normalizeAttributeValue(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return 10
+  }
+
+  return Math.min(40, Math.max(0, Math.trunc(value)))
+}
+
+function normalizeDefenseValue(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return 0
+  }
+
+  return Math.min(30, Math.max(0, Math.trunc(value)))
+}
+
+function normalizeLevelValue(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return 1
+  }
+
+  return Math.min(30, Math.max(1, Math.trunc(value)))
+}
+
+function normalizeSpeedValue(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return 6
+  }
+
+  return Math.min(12, Math.max(1, Math.trunc(value)))
+}
+
+function normalizeAttributes(
+  data: Partial<Record<keyof CharacterAttributes, unknown>> = {},
+): CharacterAttributes {
+  return {
+    strength: normalizeAttributeValue(data.strength),
+    constitution: normalizeAttributeValue(data.constitution),
+    dexterity: normalizeAttributeValue(data.dexterity),
+    intelligence: normalizeAttributeValue(data.intelligence),
+    wisdom: normalizeAttributeValue(data.wisdom),
+    charisma: normalizeAttributeValue(data.charisma),
+  }
+}
+
+function normalizeDefenses(
+  data: Partial<Record<keyof CharacterDefenses, unknown>> = {},
+): CharacterDefenses {
+  return {
+    kp: normalizeDefenseValue(data.kp),
+    fortitude: normalizeDefenseValue(data.fortitude),
+    reflex: normalizeDefenseValue(data.reflex),
+    will: normalizeDefenseValue(data.will),
+  }
+}
+
+function normalizeTrainingValue(value: unknown): boolean {
+  return value === true
+}
+
+function getAttributeModifier(value: number): number {
+  return Math.floor((normalizeAttributeValue(value) - 10) / 2)
+}
+
+function getLevelBonus(value: number): number {
+  return Math.floor(normalizeLevelValue(value) / 2)
+}
+
+function buildAttributeBonuses(attributes: CharacterAttributes): CharacterAttributeBonuses {
+  return {
+    strength: getAttributeModifier(attributes.strength),
+    constitution: getAttributeModifier(attributes.constitution),
+    dexterity: getAttributeModifier(attributes.dexterity),
+    intelligence: getAttributeModifier(attributes.intelligence),
+    wisdom: getAttributeModifier(attributes.wisdom),
+    charisma: getAttributeModifier(attributes.charisma),
+  }
+}
+
+function buildSkillBonuses(
+  level: number,
+  attributeBonuses: CharacterAttributeBonuses,
+  training: CharacterTraining,
+): CharacterSkillBonuses {
+  const levelBonus = getLevelBonus(level)
+
+  function withTraining(baseBonus: number, trained: boolean): number {
+    return baseBonus + levelBonus + (trained ? 5 : 0)
+  }
+
+  return {
+    acrobatics: withTraining(attributeBonuses.dexterity, training.acrobatics),
+    arcana: withTraining(attributeBonuses.intelligence, training.arcana),
+    athletics: withTraining(attributeBonuses.strength, training.athletics),
+    diplomacy: withTraining(attributeBonuses.charisma, training.diplomacy),
+    history: withTraining(attributeBonuses.intelligence, training.history),
+    healing: withTraining(attributeBonuses.wisdom, training.healing),
+    deception: withTraining(attributeBonuses.charisma, training.deception),
+    perception: withTraining(attributeBonuses.wisdom, training.perception),
+    dungeoneering: withTraining(attributeBonuses.intelligence, training.dungeoneering),
+    nature: withTraining(attributeBonuses.wisdom, training.nature),
+    religion: withTraining(attributeBonuses.intelligence, training.religion),
+    insight: withTraining(attributeBonuses.charisma, training.insight),
+    stealth: withTraining(attributeBonuses.dexterity, training.stealth),
+    streetwise: withTraining(attributeBonuses.wisdom, training.streetwise),
+    intimidation: withTraining(attributeBonuses.charisma, training.intimidation),
+    thievery: withTraining(attributeBonuses.dexterity, training.thievery),
+  }
+}
+
+function buildDefenseBonuses(level: number, attributeBonuses: CharacterAttributeBonuses): CharacterDefenseBonuses {
+  const levelBonus = getLevelBonus(level)
+
+  return {
+    kp: 10 + Math.max(attributeBonuses.dexterity, attributeBonuses.intelligence) + levelBonus,
+    fortitude: 10 + Math.max(attributeBonuses.strength, attributeBonuses.constitution) + levelBonus,
+    reflex: 10 + Math.max(attributeBonuses.dexterity, attributeBonuses.intelligence) + levelBonus,
+    will: 10 + Math.max(attributeBonuses.wisdom, attributeBonuses.charisma) + levelBonus,
+  }
+}
+
+function normalizeTraining(
+  data: Partial<Record<keyof CharacterTraining, unknown>> = {},
+): CharacterTraining {
+  return {
+    acrobatics: normalizeTrainingValue(data.acrobatics),
+    arcana: normalizeTrainingValue(data.arcana),
+    athletics: normalizeTrainingValue(data.athletics),
+    diplomacy: normalizeTrainingValue(data.diplomacy),
+    history: normalizeTrainingValue(data.history),
+    healing: normalizeTrainingValue(data.healing),
+    deception: normalizeTrainingValue(data.deception),
+    perception: normalizeTrainingValue(data.perception),
+    dungeoneering: normalizeTrainingValue(data.dungeoneering),
+    nature: normalizeTrainingValue(data.nature),
+    religion: normalizeTrainingValue(data.religion),
+    insight: normalizeTrainingValue(data.insight),
+    stealth: normalizeTrainingValue(data.stealth),
+    streetwise: normalizeTrainingValue(data.streetwise),
+    intimidation: normalizeTrainingValue(data.intimidation),
+    thievery: normalizeTrainingValue(data.thievery),
+  }
+}
+
+function normalizeRaceValue(value: unknown): CharacterRace {
+  if (typeof value === 'string') {
+    if (Object.values(CharacterRace).includes(value as CharacterRace)) {
+      return value as CharacterRace
+    }
+  }
+
+  return CharacterRace.Human
+}
+
+function normalizeClassValue(value: unknown): CharacterClass {
+  if (typeof value === 'string') {
+    if (Object.values(CharacterClass).includes(value as CharacterClass)) {
+      return value as CharacterClass
+    }
+  }
+
+  return CharacterClass.Warlock
+}
+
+function normalizeCharacter(
+  data: Partial<Record<keyof CharacterData, unknown>> = {},
+): CharacterData {
+  const level = normalizeLevelValue(data.level)
+  const attributes =
+    typeof data.attributes === 'object' && data.attributes !== null
+      ? normalizeAttributes(data.attributes as Partial<Record<keyof CharacterAttributes, unknown>>)
+      : normalizeAttributes()
+  const training =
+    typeof data.training === 'object' && data.training !== null
+      ? normalizeTraining(data.training as Partial<Record<keyof CharacterTraining, unknown>>)
+      : normalizeTraining()
+  const attributeBonuses = buildAttributeBonuses(attributes)
+  const race =
+    typeof data.race === 'string'
+      ? normalizeRaceValue(data.race)
+      : CharacterRaceValue.Human
+  const clazz =
+    typeof data.class === 'string'
+      ? normalizeClassValue(data.class)
+      : CharacterClassValue.Warlock
+
+  const speed = normalizeSpeedValue(data.speed)
+
+  const bonuses: CharacterBonuses = {
+    level: getLevelBonus(level),
+    attributes: attributeBonuses,
+    skills: buildSkillBonuses(level, attributeBonuses, training),
+    defenses: buildDefenseBonuses(level, attributeBonuses),
+  }
+
+  return {
+    name: typeof data.name === 'string' ? data.name : '',
+    level,
+    race,
+    class: clazz,
+    speed,
+    attributes,
+    bonuses,
+    defenses:
+      typeof data.defenses === 'object' && data.defenses !== null
+        ? normalizeDefenses(data.defenses as Partial<Record<keyof CharacterDefenses, unknown>>)
+        : normalizeDefenses(),
+    training,
+  }
+}
+
+function parseCharacter(rawCharacter: string): Partial<Record<keyof CharacterData, unknown>> {
+  return JSON.parse(rawCharacter || '{}') as Partial<Record<keyof CharacterData, unknown>>
+}
+
+async function ensureCharactersDirectory(): Promise<void> {
+  await mkdir(charactersDirectory, { recursive: true })
+}
+
+function getCharacterFilePath(characterId: string): string {
+  if (!isSafeCharacterId(characterId)) {
+    const error = new Error('Invalid character id') as ApiError
+    error.statusCode = 400
+    error.code = 'API_INVALID_CHARACTER_ID'
+    throw error
+  }
+
+  return path.join(charactersDirectory, `${characterId}.json`)
+}
+
+export function isSafeCharacterId(characterId: string): boolean {
+  return safeCharacterIdPattern.test(characterId)
+}
+
+export async function listCharacters(): Promise<Character[]> {
+  await ensureCharactersDirectory()
+
+  const entries = await readdir(charactersDirectory, { withFileTypes: true })
+  const characterFiles = entries.filter(
+    (entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'),
+  )
+
+  const characters = await Promise.all(
+    characterFiles.map(async (entry) => {
+      const characterId = path.basename(entry.name, '.json')
+      const filePath = getCharacterFilePath(characterId)
+      const [rawCharacter, fileInfo] = await Promise.all([
+        readFile(filePath, 'utf8'),
+        stat(filePath),
+      ])
+
+      return {
+        id: characterId,
+        ...normalizeCharacter(parseCharacter(rawCharacter)),
+        updatedAt: fileInfo.mtime.toISOString(),
+      }
+    }),
+  )
+
+  return characters.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+}
+
+export async function readCharacter(characterId: string): Promise<Character> {
+  await ensureCharactersDirectory()
+
+  const filePath = getCharacterFilePath(characterId)
+  const rawCharacter = await readFile(filePath, 'utf8')
+  const fileInfo = await stat(filePath)
+
+  return {
+    id: characterId,
+    ...normalizeCharacter(parseCharacter(rawCharacter)),
+    updatedAt: fileInfo.mtime.toISOString(),
+  }
+}
+
+export async function createCharacter(): Promise<Character> {
+  await ensureCharactersDirectory()
+
+  const characterId = `${Date.now()}-${randomUUID().slice(0, 8)}`
+  const filePath = getCharacterFilePath(characterId)
+
+  await writeFile(filePath, '{}\n', 'utf8')
+
+  return readCharacter(characterId)
+}
+
+export async function updateCharacter(characterId: string, data: unknown): Promise<Character> {
+  await ensureCharactersDirectory()
+
+  const filePath = getCharacterFilePath(characterId)
+  const rawCharacter = await readFile(filePath, 'utf8')
+  const existingCharacter = parseCharacter(rawCharacter)
+  const nextCharacter = {
+    ...existingCharacter,
+    ...normalizeCharacter(
+      typeof data === 'object' && data !== null
+        ? (data as Partial<Record<keyof CharacterData, unknown>>)
+        : {},
+    ),
+  }
+
+  await writeFile(filePath, `${JSON.stringify(nextCharacter, null, 2)}\n`, 'utf8')
+
+  return readCharacter(characterId)
+}
+
+export async function deleteCharacter(characterId: string): Promise<void> {
+  await ensureCharactersDirectory()
+
+  const filePath = getCharacterFilePath(characterId)
+  await unlink(filePath)
+}

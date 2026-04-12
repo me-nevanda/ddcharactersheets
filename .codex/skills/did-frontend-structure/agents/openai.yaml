@@ -1,0 +1,4 @@
+interface:
+  display_name: "DID frontend structure"
+  short_description: "Enforce page, types and SCSS module structure"
+  default_prompt: "Use $did-frontend-structure to change this project while preserving its page/view/hook/types and style.module.scss conventions."
