@@ -51,6 +51,10 @@ export const pl: TranslationDictionary = {
     characterEdit: {
       eyebrow: 'Edycja karty',
       title: 'Bohater',
+      tabs: {
+        general: 'Główne',
+        abilities: 'Zdolności',
+      },
       sections: {
         general: 'Ogólne',
         attributes: 'Atrybuty',

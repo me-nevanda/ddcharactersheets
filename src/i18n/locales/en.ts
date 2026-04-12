@@ -51,6 +51,10 @@ export const en: TranslationDictionary = {
     characterEdit: {
       eyebrow: 'Edit character',
       title: 'Hero',
+      tabs: {
+        general: 'Main',
+        abilities: 'Abilities',
+      },
       sections: {
         general: 'General',
         attributes: 'Attributes',

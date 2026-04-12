@@ -1,23 +1,17 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppIcon } from '../../components/AppIcon'
 import { useI18n } from '../../i18n'
-import { AttributesSection } from './sections/AttributesSection'
-import { DefensesSection } from './sections/DefensesSection'
-import { GeneralSection } from './sections/GeneralSection'
-import { SkillSection } from './sections/SkillSection'
-import styles from './style.module.scss'
 import { CharacterEditPageProvider, useCharacterEditPageContext } from './characterEditPageContext'
+import styles from './style.module.scss'
+import type { CharacterEditTabKey } from './types'
+import { AbilitiesTab } from './tabs/AbilitiesTab'
+import { GeneralTab } from './tabs/GeneralTab'
 
 function CharacterEditPageContent() {
   const { t } = useI18n()
-  const {
-    error,
-    form,
-    loading,
-    saving,
-    handleGeneralChange,
-    handleSubmit,
-  } = useCharacterEditPageContext()
+  const [activeTab, setActiveTab] = useState<CharacterEditTabKey>('general')
+  const { error, form, loading, saving, handleGeneralChange, handleSubmit } = useCharacterEditPageContext()
 
   return (
     <main className={styles.editorLayout}>
@@ -39,9 +33,20 @@ function CharacterEditPageContent() {
               />
             </label>
           </div>
-          <Link className={styles.ghostLink} to="/">
-            {t('common.actions.backToList')}
-          </Link>
+          <div className={styles.headerActions}>
+            <Link className={styles.ghostLink} to="/">
+              {t('common.actions.backToList')}
+            </Link>
+            <Link className={styles.secondaryButton} to="/">
+              {t('common.actions.cancel')}
+            </Link>
+            <button className={styles.primaryButton} form="character-edit-form" type="submit" disabled={saving}>
+              <span className={styles.buttonContent}>
+                <AppIcon name="save" />
+                <span>{saving ? t('common.states.saving') : t('common.actions.save')}</span>
+              </span>
+            </button>
+          </div>
         </div>
 
         {error ? <p className={styles.status}>{error}</p> : null}
@@ -49,24 +54,29 @@ function CharacterEditPageContent() {
         {loading ? (
           <p className={styles.loadingText}>{t('common.states.loadingCharacter')}</p>
         ) : (
-          <form className={styles.editorForm} onSubmit={(event) => void handleSubmit(event)}>
-            <div className={styles.sectionsGrid}>
-              <GeneralSection />
-              <AttributesSection />
-              <DefensesSection />
-              <SkillSection />
-            </div>
+          <form id="character-edit-form" className={styles.editorForm} onSubmit={(event) => void handleSubmit(event)}>
+            <div className={styles.editorBody}>
+              <aside className={styles.tabRail} aria-label={t('pages.characterEdit.title')}>
+                <button
+                  className={`${styles.tabButton} ${activeTab === 'general' ? styles.tabButtonActive : ''}`}
+                  type="button"
+                  onClick={() => setActiveTab('general')}
+                >
+                  {t('pages.characterEdit.tabs.general')}
+                </button>
+                <button
+                  className={`${styles.tabButton} ${activeTab === 'abilities' ? styles.tabButtonActive : ''}`}
+                  type="button"
+                  onClick={() => setActiveTab('abilities')}
+                >
+                  {t('pages.characterEdit.tabs.abilities')}
+                </button>
+              </aside>
 
-            <div className={styles.formActions}>
-              <Link className={styles.secondaryButton} to="/">
-                {t('common.actions.cancel')}
-              </Link>
-              <button className={styles.primaryButton} type="submit" disabled={saving}>
-                <span className={styles.buttonContent}>
-                  <AppIcon name="save" />
-                  <span>{saving ? t('common.states.saving') : t('common.actions.save')}</span>
-                </span>
-              </button>
+              <div className={styles.tabPanel}>
+                {activeTab === 'general' ? <GeneralTab /> : null}
+                {activeTab === 'abilities' ? <AbilitiesTab /> : null}
+              </div>
             </div>
           </form>
         )}

@@ -50,6 +50,10 @@ export interface TranslationDictionary {
     characterEdit: {
       eyebrow: string
       title: string
+      tabs: {
+        general: string
+        abilities: string
+      }
       sections: {
         general: string
         attributes: string

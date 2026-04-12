@@ -13,32 +13,24 @@ export function DefensesSection() {
       </div>
 
       <div className={styles.numericGrid}>
-        <div className={styles.field}>
-          <div className={styles.defenseRow}>
-            <span className={styles.label}>{t('pages.characterEdit.fields.kp')}</span>
-            <span className={styles.modifierBadge}>{defenseValues.kp}</span>
-          </div>
+        <div className={styles.defenseCard}>
+          <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.kp')}</span>
+          <span className={styles.modifierBadge}>{defenseValues.kp}</span>
         </div>
 
-        <div className={styles.field}>
-          <div className={styles.defenseRow}>
-            <span className={styles.label}>{t('pages.characterEdit.fields.fortitude')}</span>
-            <span className={styles.modifierBadge}>{defenseValues.fortitude}</span>
-          </div>
+        <div className={styles.defenseCard}>
+          <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.fortitude')}</span>
+          <span className={styles.modifierBadge}>{defenseValues.fortitude}</span>
         </div>
 
-        <div className={styles.field}>
-          <div className={styles.defenseRow}>
-            <span className={styles.label}>{t('pages.characterEdit.fields.reflex')}</span>
-            <span className={styles.modifierBadge}>{defenseValues.reflex}</span>
-          </div>
+        <div className={styles.defenseCard}>
+          <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.reflex')}</span>
+          <span className={styles.modifierBadge}>{defenseValues.reflex}</span>
         </div>
 
-        <div className={styles.field}>
-          <div className={styles.defenseRow}>
-            <span className={styles.label}>{t('pages.characterEdit.fields.will')}</span>
-            <span className={styles.modifierBadge}>{defenseValues.will}</span>
-          </div>
+        <div className={styles.defenseCard}>
+          <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.will')}</span>
+          <span className={styles.modifierBadge}>{defenseValues.will}</span>
         </div>
       </div>
     </section>
