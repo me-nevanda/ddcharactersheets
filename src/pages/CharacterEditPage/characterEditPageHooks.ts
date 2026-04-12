@@ -109,9 +109,23 @@ function buildSkillBonuses(
   attributeModifiers: CharacterAttributeBonuses,
   levelBonus: number,
   training: CharacterTraining,
+  race: CharacterRace,
 ): CharacterSkillBonuses {
+  const racialSkillBonuses: Partial<Record<keyof CharacterSkillBonuses, number>> = {
+    deception: race === CharacterRace.Tiefling ? 2 : 0,
+    stealth: race === CharacterRace.Tiefling ? 2 : 0,
+    history: race === CharacterRace.Eladrin || race === CharacterRace.Dragonborn ? 2 : 0,
+    intimidation: race === CharacterRace.Dragonborn ? 2 : 0,
+    arcana: race === CharacterRace.Eladrin ? 2 : 0,
+    perception: race === CharacterRace.Elf ? 2 : 0,
+    nature: race === CharacterRace.Elf ? 2 : 0,
+  }
+
   return trainingDefinitions.reduce((acc, definition) => {
-    acc[definition.key] = attributeModifiers[definition.attributeKey] + levelBonus + (training[definition.key] ? 5 : 0)
+    const racialBonus = racialSkillBonuses[definition.key] ?? 0
+
+    acc[definition.key] =
+      attributeModifiers[definition.attributeKey] + levelBonus + racialBonus + (training[definition.key] ? 5 : 0)
     return acc
   }, {} as CharacterSkillBonuses)
 }
@@ -119,18 +133,32 @@ function buildSkillBonuses(
 function buildDefenseValues(
   attributeModifiers: CharacterAttributeBonuses,
   levelBonus: number,
+  race: CharacterRace,
 ): DefenseValues {
+  const humanDefenseBonus = race === CharacterRace.Human ? 1 : 0
+
   return {
     kp: clampDefenseValue(
       10 + Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence) + levelBonus,
     ),
     fortitude: clampDefenseValue(
-      10 + Math.max(attributeModifiers.strength, attributeModifiers.constitution) + levelBonus,
+      10 +
+        Math.max(attributeModifiers.strength, attributeModifiers.constitution) +
+        levelBonus +
+        humanDefenseBonus,
     ),
     reflex: clampDefenseValue(
-      10 + Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence) + levelBonus,
+      10 +
+        Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence) +
+        levelBonus +
+        humanDefenseBonus,
     ),
-    will: clampDefenseValue(10 + Math.max(attributeModifiers.wisdom, attributeModifiers.charisma) + levelBonus),
+    will: clampDefenseValue(
+      10 +
+        Math.max(attributeModifiers.wisdom, attributeModifiers.charisma) +
+        levelBonus +
+        humanDefenseBonus,
+    ),
   }
 }
 
@@ -310,8 +338,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
   const attributeModifierMap = buildAttributeModifierMap(normalizedAttributes)
   const levelBonusValue = getLevelBonus(form.level)
   const levelBonusLabel = formatModifier(levelBonusValue)
-  const defenseValues = buildDefenseValues(attributeModifierMap, levelBonusValue)
-  const skillBonuses = buildSkillBonuses(attributeModifierMap, levelBonusValue, form.training)
+  const defenseValues = buildDefenseValues(attributeModifierMap, levelBonusValue, form.race)
+  const skillBonuses = buildSkillBonuses(attributeModifierMap, levelBonusValue, form.training, form.race)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()

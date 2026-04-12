@@ -13,44 +13,26 @@ export function GeneralSection({ form, levelBonusLabel, onChange }: GeneralSecti
       </div>
 
       <div className={styles.sectionGrid}>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="name">
-            {t('pages.characterEdit.fields.name')}
+        <div className={styles.generalCard}>
+          <label className={styles.attributeLabel} htmlFor="level">
+            {t('pages.characterEdit.fields.level')}
           </label>
           <input
             className={styles.input}
-            id="name"
-            name="name"
-            type="text"
-            value={form.name}
+            id="level"
+            name="level"
+            type="number"
+            min={1}
+            max={30}
+            inputMode="numeric"
+            value={form.level}
             onChange={onChange}
-            placeholder={t('pages.characterEdit.placeholders.name')}
-            autoComplete="off"
           />
+          <span className={styles.modifierBadge}>{levelBonusLabel}</span>
         </div>
 
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="level">
-            {t('pages.characterEdit.fields.level')}
-          </label>
-          <div className={styles.valueRow}>
-            <input
-              className={styles.input}
-              id="level"
-              name="level"
-              type="number"
-              min={1}
-              max={30}
-              inputMode="numeric"
-              value={form.level}
-              onChange={onChange}
-            />
-            <span className={styles.modifierBadge}>{levelBonusLabel}</span>
-          </div>
-        </div>
-
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="speed">
+        <div className={styles.generalCard}>
+          <label className={styles.attributeLabel} htmlFor="speed">
             {t('pages.characterEdit.fields.speed')}
           </label>
           <input
@@ -66,12 +48,12 @@ export function GeneralSection({ form, levelBonusLabel, onChange }: GeneralSecti
           />
         </div>
 
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="race">
+        <div className={styles.generalCard}>
+          <label className={styles.attributeLabel} htmlFor="race">
             {t('pages.characterEdit.fields.race')}
           </label>
           <select
-            className={styles.input}
+            className={`${styles.input} ${styles.selectChevronInset}`}
             id="race"
             name="race"
             value={form.race}
@@ -89,12 +71,12 @@ export function GeneralSection({ form, levelBonusLabel, onChange }: GeneralSecti
           </select>
         </div>
 
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="class">
+        <div className={styles.generalCard}>
+          <label className={styles.attributeLabel} htmlFor="class">
             {t('pages.characterEdit.fields.class')}
           </label>
           <select
-            className={styles.input}
+            className={`${styles.input} ${styles.selectChevronInset}`}
             id="class"
             name="class"
             value={form.class}

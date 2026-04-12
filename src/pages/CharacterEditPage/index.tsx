@@ -29,10 +29,22 @@ function CharacterEditPageContent({
     <main className={styles.editorLayout}>
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
-        <div className={styles.headerCopy}>
-          <p className={styles.eyebrow}>{t('pages.characterEdit.eyebrow')}</p>
-          <h1 className={styles.title}>{t('pages.characterEdit.title')}</h1>
-        </div>
+          <div className={styles.headerCopy}>
+            <p className={styles.eyebrow}>{t('pages.characterEdit.eyebrow')}</p>
+            <label className={styles.titleField} htmlFor="name">
+              <span className={styles.srOnly}>{t('pages.characterEdit.fields.name')}</span>
+              <input
+                className={styles.titleInput}
+                id="name"
+                name="name"
+                type="text"
+                value={form.name}
+                onChange={handleGeneralChange}
+                placeholder={t('pages.characterEdit.placeholders.titleName')}
+                autoComplete="off"
+              />
+            </label>
+          </div>
           <Link className={styles.ghostLink} to="/">
             {t('common.actions.backToList')}
           </Link>
@@ -46,7 +58,10 @@ function CharacterEditPageContent({
           <form className={styles.editorForm} onSubmit={(event) => void handleSubmit(event)}>
             <div className={styles.sectionsGrid}>
               <GeneralSection form={form} onChange={handleGeneralChange} levelBonusLabel={levelBonusLabel} />
-              <AttributesSection attributeRows={attributeRows} onChange={handleAttributeChange} />
+              <AttributesSection
+                attributeRows={attributeRows}
+                onChange={handleAttributeChange}
+              />
               <DefensesSection defenseValues={defenseValues} />
               <TrainingSection
                 training={form.training}
