@@ -159,6 +159,41 @@
   gap: 0.75rem;
 }
 
+.attributeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.attributeCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.95rem;
+  background: rgba(255, 248, 235, 0.03);
+  border: 1px solid rgba(255, 248, 235, 0.06);
+}
+
+.attributeField {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.attributeLabel {
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.attributeInput {
+  width: calc(3.5rem + 6px);
+  max-width: calc(3.5rem + 6px);
+  text-align: right;
+}
+
 .field {
   display: grid;
   gap: 0.35rem;
@@ -263,6 +298,9 @@
     display: none;
   }
   .skillGrid {
+    grid-template-columns: 1fr;
+  }
+  .attributeGrid {
     grid-template-columns: 1fr;
   }
 }
