@@ -2,12 +2,21 @@
 import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type {
+  CharacterAbility,
   Character,
+  CharacterAbilityAction,
+  CharacterAbilityKind,
+  CharacterAbilityType,
   CharacterAttributeBonuses,
   CharacterAttributes,
   CharacterBonuses,
   CharacterData,
   CharacterDefenses,
+  CharacterArmor,
+  CharacterWeapon,
+  CharacterOtherItem,
+  CharacterWeaponDamageDiceType,
+  CharacterWeaponDamageType,
   CharacterSkillBonuses,
   CharacterTraining,
   CharacterDefenseBonuses,
@@ -96,6 +105,136 @@ function normalizeDefenses(
 
 function normalizeTrainingValue(value: unknown): boolean {
   return value === true
+}
+
+function normalizeAbilities(
+  data: unknown,
+): CharacterAbility[] {
+  if (!Array.isArray(data)) {
+    return []
+  }
+
+  return data
+    .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+    .map((item) => ({
+      id: typeof item.id === 'string' && item.id.length > 0 ? item.id : randomUUID(),
+      name: typeof item.name === 'string' ? item.name : '',
+      description: typeof item.description === 'string' ? item.description : '',
+      action: (item.action === 'noAction' ? 'noAction' : 'action') as CharacterAbilityAction,
+      type: (item.type === 'encounter' || item.type === 'daily' ? item.type : 'unlimited') as CharacterAbilityType,
+      kind: (item.kind === 'utility' ? 'utility' : 'offensive') as CharacterAbilityKind,
+    }))
+    .filter((ability) => ability.name.length > 0 || ability.description.length > 0)
+}
+
+function normalizeItemGroup<T extends CharacterArmor | CharacterWeapon | CharacterOtherItem>(data: unknown): T[] {
+  if (!Array.isArray(data)) {
+    return []
+  }
+
+  const normalized = data
+    .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+    .map((item) => ({
+      name: typeof item.name === 'string' ? item.name.trim() : '',
+      description: typeof item.description === 'string' ? item.description.trim() : '',
+    })) as T[]
+
+  return normalized.filter((item) => item.name.length > 0 || item.description.length > 0)
+}
+
+function normalizeWeaponDamageDiceType(value: unknown): CharacterWeaponDamageDiceType {
+  if (
+    value === 'd4' ||
+    value === 'd6' ||
+    value === 'd8' ||
+    value === 'd10' ||
+    value === 'd12' ||
+    value === 'd20'
+  ) {
+    return value
+  }
+
+  return 'd4'
+}
+
+function normalizeWeaponDamageType(value: unknown): CharacterWeaponDamageType {
+  if (
+    value === 'normal' ||
+    value === 'poison' ||
+    value === 'radiant' ||
+    value === 'necrotic' ||
+    value === 'psychic'
+  ) {
+    return value
+  }
+
+  return 'normal'
+}
+
+function normalizeWeaponDamageNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(10, Math.max(0, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(10, Math.max(0, Math.trunc(parsed)))
+    }
+  }
+
+  return 0
+}
+
+function normalizeWeaponGroup(data: unknown): CharacterWeapon[] {
+  if (!Array.isArray(data)) {
+    return []
+  }
+
+  return data
+    .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+    .map((item) => ({
+      name: typeof item.name === 'string' ? item.name.trim() : '',
+      description: typeof item.description === 'string' ? item.description.trim() : '',
+      damageDiceCount:
+        typeof item.damageDiceCount === 'number' && Number.isFinite(item.damageDiceCount)
+          ? Math.min(5, Math.max(1, Math.trunc(item.damageDiceCount)))
+          : 1,
+      damageDiceType: normalizeWeaponDamageDiceType(item.damageDiceType),
+      damageBonusNumber: normalizeWeaponDamageNumber(item.damageBonusNumber ?? item.damageBonus),
+      damageType: normalizeWeaponDamageType(item.damageType),
+    }))
+    .filter((item) => item.name.length > 0 || item.description.length > 0)
+}
+
+function normalizeItems(data: unknown): {
+  armors: CharacterArmor[]
+  weapons: CharacterWeapon[]
+  others: CharacterOtherItem[]
+} {
+  if (Array.isArray(data)) {
+    return {
+      armors: [],
+      weapons: [],
+      others: normalizeItemGroup(data),
+    }
+  }
+
+  if (!data || typeof data !== 'object') {
+    return {
+      armors: [],
+      weapons: [],
+      others: [],
+    }
+  }
+
+  const source = data as Partial<Record<'armors' | 'weapons' | 'others', unknown>>
+
+  return {
+    armors: normalizeItemGroup(source.armors),
+    weapons: normalizeWeaponGroup(source.weapons),
+    others: normalizeItemGroup(source.others),
+  }
 }
 
 function getAttributeModifier(value: number): number {
@@ -305,6 +444,8 @@ function normalizeCharacter(
     typeof data.training === 'object' && data.training !== null
       ? normalizeTraining(data.training as Partial<Record<keyof CharacterTraining, unknown>>)
       : normalizeTraining()
+  const abilities = normalizeAbilities((data as Record<string, unknown>).abilities)
+  const items = normalizeItems((data as Record<string, unknown>).items)
   const attributeBonuses = buildAttributeBonuses(attributes)
   const race =
     typeof data.race === 'string'
@@ -354,6 +495,8 @@ function normalizeCharacter(
     speed,
     attributes,
     attributesPlus: normalizeAttributeBonuses(attributesPlusData, buildZeroAttributeBonuses()),
+    abilities,
+    items,
     bonuses,
     defenses:
       typeof data.defenses === 'object' && data.defenses !== null

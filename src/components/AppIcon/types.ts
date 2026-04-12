@@ -1,4 +1,4 @@
-export type AppIconName = 'edit' | 'plus' | 'save' | 'trash'
+export type AppIconName = 'edit' | 'plus' | 'save' | 'trash' | 'delete'
 
 export interface AppIconProps {
   className?: string

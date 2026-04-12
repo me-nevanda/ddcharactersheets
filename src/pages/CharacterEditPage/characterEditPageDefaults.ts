@@ -1,8 +1,14 @@
 import { CharacterClass, CharacterRace } from '../../types/character'
 import type {
+  CharacterAbility,
+  CharacterAbilityAction,
+  CharacterAbilityKind,
+  CharacterAbilityType,
   CharacterAttributeBonuses,
   CharacterBonuses,
   CharacterDefenses,
+  CharacterWeapon,
+  CharacterItems,
   CharacterSkillBonuses,
   CharacterTraining,
 } from '../../types/character'
@@ -63,6 +69,26 @@ export const zeroBonuses: CharacterBonuses = {
   },
 }
 
+export const emptyAbilities: CharacterAbility[] = []
+export const emptyItems: CharacterItems = {
+  armors: [],
+  weapons: [],
+  others: [],
+}
+
+export const emptyWeapon: CharacterWeapon = {
+  name: '',
+  description: '',
+  damageDiceCount: 1,
+  damageDiceType: 'd4',
+  damageBonusNumber: 0,
+  damageType: 'normal',
+}
+
+export const defaultAbilityAction: CharacterAbilityAction = 'action'
+export const defaultAbilityType: CharacterAbilityType = 'unlimited'
+export const defaultAbilityKind: CharacterAbilityKind = 'offensive'
+
 export const emptyTraining: CharacterTraining = {
   acrobatics: false,
   arcana: false,
@@ -100,6 +126,8 @@ export const emptyForm: CharacterEditFormData = {
     charisma: 10,
   },
   attributesPlus: zeroAttributeBonuses,
+  abilities: emptyAbilities,
+  items: emptyItems,
   defenses: zeroDefenses,
   bonuses: zeroBonuses,
   training: emptyTraining,

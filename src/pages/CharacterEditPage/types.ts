@@ -1,10 +1,14 @@
 import type { ChangeEvent, FormEvent } from 'react'
 import type {
+  CharacterAbility,
   Character,
   CharacterBonuses,
-  CharacterAttributeBonuses,
   CharacterAttributes,
   CharacterDefenses,
+  CharacterItemBase,
+  CharacterItems,
+  CharacterWeaponDamageDiceType,
+  CharacterWeaponDamageType,
   CharacterTraining,
 } from '../../types/character'
 
@@ -19,6 +23,12 @@ export type CharacterAttributeFieldName = keyof CharacterAttributes
 export type CharacterSkillFieldName = keyof CharacterTraining
 
 export type CharacterGeneralChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement>
+
+export type CharacterAbilityFieldName = keyof CharacterAbility
+
+export type CharacterItemFieldName = keyof CharacterItemBase
+
+export type CharacterItemGroupKey = keyof CharacterItems
 
 export type CharacterEditTabKey = 'general' | 'abilities' | 'feats' | 'items'
 
@@ -38,6 +48,23 @@ export interface CharacterEditPageState {
   handleGeneralChange: (event: CharacterGeneralChangeEvent) => void
   handleAttributeChange: (event: ChangeEvent<HTMLInputElement>) => void
   handleTrainingChange: (event: ChangeEvent<HTMLInputElement>) => void
+  handleAbilityCreateEmpty: () => void
+  handleAbilityAdd: (ability: CharacterAbility) => void
+  handleAbilityChange: (index: number, fieldName: CharacterAbilityFieldName, value: string) => void
+  handleAbilityRemove: (index: number) => void
+  handleItemCreateEmpty: (group: CharacterItemGroupKey) => void
+  handleItemChange: (
+    group: CharacterItemGroupKey,
+    index: number,
+    fieldName: CharacterItemFieldName,
+    value: string,
+  ) => void
+  handleWeaponDamageChange: (
+    index: number,
+    fieldName: 'damageDiceCount' | 'damageDiceType' | 'damageBonusNumber' | 'damageType',
+    value: number | CharacterWeaponDamageDiceType | CharacterWeaponDamageType,
+  ) => void
+  handleItemRemove: (group: CharacterItemGroupKey, index: number) => void
   handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
   attributeRows: AttributeRow[]
   skillModifiers: SkillModifierMap

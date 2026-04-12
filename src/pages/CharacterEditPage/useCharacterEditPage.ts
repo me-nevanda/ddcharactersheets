@@ -4,8 +4,14 @@ import { getCharacter, saveCharacter } from '@lib/api'
 import { useI18n } from '@i18n/index'
 import { getErrorMessage } from '@lib/errors'
 import {
+  emptyAbilities,
+  emptyItems,
+  emptyWeapon,
   emptyForm,
   emptyTraining,
+  defaultAbilityAction,
+  defaultAbilityKind,
+  defaultAbilityType,
   zeroAttributeBonuses,
   zeroDefenses,
   zeroDefenseBonuses,
@@ -30,10 +36,23 @@ import {
   normalizeClassValue,
   normalizeRaceValue,
 } from './sections/GeneralSection/generalSectionLogic'
-import { CharacterClass, type CharacterBonuses } from '../../types/character'
+import {
+  CharacterClass,
+  type CharacterAbility,
+  type CharacterBonuses,
+  type CharacterArmor,
+  type CharacterWeapon,
+  type CharacterOtherItem,
+  type CharacterItems,
+  type CharacterWeaponDamageDiceType,
+  type CharacterWeaponDamageType,
+} from '../../types/character'
 import type {
   AttributeRow,
   CharacterAttributeFieldName,
+  CharacterAbilityFieldName,
+  CharacterItemGroupKey,
+  CharacterItemFieldName,
   CharacterEditFormData,
   CharacterEditPageState,
   CharacterGeneralChangeEvent,
@@ -41,7 +60,6 @@ import type {
   CharacterSkillFieldName,
   SkillModifierMap,
 } from './types'
-
 export function useCharacterEditPage(): CharacterEditPageState {
   const { t } = useI18n()
   const navigate = useNavigate()
@@ -50,6 +68,104 @@ export function useCharacterEditPage(): CharacterEditPageState {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  function normalizeItems(items: unknown): CharacterItems {
+    function normalizeItemGroup<T extends CharacterArmor | CharacterOtherItem>(group: unknown): T[] {
+      if (!Array.isArray(group)) {
+        return []
+      }
+
+      return group
+        .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
+        .map((entry) => ({
+          name: typeof entry.name === 'string' ? entry.name : '',
+          description: typeof entry.description === 'string' ? entry.description : '',
+        })) as T[]
+    }
+
+    function normalizeWeaponGroup(group: unknown): CharacterWeapon[] {
+      if (!Array.isArray(group)) {
+        return []
+      }
+
+      return group
+        .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
+        .map((entry) => ({
+          name: typeof entry.name === 'string' ? entry.name : '',
+          description: typeof entry.description === 'string' ? entry.description : '',
+          damageDiceCount:
+            typeof entry.damageDiceCount === 'number' && Number.isFinite(entry.damageDiceCount)
+              ? Math.min(5, Math.max(1, Math.trunc(entry.damageDiceCount)))
+              : 1,
+          damageDiceType: normalizeWeaponDamageDiceType(entry.damageDiceType),
+          damageBonusNumber: normalizeWeaponDamageNumber(entry.damageBonusNumber ?? entry.damageBonus),
+          damageType: normalizeWeaponDamageType(entry.damageType),
+        }))
+    }
+
+    function normalizeWeaponDamageDiceType(value: unknown): CharacterWeaponDamageDiceType {
+      if (
+        value === 'd4' ||
+        value === 'd6' ||
+        value === 'd8' ||
+        value === 'd10' ||
+        value === 'd12' ||
+        value === 'd20'
+      ) {
+        return value
+      }
+
+      return 'd4'
+    }
+
+    function normalizeWeaponDamageNumber(value: unknown): number {
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        return Math.min(10, Math.max(0, Math.trunc(value)))
+      }
+
+      if (typeof value === 'string') {
+        const parsed = Number.parseInt(value, 10)
+        if (Number.isFinite(parsed)) {
+          return Math.min(10, Math.max(0, Math.trunc(parsed)))
+        }
+      }
+
+      return 0
+    }
+
+    function normalizeWeaponDamageType(value: unknown): CharacterWeaponDamageType {
+      if (
+        value === 'normal' ||
+        value === 'poison' ||
+        value === 'radiant' ||
+        value === 'necrotic' ||
+        value === 'psychic'
+      ) {
+        return value
+      }
+
+      return 'normal'
+    }
+
+    if (Array.isArray(items)) {
+      return {
+        ...emptyItems,
+        others: normalizeItemGroup(items),
+      }
+    }
+
+    if (!items || typeof items !== 'object') {
+      return emptyItems
+    }
+
+    const source = items as Partial<Record<CharacterItemGroupKey, unknown>>
+
+    return {
+      armors: normalizeItemGroup(source.armors),
+      weapons: normalizeWeaponGroup(source.weapons),
+      others: normalizeItemGroup(source.others),
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -69,6 +185,14 @@ export function useCharacterEditPage(): CharacterEditPageState {
             surge: character.surge ?? 0,
             attributes: buildNormalizedAttributes(character.attributes),
             attributesPlus: buildRaceAttributeBonuses(character.race),
+            abilities: (character.abilities ?? emptyAbilities).map((ability) => ({
+              ...ability,
+              id: ability.id || globalThis.crypto.randomUUID(),
+              action: ability.action ?? defaultAbilityAction,
+              type: ability.type ?? defaultAbilityType,
+              kind: ability.kind ?? defaultAbilityKind,
+            })),
+            items: normalizeItems(character.items),
             defenses: character.defenses ?? zeroDefenses,
             training: {
               ...character.training,
@@ -226,6 +350,130 @@ export function useCharacterEditPage(): CharacterEditPageState {
     }))
   }
 
+  function handleAbilityAdd(ability: CharacterAbility) {
+    const nextAbility: CharacterAbility = {
+      id: globalThis.crypto.randomUUID(),
+      name: ability.name.trim(),
+      description: ability.description.trim(),
+      action: ability.action,
+      type: ability.type,
+      kind: ability.kind,
+    }
+
+    if (!nextAbility.name && !nextAbility.description) {
+      return
+    }
+
+    setForm((currentForm) => ({
+      ...currentForm,
+      abilities: [...currentForm.abilities, nextAbility],
+    }))
+  }
+
+  function handleAbilityCreateEmpty() {
+    setForm((currentForm) => ({
+      ...currentForm,
+      abilities: [
+        ...currentForm.abilities,
+        {
+          id: globalThis.crypto.randomUUID(),
+          name: '',
+          description: '',
+          action: defaultAbilityAction,
+          type: defaultAbilityType,
+          kind: defaultAbilityKind,
+        },
+      ],
+    }))
+  }
+
+  function handleAbilityChange(index: number, fieldName: CharacterAbilityFieldName, value: string) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      abilities: currentForm.abilities.map((ability, abilityIndex) =>
+        abilityIndex === index
+          ? {
+              ...ability,
+              [fieldName]: value,
+            }
+          : ability,
+      ),
+    }))
+  }
+
+  function handleAbilityRemove(index: number) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      abilities: currentForm.abilities.filter((_, abilityIndex) => abilityIndex !== index),
+    }))
+  }
+
+  function handleItemCreateEmpty(group: CharacterItemGroupKey) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      items: {
+        ...currentForm.items,
+        [group]:
+          group === 'weapons'
+            ? [...currentForm.items[group], { ...emptyWeapon }]
+            : [...currentForm.items[group], { name: '', description: '' }],
+      },
+    }))
+  }
+
+  function handleItemChange(
+    group: CharacterItemGroupKey,
+    index: number,
+    fieldName: CharacterItemFieldName,
+    value: string,
+  ) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      items: {
+        ...currentForm.items,
+        [group]: currentForm.items[group].map((item, itemIndex) =>
+          itemIndex === index
+            ? {
+                ...item,
+                [fieldName]: value,
+              }
+            : item,
+        ),
+      },
+    }))
+  }
+
+  function handleWeaponDamageChange(
+    index: number,
+    fieldName: 'damageDiceCount' | 'damageDiceType' | 'damageBonusNumber' | 'damageType',
+    value: number | CharacterWeaponDamageDiceType | CharacterWeaponDamageType,
+  ) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      items: {
+        ...currentForm.items,
+        weapons: currentForm.items.weapons.map((weapon, weaponIndex) =>
+          weaponIndex === index
+            ? {
+                ...weapon,
+                [fieldName]: value,
+              }
+            : weapon,
+        ),
+      },
+    }))
+  }
+
+  function handleItemRemove(group: CharacterItemGroupKey, index: number) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      items: {
+        ...currentForm.items,
+        [group]: currentForm.items[group].filter((_, itemIndex) => itemIndex !== index),
+      },
+    }))
+  }
+
   const normalizedAttributes = buildNormalizedAttributes(form.attributes)
   const effectiveAttributes = buildEffectiveAttributes(normalizedAttributes, form.attributesPlus)
   const attributeModifierMap = buildAttributeModifierMap(effectiveAttributes)
@@ -259,6 +507,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
         surge: surgeValue,
         attributes: normalizedAttributes,
         attributesPlus: form.attributesPlus,
+        abilities: form.abilities,
+        items: form.items,
         defenses: normalizeDefenses(
           {
             kp: defenseValues.kp,
@@ -290,6 +540,14 @@ export function useCharacterEditPage(): CharacterEditPageState {
     handleGeneralChange,
     handleAttributeChange,
     handleTrainingChange,
+    handleAbilityCreateEmpty,
+    handleAbilityAdd,
+    handleAbilityChange,
+    handleAbilityRemove,
+    handleItemCreateEmpty,
+    handleItemChange,
+    handleWeaponDamageChange,
+    handleItemRemove,
     handleSubmit,
     attributeRows,
     levelBonusLabel,

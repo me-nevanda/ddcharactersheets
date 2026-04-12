@@ -47,6 +47,46 @@ export interface CharacterBonuses {
   defenses: CharacterDefenseBonuses
 }
 
+export interface CharacterAbility {
+  id: string
+  name: string
+  description: string
+  action: CharacterAbilityAction
+  type: CharacterAbilityType
+  kind: CharacterAbilityKind
+}
+
+export interface CharacterItemBase {
+  name: string
+  description: string
+}
+
+export interface CharacterArmor extends CharacterItemBase {}
+
+export interface CharacterWeapon extends CharacterItemBase {
+  damageDiceCount: number
+  damageDiceType: CharacterWeaponDamageDiceType
+  damageBonusNumber: number
+  damageType: CharacterWeaponDamageType
+}
+
+export interface CharacterOtherItem extends CharacterItemBase {}
+
+export interface CharacterItems {
+  armors: CharacterArmor[]
+  weapons: CharacterWeapon[]
+  others: CharacterOtherItem[]
+}
+
+export type CharacterItem = CharacterArmor | CharacterWeapon | CharacterOtherItem
+
+export type CharacterWeaponDamageDiceType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20'
+export type CharacterWeaponDamageType = 'normal' | 'poison' | 'radiant' | 'necrotic' | 'psychic'
+
+export type CharacterAbilityAction = 'action' | 'noAction'
+export type CharacterAbilityType = 'unlimited' | 'encounter' | 'daily'
+export type CharacterAbilityKind = 'offensive' | 'utility'
+
 export interface CharacterDefenseBonuses {
   kp: number
   fortitude: number
@@ -110,6 +150,8 @@ export interface CharacterData {
   surge: number
   attributes: CharacterAttributes
   attributesPlus: CharacterAttributeBonuses
+  abilities: CharacterAbility[]
+  items: CharacterItems
   bonuses?: CharacterBonuses
   defenses: CharacterDefenses
   training: CharacterTraining

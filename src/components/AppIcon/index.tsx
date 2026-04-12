@@ -57,6 +57,7 @@ function getIconPath(name: AppIconProps['name']) {
         </>
       )
     case 'trash':
+    case 'delete':
       return (
         <>
           <path

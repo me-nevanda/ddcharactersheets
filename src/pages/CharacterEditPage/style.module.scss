@@ -187,6 +187,11 @@
   align-items: start;
 }
 
+.itemsGroupsLayout {
+  display: grid;
+  gap: 0.85rem;
+}
+
 .section {
   @include surface-card;
   display: grid;
@@ -219,6 +224,275 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
+}
+
+.abilityToolbar {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.abilityForm {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.95rem;
+  border-radius: 1rem;
+  background: rgba(255, 248, 235, 0.03);
+  border: 1px solid rgba(255, 248, 235, 0.06);
+}
+
+.abilityFormTitle {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 0.94rem;
+}
+
+.abilityFormGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.abilityField {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.abilityActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.abilityGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.abilityCard {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.95rem;
+  border-radius: 1rem;
+  background: rgba(255, 248, 235, 0.03);
+  border: 1px solid rgba(255, 248, 235, 0.06);
+}
+
+.abilityCardHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 0.8fr)) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.85rem;
+  border: 1px solid transparent;
+}
+
+.itemCardHeader {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.weaponDamageRow {
+  display: grid;
+  grid-template-columns: max-content auto max-content auto max-content auto max-content auto max-content;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.weaponDamageRow > :nth-child(1),
+.weaponDamageRow > :nth-child(3),
+.weaponDamageRow > :nth-child(5),
+.weaponDamageRow > :nth-child(7),
+.weaponDamageRow > :nth-child(9) {
+  width: max-content;
+  min-width: 0;
+}
+
+.weaponDamageSeparator {
+  color: var(--text-soft);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.abilityHeaderUnlimited {
+  background: linear-gradient(135deg, rgba(126, 217, 87, 0.18), rgba(126, 217, 87, 0.06));
+  border-color: rgba(126, 217, 87, 0.28);
+}
+
+.abilityHeaderEncounter {
+  background: linear-gradient(135deg, rgba(217, 95, 95, 0.18), rgba(217, 95, 95, 0.06));
+  border-color: rgba(217, 95, 95, 0.28);
+}
+
+.abilityHeaderDaily {
+  background: linear-gradient(135deg, rgba(16, 16, 16, 0.92), rgba(16, 16, 16, 0.76));
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f6f1ea;
+}
+
+.abilityHeaderDaily .abilityCardTitleInput {
+  color: #f6f1ea;
+}
+
+.abilityHeaderDaily .abilityCardTitleInput::placeholder {
+  color: rgba(246, 241, 234, 0.72);
+}
+
+.abilityHeaderDaily .abilityHeaderSelect {
+  color: #f6f1ea;
+}
+
+.abilityHeaderDaily .abilityRemoveButton {
+  color: #f6f1ea;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.abilityCardTitleInput {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-strong);
+  font: inherit;
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  line-height: 1;
+  outline: none;
+}
+
+.abilityCardTitleInput::placeholder {
+  color: var(--text-soft);
+  opacity: 1;
+}
+
+.abilityCardTitleInput:focus {
+  box-shadow: none;
+}
+
+.abilityHeaderSelect {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0.45rem 0.65rem;
+  border: 0;
+  border-radius: 0.65rem;
+  background: #0e0e0e;
+  color: #f6f1ea;
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1;
+  outline: none;
+  min-height: 2.2rem;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-size: auto;
+  text-overflow: ellipsis;
+}
+
+.abilityHeaderSelect:focus {
+  background: #0e0e0e;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.abilityHeaderSelect::-ms-expand {
+  display: none;
+}
+
+.abilityRemoveButton {
+  @include pill-button;
+  padding-inline: 0.75rem;
+  background: rgba(255, 248, 235, 0.04);
+  border-color: rgba(255, 248, 235, 0.08);
+  color: var(--text-strong);
+}
+
+.abilityTextarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.deleteBackdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(6, 4, 4, 0.72);
+  backdrop-filter: blur(6px);
+  z-index: 20;
+}
+
+.deleteDialog {
+  width: min(100%, 420px);
+  padding: 1.35rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent),
+    var(--bg-panel-strong);
+  box-shadow: var(--shadow);
+}
+
+.deleteDialogTitle {
+  margin: 0 0 0.35rem;
+  color: var(--text-strong);
+  font-size: 1.35rem;
+}
+
+.deleteDialogText {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.deleteDialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1.1rem;
+}
+
+.deleteDialogSecondaryButton,
+.deleteDialogDangerButton {
+  @include pill-button;
+}
+
+.deleteDialogSecondaryButton {
+  background: rgba(255, 248, 235, 0.04);
+  border-color: var(--border-soft);
+  color: var(--text-strong);
+}
+
+.deleteDialogDangerButton {
+  background: rgba(122, 32, 32, 0.18);
+  border-color: rgba(243, 165, 165, 0.3);
+  color: #ffe1e1;
+}
+
+.deleteDialogSecondaryButton:hover,
+.deleteDialogDangerButton:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.deleteDialogSecondaryButton:disabled,
+.deleteDialogDangerButton:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
+.abilitySelect {
+  min-width: 0;
 }
 
 .skillCard {
@@ -424,6 +698,11 @@
   }
 
   .numericGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .abilityFormGrid,
+  .abilityGrid {
     grid-template-columns: 1fr;
   }
 

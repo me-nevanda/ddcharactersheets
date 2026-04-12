@@ -62,6 +62,67 @@ export interface TranslationDictionary {
         defenses: string
         skills: string
       }
+      abilities: {
+        title: string
+        emptyState: string
+        addTitle: string
+        addButton: string
+        removeButton: string
+        removeConfirm: string
+        removeDialog: {
+          title: string
+          body: string
+        }
+        actionLabel: string
+        actionOptions: {
+          action: string
+          noAction: string
+        }
+        typeLabel: string
+        typeOptions: {
+          unlimited: string
+          encounter: string
+          daily: string
+        }
+        kindLabel: string
+        kindOptions: {
+          offensive: string
+          utility: string
+        }
+        nameLabel: string
+        descriptionLabel: string
+        namePlaceholder: string
+        descriptionPlaceholder: string
+      }
+      items: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeButton: string
+        groups: {
+          armors: string
+          weapons: string
+          others: string
+        }
+        weaponBonus: {
+          none: string
+        }
+        weaponType: {
+          normal: string
+          poison: string
+          radiant: string
+          necrotic: string
+          psychic: string
+        }
+        removeDialog: {
+          title: string
+          body: string
+        }
+        nameLabel: string
+        descriptionLabel: string
+        namePlaceholder: string
+        descriptionPlaceholder: string
+      }
       fields: {
         name: string
         level: string
