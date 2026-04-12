@@ -107,6 +107,7 @@ export interface CharacterData {
   race: CharacterRace
   class: CharacterClass
   attributes: CharacterAttributes
+  attributesPlus: CharacterAttributeBonuses
   bonuses?: CharacterBonuses
   defenses: CharacterDefenses
   training: CharacterTraining

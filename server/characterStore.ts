@@ -23,6 +23,10 @@ interface ApiError extends Error {
   statusCode?: number
 }
 
+interface LegacyCharacterBonuses extends CharacterBonuses {
+  attributesPlus?: unknown
+}
+
 const charactersDirectory = path.resolve(process.cwd(), 'data', 'characters')
 const safeCharacterIdPattern = /^[a-z0-9-]+$/i
 
@@ -105,6 +109,59 @@ function buildAttributeBonuses(attributes: CharacterAttributes): CharacterAttrib
   }
 }
 
+function buildZeroAttributeBonuses(): CharacterAttributeBonuses {
+  return {
+    strength: 0,
+    constitution: 0,
+    dexterity: 0,
+    intelligence: 0,
+    wisdom: 0,
+    charisma: 0,
+  }
+}
+
+function normalizeAttributeBonusValue(value: unknown): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return null
+  }
+
+  return Math.trunc(value)
+}
+
+function normalizeAttributeBonuses(
+  data: Partial<Record<keyof CharacterAttributeBonuses, unknown>> | undefined,
+  fallback: CharacterAttributeBonuses,
+): CharacterAttributeBonuses {
+  return {
+    strength: normalizeAttributeBonusValue(data?.strength) ?? fallback.strength,
+    constitution: normalizeAttributeBonusValue(data?.constitution) ?? fallback.constitution,
+    dexterity: normalizeAttributeBonusValue(data?.dexterity) ?? fallback.dexterity,
+    intelligence: normalizeAttributeBonusValue(data?.intelligence) ?? fallback.intelligence,
+    wisdom: normalizeAttributeBonusValue(data?.wisdom) ?? fallback.wisdom,
+    charisma: normalizeAttributeBonusValue(data?.charisma) ?? fallback.charisma,
+  }
+}
+
+function normalizeDefenseBonusValue(value: unknown): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return null
+  }
+
+  return Math.trunc(value)
+}
+
+function normalizeDefenseBonuses(
+  data: Partial<Record<keyof CharacterDefenseBonuses, unknown>> | undefined,
+  fallback: CharacterDefenseBonuses,
+): CharacterDefenseBonuses {
+  return {
+    kp: normalizeDefenseBonusValue(data?.kp) ?? fallback.kp,
+    fortitude: normalizeDefenseBonusValue(data?.fortitude) ?? fallback.fortitude,
+    reflex: normalizeDefenseBonusValue(data?.reflex) ?? fallback.reflex,
+    will: normalizeDefenseBonusValue(data?.will) ?? fallback.will,
+  }
+}
+
 function buildSkillBonuses(
   level: number,
   attributeBonuses: CharacterAttributeBonuses,
@@ -137,7 +194,43 @@ function buildSkillBonuses(
   }
 }
 
-function buildDefenseBonuses(level: number, attributeBonuses: CharacterAttributeBonuses): CharacterDefenseBonuses {
+function normalizeSkillBonusValue(value: unknown): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return null
+  }
+
+  return Math.trunc(value)
+}
+
+function normalizeSkillBonuses(
+  data: Partial<Record<keyof CharacterSkillBonuses, unknown>> | undefined,
+  fallback: CharacterSkillBonuses,
+): CharacterSkillBonuses {
+  return {
+    acrobatics: normalizeSkillBonusValue(data?.acrobatics) ?? fallback.acrobatics,
+    arcana: normalizeSkillBonusValue(data?.arcana) ?? fallback.arcana,
+    athletics: normalizeSkillBonusValue(data?.athletics) ?? fallback.athletics,
+    diplomacy: normalizeSkillBonusValue(data?.diplomacy) ?? fallback.diplomacy,
+    history: normalizeSkillBonusValue(data?.history) ?? fallback.history,
+    healing: normalizeSkillBonusValue(data?.healing) ?? fallback.healing,
+    deception: normalizeSkillBonusValue(data?.deception) ?? fallback.deception,
+    perception: normalizeSkillBonusValue(data?.perception) ?? fallback.perception,
+    endurance: normalizeSkillBonusValue(data?.endurance) ?? fallback.endurance,
+    dungeoneering: normalizeSkillBonusValue(data?.dungeoneering) ?? fallback.dungeoneering,
+    nature: normalizeSkillBonusValue(data?.nature) ?? fallback.nature,
+    religion: normalizeSkillBonusValue(data?.religion) ?? fallback.religion,
+    insight: normalizeSkillBonusValue(data?.insight) ?? fallback.insight,
+    stealth: normalizeSkillBonusValue(data?.stealth) ?? fallback.stealth,
+    streetwise: normalizeSkillBonusValue(data?.streetwise) ?? fallback.streetwise,
+    intimidation: normalizeSkillBonusValue(data?.intimidation) ?? fallback.intimidation,
+    thievery: normalizeSkillBonusValue(data?.thievery) ?? fallback.thievery,
+  }
+}
+
+function buildDefenseBonuses(
+  level: number,
+  attributeBonuses: CharacterAttributeBonuses,
+): CharacterDefenseBonuses {
   const levelBonus = getLevelBonus(level)
 
   return {
@@ -215,12 +308,32 @@ function normalizeCharacter(
       : CharacterClassValue.Warlock
 
   const speed = normalizeSpeedValue(data.speed)
+  const computedSkillBonuses = buildSkillBonuses(level, attributeBonuses, training)
+  const computedAttributeBonuses = buildAttributeBonuses(attributes)
+  const computedDefenseBonuses = buildDefenseBonuses(level, attributeBonuses)
+  const bonusData =
+    typeof data.bonuses === 'object' && data.bonuses !== null
+      ? (data.bonuses as LegacyCharacterBonuses)
+      : undefined
+  const attributesPlusData =
+    typeof data.attributesPlus === 'object' && data.attributesPlus !== null
+      ? (data.attributesPlus as Partial<Record<keyof CharacterAttributeBonuses, unknown>>)
+      : (bonusData?.attributesPlus as Partial<Record<keyof CharacterAttributeBonuses, unknown>> | undefined)
 
   const bonuses: CharacterBonuses = {
     level: getLevelBonus(level),
-    attributes: attributeBonuses,
-    skills: buildSkillBonuses(level, attributeBonuses, training),
-    defenses: buildDefenseBonuses(level, attributeBonuses),
+    attributes: normalizeAttributeBonuses(
+      bonusData?.attributes as Partial<Record<keyof CharacterAttributeBonuses, unknown>> | undefined,
+      computedAttributeBonuses,
+    ),
+    skills: normalizeSkillBonuses(
+      bonusData?.skills as Partial<Record<keyof CharacterSkillBonuses, unknown>> | undefined,
+      computedSkillBonuses,
+    ),
+    defenses: normalizeDefenseBonuses(
+      bonusData?.defenses as Partial<Record<keyof CharacterDefenseBonuses, unknown>> | undefined,
+      computedDefenseBonuses,
+    ),
   }
 
   return {
@@ -230,6 +343,7 @@ function normalizeCharacter(
     class: clazz,
     speed,
     attributes,
+    attributesPlus: normalizeAttributeBonuses(attributesPlusData, buildZeroAttributeBonuses()),
     bonuses,
     defenses:
       typeof data.defenses === 'object' && data.defenses !== null

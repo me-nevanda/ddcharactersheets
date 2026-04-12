@@ -47,6 +47,50 @@ const emptyForm: CharacterEditFormData = {
     reflex: 0,
     will: 0,
   },
+  attributesPlus: {
+    strength: 0,
+    constitution: 0,
+    dexterity: 0,
+    intelligence: 0,
+    wisdom: 0,
+    charisma: 0,
+  },
+  bonuses: {
+    level: 0,
+    attributes: {
+      strength: 0,
+      constitution: 0,
+      dexterity: 0,
+      intelligence: 0,
+      wisdom: 0,
+      charisma: 0,
+    },
+    skills: {
+      acrobatics: 0,
+      arcana: 0,
+      athletics: 0,
+      diplomacy: 0,
+      history: 0,
+      healing: 0,
+      deception: 0,
+      perception: 0,
+      endurance: 0,
+      dungeoneering: 0,
+      nature: 0,
+      religion: 0,
+      insight: 0,
+      stealth: 0,
+      streetwise: 0,
+      intimidation: 0,
+      thievery: 0,
+    },
+    defenses: {
+      kp: 0,
+      fortitude: 0,
+      reflex: 0,
+      will: 0,
+    },
+  },
   training: {
     acrobatics: false,
     arcana: false,
@@ -111,29 +155,34 @@ function buildDefenseValues(
   levelBonus: number,
   race: CharacterRace,
 ): DefenseValues {
-  const humanDefenseBonus = race === CharacterRace.Human ? 1 : 0
+  const racialDefenseBonuses: Partial<Record<keyof DefenseValues, number>> = {
+    kp: 0,
+    fortitude: race === CharacterRace.Human ? 1 : 0,
+    reflex: race === CharacterRace.Human ? 1 : 0,
+    will: race === CharacterRace.Human ? 1 : 0,
+  }
 
   return {
     kp: clampDefenseValue(
-      10 + Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence) + levelBonus,
+      10 + Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence) + levelBonus + (racialDefenseBonuses.kp ?? 0),
     ),
     fortitude: clampDefenseValue(
       10 +
         Math.max(attributeModifiers.strength, attributeModifiers.constitution) +
         levelBonus +
-        humanDefenseBonus,
+        (racialDefenseBonuses.fortitude ?? 0),
     ),
     reflex: clampDefenseValue(
       10 +
         Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence) +
         levelBonus +
-        humanDefenseBonus,
+        (racialDefenseBonuses.reflex ?? 0),
     ),
     will: clampDefenseValue(
       10 +
         Math.max(attributeModifiers.wisdom, attributeModifiers.charisma) +
         levelBonus +
-        humanDefenseBonus,
+        (racialDefenseBonuses.will ?? 0),
     ),
   }
 }
@@ -193,6 +242,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
               wisdom: character.attributes.wisdom,
               charisma: character.attributes.charisma,
             },
+            attributesPlus: character.attributesPlus ?? zeroAttributeBonuses,
             defenses: {
               kp: character.defenses.kp,
               fortitude: character.defenses.fortitude,
@@ -350,6 +400,15 @@ export function useCharacterEditPage(): CharacterEditPageState {
     return acc
   }, {} as CharacterSkillBonuses)
 
+  const zeroAttributeBonuses = {
+    strength: 0,
+    constitution: 0,
+    dexterity: 0,
+    intelligence: 0,
+    wisdom: 0,
+    charisma: 0,
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setSaving(true)
@@ -370,6 +429,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
         class: form.class,
         speed: clampSpeedValue(form.speed),
         attributes: normalizedAttributes,
+        attributesPlus: zeroAttributeBonuses,
         defenses: defenseValues,
         training: form.training,
         bonuses,
