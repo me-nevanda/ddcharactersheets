@@ -1,20 +1,22 @@
 import type { ChangeEvent, FormEvent } from 'react'
 import type {
+  Character,
+  CharacterBonuses,
+  CharacterAttributeBonuses,
   CharacterAttributes,
-  CharacterData,
   CharacterDefenses,
   CharacterTraining,
 } from '../../types/character'
 
-export interface CharacterEditFormData extends CharacterData {}
+export interface CharacterEditFormData extends Omit<Character, 'id' | 'updatedAt'> {
+  bonuses: CharacterBonuses
+}
 
 export type CharacterGeneralFieldName = 'name' | 'level' | 'speed' | 'race' | 'class'
 
 export type CharacterAttributeFieldName = keyof CharacterAttributes
 
-export type CharacterDefenseFieldName = keyof CharacterDefenses
-
-export type CharacterTrainingFieldName = keyof CharacterTraining
+export type CharacterSkillFieldName = keyof CharacterTraining
 
 export type CharacterGeneralChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement>
 
@@ -24,7 +26,7 @@ export interface AttributeRow {
   modifierLabel: string
 }
 
-export type SkillModifierMap = Record<CharacterTrainingFieldName, string>
+export type SkillModifierMap = Record<CharacterSkillFieldName, string>
 
 export interface CharacterEditPageState {
   error: string
@@ -49,10 +51,11 @@ export interface GeneralSectionProps {
 
 export interface AttributesSectionProps {
   attributeRows: AttributeRow[]
+  attributesPlus: CharacterAttributeBonuses
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
-export interface TrainingSectionProps {
+export interface SkillSectionProps {
   training: CharacterTraining
   skillModifiers: SkillModifierMap
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
@@ -67,15 +70,4 @@ export interface DefenseValues {
   fortitude: number
   reflex: number
   will: number
-}
-
-export interface AttributeDefinition {
-  key: CharacterAttributeFieldName
-  translationKey: string
-}
-
-export interface SkillDefinition {
-  key: CharacterTrainingFieldName
-  attributeKey: CharacterAttributeFieldName
-  translationKey: string
 }

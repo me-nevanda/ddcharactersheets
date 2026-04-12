@@ -3,7 +3,11 @@ import styles from '../../style.module.scss'
 import type { AttributesSectionProps } from '../../types'
 import { attributeDefinitions } from '@dictionaries/characterEditDefinitions'
 
-export function AttributesSection({ attributeRows, onChange }: AttributesSectionProps) {
+function formatSignedValue(value: number): string {
+  return value > 0 ? `+${value}` : String(value)
+}
+
+export function AttributesSection({ attributeRows, attributesPlus, onChange }: AttributesSectionProps) {
   const { t } = useI18n()
 
   return (
@@ -29,6 +33,7 @@ export function AttributesSection({ attributeRows, onChange }: AttributesSection
                   value={row.value}
                   onChange={onChange}
                 />
+                <span className={styles.attributePlus}>{formatSignedValue(attributesPlus[definition.key])}</span>
                 <span className={styles.attributeLabel}>{t(definition.translationKey)}</span>
               </label>
               <span className={styles.modifierBadge}>{row.modifierLabel}</span>

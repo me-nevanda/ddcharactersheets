@@ -1,4 +1,5 @@
-﻿import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+/*
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getCharacter, saveCharacter } from '../../lib/api'
 import { useI18n } from '../../i18n'
@@ -18,6 +19,8 @@ import type {
   CharacterAttributes,
   CharacterAttributeBonuses,
   CharacterBonuses,
+  CharacterDefenseBonuses,
+  CharacterDefenses,
   CharacterSkillBonuses,
   CharacterTraining,
 } from '../../types/character'
@@ -110,6 +113,29 @@ const emptyForm: CharacterEditFormData = {
     intimidation: false,
     thievery: false,
   },
+}
+
+const zeroAttributeBonuses: CharacterAttributeBonuses = {
+  strength: 0,
+  constitution: 0,
+  dexterity: 0,
+  intelligence: 0,
+  wisdom: 0,
+  charisma: 0,
+}
+
+const zeroDefenseBonuses: CharacterDefenseBonuses = {
+  kp: 0,
+  fortitude: 0,
+  reflex: 0,
+  will: 0,
+}
+
+const zeroDefenses: CharacterDefenses = {
+  kp: 0,
+  fortitude: 0,
+  reflex: 0,
+  will: 0,
 }
 
 function clampAttributeValue(value: number): number {
@@ -228,45 +254,23 @@ export function useCharacterEditPage(): CharacterEditPageState {
         const character = await getCharacter(characterId)
 
         if (!cancelled) {
-        setForm({
-          name: character.name,
-          level: clampLevelValue(character.level),
-          speed: clampSpeedValue(character.speed),
-          race: character.race,
-          class: character.class,
-            attributes: {
-              strength: character.attributes.strength,
-              constitution: character.attributes.constitution,
-              dexterity: character.attributes.dexterity,
-              intelligence: character.attributes.intelligence,
-              wisdom: character.attributes.wisdom,
-              charisma: character.attributes.charisma,
-            },
+          const { id, updatedAt, bonuses: characterBonuses, ...characterData } = character
+
+          setForm({
+            ...characterData,
+            level: clampLevelValue(character.level),
+            speed: clampSpeedValue(character.speed),
             attributesPlus: character.attributesPlus ?? zeroAttributeBonuses,
-            defenses: {
-              kp: character.defenses.kp,
-              fortitude: character.defenses.fortitude,
-              reflex: character.defenses.reflex,
-              will: character.defenses.will,
-            },
+            defenses: character.defenses ?? zeroDefenses,
             training: {
-              acrobatics: character.training.acrobatics,
-              arcana: character.training.arcana,
-              athletics: character.training.athletics,
-              diplomacy: character.training.diplomacy,
-              history: character.training.history,
-              healing: character.training.healing,
-              deception: character.training.deception,
-              perception: character.training.perception,
+              ...character.training,
               endurance: character.training.endurance ?? false,
-              dungeoneering: character.training.dungeoneering,
-              nature: character.training.nature,
-              religion: character.training.religion,
-              insight: character.training.insight,
-              stealth: character.training.stealth,
-              streetwise: character.training.streetwise,
-              intimidation: character.training.intimidation,
-              thievery: character.training.thievery,
+            },
+            bonuses: {
+              level: characterBonuses?.level ?? 0,
+              attributes: characterBonuses?.attributes ?? zeroAttributeBonuses,
+              skills: characterBonuses?.skills ?? emptyForm.bonuses.skills,
+              defenses: characterBonuses?.defenses ?? zeroDefenseBonuses,
             },
           })
           setError('')
@@ -400,15 +404,6 @@ export function useCharacterEditPage(): CharacterEditPageState {
     return acc
   }, {} as CharacterSkillBonuses)
 
-  const zeroAttributeBonuses = {
-    strength: 0,
-    constitution: 0,
-    dexterity: 0,
-    intelligence: 0,
-    wisdom: 0,
-    charisma: 0,
-  }
-
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setSaving(true)
@@ -423,16 +418,24 @@ export function useCharacterEditPage(): CharacterEditPageState {
       }
 
       await saveCharacter(characterId, {
+        ...form,
         name: form.name.trim(),
         level: clampLevelValue(form.level),
-        race: form.race,
-        class: form.class,
         speed: clampSpeedValue(form.speed),
         attributes: normalizedAttributes,
         attributesPlus: zeroAttributeBonuses,
-        defenses: defenseValues,
+        defenses: {
+          ...form.defenses,
+          ...defenseValues,
+        },
         training: form.training,
-        bonuses,
+        bonuses: {
+          ...form.bonuses,
+          ...bonuses,
+          attributes: attributeModifierMap,
+          defenses: defenseValues,
+          skills: skillBonuses,
+        },
       })
       navigate('/')
     } catch (nextError) {
@@ -470,3 +473,5 @@ export function useCharacterEditPage(): CharacterEditPageState {
     defenseValues,
   }
 }
+
+*/

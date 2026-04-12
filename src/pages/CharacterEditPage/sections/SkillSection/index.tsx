@@ -1,9 +1,9 @@
 import { useI18n } from '../../../../i18n'
 import styles from '../../style.module.scss'
-import type { TrainingSectionProps } from '../../types'
-import { trainingDefinitions } from '@dictionaries/characterEditDefinitions'
+import type { SkillSectionProps } from '../../types'
+import { skillDefinitions } from '@dictionaries/characterEditDefinitions'
 
-export function TrainingSection({ training, skillModifiers, onChange }: TrainingSectionProps) {
+export function SkillSection({ training, skillModifiers, onChange }: SkillSectionProps) {
   const { t } = useI18n()
 
   return (
@@ -13,7 +13,7 @@ export function TrainingSection({ training, skillModifiers, onChange }: Training
       </div>
 
       <div className={styles.skillGrid}>
-        {trainingDefinitions.map((skill) => (
+        {skillDefinitions.map((skill) => (
           <div className={styles.skillCard} key={skill.key}>
             <label className={styles.checkboxField} htmlFor={skill.key}>
               <input

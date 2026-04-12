@@ -10,7 +10,7 @@ export const attributeDefinitions: AttributeDefinition[] = [
   { key: 'charisma', translationKey: 'pages.characterEdit.fields.charisma' },
 ]
 
-export const trainingDefinitions: SkillDefinition[] = [
+export const skillDefinitions: SkillDefinition[] = [
   {
     key: 'acrobatics',
     attributeKey: 'dexterity',
@@ -97,6 +97,8 @@ export const trainingDefinitions: SkillDefinition[] = [
     translationKey: 'pages.characterEdit.fields.thievery',
   },
 ]
+
+export const trainingDefinitions = skillDefinitions
 
 export const raceOptions: CharacterRace[] = [
   CharacterRace.Human,

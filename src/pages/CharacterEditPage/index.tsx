@@ -4,10 +4,10 @@ import { useI18n } from '../../i18n'
 import { AttributesSection } from './sections/AttributesSection'
 import { DefensesSection } from './sections/DefensesSection'
 import { GeneralSection } from './sections/GeneralSection'
-import { TrainingSection } from './sections/TrainingSection'
+import { SkillSection } from './sections/SkillSection'
 import styles from './style.module.scss'
 import type { CharacterEditPageState } from './types'
-import { useCharacterEditPage } from './characterEditPageHooks'
+import { useCharacterEditPage } from './useCharacterEditPage'
 
 function CharacterEditPageContent({
   error,
@@ -60,10 +60,11 @@ function CharacterEditPageContent({
               <GeneralSection form={form} onChange={handleGeneralChange} levelBonusLabel={levelBonusLabel} />
               <AttributesSection
                 attributeRows={attributeRows}
+                attributesPlus={form.attributesPlus}
                 onChange={handleAttributeChange}
               />
               <DefensesSection defenseValues={defenseValues} />
-              <TrainingSection
+              <SkillSection
                 training={form.training}
                 skillModifiers={skillModifiers}
                 onChange={handleTrainingChange}
