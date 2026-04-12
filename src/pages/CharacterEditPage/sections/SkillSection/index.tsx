@@ -1,10 +1,11 @@
 import { useI18n } from '../../../../i18n'
 import styles from '../../style.module.scss'
-import type { SkillSectionProps } from '../../types'
+import { useCharacterEditPageContext } from '../../characterEditPageContext'
 import { skillDefinitions } from '@dictionaries/characterEditDefinitions'
 
-export function SkillSection({ training, skillModifiers, onChange }: SkillSectionProps) {
+export function SkillSection() {
   const { t } = useI18n()
+  const { form, skillModifiers, handleTrainingChange } = useCharacterEditPageContext()
 
   return (
     <section className={styles.section}>
@@ -21,8 +22,8 @@ export function SkillSection({ training, skillModifiers, onChange }: SkillSectio
                 id={skill.key}
                 name={skill.key}
                 type="checkbox"
-                checked={training[skill.key]}
-                onChange={onChange}
+                checked={form.training[skill.key]}
+                onChange={handleTrainingChange}
               />
               <span className={styles.checkboxLabel}>{t(skill.translationKey)}</span>
             </label>

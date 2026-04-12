@@ -1,10 +1,11 @@
 import { useI18n } from '../../../../i18n'
 import styles from '../../style.module.scss'
-import type { GeneralSectionProps } from '../../types'
+import { useCharacterEditPageContext } from '../../characterEditPageContext'
 import { classOptions, raceOptions } from '@dictionaries/characterEditDefinitions'
 
-export function GeneralSection({ form, levelBonusLabel, onChange }: GeneralSectionProps) {
+export function GeneralSection() {
   const { t } = useI18n()
+  const { form, levelBonusLabel, handleGeneralChange } = useCharacterEditPageContext()
 
   return (
     <section className={styles.section}>
@@ -26,7 +27,7 @@ export function GeneralSection({ form, levelBonusLabel, onChange }: GeneralSecti
             max={30}
             inputMode="numeric"
             value={form.level}
-            onChange={onChange}
+            onChange={handleGeneralChange}
           />
           <span className={styles.modifierBadge}>{levelBonusLabel}</span>
         </div>
@@ -44,7 +45,7 @@ export function GeneralSection({ form, levelBonusLabel, onChange }: GeneralSecti
             max={12}
             inputMode="numeric"
             value={form.speed}
-            onChange={onChange}
+            onChange={handleGeneralChange}
           />
         </div>
 
@@ -57,7 +58,7 @@ export function GeneralSection({ form, levelBonusLabel, onChange }: GeneralSecti
             id="race"
             name="race"
             value={form.race}
-            onChange={onChange}
+            onChange={handleGeneralChange}
           >
             {raceOptions.map((optionKey) => {
               const label = t(`pages.characterEdit.options.race.${optionKey}`)
@@ -80,7 +81,7 @@ export function GeneralSection({ form, levelBonusLabel, onChange }: GeneralSecti
             id="class"
             name="class"
             value={form.class}
-            onChange={onChange}
+            onChange={handleGeneralChange}
           >
             {classOptions.map((optionKey) => {
               const label = t(`pages.characterEdit.options.class.${optionKey}`)

@@ -1,9 +1,10 @@
 import { useI18n } from '../../../../i18n'
 import styles from '../../style.module.scss'
-import type { DefensesSectionProps } from '../../types'
+import { useCharacterEditPageContext } from '../../characterEditPageContext'
 
-export function DefensesSection({ defenseValues }: DefensesSectionProps) {
+export function DefensesSection() {
   const { t } = useI18n()
+  const { defenseValues } = useCharacterEditPageContext()
 
   return (
     <section className={styles.section}>

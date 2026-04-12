@@ -17,6 +17,16 @@ export function buildNormalizedAttributes(attributes: CharacterAttributes): Char
   }, {} as CharacterAttributes)
 }
 
+export function buildEffectiveAttributes(
+  attributes: CharacterAttributes,
+  attributeBonuses: CharacterAttributeBonuses,
+): CharacterAttributes {
+  return attributeDefinitions.reduce((acc, { key }) => {
+    acc[key] = clampAttributeValue(attributes[key] + attributeBonuses[key])
+    return acc
+  }, {} as CharacterAttributes)
+}
+
 export function buildAttributeModifierMap(attributes: CharacterAttributes): CharacterAttributeBonuses {
   return attributeDefinitions.reduce((acc, { key }) => {
     acc[key] = getAttributeModifier(attributes[key])

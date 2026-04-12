@@ -39,11 +39,11 @@ export function normalizeClassValue(value: string): CharacterClass {
 
 export function buildRaceAttributeBonuses(race: CharacterRace): CharacterAttributeBonuses {
   return {
-    strength: 0,
+    strength: race === CharacterRace.Dragonborn ? 2 : 0,
     constitution: 0,
-    dexterity: 0,
-    intelligence: race === CharacterRace.Tiefling ? 2 : 0,
+    dexterity: race === CharacterRace.Eladrin ? 2 : 0,
+    intelligence: race === CharacterRace.Tiefling || race === CharacterRace.Eladrin ? 2 : 0,
     wisdom: 0,
-    charisma: race === CharacterRace.Tiefling ? 2 : 0,
+    charisma: race === CharacterRace.Tiefling || race === CharacterRace.Dragonborn ? 2 : 0,
   }
 }

@@ -6,24 +6,18 @@ import { DefensesSection } from './sections/DefensesSection'
 import { GeneralSection } from './sections/GeneralSection'
 import { SkillSection } from './sections/SkillSection'
 import styles from './style.module.scss'
-import type { CharacterEditPageState } from './types'
-import { useCharacterEditPage } from './useCharacterEditPage'
+import { CharacterEditPageProvider, useCharacterEditPageContext } from './characterEditPageContext'
 
-function CharacterEditPageContent({
-  error,
-  form,
-  loading,
-  saving,
-  handleGeneralChange,
-  handleAttributeChange,
-  handleTrainingChange,
-  handleSubmit,
-  attributeRows,
-  levelBonusLabel,
-  skillModifiers,
-  defenseValues,
-}: CharacterEditPageState) {
+function CharacterEditPageContent() {
   const { t } = useI18n()
+  const {
+    error,
+    form,
+    loading,
+    saving,
+    handleGeneralChange,
+    handleSubmit,
+  } = useCharacterEditPageContext()
 
   return (
     <main className={styles.editorLayout}>
@@ -57,18 +51,10 @@ function CharacterEditPageContent({
         ) : (
           <form className={styles.editorForm} onSubmit={(event) => void handleSubmit(event)}>
             <div className={styles.sectionsGrid}>
-              <GeneralSection form={form} onChange={handleGeneralChange} levelBonusLabel={levelBonusLabel} />
-              <AttributesSection
-                attributeRows={attributeRows}
-                attributesPlus={form.attributesPlus}
-                onChange={handleAttributeChange}
-              />
-              <DefensesSection defenseValues={defenseValues} />
-              <SkillSection
-                training={form.training}
-                skillModifiers={skillModifiers}
-                onChange={handleTrainingChange}
-              />
+              <GeneralSection />
+              <AttributesSection />
+              <DefensesSection />
+              <SkillSection />
             </div>
 
             <div className={styles.formActions}>
@@ -90,7 +76,9 @@ function CharacterEditPageContent({
 }
 
 export function CharacterEditPage() {
-  const page = useCharacterEditPage()
-
-  return <CharacterEditPageContent {...page} />
+  return (
+    <CharacterEditPageProvider>
+      <CharacterEditPageContent />
+    </CharacterEditPageProvider>
+  )
 }

@@ -4,7 +4,13 @@ import { getCharacter, saveCharacter } from '../../lib/api'
 import { useI18n } from '../../i18n'
 import { getErrorMessage } from '../../lib/errors'
 import { emptyForm, zeroAttributeBonuses, zeroDefenses, zeroDefenseBonuses } from './characterEditPageDefaults'
-import { buildAttributeModifierMap, buildAttributeRows, buildNormalizedAttributes, clampAttributeValue } from './sections/AttributesSection/attributesSectionLogic'
+import {
+  buildAttributeModifierMap,
+  buildAttributeRows,
+  buildEffectiveAttributes,
+  buildNormalizedAttributes,
+  clampAttributeValue,
+} from './sections/AttributesSection/attributesSectionLogic'
 import { buildDefenseValues, normalizeDefenses } from './sections/DefensesSection/defensesSectionLogic'
 import { buildSkillBonuses, buildSkillModifiers } from './sections/SkillSection/skillSectionLogic'
 import {
@@ -158,7 +164,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
   }
 
   const normalizedAttributes = buildNormalizedAttributes(form.attributes)
-  const attributeModifierMap = buildAttributeModifierMap(normalizedAttributes)
+  const effectiveAttributes = buildEffectiveAttributes(normalizedAttributes, form.attributesPlus)
+  const attributeModifierMap = buildAttributeModifierMap(effectiveAttributes)
   const levelBonusValue = getLevelBonus(form.level)
   const levelBonusLabel = formatModifier(levelBonusValue)
   const defenseValues = buildDefenseValues(attributeModifierMap, levelBonusValue, form.race)

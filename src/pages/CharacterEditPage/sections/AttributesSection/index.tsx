@@ -1,14 +1,15 @@
 import { useI18n } from '../../../../i18n'
 import styles from '../../style.module.scss'
-import type { AttributesSectionProps } from '../../types'
+import { useCharacterEditPageContext } from '../../characterEditPageContext'
 import { attributeDefinitions } from '@dictionaries/characterEditDefinitions'
 
 function formatSignedValue(value: number): string {
   return value > 0 ? `+${value}` : String(value)
 }
 
-export function AttributesSection({ attributeRows, attributesPlus, onChange }: AttributesSectionProps) {
+export function AttributesSection() {
   const { t } = useI18n()
+  const { attributeRows, form, handleAttributeChange } = useCharacterEditPageContext()
 
   return (
     <section className={styles.section}>
@@ -31,9 +32,9 @@ export function AttributesSection({ attributeRows, attributesPlus, onChange }: A
                   max={40}
                   inputMode="numeric"
                   value={row.value}
-                  onChange={onChange}
+                  onChange={handleAttributeChange}
                 />
-                <span className={styles.attributePlus}>{formatSignedValue(attributesPlus[definition.key])}</span>
+                <span className={styles.attributePlus}>{formatSignedValue(form.attributesPlus[definition.key])}</span>
                 <span className={styles.attributeLabel}>{t(definition.translationKey)}</span>
               </label>
               <span className={styles.modifierBadge}>{row.modifierLabel}</span>

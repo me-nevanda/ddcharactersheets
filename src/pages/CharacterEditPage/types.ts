@@ -43,28 +43,6 @@ export interface CharacterEditPageState {
   defenseValues: DefenseValues
 }
 
-export interface GeneralSectionProps {
-  form: CharacterEditFormData
-  levelBonusLabel: string
-  onChange: (event: CharacterGeneralChangeEvent) => void
-}
-
-export interface AttributesSectionProps {
-  attributeRows: AttributeRow[]
-  attributesPlus: CharacterAttributeBonuses
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void
-}
-
-export interface SkillSectionProps {
-  training: CharacterTraining
-  skillModifiers: SkillModifierMap
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void
-}
-
-export interface DefensesSectionProps {
-  defenseValues: DefenseValues
-}
-
 export interface DefenseValues {
   kp: number
   fortitude: number
