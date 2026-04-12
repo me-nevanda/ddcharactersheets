@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AppIcon } from '../../components/AppIcon'
-import { useI18n } from '../../i18n'
-import { CharacterEditPageProvider, useCharacterEditPageContext } from './characterEditPageContext'
+import { AppIcon } from '@components/AppIcon'
+import { useI18n } from '@i18n/index'
+import { CharacterEditPageProvider, useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext'
 import styles from './style.module.scss'
-import type { CharacterEditTabKey } from './types'
-import { AbilitiesTab } from './tabs/AbilitiesTab'
-import { GeneralTab } from './tabs/GeneralTab'
+import type { CharacterEditTabKey } from '@pages/CharacterEditPage/types'
+import { AbilitiesTab } from '@pages/CharacterEditPage/tabs/AbilitiesTab'
+import { GeneralTab } from '@pages/CharacterEditPage/tabs/GeneralTab'
 
 function CharacterEditPageContent() {
   const { t } = useI18n()

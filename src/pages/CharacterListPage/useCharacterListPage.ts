@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createCharacter, deleteCharacter, listCharacters } from '../../lib/api'
-import { useI18n } from '../../i18n'
-import { getErrorMessage } from '../../lib/errors'
+import { createCharacter, deleteCharacter, listCharacters } from '@lib/api'
+import { useI18n } from '@i18n/index'
+import { getErrorMessage } from '@lib/errors'
 import type { Character } from '../../types/character'
 import type { CharacterListPageState } from './types'
 

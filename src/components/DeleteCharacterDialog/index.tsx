@@ -1,4 +1,4 @@
-import { useI18n } from '../../i18n'
+import { useI18n } from '@i18n/index'
 import type { DeleteCharacterDialogProps } from './types'
 import styles from './style.module.scss'
 

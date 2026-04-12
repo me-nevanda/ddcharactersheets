@@ -1,8 +1,8 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getCharacter, saveCharacter } from '../../lib/api'
-import { useI18n } from '../../i18n'
-import { getErrorMessage } from '../../lib/errors'
+import { getCharacter, saveCharacter } from '@lib/api'
+import { useI18n } from '@i18n/index'
+import { getErrorMessage } from '@lib/errors'
 import {
   emptyForm,
   emptyTraining,
