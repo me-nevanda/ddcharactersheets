@@ -38,18 +38,6 @@ export function WeaponItemCard({
       <div className={styles.weaponDamageRow}>
         <select
           className={styles.abilityHeaderSelect}
-          value={weapon.damageDiceCount}
-          onChange={(event) => onDamageChange(index, 'damageDiceCount', Number.parseInt(event.target.value, 10))}
-        >
-          {[1, 2, 3, 4, 5].map((count) => (
-            <option key={count} value={count}>
-              {count}
-            </option>
-          ))}
-        </select>
-        <span className={styles.weaponDamageSeparator}>x</span>
-        <select
-          className={styles.abilityHeaderSelect}
           value={weapon.damageDiceType}
           onChange={(event) =>
             onDamageChange(
@@ -63,7 +51,7 @@ export function WeaponItemCard({
             <option key={die} value={die}>
               K{die.slice(1)}
             </option>
-          ))}
+            ))}
         </select>
         <span className={styles.weaponDamageSeparator}>+</span>
         <select
@@ -77,7 +65,7 @@ export function WeaponItemCard({
             </option>
           ))}
         </select>
-        <span className={styles.weaponDamageSeparator}>+</span>
+        <span className={styles.weaponDamageTypeLabel}>{t('pages.characterEdit.items.weaponDamageTypeLabel')}</span>
         <select
           className={styles.abilityHeaderSelect}
           value={weapon.damageType}

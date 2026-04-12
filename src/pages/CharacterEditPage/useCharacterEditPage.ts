@@ -191,6 +191,9 @@ export function useCharacterEditPage(): CharacterEditPageState {
               action: ability.action ?? defaultAbilityAction,
               type: ability.type ?? defaultAbilityType,
               kind: ability.kind ?? defaultAbilityKind,
+              weaponCount: ability.weaponCount ?? 1,
+              weaponName: ability.weaponName ?? '',
+              weaponAttributeBonus: ability.weaponAttributeBonus ?? '',
             })),
             items: normalizeItems(character.items),
             defenses: character.defenses ?? zeroDefenses,
@@ -358,6 +361,9 @@ export function useCharacterEditPage(): CharacterEditPageState {
       action: ability.action,
       type: ability.type,
       kind: ability.kind,
+      weaponCount: ability.weaponCount,
+      weaponName: ability.weaponName.trim(),
+      weaponAttributeBonus: ability.weaponAttributeBonus,
     }
 
     if (!nextAbility.name && !nextAbility.description) {
@@ -382,12 +388,15 @@ export function useCharacterEditPage(): CharacterEditPageState {
           action: defaultAbilityAction,
           type: defaultAbilityType,
           kind: defaultAbilityKind,
+          weaponCount: 1,
+          weaponName: '',
+          weaponAttributeBonus: '',
         },
       ],
     }))
   }
 
-  function handleAbilityChange(index: number, fieldName: CharacterAbilityFieldName, value: string) {
+  function handleAbilityChange(index: number, fieldName: CharacterAbilityFieldName, value: string | number) {
     setForm((currentForm) => ({
       ...currentForm,
       abilities: currentForm.abilities.map((ability, abilityIndex) =>
@@ -395,6 +404,13 @@ export function useCharacterEditPage(): CharacterEditPageState {
           ? {
               ...ability,
               [fieldName]: value,
+              ...(fieldName === 'kind' && value === 'utility'
+                ? {
+                    weaponCount: 1,
+                    weaponName: '',
+                    weaponAttributeBonus: '',
+                  }
+                : null),
             }
           : ability,
       ),
@@ -507,7 +523,16 @@ export function useCharacterEditPage(): CharacterEditPageState {
         surge: surgeValue,
         attributes: normalizedAttributes,
         attributesPlus: form.attributesPlus,
-        abilities: form.abilities,
+        abilities: form.abilities.map((ability) =>
+          ability.kind === 'utility'
+            ? {
+                ...ability,
+                weaponCount: 1,
+                weaponName: '',
+                weaponAttributeBonus: '',
+              }
+            : ability,
+        ),
         items: form.items,
         defenses: normalizeDefenses(
           {

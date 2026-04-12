@@ -50,7 +50,7 @@ export interface CharacterEditPageState {
   handleTrainingChange: (event: ChangeEvent<HTMLInputElement>) => void
   handleAbilityCreateEmpty: () => void
   handleAbilityAdd: (ability: CharacterAbility) => void
-  handleAbilityChange: (index: number, fieldName: CharacterAbilityFieldName, value: string) => void
+  handleAbilityChange: (index: number, fieldName: CharacterAbilityFieldName, value: string | number) => void
   handleAbilityRemove: (index: number) => void
   handleItemCreateEmpty: (group: CharacterItemGroupKey) => void
   handleItemChange: (

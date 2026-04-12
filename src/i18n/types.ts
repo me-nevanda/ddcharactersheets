@@ -89,6 +89,14 @@ export interface TranslationDictionary {
           offensive: string
           utility: string
         }
+        weaponLabel: string
+        weaponBonusOptions: {
+          none: string
+          prefix: string
+        }
+        weaponOptions: {
+          none: string
+        }
         nameLabel: string
         descriptionLabel: string
         namePlaceholder: string
@@ -107,6 +115,7 @@ export interface TranslationDictionary {
         weaponBonus: {
           none: string
         }
+        weaponDamageTypeLabel: string
         weaponType: {
           normal: string
           poison: string

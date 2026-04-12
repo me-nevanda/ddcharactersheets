@@ -123,8 +123,29 @@ function normalizeAbilities(
       action: (item.action === 'noAction' ? 'noAction' : 'action') as CharacterAbilityAction,
       type: (item.type === 'encounter' || item.type === 'daily' ? item.type : 'unlimited') as CharacterAbilityType,
       kind: (item.kind === 'utility' ? 'utility' : 'offensive') as CharacterAbilityKind,
+      weaponCount:
+        typeof item.weaponCount === 'number' && Number.isFinite(item.weaponCount)
+          ? Math.min(10, Math.max(1, Math.trunc(item.weaponCount)))
+          : 1,
+      weaponName: typeof item.weaponName === 'string' ? item.weaponName : '',
+      weaponAttributeBonus: normalizeWeaponAttributeBonus(item.weaponAttributeBonus),
     }))
     .filter((ability) => ability.name.length > 0 || ability.description.length > 0)
+}
+
+function normalizeWeaponAttributeBonus(value: unknown): keyof CharacterAttributes | '' {
+  if (
+    value === 'strength' ||
+    value === 'condition' ||
+    value === 'dexterity' ||
+    value === 'intelligence' ||
+    value === 'wisdom' ||
+    value === 'charisma'
+  ) {
+    return value
+  }
+
+  return ''
 }
 
 function normalizeItemGroup<T extends CharacterArmor | CharacterWeapon | CharacterOtherItem>(data: unknown): T[] {

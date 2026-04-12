@@ -257,6 +257,15 @@
   gap: 0.35rem;
 }
 
+.abilityWeaponRow {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-x: auto;
+}
+
 .abilityActions {
   display: flex;
   justify-content: flex-end;
@@ -293,18 +302,25 @@
 
 .weaponDamageRow {
   display: grid;
-  grid-template-columns: max-content auto max-content auto max-content auto max-content auto max-content;
+  grid-template-columns: repeat(5, max-content);
   gap: 0.5rem;
   align-items: center;
+  justify-content: start;
+  justify-items: start;
 }
 
 .weaponDamageRow > :nth-child(1),
 .weaponDamageRow > :nth-child(3),
-.weaponDamageRow > :nth-child(5),
-.weaponDamageRow > :nth-child(7),
-.weaponDamageRow > :nth-child(9) {
+.weaponDamageRow > :nth-child(5) {
   width: max-content;
   min-width: 0;
+}
+
+.weaponDamageTypeLabel {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .weaponDamageSeparator {
@@ -493,6 +509,23 @@
 
 .abilitySelect {
   min-width: 0;
+}
+
+.abilityWeaponCountSelect {
+  width: auto;
+  flex: 0 0 4.75rem;
+}
+
+.abilityWeaponSelect {
+  width: auto;
+  min-width: 10rem;
+  flex: 1 1 11rem;
+}
+
+.abilityWeaponBonusSelect {
+  width: auto;
+  min-width: 12rem;
+  flex: 1 1 12rem;
 }
 
 .skillCard {

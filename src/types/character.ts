@@ -54,6 +54,9 @@ export interface CharacterAbility {
   action: CharacterAbilityAction
   type: CharacterAbilityType
   kind: CharacterAbilityKind
+  weaponCount: number
+  weaponName: string
+  weaponAttributeBonus: string
 }
 
 export interface CharacterItemBase {

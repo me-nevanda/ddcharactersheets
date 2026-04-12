@@ -90,6 +90,14 @@ export const pl: TranslationDictionary = {
           offensive: 'Ofensywna',
           utility: 'Użytkowa',
         },
+        weaponLabel: 'Rodzaj używanej broni',
+        weaponBonusOptions: {
+          none: 'Brak',
+          prefix: 'bonus',
+        },
+        weaponOptions: {
+          none: 'Brak',
+        },
         nameLabel: 'Nazwa',
         descriptionLabel: 'Opis',
         namePlaceholder: 'Np. Uderzenie tarczą',
@@ -108,6 +116,7 @@ export const pl: TranslationDictionary = {
         weaponBonus: {
           none: 'Brak',
         },
+        weaponDamageTypeLabel: 'Typ obrażeń',
         weaponType: {
           normal: 'Zwykłe',
           poison: 'Trucizna',

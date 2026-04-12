@@ -90,6 +90,14 @@ export const en: TranslationDictionary = {
           offensive: 'Offensive',
           utility: 'Utility',
         },
+        weaponLabel: 'Weapon type',
+        weaponBonusOptions: {
+          none: 'None',
+          prefix: 'bonus',
+        },
+        weaponOptions: {
+          none: 'None',
+        },
         nameLabel: 'Name',
         descriptionLabel: 'Description',
         namePlaceholder: 'e.g. Shield Bash',
@@ -108,6 +116,7 @@ export const en: TranslationDictionary = {
         weaponBonus: {
           none: 'None',
         },
+        weaponDamageTypeLabel: 'Damage type',
         weaponType: {
           normal: 'Normal',
           poison: 'Poison',
