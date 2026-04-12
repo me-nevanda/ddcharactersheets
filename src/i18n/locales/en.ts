@@ -54,12 +54,14 @@ export const en: TranslationDictionary = {
       tabs: {
         general: 'Main',
         abilities: 'Abilities',
+        feats: 'Feats',
+        items: 'Items',
       },
       sections: {
         general: 'General',
         attributes: 'Attributes',
         defenses: 'Defenses',
-        training: 'Skills (+ training)',
+        skills: 'Skills (+ training)',
       },
       fields: {
         name: 'Name',
@@ -70,7 +72,7 @@ export const en: TranslationDictionary = {
         race: 'Race',
         class: 'Class',
         strength: 'Strength',
-        constitution: 'Constitution',
+        condition: 'Condition',
         dexterity: 'Dexterity',
         intelligence: 'Intelligence',
         wisdom: 'Wisdom',

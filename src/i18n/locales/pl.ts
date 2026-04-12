@@ -54,12 +54,14 @@ export const pl: TranslationDictionary = {
       tabs: {
         general: 'Główne',
         abilities: 'Zdolności',
+        feats: 'Atuty',
+        items: 'Przedmioty',
       },
       sections: {
         general: 'Ogólne',
         attributes: 'Atrybuty',
         defenses: 'Obrony',
-        training: 'Umiejętności (+ wyszkolenia)',
+        skills: 'Umiejętności (+ wyszkolenia)',
       },
       fields: {
         name: 'Imię',
@@ -70,7 +72,7 @@ export const pl: TranslationDictionary = {
         race: 'Rasa',
         class: 'Klasa',
         strength: 'Siła',
-        constitution: 'Kondycja',
+        condition: 'Kondycja',
         dexterity: 'Zręczność',
         intelligence: 'Inteligencja',
         wisdom: 'Rozsądek',

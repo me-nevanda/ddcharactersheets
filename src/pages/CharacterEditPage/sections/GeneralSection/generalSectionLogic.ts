@@ -40,7 +40,7 @@ export function normalizeClassValue(value: string): CharacterClass {
 export function buildRaceAttributeBonuses(race: CharacterRace): CharacterAttributeBonuses {
   return {
     strength: race === CharacterRace.Dragonborn ? 2 : 0,
-    constitution: race === CharacterRace.Dwarf || race === CharacterRace.HalfElf ? 2 : 0,
+    condition: race === CharacterRace.Dwarf || race === CharacterRace.HalfElf ? 2 : 0,
     dexterity: race === CharacterRace.Eladrin || race === CharacterRace.Elf || race === CharacterRace.Halfling ? 2 : 0,
     intelligence: race === CharacterRace.Tiefling || race === CharacterRace.Eladrin ? 2 : 0,
     wisdom: race === CharacterRace.Elf || race === CharacterRace.Dwarf ? 2 : 0,
@@ -57,22 +57,22 @@ export function buildRaceAttributeBonuses(race: CharacterRace): CharacterAttribu
 export function buildCharacterHp(
   characterClass: CharacterClass,
   level: number,
-  constitution: number,
+  condition: number,
 ): number {
   if (characterClass === CharacterClass.Warlock || characterClass === CharacterClass.Rogue || characterClass === CharacterClass.Ranger) {
-    return 7 + constitution + 5 * level
+    return 7 + condition + 5 * level
   }
 
   if (characterClass === CharacterClass.Wizard) {
-    return 6 + constitution + 4 * level
+    return 6 + condition + 4 * level
   }
 
   if (characterClass === CharacterClass.Paladin || characterClass === CharacterClass.Fighter || characterClass === CharacterClass.Barbarian) {
-    return 9 + constitution + 6 * level
+    return 9 + condition + 6 * level
   }
 
   if (characterClass === CharacterClass.Warlord || characterClass === CharacterClass.Bard || characterClass === CharacterClass.Cleric) {
-    return 7 + constitution + 5 * level
+    return 7 + condition + 5 * level
   }
 
   return 0
@@ -80,22 +80,22 @@ export function buildCharacterHp(
 
 export function buildCharacterSurge(
   characterClass: CharacterClass,
-  constitutionBonus: number,
+  conditionBonus: number,
 ): number {
   if (characterClass === CharacterClass.Warlock || characterClass === CharacterClass.Rogue || characterClass === CharacterClass.Ranger) {
-    return 6 + constitutionBonus
+    return 6 + conditionBonus
   }
 
   if (characterClass === CharacterClass.Wizard) {
-    return 6 + constitutionBonus
+    return 6 + conditionBonus
   }
 
   if (characterClass === CharacterClass.Paladin || characterClass === CharacterClass.Fighter || characterClass === CharacterClass.Barbarian) {
-    return 10 + constitutionBonus
+    return 10 + conditionBonus
   }
 
   if (characterClass === CharacterClass.Warlord || characterClass === CharacterClass.Bard || characterClass === CharacterClass.Cleric) {
-    return 7 + constitutionBonus
+    return 7 + conditionBonus
   }
 
   return 0

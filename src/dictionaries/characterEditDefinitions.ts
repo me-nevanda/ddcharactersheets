@@ -3,7 +3,7 @@ import { CharacterClass, CharacterRace } from '../types/character'
 
 export const attributeDefinitions: AttributeDefinition[] = [
   { key: 'strength', translationKey: 'pages.characterEdit.fields.strength' },
-  { key: 'constitution', translationKey: 'pages.characterEdit.fields.constitution' },
+  { key: 'condition', translationKey: 'pages.characterEdit.fields.condition' },
   { key: 'dexterity', translationKey: 'pages.characterEdit.fields.dexterity' },
   { key: 'intelligence', translationKey: 'pages.characterEdit.fields.intelligence' },
   { key: 'wisdom', translationKey: 'pages.characterEdit.fields.wisdom' },
@@ -53,7 +53,7 @@ export const skillDefinitions: SkillDefinition[] = [
   },
   {
     key: 'endurance',
-    attributeKey: 'constitution',
+    attributeKey: 'condition',
     translationKey: 'pages.characterEdit.fields.endurance',
   },
   {

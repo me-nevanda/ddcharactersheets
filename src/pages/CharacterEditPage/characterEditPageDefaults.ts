@@ -10,7 +10,7 @@ import type { CharacterEditFormData } from './types'
 
 export const zeroAttributeBonuses: CharacterAttributeBonuses = {
   strength: 0,
-  constitution: 0,
+  condition: 0,
   dexterity: 0,
   intelligence: 0,
   wisdom: 0,
@@ -93,7 +93,7 @@ export const emptyForm: CharacterEditFormData = {
   speed: 6,
   attributes: {
     strength: 10,
-    constitution: 10,
+    condition: 10,
     dexterity: 10,
     intelligence: 10,
     wisdom: 10,

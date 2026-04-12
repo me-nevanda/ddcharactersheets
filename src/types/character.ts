@@ -24,7 +24,7 @@ export enum CharacterClass {
 
 export interface CharacterAttributes {
   strength: number
-  constitution: number
+  condition: number
   dexterity: number
   intelligence: number
   wisdom: number
@@ -33,7 +33,7 @@ export interface CharacterAttributes {
 
 export interface CharacterAttributeBonuses {
   strength: number
-  constitution: number
+  condition: number
   dexterity: number
   intelligence: number
   wisdom: number

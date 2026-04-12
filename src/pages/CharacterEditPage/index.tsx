@@ -7,6 +7,8 @@ import styles from './style.module.scss'
 import type { CharacterEditTabKey } from '@pages/CharacterEditPage/types'
 import { AbilitiesTab } from '@pages/CharacterEditPage/tabs/AbilitiesTab'
 import { GeneralTab } from '@pages/CharacterEditPage/tabs/GeneralTab'
+import { FeatsTab } from '@pages/CharacterEditPage/tabs/FeatsTab'
+import { ItemsTab } from '@pages/CharacterEditPage/tabs/ItemsTab'
 
 function CharacterEditPageContent() {
   const { t } = useI18n()
@@ -71,11 +73,27 @@ function CharacterEditPageContent() {
                 >
                   {t('pages.characterEdit.tabs.abilities')}
                 </button>
+                <button
+                  className={`${styles.tabButton} ${activeTab === 'feats' ? styles.tabButtonActive : ''}`}
+                  type="button"
+                  onClick={() => setActiveTab('feats')}
+                >
+                  {t('pages.characterEdit.tabs.feats')}
+                </button>
+                <button
+                  className={`${styles.tabButton} ${activeTab === 'items' ? styles.tabButtonActive : ''}`}
+                  type="button"
+                  onClick={() => setActiveTab('items')}
+                >
+                  {t('pages.characterEdit.tabs.items')}
+                </button>
               </aside>
 
               <div className={styles.tabPanel}>
                 {activeTab === 'general' ? <GeneralTab /> : null}
                 {activeTab === 'abilities' ? <AbilitiesTab /> : null}
+                {activeTab === 'feats' ? <FeatsTab /> : null}
+                {activeTab === 'items' ? <ItemsTab /> : null}
               </div>
             </div>
           </form>

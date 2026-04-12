@@ -20,7 +20,7 @@ export type CharacterSkillFieldName = keyof CharacterTraining
 
 export type CharacterGeneralChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement>
 
-export type CharacterEditTabKey = 'general' | 'abilities'
+export type CharacterEditTabKey = 'general' | 'abilities' | 'feats' | 'items'
 
 export interface AttributeRow {
   key: CharacterAttributeFieldName

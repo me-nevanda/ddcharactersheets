@@ -42,7 +42,7 @@ export function buildDefenseValues(
     ),
     fortitude: clampDefenseValue(
       10 +
-        Math.max(attributeModifiers.strength, attributeModifiers.constitution) +
+        Math.max(attributeModifiers.strength, attributeModifiers.condition) +
         levelBonus +
         humanDefenseBonus +
         fortitudeClassBonus +

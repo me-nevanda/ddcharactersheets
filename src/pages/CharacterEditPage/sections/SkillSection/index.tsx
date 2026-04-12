@@ -102,7 +102,7 @@ export function SkillSection() {
   return (
     <section className={styles.section}>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>{t('pages.characterEdit.sections.training')}</h2>
+        <h2 className={styles.sectionTitle}>{t('pages.characterEdit.sections.skills')}</h2>
       </div>
 
       <div className={styles.skillGrid}>

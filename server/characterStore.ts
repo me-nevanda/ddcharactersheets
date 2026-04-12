@@ -75,7 +75,7 @@ function normalizeAttributes(
 ): CharacterAttributes {
   return {
     strength: normalizeAttributeValue(data.strength),
-    constitution: normalizeAttributeValue(data.constitution),
+    condition: normalizeAttributeValue(data.condition),
     dexterity: normalizeAttributeValue(data.dexterity),
     intelligence: normalizeAttributeValue(data.intelligence),
     wisdom: normalizeAttributeValue(data.wisdom),
@@ -109,7 +109,7 @@ function getLevelBonus(value: number): number {
 function buildAttributeBonuses(attributes: CharacterAttributes): CharacterAttributeBonuses {
   return {
     strength: getAttributeModifier(attributes.strength),
-    constitution: getAttributeModifier(attributes.constitution),
+    condition: getAttributeModifier(attributes.condition),
     dexterity: getAttributeModifier(attributes.dexterity),
     intelligence: getAttributeModifier(attributes.intelligence),
     wisdom: getAttributeModifier(attributes.wisdom),
@@ -120,7 +120,7 @@ function buildAttributeBonuses(attributes: CharacterAttributes): CharacterAttrib
 function buildZeroAttributeBonuses(): CharacterAttributeBonuses {
   return {
     strength: 0,
-    constitution: 0,
+    condition: 0,
     dexterity: 0,
     intelligence: 0,
     wisdom: 0,
@@ -142,7 +142,7 @@ function normalizeAttributeBonuses(
 ): CharacterAttributeBonuses {
   return {
     strength: normalizeAttributeBonusValue(data?.strength) ?? fallback.strength,
-    constitution: normalizeAttributeBonusValue(data?.constitution) ?? fallback.constitution,
+    condition: normalizeAttributeBonusValue(data?.condition) ?? fallback.condition,
     dexterity: normalizeAttributeBonusValue(data?.dexterity) ?? fallback.dexterity,
     intelligence: normalizeAttributeBonusValue(data?.intelligence) ?? fallback.intelligence,
     wisdom: normalizeAttributeBonusValue(data?.wisdom) ?? fallback.wisdom,
@@ -190,7 +190,7 @@ function buildSkillBonuses(
     healing: withTraining(attributeBonuses.wisdom, training.healing),
     deception: withTraining(attributeBonuses.charisma, training.deception),
     perception: withTraining(attributeBonuses.wisdom, training.perception),
-    endurance: withTraining(attributeBonuses.constitution, training.endurance),
+    endurance: withTraining(attributeBonuses.condition, training.endurance),
     dungeoneering: withTraining(attributeBonuses.intelligence, training.dungeoneering),
     nature: withTraining(attributeBonuses.wisdom, training.nature),
     religion: withTraining(attributeBonuses.intelligence, training.religion),
@@ -243,7 +243,7 @@ function buildDefenseBonuses(
 
   return {
     kp: 10 + Math.max(attributeBonuses.dexterity, attributeBonuses.intelligence) + levelBonus,
-    fortitude: 10 + Math.max(attributeBonuses.strength, attributeBonuses.constitution) + levelBonus,
+    fortitude: 10 + Math.max(attributeBonuses.strength, attributeBonuses.condition) + levelBonus,
     reflex: 10 + Math.max(attributeBonuses.dexterity, attributeBonuses.intelligence) + levelBonus,
     will: 10 + Math.max(attributeBonuses.wisdom, attributeBonuses.charisma) + levelBonus,
   }

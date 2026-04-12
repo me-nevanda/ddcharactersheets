@@ -53,12 +53,14 @@ export interface TranslationDictionary {
       tabs: {
         general: string
         abilities: string
+        feats: string
+        items: string
       }
       sections: {
         general: string
         attributes: string
         defenses: string
-        training: string
+        skills: string
       }
       fields: {
         name: string
@@ -69,7 +71,7 @@ export interface TranslationDictionary {
         race: string
         class: string
         strength: string
-        constitution: string
+        condition: string
         dexterity: string
         intelligence: string
         wisdom: string

@@ -275,10 +275,11 @@
 }
 
 .generalValueCard {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 0.55rem;
+  min-height: 2.7rem;
   padding: 0.45rem 0.75rem;
   border-radius: 0.95rem;
   background: rgba(255, 248, 235, 0.03);
