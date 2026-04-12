@@ -4,8 +4,8 @@ import {
   type CharacterAttributeBonuses,
   type CharacterSkillBonuses,
   type CharacterTraining,
-} from '../../types/character'
-import { formatModifier, getLevelBonus } from './generalSectionLogic'
+} from '../../../../types/character'
+import { formatModifier, getLevelBonus } from '../GeneralSection/generalSectionLogic'
 
 export function buildSkillBonuses(
   level: number,

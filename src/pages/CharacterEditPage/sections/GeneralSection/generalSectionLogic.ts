@@ -1,5 +1,5 @@
-import { CharacterClass, CharacterRace } from '../../types/character'
-import type { CharacterAttributeBonuses } from '../../types/character'
+import { CharacterClass, CharacterRace } from '../../../../types/character'
+import type { CharacterAttributeBonuses } from '../../../../types/character'
 
 export function clampLevelValue(value: number): number {
   return Math.min(30, Math.max(1, Math.trunc(value)))

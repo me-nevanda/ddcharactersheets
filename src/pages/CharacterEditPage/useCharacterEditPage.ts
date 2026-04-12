@@ -4,9 +4,9 @@ import { getCharacter, saveCharacter } from '../../lib/api'
 import { useI18n } from '../../i18n'
 import { getErrorMessage } from '../../lib/errors'
 import { emptyForm, zeroAttributeBonuses, zeroDefenses, zeroDefenseBonuses } from './characterEditPageDefaults'
-import { buildAttributeModifierMap, buildAttributeRows, buildNormalizedAttributes, clampAttributeValue } from './attributesSectionLogic'
-import { buildDefenseValues, normalizeDefenses } from './defensesSectionLogic'
-import { buildSkillBonuses, buildSkillModifiers } from './skillSectionLogic'
+import { buildAttributeModifierMap, buildAttributeRows, buildNormalizedAttributes, clampAttributeValue } from './sections/AttributesSection/attributesSectionLogic'
+import { buildDefenseValues, normalizeDefenses } from './sections/DefensesSection/defensesSectionLogic'
+import { buildSkillBonuses, buildSkillModifiers } from './sections/SkillSection/skillSectionLogic'
 import {
   buildRaceAttributeBonuses,
   clampLevelValue,
@@ -15,7 +15,7 @@ import {
   getLevelBonus,
   normalizeClassValue,
   normalizeRaceValue,
-} from './generalSectionLogic'
+} from './sections/GeneralSection/generalSectionLogic'
 import type {
   AttributeRow,
   CharacterAttributeFieldName,

@@ -1,6 +1,6 @@
-import { CharacterRace } from '../../types/character'
-import type { CharacterAttributeBonuses, CharacterDefenses } from '../../types/character'
-import type { DefenseValues } from './types'
+import { CharacterRace } from '../../../../types/character'
+import type { CharacterAttributeBonuses, CharacterDefenses } from '../../../../types/character'
+import type { DefenseValues } from '../../types'
 
 export function clampDefenseValue(value: number): number {
   return Math.min(30, Math.max(0, Math.trunc(value)))

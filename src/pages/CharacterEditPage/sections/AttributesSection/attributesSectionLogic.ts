@@ -1,6 +1,6 @@
 import { attributeDefinitions } from '@dictionaries/characterEditDefinitions'
-import type { CharacterAttributeBonuses, CharacterAttributes } from '../../types/character'
-import type { AttributeRow } from './types'
+import type { CharacterAttributeBonuses, CharacterAttributes } from '../../../../types/character'
+import type { AttributeRow } from '../../types'
 
 export function clampAttributeValue(value: number): number {
   return Math.min(40, Math.max(0, Math.trunc(value)))
