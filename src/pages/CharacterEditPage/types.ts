@@ -72,6 +72,7 @@ export interface CharacterEditPageState {
   defenseValues: DefenseValues
   hpValue: number
   surgeValue: number
+  hasChanges: boolean
 }
 
 export interface DefenseValues {

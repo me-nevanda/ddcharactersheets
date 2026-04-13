@@ -13,7 +13,8 @@ import { ItemsTab } from '@pages/CharacterEditPage/tabs/ItemsTab'
 function CharacterEditPageContent() {
   const { t } = useI18n()
   const [activeTab, setActiveTab] = useState<CharacterEditTabKey>('general')
-  const { error, form, loading, saving, handleGeneralChange, handleSubmit } = useCharacterEditPageContext()
+  const { error, form, loading, saving, hasChanges, handleGeneralChange, handleSubmit } =
+    useCharacterEditPageContext()
 
   return (
     <main className={styles.editorLayout}>
@@ -39,10 +40,7 @@ function CharacterEditPageContent() {
             <Link className={styles.ghostLink} to="/">
               {t('common.actions.backToList')}
             </Link>
-            <Link className={styles.secondaryButton} to="/">
-              {t('common.actions.cancel')}
-            </Link>
-            <button className={styles.primaryButton} form="character-edit-form" type="submit" disabled={saving}>
+            <button className={styles.primaryButton} form="character-edit-form" type="submit" disabled={saving || !hasChanges}>
               <span className={styles.buttonContent}>
                 <AppIcon name="save" />
                 <span>{saving ? t('common.states.saving') : t('common.actions.save')}</span>

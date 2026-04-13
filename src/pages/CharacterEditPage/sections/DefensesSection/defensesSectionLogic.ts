@@ -28,14 +28,6 @@ export function buildDefenseValues(
   const warlockWillBonus = characterClass === CharacterClass.Warlock ? 1 : 0
   const warlockReflexBonus = characterClass === CharacterClass.Warlock ? 1 : 0
 
-  console.log(
-    Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence),
-    levelBonus,
-    humanDefenseBonus,
-    paladinDefenseBonus,
-    warlockReflexBonus,
-    rogueReflexBonus,)
-
   return {
     kp: clampDefenseValue(
       10 + Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence) + levelBonus,

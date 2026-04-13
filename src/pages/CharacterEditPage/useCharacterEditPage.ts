@@ -1,5 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { getCharacter, saveCharacter } from '@lib/api'
 import { useI18n } from '@i18n/index'
 import { getErrorMessage } from '@lib/errors'
@@ -62,9 +62,9 @@ import type {
 } from './types'
 export function useCharacterEditPage(): CharacterEditPageState {
   const { t } = useI18n()
-  const navigate = useNavigate()
   const { characterId = '' } = useParams()
   const [form, setForm] = useState<CharacterEditFormData>(emptyForm)
+  const [initialForm, setInitialForm] = useState<CharacterEditFormData>(emptyForm)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -176,8 +176,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
 
         if (!cancelled) {
           const { id, updatedAt, bonuses: characterBonuses, ...characterData } = character
-
-          setForm({
+          const nextForm: CharacterEditFormData = {
             ...characterData,
             level: clampLevelValue(character.level),
             speed: clampSpeedValue(character.speed),
@@ -207,7 +206,10 @@ export function useCharacterEditPage(): CharacterEditPageState {
               skills: characterBonuses?.skills ?? emptyForm.bonuses.skills,
               defenses: characterBonuses?.defenses ?? zeroDefenseBonuses,
             },
-          })
+          }
+
+          setForm(nextForm)
+          setInitialForm(nextForm)
           setError('')
         }
       } catch (nextError) {
@@ -500,6 +502,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
   const defenseValues = buildDefenseValues(attributeModifierMap, levelBonusValue, form.race, form.class)
   const skillBonuses = buildSkillBonuses(form.level, attributeModifierMap, form.training, form.race)
   const skillModifiers = buildSkillModifiers(skillBonuses)
+  const hasChanges = JSON.stringify(form) !== JSON.stringify(initialForm)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -548,7 +551,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
           ...bonuses,
         },
       })
-      navigate('/')
+      setInitialForm(form)
+      setSaving(false)
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
       setSaving(false)
@@ -580,5 +584,6 @@ export function useCharacterEditPage(): CharacterEditPageState {
     defenseValues,
     hpValue,
     surgeValue,
+    hasChanges,
   }
 }
