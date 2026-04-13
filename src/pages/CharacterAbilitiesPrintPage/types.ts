@@ -16,6 +16,9 @@ export interface PrintAbilityRow {
   action: CharacterAbility['action']
   type: PrintAbilityType
   kind: PrintAbilityKind
+  weaponAttackAttribute: CharacterAbility['weaponAttackAttribute']
+  weaponAttackDefense: CharacterAbility['weaponAttackDefense']
+  weaponAttackDisplay: string
   damage: string
   details: PrintAbilityDetailRow[]
   offensiveNotes: PrintAbilityDetailRow[]

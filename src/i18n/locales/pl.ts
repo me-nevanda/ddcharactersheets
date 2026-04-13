@@ -112,6 +112,9 @@ export const pl: TranslationDictionary = {
           offensive: 'Ofensywna',
           utility: 'Użytkowa',
         },
+        weaponAttackAttributeLabel: 'Atrybut ataku',
+        weaponAgainstLabel: 'przeciw',
+        weaponAttackDefenseLabel: 'Obrona',
         weaponLabel: 'Obrażenia jednorazowe',
         weaponDamageDiceLabel: 'Kostka',
         weaponDamageCountLabel: 'Liczba',
@@ -269,6 +272,7 @@ export const pl: TranslationDictionary = {
       back: 'Wróć do edycji',
       printButtonLabel: 'Drukuj',
       emptyState: 'Nie dodano jeszcze żadnych zdolności.',
+      attackLabel: 'Atak',
       damageLabel: 'Obrażenia',
       damageParts: {
         recurring: 'nawracających',

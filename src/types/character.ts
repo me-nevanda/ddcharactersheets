@@ -59,6 +59,8 @@ export interface CharacterAbility {
   weaponDamageDiceType: CharacterWeaponDamageDiceType | ''
   weaponDamageDiceCount: number
   weaponAttributeBonus: string
+  weaponAttackAttribute: keyof CharacterAttributes | ''
+  weaponAttackDefense: keyof CharacterDefenses | ''
   weaponDamageType: CharacterWeaponDamageType
   weaponRecurringDamageCount: number
   weaponRecurringDamageType: CharacterWeaponDamageType

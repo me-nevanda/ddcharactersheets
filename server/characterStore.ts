@@ -144,6 +144,29 @@ function normalizeAbilityWeaponDamageType(value: unknown): CharacterWeaponDamage
   return 'normal'
 }
 
+function normalizeAbilityWeaponAttackAttribute(value: unknown): CharacterAbility['weaponAttackAttribute'] {
+  if (
+    value === 'strength' ||
+    value === 'condition' ||
+    value === 'dexterity' ||
+    value === 'intelligence' ||
+    value === 'wisdom' ||
+    value === 'charisma'
+  ) {
+    return value
+  }
+
+  return ''
+}
+
+function normalizeAbilityWeaponAttackDefense(value: unknown): CharacterAbility['weaponAttackDefense'] {
+  if (value === 'kp' || value === 'fortitude' || value === 'reflex' || value === 'will') {
+    return value
+  }
+
+  return ''
+}
+
 function normalizeAbilityWeaponRange(value: unknown): number {
   if (typeof value === 'number' && Number.isFinite(value)) {
     return Math.min(30, Math.max(0, Math.trunc(value)))
@@ -216,6 +239,8 @@ function normalizeAbilities(
           ? Math.min(20, Math.max(0, Math.trunc(item.weaponDamageDiceCount)))
           : 0,
       weaponAttributeBonus: normalizeWeaponAttributeBonus(item.weaponAttributeBonus),
+      weaponAttackAttribute: normalizeAbilityWeaponAttackAttribute(item.weaponAttackAttribute),
+      weaponAttackDefense: normalizeAbilityWeaponAttackDefense(item.weaponAttackDefense),
       weaponDamageType: normalizeAbilityWeaponDamageType(item.weaponDamageType),
       weaponRecurringDamageCount:
         typeof item.weaponRecurringDamageCount === 'number' && Number.isFinite(item.weaponRecurringDamageCount)

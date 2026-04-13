@@ -111,6 +111,9 @@ export interface TranslationDictionary {
           offensive: string
           utility: string
         }
+        weaponAttackAttributeLabel: string
+        weaponAgainstLabel: string
+        weaponAttackDefenseLabel: string
         weaponLabel: string
         weaponDamageDiceLabel: string
         weaponDamageCountLabel: string
@@ -268,6 +271,7 @@ export interface TranslationDictionary {
       back: string
       printButtonLabel: string
       emptyState: string
+      attackLabel: string
       damageLabel: string
       damageParts: {
         recurring: string

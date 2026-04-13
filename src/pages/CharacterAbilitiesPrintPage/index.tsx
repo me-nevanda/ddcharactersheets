@@ -100,6 +100,12 @@ export function CharacterAbilitiesPrintPage() {
                             </div>
                           ))}
                         </div>
+                        {ability.kind === 'offensive' && ability.weaponAttackDisplay.length > 0 ? (
+                          <div className={styles.attackSection}>
+                            <span className={styles.damageLabel}>{`${t('pages.characterAbilitiesPrint.attackLabel')}:`}</span>
+                            <strong className={styles.damageValue}>{ability.weaponAttackDisplay}</strong>
+                          </div>
+                        ) : null}
                         {ability.damage.length > 0 ? (
                           <div className={styles.damageSection}>
                             <span className={styles.damageLabel}>{`${t('pages.characterAbilitiesPrint.damageLabel')}:`}</span>

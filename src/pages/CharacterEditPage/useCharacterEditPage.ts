@@ -19,6 +19,8 @@ import {
   defaultAbilityWeaponDamageType,
   defaultAbilityWeaponRecurringDamageCount,
   defaultAbilityWeaponRecurringDamageType,
+  defaultAbilityWeaponAttackAttribute,
+  defaultAbilityWeaponAttackDefense,
   defaultAbilityWeaponHit,
   defaultAbilityWeaponMiss,
   defaultAbilityWeaponProvocation,
@@ -151,6 +153,33 @@ function normalizeAbilityWeaponDamageType(value: unknown, fallback: CharacterWea
   }
 
   return fallback
+}
+
+function normalizeAbilityWeaponAttackAttribute(
+  value: unknown,
+): CharacterAbility['weaponAttackAttribute'] {
+  if (
+    value === 'strength' ||
+    value === 'condition' ||
+    value === 'dexterity' ||
+    value === 'intelligence' ||
+    value === 'wisdom' ||
+    value === 'charisma'
+  ) {
+    return value
+  }
+
+  return ''
+}
+
+function normalizeAbilityWeaponAttackDefense(
+  value: unknown,
+): CharacterAbility['weaponAttackDefense'] {
+  if (value === 'kp' || value === 'fortitude' || value === 'reflex' || value === 'will') {
+    return value
+  }
+
+  return ''
 }
 
 function normalizeAbilityWeaponRange(value: unknown): number {
@@ -480,6 +509,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
                 defaultAbilityWeaponDamageDiceCount,
               ),
               weaponAttributeBonus: ability.weaponAttributeBonus ?? '',
+              weaponAttackAttribute: normalizeAbilityWeaponAttackAttribute(ability.weaponAttackAttribute),
+              weaponAttackDefense: normalizeAbilityWeaponAttackDefense(ability.weaponAttackDefense),
               weaponDamageType: normalizeAbilityWeaponDamageType(
                 ability.weaponDamageType,
                 defaultAbilityWeaponDamageType,
@@ -664,6 +695,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
       weaponDamageDiceType: ability.weaponDamageDiceType,
       weaponDamageDiceCount: ability.weaponDamageDiceCount,
       weaponAttributeBonus: ability.weaponAttributeBonus,
+      weaponAttackAttribute: normalizeAbilityWeaponAttackAttribute(ability.weaponAttackAttribute),
+      weaponAttackDefense: normalizeAbilityWeaponAttackDefense(ability.weaponAttackDefense),
       weaponDamageType: ability.weaponDamageType,
       weaponRecurringDamageCount: ability.weaponRecurringDamageCount,
       weaponRecurringDamageType: ability.weaponRecurringDamageType,
@@ -701,6 +734,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
           weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
           weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
           weaponAttributeBonus: '',
+          weaponAttackAttribute: defaultAbilityWeaponAttackAttribute,
+          weaponAttackDefense: defaultAbilityWeaponAttackDefense,
           weaponDamageType: defaultAbilityWeaponDamageType,
           weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
           weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,
@@ -729,6 +764,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
                     weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
                     weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
                     weaponAttributeBonus: '',
+                    weaponAttackAttribute: defaultAbilityWeaponAttackAttribute,
+                    weaponAttackDefense: defaultAbilityWeaponAttackDefense,
                     weaponDamageType: defaultAbilityWeaponDamageType,
                     weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
                     weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,
@@ -1005,6 +1042,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
                 weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
                 weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
                 weaponAttributeBonus: '',
+                weaponAttackAttribute: defaultAbilityWeaponAttackAttribute,
+                weaponAttackDefense: defaultAbilityWeaponAttackDefense,
                 weaponDamageType: defaultAbilityWeaponDamageType,
                 weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
                 weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,

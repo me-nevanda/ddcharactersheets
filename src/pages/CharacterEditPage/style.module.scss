@@ -305,6 +305,20 @@
   gap: 0.5rem;
 }
 
+.abilityWeaponTargetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.abilityWeaponTargetGroup {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
 .abilityWeaponRowSecondary {
   display: flex;
   flex-wrap: wrap;
@@ -719,6 +733,19 @@
   width: auto;
   min-width: 8.5rem;
   flex: 0 1 8.5rem;
+}
+
+.abilityWeaponTargetSelect {
+  width: auto;
+  min-width: 10.5rem;
+  flex: 0 1 10.5rem;
+}
+
+.weaponAttackAgainstLabel {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .abilityActionRow > .abilitySelect {

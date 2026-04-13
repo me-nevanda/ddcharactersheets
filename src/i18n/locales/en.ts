@@ -112,6 +112,9 @@ export const en: TranslationDictionary = {
           offensive: 'Offensive',
           utility: 'Utility',
         },
+        weaponAttackAttributeLabel: 'Attack attribute',
+        weaponAgainstLabel: 'against',
+        weaponAttackDefenseLabel: 'Defense',
         weaponLabel: 'Single-use damage',
         weaponDamageDiceLabel: 'Die',
         weaponDamageCountLabel: 'Count',
@@ -269,6 +272,7 @@ export const en: TranslationDictionary = {
       back: 'Back to edit',
       printButtonLabel: 'Print',
       emptyState: 'No abilities have been added yet.',
+      attackLabel: 'Attack',
       damageLabel: 'Damage',
       damageParts: {
         recurring: 'recurring',

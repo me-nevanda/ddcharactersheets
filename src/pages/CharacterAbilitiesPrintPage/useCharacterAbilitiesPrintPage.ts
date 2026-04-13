@@ -18,6 +18,65 @@ function buildAbilityMeta(t: ReturnType<typeof useI18n>['t'], ability: Character
   ]
 }
 
+function buildAttackAttributeLabel(
+  t: ReturnType<typeof useI18n>['t'],
+  attribute: CharacterAbility['weaponAttackAttribute'],
+  attributeModifierLookup: CharacterAttributeBonuses,
+): string {
+  if (!attribute) {
+    return ''
+  }
+
+  const labelMap: Record<keyof CharacterAttributeBonuses, string> = {
+    strength: t('pages.characterEdit.fields.strength'),
+    condition: t('pages.characterEdit.fields.condition'),
+    dexterity: t('pages.characterEdit.fields.dexterity'),
+    intelligence: t('pages.characterEdit.fields.intelligence'),
+    wisdom: t('pages.characterEdit.fields.wisdom'),
+    charisma: t('pages.characterEdit.fields.charisma'),
+  }
+
+  return `${labelMap[attribute]} (${attributeModifierLookup[attribute] ?? 0})`
+}
+
+function buildDefenseLabel(
+  t: ReturnType<typeof useI18n>['t'],
+  defense: CharacterAbility['weaponAttackDefense'],
+): string {
+  switch (defense) {
+    case 'kp':
+      return t('pages.characterEdit.fields.kp')
+    case 'fortitude':
+      return t('pages.characterEdit.fields.fortitude')
+    case 'reflex':
+      return t('pages.characterEdit.fields.reflex')
+    case 'will':
+      return t('pages.characterEdit.fields.will')
+    default:
+      return ''
+  }
+}
+
+function buildAttackDisplayLabel(
+  t: ReturnType<typeof useI18n>['t'],
+  ability: CharacterAbility,
+  character: CharacterAbilitiesPrintPageState['character'],
+): string {
+  if (!character) {
+    return ''
+  }
+
+  const attributeModifierLookup = buildAttributeModifierLookup(character)
+  const attackAttributeLabel = buildAttackAttributeLabel(t, ability.weaponAttackAttribute, attributeModifierLookup)
+  const attackDefenseLabel = buildDefenseLabel(t, ability.weaponAttackDefense)
+
+  if (!attackAttributeLabel || !attackDefenseLabel) {
+    return ''
+  }
+
+  return `${attackAttributeLabel} ${t('pages.characterEdit.abilities.weaponAgainstLabel')} ${attackDefenseLabel}`
+}
+
 function buildDamageTypeLabel(t: ReturnType<typeof useI18n>['t'], damageType: CharacterAbility['weaponDamageType']): string {
   switch (damageType) {
     case 'normal':
@@ -288,6 +347,9 @@ export function useCharacterAbilitiesPrintPage(): CharacterAbilitiesPrintPageSta
       action: ability.action,
       type: ability.type,
       kind: ability.kind,
+      weaponAttackAttribute: ability.weaponAttackAttribute,
+      weaponAttackDefense: ability.weaponAttackDefense,
+      weaponAttackDisplay: buildAttackDisplayLabel(t, ability, character),
       damage: buildAbilityDamage(t, ability, character),
       details: buildAbilityDetails(t, ability),
       offensiveNotes: buildOffensiveNotes(t, ability),

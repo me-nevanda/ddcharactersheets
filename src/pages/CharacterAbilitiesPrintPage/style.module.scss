@@ -150,6 +150,13 @@
   border-bottom: 1px solid rgba(255, 248, 235, 0.18);
 }
 
+.attackSection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: baseline;
+}
+
 .abilityName {
   margin: 0;
   color: var(--text-strong);
@@ -350,6 +357,10 @@
   .damageSection {
     gap: 0.25rem;
     border-bottom-color: #c8c8c8;
+  }
+
+  .attackSection {
+    gap: 0.25rem;
   }
 
   .eyebrow,

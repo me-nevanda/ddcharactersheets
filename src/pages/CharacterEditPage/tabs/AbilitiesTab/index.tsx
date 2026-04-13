@@ -46,6 +46,12 @@ export function AbilitiesTab() {
       label: `${t('pages.characterEdit.fields.charisma')} (${attributeModifierMap.charisma})`,
     },
   ]
+  const defenseOptions = [
+    { value: 'kp', label: t('pages.characterEdit.fields.kp') },
+    { value: 'fortitude', label: t('pages.characterEdit.fields.fortitude') },
+    { value: 'reflex', label: t('pages.characterEdit.fields.reflex') },
+    { value: 'will', label: t('pages.characterEdit.fields.will') },
+  ]
   const weaponDamageTypeOptions = [
     { value: 'normal', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.normal') },
     { value: 'acid', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.acid') },
@@ -275,6 +281,50 @@ export function AbilitiesTab() {
                   <div className={styles.abilityField}>
                     <span className={styles.attributeLabel}>{t('pages.characterEdit.abilities.weaponLabel')}</span>
                     <div className={styles.abilityWeaponStack}>
+                      <div className={styles.abilityWeaponTargetRow}>
+                        <label className={styles.abilityWeaponTargetGroup} htmlFor={`ability-weapon-attack-attribute-${index}`}>
+                          <span className={styles.attributeLabel}>
+                            {t('pages.characterEdit.abilities.weaponAttackAttributeLabel')}
+                          </span>
+                          <select
+                            className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponTargetSelect}`}
+                            id={`ability-weapon-attack-attribute-${index}`}
+                            value={ability.weaponAttackAttribute}
+                            onChange={(event) =>
+                              handleAbilityChange(index, 'weaponAttackAttribute', event.target.value)
+                            }
+                          >
+                            {attributeOptions.map((attribute) => (
+                              <option key={attribute.value} value={attribute.value}>
+                                {attribute.label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <span className={styles.weaponAttackAgainstLabel}>
+                          {t('pages.characterEdit.abilities.weaponAgainstLabel')}
+                        </span>
+                        <label className={styles.abilityWeaponTargetGroup} htmlFor={`ability-weapon-attack-defense-${index}`}>
+                          <span className={styles.attributeLabel}>
+                            {t('pages.characterEdit.abilities.weaponAttackDefenseLabel')}
+                          </span>
+                          <select
+                            className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponTargetSelect}`}
+                            id={`ability-weapon-attack-defense-${index}`}
+                            value={ability.weaponAttackDefense}
+                            onChange={(event) =>
+                              handleAbilityChange(index, 'weaponAttackDefense', event.target.value)
+                            }
+                          >
+                            {defenseOptions.map((defense) => (
+                              <option key={defense.value} value={defense.value}>
+                                {defense.label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+
                       <div className={styles.abilityWeaponRow}>
                         <select
                           className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponCountSelect}`}
