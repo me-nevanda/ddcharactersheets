@@ -254,5 +254,13 @@ export const en: TranslationDictionary = {
         },
       },
     },
+    characterPrint: {
+      title: 'Character sheet',
+      loading: 'Preparing print view...',
+      error: 'Could not prepare the print view.',
+      back: 'Back to edit',
+      pdLabel: 'PD',
+      printButtonLabel: 'Print',
+    },
   },
 }

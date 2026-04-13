@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
 import { CharacterEditPageProvider, useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext'
@@ -12,6 +12,7 @@ import { ItemsTab } from '@pages/CharacterEditPage/tabs/ItemsTab'
 
 function CharacterEditPageContent() {
   const { t } = useI18n()
+  const { characterId = '' } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const [isPrintMenuOpen, setPrintMenuOpen] = useState(false)
   const printMenuRef = useRef<HTMLDivElement>(null)
@@ -49,15 +50,14 @@ function CharacterEditPageContent() {
     setSearchParams(nextParams)
   }
 
-  function handlePrintSection(nextTab: CharacterEditTabKey) {
-    handleTabChange(nextTab)
+  function handlePrintSheet() {
     setPrintMenuOpen(false)
 
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        window.print()
-      })
-    })
+    if (!characterId) {
+      return
+    }
+
+    window.open(`/characters/${characterId}/print`, '_blank')
   }
 
   return (
@@ -102,18 +102,18 @@ function CharacterEditPageContent() {
                   <button
                     className={styles.printMenuItem}
                     type="button"
-                    onClick={() => handlePrintSection('general')}
+                    onClick={handlePrintSheet}
                   >
                     {t('pages.characterEdit.printMenu.characterSheet')}
                   </button>
                   <button
                     className={styles.printMenuItem}
                     type="button"
-                    onClick={() => handlePrintSection('abilities')}
+                    onClick={handlePrintSheet}
                   >
                     {t('pages.characterEdit.printMenu.abilitiesAndFeats')}
                   </button>
-                  <button className={styles.printMenuItem} type="button" onClick={() => handlePrintSection('items')}>
+                  <button className={styles.printMenuItem} type="button" onClick={handlePrintSheet}>
                     {t('pages.characterEdit.printMenu.items')}
                   </button>
                 </div>

@@ -253,5 +253,13 @@ export interface TranslationDictionary {
         }
       }
     }
+    characterPrint: {
+      title: string
+      loading: string
+      error: string
+      back: string
+      pdLabel: string
+      printButtonLabel: string
+    }
   }
 }

@@ -7,7 +7,7 @@ export function LanguageSwitcher() {
   const { locale, setLocale, t } = useI18n()
 
   return (
-    <div className={styles.switcher} aria-label={t('common.language')}>
+    <div className={`${styles.switcher} language-switcher`} aria-label={t('common.language')}>
       {locales.map((localeOption) => (
         <button
           key={localeOption}

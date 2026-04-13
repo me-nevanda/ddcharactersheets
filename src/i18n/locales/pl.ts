@@ -254,5 +254,13 @@ export const pl: TranslationDictionary = {
         },
       },
     },
+    characterPrint: {
+      title: 'Karta postaci',
+      loading: 'Przygotowywanie wydruku...',
+      error: 'Nie udało się przygotować wydruku.',
+      back: 'Wróć do edycji',
+      pdLabel: 'PD',
+      printButtonLabel: 'Drukuj',
+    },
   },
 }
