@@ -138,35 +138,6 @@ export function AbilitiesTab() {
                     placeholder={t('pages.characterEdit.abilities.namePlaceholder')}
                     onChange={(event) => handleAbilityChange(index, 'name', event.target.value)}
                   />
-                  <select
-                    className={styles.abilityHeaderSelect}
-                    id={`ability-type-${index}`}
-                    value={ability.type}
-                    onChange={(event) =>
-                      handleAbilityChange(
-                        index,
-                        'type',
-                        event.target.value === 'encounter' || event.target.value === 'daily'
-                          ? event.target.value
-                          : 'unlimited',
-                      )
-                    }
-                  >
-                    <option value="unlimited">{t('pages.characterEdit.abilities.typeOptions.unlimited')}</option>
-                    <option value="encounter">{t('pages.characterEdit.abilities.typeOptions.encounter')}</option>
-                    <option value="daily">{t('pages.characterEdit.abilities.typeOptions.daily')}</option>
-                  </select>
-                  <select
-                    className={styles.abilityHeaderSelect}
-                    id={`ability-kind-${index}`}
-                    value={ability.kind}
-                    onChange={(event) =>
-                      handleAbilityChange(index, 'kind', event.target.value === 'utility' ? 'utility' : 'offensive')
-                    }
-                  >
-                    <option value="offensive">{t('pages.characterEdit.abilities.kindOptions.offensive')}</option>
-                    <option value="utility">{t('pages.characterEdit.abilities.kindOptions.utility')}</option>
-                  </select>
                   <button
                     className={styles.abilityRemoveButton}
                     type="button"
@@ -192,6 +163,41 @@ export function AbilitiesTab() {
                       <option value="action">{t('pages.characterEdit.abilities.actionOptions.action')}</option>
                       <option value="noAction">{t('pages.characterEdit.abilities.actionOptions.noAction')}</option>
                     </select>
+                    <label className={styles.abilityActionTypeGroup} htmlFor={`ability-type-${index}`}>
+                      <span className={styles.attributeLabel}>{t('pages.characterEdit.abilities.typeLabel')}</span>
+                      <select
+                        className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityActionTypeSelect}`}
+                        id={`ability-type-${index}`}
+                        value={ability.type}
+                        onChange={(event) =>
+                          handleAbilityChange(
+                            index,
+                            'type',
+                            event.target.value === 'encounter' || event.target.value === 'daily'
+                              ? event.target.value
+                              : 'unlimited',
+                          )
+                        }
+                      >
+                        <option value="unlimited">{t('pages.characterEdit.abilities.typeOptions.unlimited')}</option>
+                        <option value="encounter">{t('pages.characterEdit.abilities.typeOptions.encounter')}</option>
+                        <option value="daily">{t('pages.characterEdit.abilities.typeOptions.daily')}</option>
+                      </select>
+                    </label>
+                    <label className={styles.abilityActionKindGroup} htmlFor={`ability-kind-${index}`}>
+                      <span className={styles.attributeLabel}>{t('pages.characterEdit.abilities.kindLabel')}</span>
+                      <select
+                        className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityActionKindSelect}`}
+                        id={`ability-kind-${index}`}
+                        value={ability.kind}
+                        onChange={(event) =>
+                          handleAbilityChange(index, 'kind', event.target.value === 'utility' ? 'utility' : 'offensive')
+                        }
+                      >
+                        <option value="offensive">{t('pages.characterEdit.abilities.kindOptions.offensive')}</option>
+                        <option value="utility">{t('pages.characterEdit.abilities.kindOptions.utility')}</option>
+                      </select>
+                    </label>
                     <label className={styles.abilityActionDistanceGroup} htmlFor={`ability-weapon-range-${index}`}>
                       <span className={styles.attributeLabel}>
                         {t('pages.characterEdit.abilities.weaponRangeLabel')}
@@ -212,7 +218,7 @@ export function AbilitiesTab() {
                       </select>
                     </label>
                     <label className={styles.abilityActionAreaGroup} htmlFor={`ability-weapon-area-${index}`}>
-                      <span className={styles.srOnly}>{t('pages.characterEdit.abilities.weaponAreaLabel')}</span>
+                      <span className={styles.attributeLabel}>{t('pages.characterEdit.abilities.weaponAreaLabel')}</span>
                       <select
                         className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponAreaSelect}`}
                         id={`ability-weapon-area-${index}`}
@@ -355,6 +361,56 @@ export function AbilitiesTab() {
                           ))}
                           </select>
                         </label>
+                      </div>
+
+                      <div className={styles.abilityWeaponTextAreaSoloRow}>
+                        <div className={styles.abilityWeaponTextAreaField}>
+                          <span className={styles.attributeLabel}>
+                            {t('pages.characterEdit.abilities.weaponRecurringDamageLabel')}
+                          </span>
+                          <div className={styles.abilityWeaponRowSecondary}>
+                            <label
+                              className={styles.abilityWeaponCountGroup}
+                              htmlFor={`ability-weapon-recurring-count-${index}`}
+                            >
+                              <span className={styles.srOnly}>
+                                {t('pages.characterEdit.abilities.weaponDamageCountLabel')}
+                              </span>
+                              <select
+                                className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponDamageCountSelect}`}
+                                id={`ability-weapon-recurring-count-${index}`}
+                                value={ability.weaponRecurringDamageCount}
+                                onChange={(event) =>
+                                  handleAbilityChange(
+                                    index,
+                                    'weaponRecurringDamageCount',
+                                    Math.min(10, Math.max(0, Number.parseInt(event.target.value, 10) || 0)),
+                                  )
+                                }
+                              >
+                                {Array.from({ length: 11 }, (_, count) => count).map((count) => (
+                                  <option key={count} value={count}>
+                                    {count}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                            <select
+                              className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponDamageTypeSelect}`}
+                              id={`ability-weapon-recurring-type-${index}`}
+                              value={ability.weaponRecurringDamageType}
+                              onChange={(event) =>
+                                handleAbilityChange(index, 'weaponRecurringDamageType', event.target.value)
+                              }
+                            >
+                              {weaponDamageTypeOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
                       </div>
 
                       <div className={styles.abilityWeaponTextAreaSoloRow}>

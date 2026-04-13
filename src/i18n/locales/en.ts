@@ -13,6 +13,7 @@ export const en: TranslationDictionary = {
       cancel: 'Cancel',
       delete: 'Delete',
       edit: 'Edit',
+      print: 'Print',
       save: 'Save',
       backToList: 'Back to list',
     },
@@ -55,6 +56,11 @@ export const en: TranslationDictionary = {
         general: 'Main',
         abilities: 'Abilities',
         feats: 'Feats',
+        items: 'Items',
+      },
+      printMenu: {
+        characterSheet: 'Character sheet',
+        abilitiesAndFeats: 'Abilities and feats',
         items: 'Items',
       },
       sections: {
@@ -106,10 +112,11 @@ export const en: TranslationDictionary = {
           offensive: 'Offensive',
           utility: 'Utility',
         },
-        weaponLabel: 'Weapon type',
+        weaponLabel: 'Single-use damage',
         weaponDamageDiceLabel: 'Die',
         weaponDamageCountLabel: 'Count',
         weaponDamageTypeLabel: 'Damage type',
+        weaponRecurringDamageLabel: 'Recurring damage',
         weaponBonusOptions: {
           none: 'None',
           prefix: 'bonus',

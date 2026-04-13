@@ -12,6 +12,7 @@ export interface TranslationDictionary {
       cancel: string
       delete: string
       edit: string
+      print: string
       save: string
       backToList: string
     }
@@ -54,6 +55,11 @@ export interface TranslationDictionary {
         general: string
         abilities: string
         feats: string
+        items: string
+      }
+      printMenu: {
+        characterSheet: string
+        abilitiesAndFeats: string
         items: string
       }
       sections: {
@@ -109,6 +115,7 @@ export interface TranslationDictionary {
         weaponDamageDiceLabel: string
         weaponDamageCountLabel: string
         weaponDamageTypeLabel: string
+        weaponRecurringDamageLabel: string
         weaponBonusOptions: {
           none: string
           prefix: string

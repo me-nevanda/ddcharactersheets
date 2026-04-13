@@ -217,6 +217,11 @@ function normalizeAbilities(
           : 0,
       weaponAttributeBonus: normalizeWeaponAttributeBonus(item.weaponAttributeBonus),
       weaponDamageType: normalizeAbilityWeaponDamageType(item.weaponDamageType),
+      weaponRecurringDamageCount:
+        typeof item.weaponRecurringDamageCount === 'number' && Number.isFinite(item.weaponRecurringDamageCount)
+          ? Math.min(10, Math.max(0, Math.trunc(item.weaponRecurringDamageCount)))
+          : 0,
+      weaponRecurringDamageType: normalizeAbilityWeaponDamageType(item.weaponRecurringDamageType),
       weaponHit: typeof item.weaponHit === 'string' ? item.weaponHit : '',
       weaponMiss: typeof item.weaponMiss === 'string' ? item.weaponMiss : '',
       weaponProvocation: typeof item.weaponProvocation === 'string' ? item.weaponProvocation : '',

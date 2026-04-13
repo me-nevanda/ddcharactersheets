@@ -17,6 +17,8 @@ import {
   defaultAbilityWeaponDamageDiceCount,
   defaultAbilityWeaponDamageDiceType,
   defaultAbilityWeaponDamageType,
+  defaultAbilityWeaponRecurringDamageCount,
+  defaultAbilityWeaponRecurringDamageType,
   defaultAbilityWeaponHit,
   defaultAbilityWeaponMiss,
   defaultAbilityWeaponProvocation,
@@ -110,6 +112,21 @@ function normalizeAbilityWeaponDamageDiceCount(value: unknown, fallback: number)
     const parsed = Number.parseInt(value, 10)
     if (Number.isFinite(parsed)) {
       return Math.min(20, Math.max(0, Math.trunc(parsed)))
+    }
+  }
+
+  return fallback
+}
+
+function normalizeAbilityWeaponRecurringDamageCount(value: unknown, fallback: number): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(10, Math.max(0, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(10, Math.max(0, Math.trunc(parsed)))
     }
   }
 
@@ -467,6 +484,14 @@ export function useCharacterEditPage(): CharacterEditPageState {
                 ability.weaponDamageType,
                 defaultAbilityWeaponDamageType,
               ),
+              weaponRecurringDamageCount: normalizeAbilityWeaponRecurringDamageCount(
+                ability.weaponRecurringDamageCount,
+                defaultAbilityWeaponRecurringDamageCount,
+              ),
+              weaponRecurringDamageType: normalizeAbilityWeaponDamageType(
+                ability.weaponRecurringDamageType,
+                defaultAbilityWeaponRecurringDamageType,
+              ),
               weaponHit: ability.weaponHit ?? '',
               weaponMiss: ability.weaponMiss ?? '',
               weaponProvocation: ability.weaponProvocation ?? '',
@@ -640,6 +665,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
       weaponDamageDiceCount: ability.weaponDamageDiceCount,
       weaponAttributeBonus: ability.weaponAttributeBonus,
       weaponDamageType: ability.weaponDamageType,
+      weaponRecurringDamageCount: ability.weaponRecurringDamageCount,
+      weaponRecurringDamageType: ability.weaponRecurringDamageType,
       weaponHit: ability.weaponHit,
       weaponMiss: ability.weaponMiss,
       weaponProvocation: ability.weaponProvocation,
@@ -675,6 +702,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
           weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
           weaponAttributeBonus: '',
           weaponDamageType: defaultAbilityWeaponDamageType,
+          weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
+          weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,
           weaponHit: defaultAbilityWeaponHit,
           weaponMiss: defaultAbilityWeaponMiss,
           weaponProvocation: defaultAbilityWeaponProvocation,
@@ -701,6 +730,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
                     weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
                     weaponAttributeBonus: '',
                     weaponDamageType: defaultAbilityWeaponDamageType,
+                    weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
+                    weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,
                     weaponHit: defaultAbilityWeaponHit,
                     weaponMiss: defaultAbilityWeaponMiss,
                     weaponProvocation: defaultAbilityWeaponProvocation,
@@ -712,6 +743,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
                       weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
                       weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
                       weaponDamageType: defaultAbilityWeaponDamageType,
+                      weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
+                      weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,
                       weaponHit: defaultAbilityWeaponHit,
                       weaponMiss: defaultAbilityWeaponMiss,
                       weaponProvocation: defaultAbilityWeaponProvocation,
@@ -973,6 +1006,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
                 weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
                 weaponAttributeBonus: '',
                 weaponDamageType: defaultAbilityWeaponDamageType,
+                weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
+                weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,
                 weaponHit: defaultAbilityWeaponHit,
                 weaponMiss: defaultAbilityWeaponMiss,
                 weaponProvocation: defaultAbilityWeaponProvocation,

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
@@ -12,14 +13,51 @@ import { ItemsTab } from '@pages/CharacterEditPage/tabs/ItemsTab'
 function CharacterEditPageContent() {
   const { t } = useI18n()
   const [searchParams, setSearchParams] = useSearchParams()
+  const [isPrintMenuOpen, setPrintMenuOpen] = useState(false)
+  const printMenuRef = useRef<HTMLDivElement>(null)
   const { error, form, loading, saving, hasChanges, handleGeneralChange, handleSubmit } =
     useCharacterEditPageContext()
   const activeTab = resolveActiveTab(searchParams.get('tab'))
+
+  useEffect(() => {
+    function handleDocumentPointerDown(event: MouseEvent) {
+      if (printMenuRef.current?.contains(event.target as Node)) {
+        return
+      }
+
+      setPrintMenuOpen(false)
+    }
+
+    function handleDocumentKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setPrintMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleDocumentPointerDown)
+    document.addEventListener('keydown', handleDocumentKeyDown)
+
+    return () => {
+      document.removeEventListener('mousedown', handleDocumentPointerDown)
+      document.removeEventListener('keydown', handleDocumentKeyDown)
+    }
+  }, [])
 
   function handleTabChange(nextTab: CharacterEditTabKey) {
     const nextParams = new URLSearchParams(searchParams)
     nextParams.set('tab', nextTab)
     setSearchParams(nextParams)
+  }
+
+  function handlePrintSection(nextTab: CharacterEditTabKey) {
+    handleTabChange(nextTab)
+    setPrintMenuOpen(false)
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        window.print()
+      })
+    })
   }
 
   return (
@@ -46,6 +84,41 @@ function CharacterEditPageContent() {
             <Link className={styles.ghostLink} to="/">
               {t('common.actions.backToList')}
             </Link>
+            <div className={styles.printMenu} ref={printMenuRef}>
+              <button
+                aria-expanded={isPrintMenuOpen}
+                aria-haspopup="menu"
+                className={styles.primaryButton}
+                type="button"
+                onClick={() => setPrintMenuOpen((current) => !current)}
+              >
+                <span className={styles.buttonContent}>
+                  <AppIcon name="print" />
+                  <span>{t('common.actions.print')}</span>
+                </span>
+              </button>
+              {isPrintMenuOpen ? (
+                <div className={styles.printMenuList} role="menu" aria-label={t('common.actions.print')}>
+                  <button
+                    className={styles.printMenuItem}
+                    type="button"
+                    onClick={() => handlePrintSection('general')}
+                  >
+                    {t('pages.characterEdit.printMenu.characterSheet')}
+                  </button>
+                  <button
+                    className={styles.printMenuItem}
+                    type="button"
+                    onClick={() => handlePrintSection('abilities')}
+                  >
+                    {t('pages.characterEdit.printMenu.abilitiesAndFeats')}
+                  </button>
+                  <button className={styles.printMenuItem} type="button" onClick={() => handlePrintSection('items')}>
+                    {t('pages.characterEdit.printMenu.items')}
+                  </button>
+                </div>
+              ) : null}
+            </div>
             <button className={styles.primaryButton} form="character-edit-form" type="submit" disabled={saving || !hasChanges}>
               <span className={styles.buttonContent}>
                 <AppIcon name="save" />

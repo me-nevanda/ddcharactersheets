@@ -57,6 +57,35 @@ function getIconPath(name: AppIconProps['name']) {
           strokeWidth="1.9"
         />
       )
+    case 'print':
+      return (
+        <>
+          <path
+            d="M7 9V5h10v4"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.9"
+          />
+          <path
+            d="M7 17H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.9"
+          />
+          <path
+            d="M8 13h8v6H8z"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.9"
+          />
+        </>
+      )
     case 'edit':
       return (
         <>

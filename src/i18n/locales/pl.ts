@@ -13,6 +13,7 @@ export const pl: TranslationDictionary = {
       cancel: 'Anuluj',
       delete: 'Usuń',
       edit: 'Edytuj',
+      print: 'Wydrukuj',
       save: 'Zapisz',
       backToList: 'Wróć do listy',
     },
@@ -55,6 +56,11 @@ export const pl: TranslationDictionary = {
         general: 'Główne',
         abilities: 'Zdolności',
         feats: 'Atuty',
+        items: 'Przedmioty',
+      },
+      printMenu: {
+        characterSheet: 'Karta postaci',
+        abilitiesAndFeats: 'Zdolności i atuty',
         items: 'Przedmioty',
       },
       sections: {
@@ -106,10 +112,11 @@ export const pl: TranslationDictionary = {
           offensive: 'Ofensywna',
           utility: 'Użytkowa',
         },
-        weaponLabel: 'Rodzaj używanej broni',
+        weaponLabel: 'Obrażenia jednorazowe',
         weaponDamageDiceLabel: 'Kostka',
         weaponDamageCountLabel: 'Liczba',
         weaponDamageTypeLabel: 'Typ obrażeń',
+        weaponRecurringDamageLabel: 'Obrażenia nawracające',
         weaponBonusOptions: {
           none: 'Brak',
           prefix: 'bonus',

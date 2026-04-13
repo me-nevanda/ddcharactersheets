@@ -27,6 +27,10 @@
   gap: 0.6rem;
 }
 
+.printMenu {
+  position: relative;
+}
+
 .headerCopy {
   display: grid;
   gap: 0.35rem;
@@ -123,6 +127,36 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+}
+
+.printMenuList {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  left: 0;
+  z-index: 20;
+  display: grid;
+  min-width: 14rem;
+  padding: 0.45rem;
+  gap: 0.35rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 1rem;
+  background: rgba(18, 16, 15, 0.96);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(12px);
+}
+
+.printMenuItem {
+  @include pill-button;
+  justify-content: flex-start;
+  width: 100%;
+  background: rgba(255, 248, 235, 0.04);
+  border-color: rgba(255, 248, 235, 0.08);
+  color: var(--text-strong);
+}
+
+.printMenuItem:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
 }
 
 .status {
@@ -295,6 +329,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
+  align-items: start;
 }
 
 .abilityCard {
@@ -304,11 +339,12 @@
   border-radius: 1rem;
   background: rgba(255, 248, 235, 0.03);
   border: 1px solid rgba(255, 248, 235, 0.06);
+  align-self: start;
 }
 
 .abilityCardHeader {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 0.8fr)) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.75rem;
   padding: 0.7rem 0.8rem;
@@ -619,9 +655,12 @@
   flex-wrap: wrap;
   gap: 0.55rem;
   align-items: center;
+  justify-content: flex-start;
 }
 
 .abilityActionDistanceGroup,
+.abilityActionTypeGroup,
+.abilityActionKindGroup,
 .abilityActionAreaGroup {
   display: inline-flex;
   align-items: center;
@@ -632,6 +671,13 @@
   width: auto;
   min-width: 4.75rem;
   flex: 0 0 4.75rem;
+}
+
+.abilityActionTypeSelect,
+.abilityActionKindSelect {
+  width: auto;
+  min-width: 8.75rem;
+  flex: 0 0 8.75rem;
 }
 
 .abilityWeaponAreaSelect {
@@ -673,6 +719,12 @@
   width: auto;
   min-width: 8.5rem;
   flex: 0 1 8.5rem;
+}
+
+.abilityActionRow > .abilitySelect {
+  width: auto;
+  min-width: 6.75rem;
+  flex: 0 0 6.75rem;
 }
 
 .abilityWeaponTextAreaRow {
