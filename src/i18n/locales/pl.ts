@@ -262,5 +262,22 @@ export const pl: TranslationDictionary = {
       pdLabel: 'PD',
       printButtonLabel: 'Drukuj',
     },
+    characterAbilitiesPrint: {
+      title: 'Zdolności i atuty',
+      loading: 'Przygotowywanie wydruku zdolności...',
+      error: 'Nie udało się przygotować wydruku zdolności.',
+      back: 'Wróć do edycji',
+      printButtonLabel: 'Drukuj',
+      emptyState: 'Nie dodano jeszcze żadnych zdolności.',
+      damageLabel: 'Obrażenia',
+      damageParts: {
+        recurring: 'nawracających',
+        type: 'typu',
+      },
+      sections: {
+        offensive: 'Ofensywne',
+        utility: 'Użytkowe',
+      },
+    },
   },
 }

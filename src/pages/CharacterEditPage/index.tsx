@@ -60,6 +60,16 @@ function CharacterEditPageContent() {
     window.open(`/characters/${characterId}/print`, '_blank')
   }
 
+  function handlePrintAbilities() {
+    setPrintMenuOpen(false)
+
+    if (!characterId) {
+      return
+    }
+
+    window.open(`/characters/${characterId}/print/abilities`, '_blank')
+  }
+
   return (
     <main className={styles.editorLayout}>
       <section className={styles.editorCard}>
@@ -109,7 +119,7 @@ function CharacterEditPageContent() {
                   <button
                     className={styles.printMenuItem}
                     type="button"
-                    onClick={handlePrintSheet}
+                    onClick={handlePrintAbilities}
                   >
                     {t('pages.characterEdit.printMenu.abilitiesAndFeats')}
                   </button>

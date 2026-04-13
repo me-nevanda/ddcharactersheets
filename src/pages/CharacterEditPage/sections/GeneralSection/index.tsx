@@ -7,6 +7,7 @@ export function GeneralSection() {
   const { t } = useI18n()
   const { form, levelBonusLabel, handleGeneralChange, hpValue, surgeValue, speedValue, speedTooltip } =
     useCharacterEditPageContext()
+  const surgeHealingValue = Math.ceil(Math.max(0, hpValue) / 4)
 
   return (
     <section className={styles.section}>
@@ -93,7 +94,11 @@ export function GeneralSection() {
 
         <div className={styles.generalValueCard}>
           <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.surge')}</span>
-          <span className={styles.modifierBadge}>{surgeValue}</span>
+          <div className={styles.surgeValueRow}>
+            <span className={styles.surgeValueBox}>{surgeValue}</span>
+            <span className={styles.surgeValueSeparator}>x</span>
+            <span className={styles.surgeValueBox}>{surgeHealingValue} HP</span>
+          </div>
         </div>
       </div>
     </section>

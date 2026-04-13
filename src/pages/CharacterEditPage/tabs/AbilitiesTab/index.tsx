@@ -59,6 +59,42 @@ export function AbilitiesTab() {
     { value: 'radiant', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.radiant') },
     { value: 'thunder', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.thunder') },
   ]
+
+  function buildAbilityDamage(ability: (typeof form.abilities)[number]) {
+    const attributeLabelMap: Record<string, string> = {
+      strength: t('pages.characterEdit.fields.strength'),
+      condition: t('pages.characterEdit.fields.condition'),
+      dexterity: t('pages.characterEdit.fields.dexterity'),
+      intelligence: t('pages.characterEdit.fields.intelligence'),
+      wisdom: t('pages.characterEdit.fields.wisdom'),
+      charisma: t('pages.characterEdit.fields.charisma'),
+    }
+
+    const damageTypeLabelMap: Record<string, string> = {
+      normal: t('pages.characterEdit.abilities.weaponDamageTypeOptions.normal'),
+      acid: t('pages.characterEdit.abilities.weaponDamageTypeOptions.acid'),
+      cold: t('pages.characterEdit.abilities.weaponDamageTypeOptions.cold'),
+      fire: t('pages.characterEdit.abilities.weaponDamageTypeOptions.fire'),
+      force: t('pages.characterEdit.abilities.weaponDamageTypeOptions.force'),
+      lightning: t('pages.characterEdit.abilities.weaponDamageTypeOptions.lightning'),
+      necrotic: t('pages.characterEdit.abilities.weaponDamageTypeOptions.necrotic'),
+      poison: t('pages.characterEdit.abilities.weaponDamageTypeOptions.poison'),
+      psychic: t('pages.characterEdit.abilities.weaponDamageTypeOptions.psychic'),
+      radiant: t('pages.characterEdit.abilities.weaponDamageTypeOptions.radiant'),
+      thunder: t('pages.characterEdit.abilities.weaponDamageTypeOptions.thunder'),
+    }
+
+    const damageParts = [
+      ability.weaponDamageDiceType && ability.weaponDamageDiceCount > 0
+        ? `${ability.weaponDamageDiceCount}${ability.weaponDamageDiceType}`
+        : '',
+      ability.weaponAttributeBonus ? `${t('pages.characterEdit.abilities.weaponBonusOptions.prefix')} ${attributeLabelMap[ability.weaponAttributeBonus] ?? ''}` : '',
+      damageTypeLabelMap[ability.weaponDamageType] ?? '',
+    ].filter((part) => part.length > 0)
+
+    return damageParts.join(' + ')
+  }
+
   const weaponAreaOptions = [
     { value: 'point', label: t('pages.characterEdit.abilities.weaponAreaOptions.point') },
     ...Array.from({ length: 10 }, (_, index) => index + 1).flatMap((count) => [
@@ -412,6 +448,13 @@ export function AbilitiesTab() {
                           </div>
                         </div>
                       </div>
+
+                      {ability.weaponName.length > 0 ? (
+                        <div className={styles.abilityDamageSection}>
+                          <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.damage')}</span>
+                          <strong className={styles.abilityDamageValue}>{buildAbilityDamage(ability)}</strong>
+                        </div>
+                      ) : null}
 
                       <div className={styles.abilityWeaponTextAreaSoloRow}>
                         <label className={styles.abilityWeaponTextAreaField} htmlFor={`ability-weapon-provocation-${index}`}>

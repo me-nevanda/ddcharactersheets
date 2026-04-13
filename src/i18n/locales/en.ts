@@ -262,5 +262,22 @@ export const en: TranslationDictionary = {
       pdLabel: 'PD',
       printButtonLabel: 'Print',
     },
+    characterAbilitiesPrint: {
+      title: 'Abilities and feats',
+      loading: 'Preparing abilities print view...',
+      error: 'Could not prepare the abilities print view.',
+      back: 'Back to edit',
+      printButtonLabel: 'Print',
+      emptyState: 'No abilities have been added yet.',
+      damageLabel: 'Damage',
+      damageParts: {
+        recurring: 'recurring',
+        type: 'type',
+      },
+      sections: {
+        offensive: 'Offensive',
+        utility: 'Utility',
+      },
+    },
   },
 }

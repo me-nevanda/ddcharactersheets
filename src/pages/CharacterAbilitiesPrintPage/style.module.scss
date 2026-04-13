@@ -1,0 +1,448 @@
+@use '../../styles/mixins' as *;
+
+@page {
+  size: A4 portrait;
+  margin: 6mm;
+}
+
+.pageShell {
+  min-height: 100vh;
+  padding: 1.25rem;
+}
+
+.printButton {
+  position: fixed;
+  top: calc(4rem + 20px);
+  right: 1rem;
+  z-index: 25;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #a64a2e 0%, #d9a441 100%);
+  color: #1d120e;
+  box-shadow: 0 12px 30px rgba(166, 74, 46, 0.28);
+}
+
+.printButton:hover {
+  transform: translateY(-1px);
+}
+
+.sheet {
+  display: grid;
+  gap: 1rem;
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  padding: 1rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 1.35rem;
+  background: rgba(24, 17, 13, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.headerCopy {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.95;
+}
+
+.section {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 1.15rem;
+  background: rgba(255, 248, 235, 0.025);
+  break-inside: avoid;
+}
+
+.sectionStack {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.sectionGroup {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.abilityGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.abilityCard {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 1rem;
+  background: rgba(255, 248, 235, 0.03);
+  break-inside: avoid;
+}
+
+.abilityCardUnlimited {
+  border-top: 0.32rem solid #3d8b4a;
+}
+
+.abilityCardEncounter {
+  border-top: 0.32rem solid #b03a34;
+}
+
+.abilityCardDaily {
+  border-top: 0.32rem solid #7a7f86;
+}
+
+.abilityHeader {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.abilityHeaderRow {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.damageSection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: baseline;
+  padding-top: 0.28rem;
+  padding-bottom: 0.28rem;
+  border-bottom: 1px solid rgba(255, 248, 235, 0.18);
+}
+
+.abilityName {
+  margin: 0;
+  color: var(--text-strong);
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  line-height: 1.05;
+}
+
+.typeBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.typeBadgeUnlimited {
+  background: #3d8b4a;
+}
+
+.typeBadgeEncounter {
+  background: #b03a34;
+}
+
+.typeBadgeDaily {
+  background: #7a7f86;
+}
+
+.metaList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.metaTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--text-soft);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.actionTagAction {
+  background: rgba(61, 139, 74, 0.25);
+  color: #dff7e3;
+}
+
+.actionTagNoAction {
+  background: rgba(122, 127, 134, 0.25);
+  color: #eceff2;
+}
+
+.abilityDescription {
+  margin: 0;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(255, 248, 235, 0.18);
+  color: var(--text-strong);
+  font-size: 0.94rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.detailList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.offensiveNotes {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.detailRow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  padding: 0;
+}
+
+.detailLabel {
+  color: var(--text-strong);
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.detailValue {
+  color: var(--text-strong);
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.emptyState,
+.status {
+  margin: 0;
+  color: var(--text-strong);
+}
+
+.emptyState {
+  padding: 0.3rem 0.1rem;
+}
+
+.backLink {
+  justify-self: start;
+  @include pill-button;
+  background: rgba(255, 248, 235, 0.04);
+  border-color: var(--border-soft);
+  color: var(--text-strong);
+}
+
+@media print {
+  :global(.language-switcher) {
+    display: none !important;
+  }
+
+  .printButton {
+    display: none;
+  }
+
+  :global(body) {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  :global(body)::before {
+    display: none !important;
+  }
+
+  .pageShell {
+    padding: 0;
+    min-height: auto;
+  }
+
+  .sheet {
+    box-sizing: border-box;
+    min-height: auto;
+    width: 100%;
+    gap: 0.45rem;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    box-shadow: none;
+    align-content: start;
+  }
+
+  .header {
+    display: none;
+  }
+
+  .section,
+  .abilityCard {
+    gap: 0.3rem;
+    padding: 0.4rem 0.45rem;
+    border-color: #bbb;
+    background: #fff;
+  }
+
+  .abilityHeaderRow {
+    justify-content: flex-start;
+  }
+
+  .sectionStack {
+    gap: 0.55rem;
+  }
+
+  .sectionGroup {
+    gap: 0.35rem;
+  }
+
+  .sectionTitle {
+    font-size: 0.78rem;
+  }
+
+  .abilityCardUnlimited {
+    border-top-color: #3d8b4a;
+  }
+
+  .abilityCardEncounter {
+    border-top-color: #b03a34;
+  }
+
+  .abilityCardDaily {
+    border-top-color: #7a7f86;
+  }
+
+  .damageSection {
+    gap: 0.25rem;
+    border-bottom-color: #c8c8c8;
+  }
+
+  .eyebrow,
+  .abilityName,
+  .typeBadge,
+  .metaTag,
+  .damageLabel,
+  .damageValue,
+  .detailLabel,
+  .detailValue,
+  .abilityDescription,
+  .emptyState,
+  .status {
+    color: #111;
+  }
+
+  .eyebrow {
+    font-size: 0.6rem;
+  }
+
+  .title {
+    font-size: 1.9rem;
+  }
+
+  .abilityName {
+    font-size: 1rem;
+  }
+
+  .typeBadge {
+    font-size: 0.58rem;
+    border: 1px solid #777;
+  }
+
+  .typeBadgeUnlimited {
+    background: rgba(61, 139, 74, 0.18);
+    color: #111;
+  }
+
+  .typeBadgeEncounter {
+    background: rgba(176, 58, 52, 0.18);
+    color: #111;
+  }
+
+  .typeBadgeDaily {
+    background: rgba(122, 127, 134, 0.18);
+    color: #111;
+  }
+
+  .metaTag {
+    margin-left: auto;
+    font-size: 0.58rem;
+  }
+
+  .actionTagAction {
+    background: rgba(61, 139, 74, 0.18);
+    color: #111;
+  }
+
+  .actionTagNoAction {
+    background: rgba(122, 127, 134, 0.18);
+    color: #111;
+  }
+
+  .damageLabel {
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .damageValue {
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+
+  .abilityDescription {
+    padding-top: 0.25rem;
+    border-top-color: #c8c8c8;
+    font-size: 0.84rem;
+  }
+
+  .detailList {
+    gap: 0.55rem;
+  }
+
+  .detailRow {
+    gap: 0.2rem;
+  }
+
+  .abilityGrid {
+    gap: 0.35rem;
+  }
+
+  .backLink {
+    display: none;
+  }
+}

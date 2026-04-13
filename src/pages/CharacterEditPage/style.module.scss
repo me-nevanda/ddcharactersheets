@@ -824,6 +824,33 @@
   border: 1px solid rgba(255, 248, 235, 0.06);
 }
 
+.surgeValueRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.surgeValueBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.15rem;
+  min-height: 2.15rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid rgba(240, 198, 111, 0.24);
+  border-radius: 0.65rem;
+  background: rgba(255, 248, 235, 0.04);
+  color: var(--text-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.surgeValueSeparator {
+  color: var(--text-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 .attributeField {
   display: flex;
   align-items: center;

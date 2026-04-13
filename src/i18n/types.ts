@@ -261,5 +261,22 @@ export interface TranslationDictionary {
       pdLabel: string
       printButtonLabel: string
     }
+    characterAbilitiesPrint: {
+      title: string
+      loading: string
+      error: string
+      back: string
+      printButtonLabel: string
+      emptyState: string
+      damageLabel: string
+      damageParts: {
+        recurring: string
+        type: string
+      }
+      sections: {
+        offensive: string
+        utility: string
+      }
+    }
   }
 }
