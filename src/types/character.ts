@@ -56,7 +56,15 @@ export interface CharacterAbility {
   kind: CharacterAbilityKind
   weaponCount: number
   weaponName: string
+  weaponDamageDiceType: CharacterWeaponDamageDiceType | ''
+  weaponDamageDiceCount: number
   weaponAttributeBonus: string
+  weaponDamageType: CharacterWeaponDamageType
+  weaponHit: string
+  weaponMiss: string
+  weaponProvocation: string
+  weaponRange: number
+  weaponArea: CharacterAbilityAreaType
 }
 
 export interface CharacterItemBase {
@@ -70,7 +78,20 @@ export interface CharacterWeapon extends CharacterItemBase {
   damageDiceCount: number
   damageDiceType: CharacterWeaponDamageDiceType
   damageBonusNumber: number
-  damageType: CharacterWeaponDamageType
+  range: number
+  equipped: boolean
+  weaponProficiencyBonusNumber: number
+  strengthBonusNumber: number
+  conditionBonusNumber: number
+  dexterityBonusNumber: number
+  intelligenceBonusNumber: number
+  wisdomBonusNumber: number
+  charismaBonusNumber: number
+  speedBonusNumber: number
+  kpBonusNumber: number
+  fortitudeBonusNumber: number
+  reflexBonusNumber: number
+  willBonusNumber: number
 }
 
 export interface CharacterOtherItem extends CharacterItemBase {}
@@ -84,11 +105,65 @@ export interface CharacterItems {
 export type CharacterItem = CharacterArmor | CharacterWeapon | CharacterOtherItem
 
 export type CharacterWeaponDamageDiceType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20'
-export type CharacterWeaponDamageType = 'normal' | 'poison' | 'radiant' | 'necrotic' | 'psychic'
+export type CharacterWeaponBonusFieldName =
+  | 'strengthBonusNumber'
+  | 'conditionBonusNumber'
+  | 'dexterityBonusNumber'
+  | 'intelligenceBonusNumber'
+  | 'wisdomBonusNumber'
+  | 'charismaBonusNumber'
+  | 'speedBonusNumber'
+  | 'kpBonusNumber'
+  | 'fortitudeBonusNumber'
+  | 'reflexBonusNumber'
+  | 'willBonusNumber'
+
+export type CharacterWeaponFieldName =
+  | 'damageDiceCount'
+  | 'damageDiceType'
+  | 'damageBonusNumber'
+  | 'range'
+  | 'equipped'
+  | 'weaponProficiencyBonusNumber'
+  | CharacterWeaponBonusFieldName
+export type CharacterWeaponDamageType =
+  | 'normal'
+  | 'acid'
+  | 'cold'
+  | 'fire'
+  | 'force'
+  | 'lightning'
+  | 'necrotic'
+  | 'poison'
+  | 'psychic'
+  | 'radiant'
+  | 'thunder'
 
 export type CharacterAbilityAction = 'action' | 'noAction'
 export type CharacterAbilityType = 'unlimited' | 'encounter' | 'daily'
 export type CharacterAbilityKind = 'offensive' | 'utility'
+export type CharacterAbilityAreaType =
+  | 'point'
+  | 'burst1'
+  | 'burst2'
+  | 'burst3'
+  | 'burst4'
+  | 'burst5'
+  | 'burst6'
+  | 'burst7'
+  | 'burst8'
+  | 'burst9'
+  | 'burst10'
+  | 'blast1'
+  | 'blast2'
+  | 'blast3'
+  | 'blast4'
+  | 'blast5'
+  | 'blast6'
+  | 'blast7'
+  | 'blast8'
+  | 'blast9'
+  | 'blast10'
 
 export interface CharacterDefenseBonuses {
   kp: number

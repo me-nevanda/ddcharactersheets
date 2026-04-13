@@ -3,6 +3,7 @@ import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promi
 import path from 'node:path'
 import type {
   CharacterAbility,
+  CharacterAbilityAreaType,
   Character,
   CharacterAbilityAction,
   CharacterAbilityKind,
@@ -107,6 +108,87 @@ function normalizeTrainingValue(value: unknown): boolean {
   return value === true
 }
 
+function normalizeAbilityWeaponDamageDiceType(value: unknown): CharacterWeaponDamageDiceType | '' {
+  if (
+    value === '' ||
+    value === 'd4' ||
+    value === 'd6' ||
+    value === 'd8' ||
+    value === 'd10' ||
+    value === 'd12' ||
+    value === 'd20'
+  ) {
+    return value
+  }
+
+  return 'd4'
+}
+
+function normalizeAbilityWeaponDamageType(value: unknown): CharacterWeaponDamageType {
+  if (
+    value === 'normal' ||
+    value === 'acid' ||
+    value === 'cold' ||
+    value === 'fire' ||
+    value === 'force' ||
+    value === 'lightning' ||
+    value === 'necrotic' ||
+    value === 'poison' ||
+    value === 'psychic' ||
+    value === 'radiant' ||
+    value === 'thunder'
+  ) {
+    return value
+  }
+
+  return 'normal'
+}
+
+function normalizeAbilityWeaponRange(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(30, Math.max(0, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(30, Math.max(0, Math.trunc(parsed)))
+    }
+  }
+
+  return 0
+}
+
+function normalizeAbilityWeaponArea(value: unknown): CharacterAbilityAreaType {
+  if (
+    value === 'point' ||
+    value === 'burst1' ||
+    value === 'burst2' ||
+    value === 'burst3' ||
+    value === 'burst4' ||
+    value === 'burst5' ||
+    value === 'burst6' ||
+    value === 'burst7' ||
+    value === 'burst8' ||
+    value === 'burst9' ||
+    value === 'burst10' ||
+    value === 'blast1' ||
+    value === 'blast2' ||
+    value === 'blast3' ||
+    value === 'blast4' ||
+    value === 'blast5' ||
+    value === 'blast6' ||
+    value === 'blast7' ||
+    value === 'blast8' ||
+    value === 'blast9' ||
+    value === 'blast10'
+  ) {
+    return value
+  }
+
+  return 'point'
+}
+
 function normalizeAbilities(
   data: unknown,
 ): CharacterAbility[] {
@@ -128,7 +210,18 @@ function normalizeAbilities(
           ? Math.min(10, Math.max(1, Math.trunc(item.weaponCount)))
           : 1,
       weaponName: typeof item.weaponName === 'string' ? item.weaponName : '',
+      weaponDamageDiceType: normalizeAbilityWeaponDamageDiceType(item.weaponDamageDiceType),
+      weaponDamageDiceCount:
+        typeof item.weaponDamageDiceCount === 'number' && Number.isFinite(item.weaponDamageDiceCount)
+          ? Math.min(20, Math.max(0, Math.trunc(item.weaponDamageDiceCount)))
+          : 0,
       weaponAttributeBonus: normalizeWeaponAttributeBonus(item.weaponAttributeBonus),
+      weaponDamageType: normalizeAbilityWeaponDamageType(item.weaponDamageType),
+      weaponHit: typeof item.weaponHit === 'string' ? item.weaponHit : '',
+      weaponMiss: typeof item.weaponMiss === 'string' ? item.weaponMiss : '',
+      weaponProvocation: typeof item.weaponProvocation === 'string' ? item.weaponProvocation : '',
+      weaponRange: normalizeAbilityWeaponRange(item.weaponRange),
+      weaponArea: normalizeAbilityWeaponArea(item.weaponArea),
     }))
     .filter((ability) => ability.name.length > 0 || ability.description.length > 0)
 }
@@ -207,6 +300,51 @@ function normalizeWeaponDamageNumber(value: unknown): number {
   return 0
 }
 
+function normalizeWeaponRange(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(20, Math.max(1, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(20, Math.max(1, Math.trunc(parsed)))
+    }
+  }
+
+  return 1
+}
+
+function normalizeWeaponBonusNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(10, Math.max(-5, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(10, Math.max(-5, Math.trunc(parsed)))
+    }
+  }
+
+  return 0
+}
+
+function normalizeWeaponProficiencyBonusNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(5, Math.max(0, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(5, Math.max(0, Math.trunc(parsed)))
+    }
+  }
+
+  return 0
+}
+
 function normalizeWeaponGroup(data: unknown): CharacterWeapon[] {
   if (!Array.isArray(data)) {
     return []
@@ -223,7 +361,20 @@ function normalizeWeaponGroup(data: unknown): CharacterWeapon[] {
           : 1,
       damageDiceType: normalizeWeaponDamageDiceType(item.damageDiceType),
       damageBonusNumber: normalizeWeaponDamageNumber(item.damageBonusNumber ?? item.damageBonus),
-      damageType: normalizeWeaponDamageType(item.damageType),
+      range: normalizeWeaponRange(item.range),
+      equipped: item.equipped === true,
+      weaponProficiencyBonusNumber: normalizeWeaponProficiencyBonusNumber(item.weaponProficiencyBonusNumber),
+      strengthBonusNumber: normalizeWeaponBonusNumber(item.strengthBonusNumber),
+      conditionBonusNumber: normalizeWeaponBonusNumber(item.conditionBonusNumber),
+      dexterityBonusNumber: normalizeWeaponBonusNumber(item.dexterityBonusNumber),
+      intelligenceBonusNumber: normalizeWeaponBonusNumber(item.intelligenceBonusNumber),
+      wisdomBonusNumber: normalizeWeaponBonusNumber(item.wisdomBonusNumber),
+      charismaBonusNumber: normalizeWeaponBonusNumber(item.charismaBonusNumber),
+      speedBonusNumber: normalizeWeaponBonusNumber(item.speedBonusNumber),
+      kpBonusNumber: normalizeWeaponBonusNumber(item.kpBonusNumber),
+      fortitudeBonusNumber: normalizeWeaponBonusNumber(item.fortitudeBonusNumber),
+      reflexBonusNumber: normalizeWeaponBonusNumber(item.reflexBonusNumber),
+      willBonusNumber: normalizeWeaponBonusNumber(item.willBonusNumber),
     }))
     .filter((item) => item.name.length > 0 || item.description.length > 0)
 }

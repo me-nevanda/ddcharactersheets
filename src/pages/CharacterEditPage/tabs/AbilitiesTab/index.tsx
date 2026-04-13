@@ -46,6 +46,29 @@ export function AbilitiesTab() {
       label: `${t('pages.characterEdit.fields.charisma')} (${attributeModifierMap.charisma})`,
     },
   ]
+  const weaponDamageTypeOptions = [
+    { value: 'normal', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.normal') },
+    { value: 'acid', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.acid') },
+    { value: 'cold', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.cold') },
+    { value: 'fire', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.fire') },
+    { value: 'force', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.force') },
+    { value: 'lightning', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.lightning') },
+    { value: 'necrotic', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.necrotic') },
+    { value: 'poison', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.poison') },
+    { value: 'psychic', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.psychic') },
+    { value: 'radiant', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.radiant') },
+    { value: 'thunder', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.thunder') },
+  ]
+  const weaponAreaOptions = [
+    { value: 'point', label: t('pages.characterEdit.abilities.weaponAreaOptions.point') },
+    ...Array.from({ length: 10 }, (_, index) => index + 1).flatMap((count) => [
+      { value: `burst${count}`, label: `${t('pages.characterEdit.abilities.weaponAreaOptions.burst')} ${count}` },
+    ]),
+    ...Array.from({ length: 10 }, (_, index) => index + 1).map((count) => ({
+      value: `blast${count}`,
+      label: `${t('pages.characterEdit.abilities.weaponAreaOptions.blast')} ${count}`,
+    })),
+  ]
 
   function handleAddAbility() {
     handleAbilityCreateEmpty()
@@ -155,71 +178,226 @@ export function AbilitiesTab() {
                   </button>
                 </div>
 
-                <label className={styles.abilityField} htmlFor={`ability-action-${index}`}>
+                <div className={styles.abilityField}>
                   <span className={styles.attributeLabel}>{t('pages.characterEdit.abilities.actionLabel')}</span>
-                  <select
-                    className={`${styles.input} ${styles.selectChevronInset} ${styles.abilitySelect}`}
-                    id={`ability-action-${index}`}
-                    value={ability.action}
-                    onChange={(event) =>
-                      handleAbilityChange(index, 'action', event.target.value === 'noAction' ? 'noAction' : 'action')
-                    }
-                  >
-                    <option value="action">{t('pages.characterEdit.abilities.actionOptions.action')}</option>
-                    <option value="noAction">{t('pages.characterEdit.abilities.actionOptions.noAction')}</option>
-                  </select>
-                </label>
-
-                {ability.kind !== 'utility' ? (
-                  <div className={styles.abilityField}>
-                    <span className={styles.attributeLabel}>{t('pages.characterEdit.abilities.weaponLabel')}</span>
-                    <div className={styles.abilityWeaponRow}>
+                  <div className={styles.abilityActionRow}>
+                    <select
+                      className={`${styles.input} ${styles.selectChevronInset} ${styles.abilitySelect}`}
+                      id={`ability-action-${index}`}
+                      value={ability.action}
+                      onChange={(event) =>
+                        handleAbilityChange(index, 'action', event.target.value === 'noAction' ? 'noAction' : 'action')
+                      }
+                    >
+                      <option value="action">{t('pages.characterEdit.abilities.actionOptions.action')}</option>
+                      <option value="noAction">{t('pages.characterEdit.abilities.actionOptions.noAction')}</option>
+                    </select>
+                    <label className={styles.abilityActionDistanceGroup} htmlFor={`ability-weapon-range-${index}`}>
+                      <span className={styles.attributeLabel}>
+                        {t('pages.characterEdit.abilities.weaponRangeLabel')}
+                      </span>
                       <select
-                        className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponCountSelect}`}
-                        id={`ability-weapon-count-${index}`}
-                        value={ability.weaponCount}
+                        className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponRangeSelect}`}
+                        id={`ability-weapon-range-${index}`}
+                        value={ability.weaponRange}
                         onChange={(event) =>
-                          handleAbilityChange(
-                            index,
-                            'weaponCount',
-                            Math.min(10, Math.max(1, Number.parseInt(event.target.value, 10) || 1)),
-                          )
+                          handleAbilityChange(index, 'weaponRange', Number.parseInt(event.target.value, 10) || 0)
                         }
                       >
-                        {Array.from({ length: 10 }, (_, count) => count + 1).map((count) => (
+                        {Array.from({ length: 31 }, (_, count) => count).map((count) => (
                           <option key={count} value={count}>
                             {count}
                           </option>
                         ))}
                       </select>
-                      <span className={styles.weaponDamageSeparator}>x</span>
+                    </label>
+                    <label className={styles.abilityActionAreaGroup} htmlFor={`ability-weapon-area-${index}`}>
+                      <span className={styles.srOnly}>{t('pages.characterEdit.abilities.weaponAreaLabel')}</span>
                       <select
-                        className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponSelect}`}
-                        id={`ability-weapon-${index}`}
-                        value={ability.weaponName}
-                        onChange={(event) => handleAbilityChange(index, 'weaponName', event.target.value)}
+                        className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponAreaSelect}`}
+                        id={`ability-weapon-area-${index}`}
+                        value={ability.weaponArea}
+                        onChange={(event) => handleAbilityChange(index, 'weaponArea', event.target.value)}
                       >
-                        <option value="">{t('pages.characterEdit.abilities.weaponOptions.none')}</option>
-                        {currentWeaponOptions.map((weaponName) => (
-                          <option key={weaponName} value={weaponName}>
-                            {weaponName}
+                        {weaponAreaOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
                           </option>
                         ))}
                       </select>
-                      <span className={styles.weaponDamageSeparator}>+</span>
-                      <select
-                        className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponBonusSelect}`}
-                        id={`ability-weapon-bonus-${index}`}
-                        value={ability.weaponAttributeBonus}
-                        onChange={(event) => handleAbilityChange(index, 'weaponAttributeBonus', event.target.value)}
-                      >
-                        <option value="">{t('pages.characterEdit.abilities.weaponBonusOptions.none')}</option>
-                        {attributeOptions.map((attribute) => (
-                          <option key={attribute.value} value={attribute.value}>
-                            {`${t('pages.characterEdit.abilities.weaponBonusOptions.prefix')} ${attribute.label}`}
-                          </option>
-                        ))}
-                      </select>
+                    </label>
+                  </div>
+                </div>
+
+                {ability.kind !== 'utility' ? (
+                  <div className={styles.abilityField}>
+                    <span className={styles.attributeLabel}>{t('pages.characterEdit.abilities.weaponLabel')}</span>
+                    <div className={styles.abilityWeaponStack}>
+                      <div className={styles.abilityWeaponRow}>
+                        <select
+                          className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponCountSelect}`}
+                          id={`ability-weapon-count-${index}`}
+                          value={ability.weaponCount}
+                          onChange={(event) =>
+                            handleAbilityChange(
+                              index,
+                              'weaponCount',
+                              Math.min(10, Math.max(1, Number.parseInt(event.target.value, 10) || 1)),
+                            )
+                          }
+                        >
+                          {Array.from({ length: 10 }, (_, count) => count + 1).map((count) => (
+                            <option key={count} value={count}>
+                              {count}
+                            </option>
+                          ))}
+                        </select>
+                        <span className={styles.weaponDamageSeparator}>x</span>
+                        <select
+                          className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponSelect}`}
+                          id={`ability-weapon-${index}`}
+                          value={ability.weaponName}
+                          onChange={(event) => {
+                            const nextWeaponName = event.target.value
+
+                            handleAbilityChange(index, 'weaponName', nextWeaponName)
+
+                            if (nextWeaponName.length === 0) {
+                              handleAbilityChange(index, 'weaponDamageDiceType', '')
+                              handleAbilityChange(index, 'weaponDamageDiceCount', 0)
+                            }
+                          }}
+                        >
+                          <option value="">{t('pages.characterEdit.abilities.weaponOptions.none')}</option>
+                          {currentWeaponOptions.map((weaponName) => (
+                            <option key={weaponName} value={weaponName}>
+                              {weaponName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className={styles.abilityWeaponRowSecondary}>
+                        <label className={styles.abilityWeaponDiceGroup} htmlFor={`ability-weapon-dice-${index}`}>
+                          <span className={styles.srOnly}>
+                            {t('pages.characterEdit.abilities.weaponDamageDiceLabel')}
+                          </span>
+                          <select
+                            className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponDiceSelect}`}
+                            id={`ability-weapon-dice-${index}`}
+                            value={ability.weaponDamageDiceType}
+                            onChange={(event) =>
+                              handleAbilityChange(index, 'weaponDamageDiceType', event.target.value)
+                            }
+                          >
+                            <option value="">{t('pages.characterEdit.abilities.weaponDamageDiceOptions.none')}</option>
+                            <option value="d4">{t('pages.characterEdit.abilities.weaponDamageDiceOptions.d4')}</option>
+                            <option value="d6">{t('pages.characterEdit.abilities.weaponDamageDiceOptions.d6')}</option>
+                            <option value="d8">{t('pages.characterEdit.abilities.weaponDamageDiceOptions.d8')}</option>
+                            <option value="d10">{t('pages.characterEdit.abilities.weaponDamageDiceOptions.d10')}</option>
+                            <option value="d12">{t('pages.characterEdit.abilities.weaponDamageDiceOptions.d12')}</option>
+                            <option value="d20">{t('pages.characterEdit.abilities.weaponDamageDiceOptions.d20')}</option>
+                          </select>
+                        </label>
+                        <span className={styles.weaponDamageSeparator}>+</span>
+                        <label className={styles.abilityWeaponCountGroup} htmlFor={`ability-weapon-dice-count-${index}`}>
+                          <span className={styles.srOnly}>
+                            {t('pages.characterEdit.abilities.weaponDamageCountLabel')}
+                          </span>
+                          <select
+                            className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponDamageCountSelect}`}
+                            id={`ability-weapon-dice-count-${index}`}
+                            value={ability.weaponDamageDiceCount}
+                            onChange={(event) =>
+                              handleAbilityChange(
+                                index,
+                                'weaponDamageDiceCount',
+                                Math.min(20, Math.max(0, Number.parseInt(event.target.value, 10) || 0)),
+                              )
+                            }
+                          >
+                            {Array.from({ length: 21 }, (_, count) => count).map((count) => (
+                              <option key={count} value={count}>
+                                {count}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <span className={styles.weaponDamageSeparator}>+</span>
+                        <select
+                          className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponBonusSelect}`}
+                          id={`ability-weapon-bonus-${index}`}
+                          value={ability.weaponAttributeBonus}
+                          onChange={(event) => handleAbilityChange(index, 'weaponAttributeBonus', event.target.value)}
+                        >
+                          <option value="">{t('pages.characterEdit.abilities.weaponBonusOptions.none')}</option>
+                          {attributeOptions.map((attribute) => (
+                            <option key={attribute.value} value={attribute.value}>
+                              {`${t('pages.characterEdit.abilities.weaponBonusOptions.prefix')} ${attribute.label}`}
+                            </option>
+                            ))}
+                          </select>
+                        <span className={styles.weaponDamageSeparator}>+</span>
+                        <label className={styles.abilityWeaponCountGroup} htmlFor={`ability-weapon-damage-type-${index}`}>
+                          <span className={styles.srOnly}>
+                            {t('pages.characterEdit.abilities.weaponDamageTypeLabel')}
+                          </span>
+                          <select
+                            className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponDamageTypeSelect}`}
+                            id={`ability-weapon-damage-type-${index}`}
+                            value={ability.weaponDamageType}
+                            onChange={(event) => handleAbilityChange(index, 'weaponDamageType', event.target.value)}
+                          >
+                            {weaponDamageTypeOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                          </select>
+                        </label>
+                      </div>
+
+                      <div className={styles.abilityWeaponTextAreaSoloRow}>
+                        <label className={styles.abilityWeaponTextAreaField} htmlFor={`ability-weapon-provocation-${index}`}>
+                          <span className={styles.attributeLabel}>
+                            {t('pages.characterEdit.abilities.weaponProvocationLabel')}
+                          </span>
+                          <textarea
+                            className={`${styles.input} ${styles.abilityWeaponTextArea}`}
+                            id={`ability-weapon-provocation-${index}`}
+                            value={ability.weaponProvocation}
+                            onChange={(event) => handleAbilityChange(index, 'weaponProvocation', event.target.value)}
+                          />
+                        </label>
+                      </div>
+
+                      <div className={styles.abilityWeaponTextAreaFullRow}>
+                        <label className={styles.abilityWeaponTextAreaField} htmlFor={`ability-weapon-hit-${index}`}>
+                          <span className={styles.attributeLabel}>
+                            {t('pages.characterEdit.abilities.weaponHitLabel')}
+                          </span>
+                          <textarea
+                            className={`${styles.input} ${styles.abilityWeaponTextArea} ${styles.abilityWeaponTextAreaFull}`}
+                            id={`ability-weapon-hit-${index}`}
+                            value={ability.weaponHit}
+                            onChange={(event) => handleAbilityChange(index, 'weaponHit', event.target.value)}
+                          />
+                        </label>
+                      </div>
+
+                      <div className={styles.abilityWeaponTextAreaFullRow}>
+                        <label className={styles.abilityWeaponTextAreaField} htmlFor={`ability-weapon-miss-${index}`}>
+                          <span className={styles.attributeLabel}>
+                            {t('pages.characterEdit.abilities.weaponMissLabel')}
+                          </span>
+                          <textarea
+                            className={`${styles.input} ${styles.abilityWeaponTextArea} ${styles.abilityWeaponTextAreaFull}`}
+                            id={`ability-weapon-miss-${index}`}
+                            value={ability.weaponMiss}
+                            onChange={(event) => handleAbilityChange(index, 'weaponMiss', event.target.value)}
+                          />
+                        </label>
+                      </div>
                     </div>
                   </div>
                 ) : null}

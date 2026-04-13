@@ -12,6 +12,14 @@ import {
   defaultAbilityAction,
   defaultAbilityKind,
   defaultAbilityType,
+  defaultAbilityWeaponDamageDiceCount,
+  defaultAbilityWeaponDamageDiceType,
+  defaultAbilityWeaponDamageType,
+  defaultAbilityWeaponHit,
+  defaultAbilityWeaponMiss,
+  defaultAbilityWeaponProvocation,
+  defaultAbilityWeaponRange,
+  defaultAbilityWeaponArea,
   zeroAttributeBonuses,
   zeroDefenses,
   zeroDefenseBonuses,
@@ -43,11 +51,13 @@ import {
 import {
   CharacterClass,
   type CharacterAbility,
+  type CharacterAbilityAreaType,
   type CharacterBonuses,
   type CharacterArmor,
   type CharacterWeapon,
   type CharacterOtherItem,
   type CharacterItems,
+  type CharacterWeaponFieldName,
   type CharacterWeaponDamageDiceType,
   type CharacterWeaponDamageType,
 } from '../../types/character'
@@ -65,6 +75,151 @@ import type {
   CharacterSkillFieldName,
   SkillModifierMap,
 } from './types'
+
+function normalizeAbilityWeaponDamageDiceType(
+  value: unknown,
+  fallback: CharacterWeaponDamageDiceType | '',
+): CharacterWeaponDamageDiceType | '' {
+  if (
+    value === '' ||
+    value === 'd4' ||
+    value === 'd6' ||
+    value === 'd8' ||
+    value === 'd10' ||
+    value === 'd12' ||
+    value === 'd20'
+  ) {
+    return value
+  }
+
+  return fallback
+}
+
+function normalizeAbilityWeaponDamageDiceCount(value: unknown, fallback: number): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(20, Math.max(0, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(20, Math.max(0, Math.trunc(parsed)))
+    }
+  }
+
+  return fallback
+}
+
+function normalizeAbilityWeaponDamageType(value: unknown, fallback: CharacterWeaponDamageType): CharacterWeaponDamageType {
+  if (
+    value === 'normal' ||
+    value === 'acid' ||
+    value === 'cold' ||
+    value === 'fire' ||
+    value === 'force' ||
+    value === 'lightning' ||
+    value === 'necrotic' ||
+    value === 'poison' ||
+    value === 'psychic' ||
+    value === 'radiant' ||
+    value === 'thunder'
+  ) {
+    return value
+  }
+
+  return fallback
+}
+
+function normalizeAbilityWeaponRange(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(30, Math.max(0, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(30, Math.max(0, Math.trunc(parsed)))
+    }
+  }
+
+  return defaultAbilityWeaponRange
+}
+
+function normalizeAbilityWeaponArea(value: unknown): CharacterAbilityAreaType {
+  if (
+    value === 'point' ||
+    value === 'burst1' ||
+    value === 'burst2' ||
+    value === 'burst3' ||
+    value === 'burst4' ||
+    value === 'burst5' ||
+    value === 'burst6' ||
+    value === 'burst7' ||
+    value === 'burst8' ||
+    value === 'burst9' ||
+    value === 'burst10' ||
+    value === 'blast1' ||
+    value === 'blast2' ||
+    value === 'blast3' ||
+    value === 'blast4' ||
+    value === 'blast5' ||
+    value === 'blast6' ||
+    value === 'blast7' ||
+    value === 'blast8' ||
+    value === 'blast9' ||
+    value === 'blast10'
+  ) {
+    return value
+  }
+
+  return defaultAbilityWeaponArea
+}
+
+function normalizeWeaponRange(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(20, Math.max(1, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(20, Math.max(1, Math.trunc(parsed)))
+    }
+  }
+
+  return 1
+}
+
+function normalizeWeaponBonusNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(10, Math.max(-5, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(10, Math.max(-5, Math.trunc(parsed)))
+    }
+  }
+
+  return 0
+}
+
+function normalizeWeaponProficiencyBonusNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(5, Math.max(0, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(5, Math.max(0, Math.trunc(parsed)))
+    }
+  }
+
+  return 0
+}
+
 export function useCharacterEditPage(): CharacterEditPageState {
   const { t } = useI18n()
   const { characterId = '' } = useParams()
@@ -104,7 +259,20 @@ export function useCharacterEditPage(): CharacterEditPageState {
               : 1,
           damageDiceType: normalizeWeaponDamageDiceType(entry.damageDiceType),
           damageBonusNumber: normalizeWeaponDamageNumber(entry.damageBonusNumber ?? entry.damageBonus),
-          damageType: normalizeWeaponDamageType(entry.damageType),
+          range: normalizeWeaponRange(entry.range),
+          equipped: entry.equipped === true,
+          weaponProficiencyBonusNumber: normalizeWeaponProficiencyBonusNumber(entry.weaponProficiencyBonusNumber),
+          strengthBonusNumber: normalizeWeaponBonusNumber(entry.strengthBonusNumber),
+          conditionBonusNumber: normalizeWeaponBonusNumber(entry.conditionBonusNumber),
+          dexterityBonusNumber: normalizeWeaponBonusNumber(entry.dexterityBonusNumber),
+          intelligenceBonusNumber: normalizeWeaponBonusNumber(entry.intelligenceBonusNumber),
+          wisdomBonusNumber: normalizeWeaponBonusNumber(entry.wisdomBonusNumber),
+          charismaBonusNumber: normalizeWeaponBonusNumber(entry.charismaBonusNumber),
+          speedBonusNumber: normalizeWeaponBonusNumber(entry.speedBonusNumber),
+          kpBonusNumber: normalizeWeaponBonusNumber(entry.kpBonusNumber),
+          fortitudeBonusNumber: normalizeWeaponBonusNumber(entry.fortitudeBonusNumber),
+          reflexBonusNumber: normalizeWeaponBonusNumber(entry.reflexBonusNumber),
+          willBonusNumber: normalizeWeaponBonusNumber(entry.willBonusNumber),
         }))
     }
 
@@ -136,20 +304,6 @@ export function useCharacterEditPage(): CharacterEditPageState {
       }
 
       return 0
-    }
-
-    function normalizeWeaponDamageType(value: unknown): CharacterWeaponDamageType {
-      if (
-        value === 'normal' ||
-        value === 'poison' ||
-        value === 'radiant' ||
-        value === 'necrotic' ||
-        value === 'psychic'
-      ) {
-        return value
-      }
-
-      return 'normal'
     }
 
     if (Array.isArray(items)) {
@@ -197,7 +351,24 @@ export function useCharacterEditPage(): CharacterEditPageState {
               kind: ability.kind ?? defaultAbilityKind,
               weaponCount: ability.weaponCount ?? 1,
               weaponName: ability.weaponName ?? '',
+              weaponDamageDiceType: normalizeAbilityWeaponDamageDiceType(
+                ability.weaponDamageDiceType,
+                defaultAbilityWeaponDamageDiceType,
+              ),
+              weaponDamageDiceCount: normalizeAbilityWeaponDamageDiceCount(
+                ability.weaponDamageDiceCount,
+                defaultAbilityWeaponDamageDiceCount,
+              ),
               weaponAttributeBonus: ability.weaponAttributeBonus ?? '',
+              weaponDamageType: normalizeAbilityWeaponDamageType(
+                ability.weaponDamageType,
+                defaultAbilityWeaponDamageType,
+              ),
+              weaponHit: ability.weaponHit ?? '',
+              weaponMiss: ability.weaponMiss ?? '',
+              weaponProvocation: ability.weaponProvocation ?? '',
+              weaponRange: normalizeAbilityWeaponRange(ability.weaponRange),
+              weaponArea: normalizeAbilityWeaponArea(ability.weaponArea),
             })),
             items: normalizeItems(character.items),
             defenses: character.defenses ?? zeroDefenses,
@@ -362,7 +533,15 @@ export function useCharacterEditPage(): CharacterEditPageState {
       kind: ability.kind,
       weaponCount: ability.weaponCount,
       weaponName: ability.weaponName.trim(),
+      weaponDamageDiceType: ability.weaponDamageDiceType,
+      weaponDamageDiceCount: ability.weaponDamageDiceCount,
       weaponAttributeBonus: ability.weaponAttributeBonus,
+      weaponDamageType: ability.weaponDamageType,
+      weaponHit: ability.weaponHit,
+      weaponMiss: ability.weaponMiss,
+      weaponProvocation: ability.weaponProvocation,
+      weaponRange: ability.weaponRange,
+      weaponArea: ability.weaponArea,
     }
 
     if (!nextAbility.name && !nextAbility.description) {
@@ -389,7 +568,15 @@ export function useCharacterEditPage(): CharacterEditPageState {
           kind: defaultAbilityKind,
           weaponCount: 1,
           weaponName: '',
+          weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
+          weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
           weaponAttributeBonus: '',
+          weaponDamageType: defaultAbilityWeaponDamageType,
+          weaponHit: defaultAbilityWeaponHit,
+          weaponMiss: defaultAbilityWeaponMiss,
+          weaponProvocation: defaultAbilityWeaponProvocation,
+          weaponRange: defaultAbilityWeaponRange,
+          weaponArea: defaultAbilityWeaponArea,
         },
       ],
     }))
@@ -407,8 +594,27 @@ export function useCharacterEditPage(): CharacterEditPageState {
                 ? {
                     weaponCount: 1,
                     weaponName: '',
+                    weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
+                    weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
                     weaponAttributeBonus: '',
+                    weaponDamageType: defaultAbilityWeaponDamageType,
+                    weaponHit: defaultAbilityWeaponHit,
+                    weaponMiss: defaultAbilityWeaponMiss,
+                    weaponProvocation: defaultAbilityWeaponProvocation,
+                    weaponRange: defaultAbilityWeaponRange,
+                    weaponArea: defaultAbilityWeaponArea,
                   }
+                : fieldName === 'weaponName' && value === ''
+                  ? {
+                      weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
+                      weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
+                      weaponDamageType: defaultAbilityWeaponDamageType,
+                      weaponHit: defaultAbilityWeaponHit,
+                      weaponMiss: defaultAbilityWeaponMiss,
+                      weaponProvocation: defaultAbilityWeaponProvocation,
+                      weaponRange: defaultAbilityWeaponRange,
+                      weaponArea: defaultAbilityWeaponArea,
+                    }
                 : null),
             }
           : ability,
@@ -460,8 +666,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
 
   function handleWeaponDamageChange(
     index: number,
-    fieldName: 'damageDiceCount' | 'damageDiceType' | 'damageBonusNumber' | 'damageType',
-    value: number | CharacterWeaponDamageDiceType | CharacterWeaponDamageType,
+    fieldName: CharacterWeaponFieldName,
+    value: number | CharacterWeaponDamageDiceType | boolean,
   ) {
     setForm((currentForm) => ({
       ...currentForm,
@@ -576,7 +782,15 @@ export function useCharacterEditPage(): CharacterEditPageState {
                 ...ability,
                 weaponCount: 1,
                 weaponName: '',
+                weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
+                weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
                 weaponAttributeBonus: '',
+                weaponDamageType: defaultAbilityWeaponDamageType,
+                weaponHit: defaultAbilityWeaponHit,
+                weaponMiss: defaultAbilityWeaponMiss,
+                weaponProvocation: defaultAbilityWeaponProvocation,
+                weaponRange: defaultAbilityWeaponRange,
+                weaponArea: defaultAbilityWeaponArea,
               }
             : ability,
         ),

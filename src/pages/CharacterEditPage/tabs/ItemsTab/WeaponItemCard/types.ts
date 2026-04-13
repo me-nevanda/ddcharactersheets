@@ -1,7 +1,7 @@
 import type {
   CharacterWeapon,
+  CharacterWeaponFieldName,
   CharacterWeaponDamageDiceType,
-  CharacterWeaponDamageType,
 } from '../../../../../types/character'
 
 export interface WeaponItemCardProps {
@@ -12,7 +12,7 @@ export interface WeaponItemCardProps {
   onRemove: (index: number, name: string) => void
   onDamageChange: (
     index: number,
-    fieldName: 'damageDiceCount' | 'damageDiceType' | 'damageBonusNumber' | 'damageType',
-    value: number | CharacterWeaponDamageDiceType | CharacterWeaponDamageType,
+    fieldName: CharacterWeaponFieldName,
+    value: number | CharacterWeaponDamageDiceType | boolean,
   ) => void
 }

@@ -3,6 +3,49 @@ import styles from './style.module.scss'
 
 function getIconPath(name: AppIconProps['name']) {
   switch (name) {
+    case 'check':
+      return (
+        <path
+          d="m5 13 4 4L19 7"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.9"
+        />
+      )
+    case 'circle':
+      return (
+        <circle
+          cx="12"
+          cy="12"
+          r="7.25"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.9"
+        />
+      )
+    case 'shirt':
+      return (
+        <>
+          <path
+            d="M9.5 5.5 12 7l2.5-1.5L18 8l-2 3v8H8V11L6 8Z"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.9"
+          />
+          <path
+            d="M12 7v4"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.9"
+          />
+        </>
+      )
     case 'plus':
       return (
         <path

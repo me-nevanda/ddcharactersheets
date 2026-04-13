@@ -266,6 +266,26 @@
   overflow-x: auto;
 }
 
+.abilityWeaponStack {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.abilityWeaponRowSecondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.abilityWeaponDiceGroup,
+.abilityWeaponCountGroup {
+  display: inline-flex;
+  align-items: center;
+}
+
 .abilityActions {
   display: flex;
   justify-content: flex-end;
@@ -300,18 +320,61 @@
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
+.itemCardActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.weaponEquipButton {
+  @include pill-button;
+  padding-inline: 0.75rem;
+}
+
+.weaponEquipButtonInactive {
+  background: rgba(255, 248, 235, 0.04);
+  border-color: rgba(255, 248, 235, 0.08);
+  color: var(--text-strong);
+}
+
+.weaponEquipButtonActive {
+  background: linear-gradient(135deg, #a64a2e 0%, #d9a441 100%);
+  border-color: rgba(240, 198, 111, 0.35);
+  color: #1d120e;
+  box-shadow: 0 10px 22px rgba(166, 74, 46, 0.22);
+}
+
+.weaponEquipButtonInactive:hover,
+.weaponEquipButtonActive:hover {
+  transform: translateY(-1px);
+}
+
+.weaponEquipButtonInactive:hover {
+  border-color: var(--border-strong);
+}
+
+.weaponEquipButtonActive:hover {
+  border-color: rgba(240, 198, 111, 0.5);
+}
+
 .weaponDamageRow {
   display: grid;
-  grid-template-columns: repeat(5, max-content);
+  grid-template-columns: repeat(7, max-content);
   gap: 0.5rem;
   align-items: center;
   justify-content: start;
   justify-items: start;
 }
 
+.weaponDamageSection {
+  display: grid;
+  gap: 0.45rem;
+}
+
 .weaponDamageRow > :nth-child(1),
 .weaponDamageRow > :nth-child(3),
-.weaponDamageRow > :nth-child(5) {
+.weaponDamageRow > :nth-child(5),
+.weaponDamageRow > :nth-child(7) {
   width: max-content;
   min-width: 0;
 }
@@ -328,6 +391,46 @@
   font-size: 0.95rem;
   font-weight: 700;
   text-align: center;
+}
+
+.weaponBonusGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.weaponBonusSection {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.weaponBonusSectionTitle {
+  color: var(--text-strong);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.weaponBonusField {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.weaponBonusLabel {
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: var(--text-strong);
+  white-space: nowrap;
+}
+
+.weaponBonusSelect {
+  width: auto;
+  min-width: 4.75rem;
+  flex: 0 0 4.75rem;
 }
 
 .abilityHeaderUnlimited {
@@ -511,6 +614,32 @@
   min-width: 0;
 }
 
+.abilityActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.abilityActionDistanceGroup,
+.abilityActionAreaGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.abilityWeaponRangeSelect {
+  width: auto;
+  min-width: 4.75rem;
+  flex: 0 0 4.75rem;
+}
+
+.abilityWeaponAreaSelect {
+  width: auto;
+  min-width: 8.5rem;
+  flex: 0 1 8.5rem;
+}
+
 .abilityWeaponCountSelect {
   width: auto;
   flex: 0 0 4.75rem;
@@ -522,10 +651,60 @@
   flex: 1 1 11rem;
 }
 
+.abilityWeaponDiceSelect {
+  width: auto;
+  min-width: 4.75rem;
+  flex: 0 0 4.85rem;
+}
+
+.abilityWeaponDamageCountSelect {
+  width: auto;
+  min-width: 4.75rem;
+  flex: 0 0 4.75rem;
+}
+
 .abilityWeaponBonusSelect {
   width: auto;
   min-width: 12rem;
   flex: 1 1 12rem;
+}
+
+.abilityWeaponDamageTypeSelect {
+  width: auto;
+  min-width: 8.5rem;
+  flex: 0 1 8.5rem;
+}
+
+.abilityWeaponTextAreaRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  width: 100%;
+}
+
+.abilityWeaponTextAreaFullRow {
+  display: grid;
+  width: 100%;
+}
+
+.abilityWeaponTextAreaSoloRow {
+  display: grid;
+  width: 100%;
+}
+
+.abilityWeaponTextAreaField {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.abilityWeaponTextArea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.abilityWeaponTextAreaFull {
+  width: 100%;
 }
 
 .skillCard {
@@ -736,6 +915,10 @@
 
   .abilityFormGrid,
   .abilityGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .weaponBonusGrid {
     grid-template-columns: 1fr;
   }
 

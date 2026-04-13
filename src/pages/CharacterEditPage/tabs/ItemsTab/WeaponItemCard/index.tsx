@@ -1,8 +1,27 @@
 import { useI18n } from '@i18n/index'
 import type { WeaponItemCardProps } from './types'
 import { AppIcon } from '@components/AppIcon'
-import type { CharacterWeaponDamageType } from '../../../../../types/character'
+import type { CharacterWeaponBonusFieldName } from '../../../../../types/character'
 import styles from '../../../style.module.scss'
+
+const weaponBonusFields: Array<{
+  fieldName: CharacterWeaponBonusFieldName
+  labelKey: string
+}> = [
+  { fieldName: 'strengthBonusNumber', labelKey: 'pages.characterEdit.fields.strength' },
+  { fieldName: 'conditionBonusNumber', labelKey: 'pages.characterEdit.fields.condition' },
+  { fieldName: 'dexterityBonusNumber', labelKey: 'pages.characterEdit.fields.dexterity' },
+  { fieldName: 'intelligenceBonusNumber', labelKey: 'pages.characterEdit.fields.intelligence' },
+  { fieldName: 'wisdomBonusNumber', labelKey: 'pages.characterEdit.fields.wisdom' },
+  { fieldName: 'charismaBonusNumber', labelKey: 'pages.characterEdit.fields.charisma' },
+  { fieldName: 'speedBonusNumber', labelKey: 'pages.characterEdit.fields.speed' },
+  { fieldName: 'kpBonusNumber', labelKey: 'pages.characterEdit.fields.kp' },
+  { fieldName: 'fortitudeBonusNumber', labelKey: 'pages.characterEdit.fields.fortitude' },
+  { fieldName: 'reflexBonusNumber', labelKey: 'pages.characterEdit.fields.reflex' },
+  { fieldName: 'willBonusNumber', labelKey: 'pages.characterEdit.fields.will' },
+]
+
+const weaponBonusOptions = Array.from({ length: 16 }, (_, bonus) => bonus - 5)
 
 export function WeaponItemCard({
   weapon,
@@ -24,18 +43,32 @@ export function WeaponItemCard({
           placeholder={t('pages.characterEdit.items.namePlaceholder')}
           onChange={(event) => onNameChange(index, event.target.value)}
         />
-        <button
-          className={styles.abilityRemoveButton}
-          type="button"
-          aria-label={t('pages.characterEdit.items.removeButton')}
-          title={t('pages.characterEdit.items.removeButton')}
-          onClick={() => onRemove(index, weapon.name)}
-        >
-          <AppIcon name="delete" />
-        </button>
+        <div className={styles.itemCardActions}>
+          <button
+            className={`${styles.weaponEquipButton} ${weapon.equipped ? styles.weaponEquipButtonActive : styles.weaponEquipButtonInactive}`}
+            type="button"
+            aria-pressed={weapon.equipped}
+            aria-label={weapon.equipped ? t('pages.characterEdit.items.equippedLabel') : t('pages.characterEdit.items.unequippedLabel')}
+            title={weapon.equipped ? t('pages.characterEdit.items.equippedLabel') : t('pages.characterEdit.items.unequippedLabel')}
+            onClick={() => onDamageChange(index, 'equipped', !weapon.equipped)}
+          >
+            <AppIcon name="shirt" />
+          </button>
+          <button
+            className={styles.abilityRemoveButton}
+            type="button"
+            aria-label={t('pages.characterEdit.items.removeButton')}
+            title={t('pages.characterEdit.items.removeButton')}
+            onClick={() => onRemove(index, weapon.name)}
+          >
+            <AppIcon name="delete" />
+          </button>
+        </div>
       </div>
 
-      <div className={styles.weaponDamageRow}>
+      <div className={styles.weaponDamageSection}>
+        <span className={styles.weaponBonusSectionTitle}>{t('pages.characterEdit.items.damageLabel')}</span>
+        <div className={styles.weaponDamageRow}>
         <select
           className={styles.abilityHeaderSelect}
           value={weapon.damageDiceType}
@@ -65,18 +98,58 @@ export function WeaponItemCard({
             </option>
           ))}
         </select>
-        <span className={styles.weaponDamageTypeLabel}>{t('pages.characterEdit.items.weaponDamageTypeLabel')}</span>
+        <span className={styles.weaponDamageTypeLabel}>{t('pages.characterEdit.items.rangeLabel')}</span>
         <select
           className={styles.abilityHeaderSelect}
-          value={weapon.damageType}
-          onChange={(event) => onDamageChange(index, 'damageType', event.target.value as CharacterWeaponDamageType)}
+          value={weapon.range}
+          aria-label={t('pages.characterEdit.items.rangeLabel')}
+          onChange={(event) => onDamageChange(index, 'range', Number.parseInt(event.target.value, 10))}
         >
-          <option value="normal">{t('pages.characterEdit.items.weaponType.normal')}</option>
-          <option value="poison">{t('pages.characterEdit.items.weaponType.poison')}</option>
-          <option value="radiant">{t('pages.characterEdit.items.weaponType.radiant')}</option>
-          <option value="necrotic">{t('pages.characterEdit.items.weaponType.necrotic')}</option>
-          <option value="psychic">{t('pages.characterEdit.items.weaponType.psychic')}</option>
+          {Array.from({ length: 20 }, (_, range) => range + 1).map((range) => (
+            <option key={range} value={range}>
+              {range}
+            </option>
+          ))}
         </select>
+        <span className={styles.weaponDamageTypeLabel}>{t('pages.characterEdit.items.proficiencyLabel')}</span>
+        <select
+          className={styles.abilityHeaderSelect}
+          value={weapon.weaponProficiencyBonusNumber}
+          aria-label={t('pages.characterEdit.items.proficiencyLabel')}
+          onChange={(event) =>
+            onDamageChange(index, 'weaponProficiencyBonusNumber', Number.parseInt(event.target.value, 10))
+          }
+        >
+          {Array.from({ length: 6 }, (_, bonus) => bonus).map((bonus) => (
+            <option key={bonus} value={bonus}>
+              {bonus}
+            </option>
+          ))}
+        </select>
+      </div>
+      </div>
+
+      <div className={styles.weaponBonusSection}>
+        <span className={styles.weaponBonusSectionTitle}>{t('pages.characterEdit.items.bonusesLabel')}</span>
+        <div className={styles.weaponBonusGrid}>
+        {weaponBonusFields.map((field) => (
+          <label key={field.fieldName} className={styles.weaponBonusField} htmlFor={`item-weapons-${field.fieldName}-${index}`}>
+            <span className={styles.weaponBonusLabel}>{t(field.labelKey)}</span>
+            <select
+              className={`${styles.abilityHeaderSelect} ${styles.weaponBonusSelect}`}
+              id={`item-weapons-${field.fieldName}-${index}`}
+              value={weapon[field.fieldName]}
+              onChange={(event) => onDamageChange(index, field.fieldName, Number.parseInt(event.target.value, 10))}
+            >
+              {weaponBonusOptions.map((bonus) => (
+                <option key={bonus} value={bonus}>
+                  {bonus}
+                </option>
+              ))}
+            </select>
+          </label>
+        ))}
+        </div>
       </div>
 
       <label className={styles.abilityField} htmlFor={`item-weapons-description-${index}`}>

@@ -7,8 +7,8 @@ import type {
   CharacterDefenses,
   CharacterItemBase,
   CharacterItems,
+  CharacterWeaponFieldName,
   CharacterWeaponDamageDiceType,
-  CharacterWeaponDamageType,
   CharacterTraining,
 } from '../../types/character'
 
@@ -61,8 +61,8 @@ export interface CharacterEditPageState {
   ) => void
   handleWeaponDamageChange: (
     index: number,
-    fieldName: 'damageDiceCount' | 'damageDiceType' | 'damageBonusNumber' | 'damageType',
-    value: number | CharacterWeaponDamageDiceType | CharacterWeaponDamageType,
+    fieldName: CharacterWeaponFieldName,
+    value: number | CharacterWeaponDamageDiceType | boolean,
   ) => void
   handleItemRemove: (group: CharacterItemGroupKey, index: number) => void
   handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>

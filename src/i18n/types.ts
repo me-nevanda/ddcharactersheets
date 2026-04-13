@@ -83,6 +83,8 @@ export interface TranslationDictionary {
           action: string
           noAction: string
         }
+        weaponRangeLabel: string
+        weaponAreaLabel: string
         typeLabel: string
         typeOptions: {
           unlimited: string
@@ -95,10 +97,43 @@ export interface TranslationDictionary {
           utility: string
         }
         weaponLabel: string
+        weaponDamageDiceLabel: string
+        weaponDamageCountLabel: string
+        weaponDamageTypeLabel: string
         weaponBonusOptions: {
           none: string
           prefix: string
         }
+        weaponDamageDiceOptions: {
+          none: string
+          d4: string
+          d6: string
+          d8: string
+          d10: string
+          d12: string
+          d20: string
+        }
+        weaponDamageTypeOptions: {
+          normal: string
+          acid: string
+          cold: string
+          fire: string
+          force: string
+          lightning: string
+          necrotic: string
+          poison: string
+          psychic: string
+          radiant: string
+          thunder: string
+        }
+        weaponAreaOptions: {
+          point: string
+          burst: string
+          blast: string
+        }
+        weaponHitLabel: string
+        weaponMissLabel: string
+        weaponProvocationLabel: string
         weaponOptions: {
           none: string
         }
@@ -120,20 +155,18 @@ export interface TranslationDictionary {
         weaponBonus: {
           none: string
         }
-        weaponDamageTypeLabel: string
-        weaponType: {
-          normal: string
-          poison: string
-          radiant: string
-          necrotic: string
-          psychic: string
-        }
         removeDialog: {
           title: string
           body: string
         }
         nameLabel: string
         descriptionLabel: string
+        damageLabel: string
+        rangeLabel: string
+        proficiencyLabel: string
+        bonusesLabel: string
+        equippedLabel: string
+        unequippedLabel: string
         namePlaceholder: string
         descriptionPlaceholder: string
       }

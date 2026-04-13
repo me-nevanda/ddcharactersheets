@@ -3,6 +3,7 @@ import { buildCharacterSpeed } from './sections/GeneralSection/generalSectionLog
 import type {
   CharacterAbility,
   CharacterAbilityAction,
+  CharacterAbilityAreaType,
   CharacterAbilityKind,
   CharacterAbilityType,
   CharacterAttributeBonuses,
@@ -12,6 +13,7 @@ import type {
   CharacterItems,
   CharacterSkillBonuses,
   CharacterTraining,
+  CharacterWeaponDamageType,
 } from '../../types/character'
 import type { CharacterEditFormData } from './types'
 
@@ -83,12 +85,33 @@ export const emptyWeapon: CharacterWeapon = {
   damageDiceCount: 1,
   damageDiceType: 'd4',
   damageBonusNumber: 0,
-  damageType: 'normal',
+  range: 1,
+  equipped: false,
+  weaponProficiencyBonusNumber: 0,
+  strengthBonusNumber: 0,
+  conditionBonusNumber: 0,
+  dexterityBonusNumber: 0,
+  intelligenceBonusNumber: 0,
+  wisdomBonusNumber: 0,
+  charismaBonusNumber: 0,
+  speedBonusNumber: 0,
+  kpBonusNumber: 0,
+  fortitudeBonusNumber: 0,
+  reflexBonusNumber: 0,
+  willBonusNumber: 0,
 }
 
 export const defaultAbilityAction: CharacterAbilityAction = 'action'
 export const defaultAbilityType: CharacterAbilityType = 'unlimited'
 export const defaultAbilityKind: CharacterAbilityKind = 'offensive'
+export const defaultAbilityWeaponDamageDiceType = ''
+export const defaultAbilityWeaponDamageDiceCount = 0
+export const defaultAbilityWeaponDamageType: CharacterWeaponDamageType = 'normal'
+export const defaultAbilityWeaponHit = ''
+export const defaultAbilityWeaponMiss = ''
+export const defaultAbilityWeaponProvocation = ''
+export const defaultAbilityWeaponRange = 0
+export const defaultAbilityWeaponArea: CharacterAbilityAreaType = 'point'
 
 export const emptyTraining: CharacterTraining = {
   acrobatics: false,
