@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
 import { CharacterEditPageProvider, useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext'
@@ -12,9 +11,16 @@ import { ItemsTab } from '@pages/CharacterEditPage/tabs/ItemsTab'
 
 function CharacterEditPageContent() {
   const { t } = useI18n()
-  const [activeTab, setActiveTab] = useState<CharacterEditTabKey>('general')
+  const [searchParams, setSearchParams] = useSearchParams()
   const { error, form, loading, saving, hasChanges, handleGeneralChange, handleSubmit } =
     useCharacterEditPageContext()
+  const activeTab = resolveActiveTab(searchParams.get('tab'))
+
+  function handleTabChange(nextTab: CharacterEditTabKey) {
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.set('tab', nextTab)
+    setSearchParams(nextParams)
+  }
 
   return (
     <main className={styles.editorLayout}>
@@ -60,28 +66,28 @@ function CharacterEditPageContent() {
                 <button
                   className={`${styles.tabButton} ${activeTab === 'general' ? styles.tabButtonActive : ''}`}
                   type="button"
-                  onClick={() => setActiveTab('general')}
+                  onClick={() => handleTabChange('general')}
                 >
                   {t('pages.characterEdit.tabs.general')}
                 </button>
                 <button
                   className={`${styles.tabButton} ${activeTab === 'abilities' ? styles.tabButtonActive : ''}`}
                   type="button"
-                  onClick={() => setActiveTab('abilities')}
+                  onClick={() => handleTabChange('abilities')}
                 >
                   {t('pages.characterEdit.tabs.abilities')}
                 </button>
                 <button
                   className={`${styles.tabButton} ${activeTab === 'feats' ? styles.tabButtonActive : ''}`}
                   type="button"
-                  onClick={() => setActiveTab('feats')}
+                  onClick={() => handleTabChange('feats')}
                 >
                   {t('pages.characterEdit.tabs.feats')}
                 </button>
                 <button
                   className={`${styles.tabButton} ${activeTab === 'items' ? styles.tabButtonActive : ''}`}
                   type="button"
-                  onClick={() => setActiveTab('items')}
+                  onClick={() => handleTabChange('items')}
                 >
                   {t('pages.characterEdit.tabs.items')}
                 </button>
@@ -99,6 +105,14 @@ function CharacterEditPageContent() {
       </section>
     </main>
   )
+}
+
+function resolveActiveTab(tab: string | null): CharacterEditTabKey {
+  if (tab === 'abilities' || tab === 'feats' || tab === 'items') {
+    return tab
+  }
+
+  return 'general'
 }
 
 export function CharacterEditPage() {

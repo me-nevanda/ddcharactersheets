@@ -9,7 +9,8 @@ function formatSignedValue(value: number): string {
 
 export function AttributesSection() {
   const { t } = useI18n()
-  const { attributeRows, form, handleAttributeChange } = useCharacterEditPageContext()
+  const { attributeRows, attributeBonuses, attributeBonusTooltips, handleAttributeChange } =
+    useCharacterEditPageContext()
 
   return (
     <section className={styles.section}>
@@ -34,7 +35,13 @@ export function AttributesSection() {
                   value={row.value}
                   onChange={handleAttributeChange}
                 />
-                <span className={styles.attributePlus}>{formatSignedValue(form.attributesPlus[definition.key])}</span>
+                <span
+                  className={styles.attributePlus}
+                  title={attributeBonusTooltips[definition.key]}
+                  aria-label={attributeBonusTooltips[definition.key]}
+                >
+                  {formatSignedValue(attributeBonuses[definition.key])}
+                </span>
                 <span className={styles.attributeLabel}>{t(definition.translationKey)}</span>
               </label>
               <span className={styles.modifierBadge}>{row.modifierLabel}</span>

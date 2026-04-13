@@ -67,6 +67,15 @@ export const en: TranslationDictionary = {
         levelBonus: 'Level bonus',
         classBonus: 'Class bonus',
         attributesBonus: 'Attribute bonus',
+        itemsBonus: 'Item bonuses:',
+      },
+      skillTooltip: {
+        trainingBonus: 'training bonus',
+      },
+      sourceTooltip: {
+        raceBonus: 'Race',
+        itemBonus: 'Item bonuses:',
+        baseSpeed: 'Base speed from race',
       },
       abilities: {
         title: 'Abilities',

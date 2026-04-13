@@ -14,6 +14,7 @@ export interface DefenseBreakdown {
   levelBonus: number
   classBonus: number
   attributeBonus: number
+  itemBonus: number
   attributeKeys: AttributeKey[]
 }
 
@@ -24,8 +25,14 @@ export function buildDefenseValues(
   levelBonus: number,
   race: CharacterRace,
   characterClass: CharacterClass,
+  itemBonuses: CharacterDefenses = {
+    kp: 0,
+    fortitude: 0,
+    reflex: 0,
+    will: 0,
+  },
 ): DefenseValues {
-  const breakdowns = buildDefenseBreakdowns(attributeModifiers, levelBonus, race, characterClass)
+  const breakdowns = buildDefenseBreakdowns(attributeModifiers, levelBonus, race, characterClass, itemBonuses)
 
   return {
     kp: breakdowns.kp.value,
@@ -40,6 +47,12 @@ export function buildDefenseBreakdowns(
   levelBonus: number,
   race: CharacterRace,
   characterClass: CharacterClass,
+  itemBonuses: CharacterDefenses = {
+    kp: 0,
+    fortitude: 0,
+    reflex: 0,
+    will: 0,
+  },
 ): DefenseBreakdowns {
   const humanDefenseBonus = race === CharacterRace.Human ? 1 : 0
   const fortitudeClassBonus =
@@ -63,10 +76,11 @@ export function buildDefenseBreakdowns(
 
   return {
     kp: {
-      value: clampDefenseValue(10 + reflexAttributeBonus + levelBonus),
+      value: clampDefenseValue(10 + reflexAttributeBonus + levelBonus + itemBonuses.kp),
       levelBonus,
       classBonus: 0,
       attributeBonus: reflexAttributeBonus,
+      itemBonus: itemBonuses.kp,
       attributeKeys: getMaxAttributeKeys(attributeModifiers.dexterity, attributeModifiers.intelligence, [
         'dexterity',
         'intelligence',
@@ -80,11 +94,13 @@ export function buildDefenseBreakdowns(
           humanDefenseBonus +
           fortitudeClassBonus +
           warlordAndBardDefenseBonus +
-          paladinDefenseBonus,
+          paladinDefenseBonus +
+          itemBonuses.fortitude,
       ),
       levelBonus,
       classBonus: humanDefenseBonus + fortitudeClassBonus + warlordAndBardDefenseBonus + paladinDefenseBonus,
       attributeBonus: fortitudeAttributeBonus,
+      itemBonus: itemBonuses.fortitude,
       attributeKeys: getMaxAttributeKeys(attributeModifiers.strength, attributeModifiers.condition, [
         'strength',
         'condition',
@@ -92,11 +108,19 @@ export function buildDefenseBreakdowns(
     },
     reflex: {
       value: clampDefenseValue(
-        10 + reflexAttributeBonus + levelBonus + humanDefenseBonus + paladinDefenseBonus + warlockReflexBonus + rogueReflexBonus,
+        10 +
+          reflexAttributeBonus +
+          levelBonus +
+          humanDefenseBonus +
+          paladinDefenseBonus +
+          warlockReflexBonus +
+          rogueReflexBonus +
+          itemBonuses.reflex,
       ),
       levelBonus,
       classBonus: humanDefenseBonus + paladinDefenseBonus + warlockReflexBonus + rogueReflexBonus,
       attributeBonus: reflexAttributeBonus,
+      itemBonus: itemBonuses.reflex,
       attributeKeys: getMaxAttributeKeys(attributeModifiers.dexterity, attributeModifiers.intelligence, [
         'dexterity',
         'intelligence',
@@ -104,12 +128,21 @@ export function buildDefenseBreakdowns(
     },
     will: {
       value: clampDefenseValue(
-        10 + willAttributeBonus + levelBonus + humanDefenseBonus + warlordAndBardDefenseBonus + clericWillBonus + wizardWillBonus + warlockWillBonus,
+        10 +
+          willAttributeBonus +
+          levelBonus +
+          humanDefenseBonus +
+          warlordAndBardDefenseBonus +
+          clericWillBonus +
+          wizardWillBonus +
+          warlockWillBonus +
+          itemBonuses.will,
       ),
       levelBonus,
       classBonus:
         humanDefenseBonus + warlordAndBardDefenseBonus + clericWillBonus + wizardWillBonus + warlockWillBonus,
       attributeBonus: willAttributeBonus,
+      itemBonus: itemBonuses.will,
       attributeKeys: getMaxAttributeKeys(attributeModifiers.wisdom, attributeModifiers.charisma, [
         'wisdom',
         'charisma',

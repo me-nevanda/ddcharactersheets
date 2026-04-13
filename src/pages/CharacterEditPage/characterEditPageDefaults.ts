@@ -1,6 +1,7 @@
 import { CharacterClass, CharacterRace } from '../../types/character'
 import { buildCharacterSpeed } from './sections/GeneralSection/generalSectionLogic'
 import type {
+  CharacterArmor,
   CharacterAbility,
   CharacterAbilityAction,
   CharacterAbilityAreaType,
@@ -11,6 +12,7 @@ import type {
   CharacterDefenses,
   CharacterWeapon,
   CharacterItems,
+  CharacterOtherItem,
   CharacterSkillBonuses,
   CharacterTraining,
   CharacterWeaponDamageType,
@@ -77,6 +79,40 @@ export const emptyItems: CharacterItems = {
   armors: [],
   weapons: [],
   others: [],
+}
+
+export const emptyArmor: CharacterArmor = {
+  name: '',
+  description: '',
+  equipped: false,
+  strengthBonusNumber: 0,
+  conditionBonusNumber: 0,
+  dexterityBonusNumber: 0,
+  intelligenceBonusNumber: 0,
+  wisdomBonusNumber: 0,
+  charismaBonusNumber: 0,
+  speedBonusNumber: 0,
+  kpBonusNumber: 0,
+  fortitudeBonusNumber: 0,
+  reflexBonusNumber: 0,
+  willBonusNumber: 0,
+}
+
+export const emptyOtherItem: CharacterOtherItem = {
+  name: '',
+  description: '',
+  equipped: false,
+  strengthBonusNumber: 0,
+  conditionBonusNumber: 0,
+  dexterityBonusNumber: 0,
+  intelligenceBonusNumber: 0,
+  wisdomBonusNumber: 0,
+  charismaBonusNumber: 0,
+  speedBonusNumber: 0,
+  kpBonusNumber: 0,
+  fortitudeBonusNumber: 0,
+  reflexBonusNumber: 0,
+  willBonusNumber: 0,
 }
 
 export const emptyWeapon: CharacterWeapon = {

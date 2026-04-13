@@ -7,6 +7,7 @@ import type {
   CharacterDefenses,
   CharacterItemBase,
   CharacterItems,
+  CharacterItemBonusFieldName,
   CharacterWeaponFieldName,
   CharacterWeaponDamageDiceType,
   CharacterTraining,
@@ -26,7 +27,7 @@ export type CharacterGeneralChangeEvent = ChangeEvent<HTMLInputElement | HTMLSel
 
 export type CharacterAbilityFieldName = keyof CharacterAbility
 
-export type CharacterItemFieldName = keyof CharacterItemBase
+export type CharacterItemFieldName = keyof CharacterItemBase | 'equipped'
 
 export type CharacterItemGroupKey = keyof CharacterItems
 
@@ -45,6 +46,8 @@ export interface CharacterEditPageState {
   form: CharacterEditFormData
   loading: boolean
   saving: boolean
+  attributeBonuses: CharacterAttributes
+  attributeBonusTooltips: Record<CharacterAttributeFieldName, string>
   handleGeneralChange: (event: CharacterGeneralChangeEvent) => void
   handleAttributeChange: (event: ChangeEvent<HTMLInputElement>) => void
   handleTrainingChange: (event: ChangeEvent<HTMLInputElement>) => void
@@ -56,8 +59,8 @@ export interface CharacterEditPageState {
   handleItemChange: (
     group: CharacterItemGroupKey,
     index: number,
-    fieldName: CharacterItemFieldName,
-    value: string,
+    fieldName: CharacterItemFieldName | CharacterItemBonusFieldName,
+    value: string | number | boolean,
   ) => void
   handleWeaponDamageChange: (
     index: number,
@@ -69,6 +72,8 @@ export interface CharacterEditPageState {
   attributeRows: AttributeRow[]
   skillModifiers: SkillModifierMap
   levelBonusLabel: string
+  speedValue: number
+  speedTooltip: string
   defenseValues: DefenseValues
   defenseTooltips: DefenseTooltipValues
   hpValue: number

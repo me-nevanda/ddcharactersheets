@@ -324,12 +324,12 @@ export function AbilitiesTab() {
                           </select>
                         </label>
                         <span className={styles.weaponDamageSeparator}>+</span>
-                        <select
-                          className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponBonusSelect}`}
-                          id={`ability-weapon-bonus-${index}`}
-                          value={ability.weaponAttributeBonus}
-                          onChange={(event) => handleAbilityChange(index, 'weaponAttributeBonus', event.target.value)}
-                        >
+                      <select
+                        className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponBonusSelect}`}
+                        id={`ability-weapon-bonus-${index}`}
+                        value={ability.weaponAttributeBonus}
+                        onChange={(event) => handleAbilityChange(index, 'weaponAttributeBonus', event.target.value)}
+                      >
                           <option value="">{t('pages.characterEdit.abilities.weaponBonusOptions.none')}</option>
                           {attributeOptions.map((attribute) => (
                             <option key={attribute.value} value={attribute.value}>

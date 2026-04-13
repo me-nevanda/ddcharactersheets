@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
 import { useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext'
+import { ArmorItemCard } from './ArmorItemCard'
+import { OtherItemCard } from './OtherItemCard'
 import { WeaponItemCard } from './WeaponItemCard'
-import type { CharacterWeapon } from '../../../../types/character'
+import type { CharacterArmor, CharacterOtherItem, CharacterWeapon } from '../../../../types/character'
 import styles from '../../style.module.scss'
 
 const itemGroups = ['weapons', 'armors', 'others'] as const
@@ -77,38 +78,36 @@ export function ItemsTab() {
                         />
                       ) : null}
 
-                      {group !== 'weapons' ? (
-                        <article className={styles.abilityCard}>
-                          <div className={styles.abilityCardHeader}>
-                            <input
-                              className={styles.abilityCardTitleInput}
-                              id={`item-${group}-name-${index}`}
-                              value={item.name}
-                              placeholder={t('pages.characterEdit.items.namePlaceholder')}
-                              onChange={(event) => handleItemChange(group, index, 'name', event.target.value)}
-                            />
-                            <button
-                              className={styles.abilityRemoveButton}
-                              type="button"
-                              aria-label={t('pages.characterEdit.items.removeButton')}
-                              title={t('pages.characterEdit.items.removeButton')}
-                              onClick={() => handleRemoveItem(group, index, item.name)}
-                            >
-                              <AppIcon name="delete" />
-                            </button>
-                          </div>
+                      {group === 'armors' ? (
+                        <ArmorItemCard
+                          index={index}
+                          armor={item as CharacterArmor}
+                          onNameChange={(armorIndex, value) => handleItemChange(group, armorIndex, 'name', value)}
+                          onDescriptionChange={(armorIndex, value) =>
+                            handleItemChange(group, armorIndex, 'description', value)
+                          }
+                          onRemove={(armorIndex, name) => handleRemoveItem(group, armorIndex, name)}
+                          onEquipChange={(armorIndex, value) => handleItemChange(group, armorIndex, 'equipped', value)}
+                          onBonusChange={(armorIndex, fieldName, value) =>
+                            handleItemChange(group, armorIndex, fieldName, value)
+                          }
+                        />
+                      ) : null}
 
-                        <label className={styles.abilityField} htmlFor={`item-${group}-description-${index}`}>
-                          <span className={styles.attributeLabel}>{t('pages.characterEdit.items.descriptionLabel')}</span>
-                          <textarea
-                            className={`${styles.input} ${styles.abilityTextarea}`}
-                            id={`item-${group}-description-${index}`}
-                            value={item.description}
-                            placeholder={t('pages.characterEdit.items.descriptionPlaceholder')}
-                            onChange={(event) => handleItemChange(group, index, 'description', event.target.value)}
-                          />
-                        </label>
-                        </article>
+                      {group === 'others' ? (
+                        <OtherItemCard
+                          index={index}
+                          item={item as CharacterOtherItem}
+                          onNameChange={(itemIndex, value) => handleItemChange(group, itemIndex, 'name', value)}
+                          onDescriptionChange={(itemIndex, value) =>
+                            handleItemChange(group, itemIndex, 'description', value)
+                          }
+                          onRemove={(itemIndex, name) => handleRemoveItem(group, itemIndex, name)}
+                          onEquipChange={(itemIndex, value) => handleItemChange(group, itemIndex, 'equipped', value)}
+                          onBonusChange={(itemIndex, fieldName, value) =>
+                            handleItemChange(group, itemIndex, fieldName, value)
+                          }
+                        />
                       ) : null}
                     </div>
                   ))}

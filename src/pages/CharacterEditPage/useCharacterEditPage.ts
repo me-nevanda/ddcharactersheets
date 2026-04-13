@@ -5,6 +5,8 @@ import { useI18n } from '@i18n/index'
 import { getErrorMessage } from '@lib/errors'
 import {
   emptyAbilities,
+  emptyArmor,
+  emptyOtherItem,
   emptyItems,
   emptyWeapon,
   emptyForm,
@@ -43,6 +45,7 @@ import {
   buildCharacterSurge,
   buildCharacterSpeed,
   clampLevelValue,
+  clampSpeedValue,
   formatModifier,
   getLevelBonus,
   normalizeClassValue,
@@ -52,11 +55,14 @@ import {
   CharacterClass,
   type CharacterAbility,
   type CharacterAbilityAreaType,
+  type CharacterAttributeBonuses,
   type CharacterBonuses,
   type CharacterArmor,
+  type CharacterDefenses,
   type CharacterWeapon,
   type CharacterOtherItem,
   type CharacterItems,
+  type CharacterItemBonusFieldName,
   type CharacterWeaponFieldName,
   type CharacterWeaponDamageDiceType,
   type CharacterWeaponDamageType,
@@ -220,6 +226,91 @@ function normalizeWeaponProficiencyBonusNumber(value: unknown): number {
   return 0
 }
 
+function normalizeArmorGroup(group: unknown): CharacterArmor[] {
+  if (!Array.isArray(group)) {
+    return []
+  }
+
+  return group
+    .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
+    .map((entry) => ({
+      name: typeof entry.name === 'string' ? entry.name : '',
+      description: typeof entry.description === 'string' ? entry.description : '',
+      equipped: entry.equipped === true,
+      strengthBonusNumber: normalizeWeaponBonusNumber(entry.strengthBonusNumber),
+      conditionBonusNumber: normalizeWeaponBonusNumber(entry.conditionBonusNumber),
+      dexterityBonusNumber: normalizeWeaponBonusNumber(entry.dexterityBonusNumber),
+      intelligenceBonusNumber: normalizeWeaponBonusNumber(entry.intelligenceBonusNumber),
+      wisdomBonusNumber: normalizeWeaponBonusNumber(entry.wisdomBonusNumber),
+      charismaBonusNumber: normalizeWeaponBonusNumber(entry.charismaBonusNumber),
+      speedBonusNumber: normalizeWeaponBonusNumber(entry.speedBonusNumber),
+      kpBonusNumber: normalizeWeaponBonusNumber(entry.kpBonusNumber),
+      fortitudeBonusNumber: normalizeWeaponBonusNumber(entry.fortitudeBonusNumber),
+      reflexBonusNumber: normalizeWeaponBonusNumber(entry.reflexBonusNumber),
+      willBonusNumber: normalizeWeaponBonusNumber(entry.willBonusNumber),
+    }))
+}
+
+type EquippedItemBonusSource = {
+  name: string
+  bonus: number
+}
+
+function buildEquippedItemBonusSources(
+  items: CharacterItems,
+  fieldName: CharacterItemBonusFieldName,
+): EquippedItemBonusSource[] {
+  return [...items.armors, ...items.weapons, ...items.others]
+    .filter((item) => item.equipped)
+    .map((item) => ({
+      name: item.name.trim() || '—',
+      bonus: item[fieldName],
+    }))
+    .filter((source) => source.bonus !== 0)
+}
+
+function buildItemAttributeBonuses(items: CharacterItems): CharacterAttributeBonuses {
+  return {
+    strength: sumEquippedItemBonus(items, 'strengthBonusNumber'),
+    condition: sumEquippedItemBonus(items, 'conditionBonusNumber'),
+    dexterity: sumEquippedItemBonus(items, 'dexterityBonusNumber'),
+    intelligence: sumEquippedItemBonus(items, 'intelligenceBonusNumber'),
+    wisdom: sumEquippedItemBonus(items, 'wisdomBonusNumber'),
+    charisma: sumEquippedItemBonus(items, 'charismaBonusNumber'),
+  }
+}
+
+function buildItemDefenseBonuses(items: CharacterItems): CharacterDefenses {
+  return {
+    kp: sumEquippedItemBonus(items, 'kpBonusNumber'),
+    fortitude: sumEquippedItemBonus(items, 'fortitudeBonusNumber'),
+    reflex: sumEquippedItemBonus(items, 'reflexBonusNumber'),
+    will: sumEquippedItemBonus(items, 'willBonusNumber'),
+  }
+}
+
+function buildItemSpeedBonus(items: CharacterItems): number {
+  return sumEquippedItemBonus(items, 'speedBonusNumber')
+}
+
+function sumEquippedItemBonus(items: CharacterItems, fieldName: CharacterItemBonusFieldName): number {
+  return [...items.armors, ...items.weapons, ...items.others]
+    .filter((item) => item.equipped)
+    .reduce((total, item) => total + item[fieldName], 0)
+}
+
+function buildSourceTooltipLine(
+  label: string,
+  sources: EquippedItemBonusSource[],
+  formatter: (value: number) => string = formatModifier,
+): string {
+  if (sources.length === 0) {
+    return ''
+  }
+
+  return [label, ...sources.map((source) => `${source.name}: ${formatter(source.bonus)}`)].join('\n')
+}
+
 export function useCharacterEditPage(): CharacterEditPageState {
   const { t } = useI18n()
   const { characterId = '' } = useParams()
@@ -230,7 +321,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
   const [error, setError] = useState('')
 
   function normalizeItems(items: unknown): CharacterItems {
-    function normalizeItemGroup<T extends CharacterArmor | CharacterOtherItem>(group: unknown): T[] {
+    function normalizeItemGroup<T extends CharacterOtherItem>(group: unknown): T[] {
       if (!Array.isArray(group)) {
         return []
       }
@@ -240,6 +331,18 @@ export function useCharacterEditPage(): CharacterEditPageState {
         .map((entry) => ({
           name: typeof entry.name === 'string' ? entry.name : '',
           description: typeof entry.description === 'string' ? entry.description : '',
+          equipped: entry.equipped === true,
+          strengthBonusNumber: normalizeWeaponBonusNumber(entry.strengthBonusNumber),
+          conditionBonusNumber: normalizeWeaponBonusNumber(entry.conditionBonusNumber),
+          dexterityBonusNumber: normalizeWeaponBonusNumber(entry.dexterityBonusNumber),
+          intelligenceBonusNumber: normalizeWeaponBonusNumber(entry.intelligenceBonusNumber),
+          wisdomBonusNumber: normalizeWeaponBonusNumber(entry.wisdomBonusNumber),
+          charismaBonusNumber: normalizeWeaponBonusNumber(entry.charismaBonusNumber),
+          speedBonusNumber: normalizeWeaponBonusNumber(entry.speedBonusNumber),
+          kpBonusNumber: normalizeWeaponBonusNumber(entry.kpBonusNumber),
+          fortitudeBonusNumber: normalizeWeaponBonusNumber(entry.fortitudeBonusNumber),
+          reflexBonusNumber: normalizeWeaponBonusNumber(entry.reflexBonusNumber),
+          willBonusNumber: normalizeWeaponBonusNumber(entry.willBonusNumber),
         })) as T[]
     }
 
@@ -320,7 +423,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
     const source = items as Partial<Record<CharacterItemGroupKey, unknown>>
 
     return {
-      armors: normalizeItemGroup(source.armors),
+      armors: normalizeArmorGroup(source.armors),
       weapons: normalizeWeaponGroup(source.weapons),
       others: normalizeItemGroup(source.others),
     }
@@ -637,7 +740,9 @@ export function useCharacterEditPage(): CharacterEditPageState {
         [group]:
           group === 'weapons'
             ? [...currentForm.items[group], { ...emptyWeapon }]
-            : [...currentForm.items[group], { name: '', description: '' }],
+            : group === 'armors'
+              ? [...currentForm.items[group], { ...emptyArmor }]
+            : [...currentForm.items[group], { ...emptyOtherItem }],
       },
     }))
   }
@@ -645,8 +750,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
   function handleItemChange(
     group: CharacterItemGroupKey,
     index: number,
-    fieldName: CharacterItemFieldName,
-    value: string,
+    fieldName: CharacterItemFieldName | CharacterItemBonusFieldName,
+    value: string | number | boolean,
   ) {
     setForm((currentForm) => ({
       ...currentForm,
@@ -696,27 +801,97 @@ export function useCharacterEditPage(): CharacterEditPageState {
   }
 
   const normalizedAttributes = buildNormalizedAttributes(form.attributes)
-  const effectiveAttributes = buildEffectiveAttributes(normalizedAttributes, form.attributesPlus)
+  const equippedItemAttributeBonuses = buildItemAttributeBonuses(form.items)
+  const equippedItemDefenseBonuses = buildItemDefenseBonuses(form.items)
+  const equippedItemSpeedBonus = buildItemSpeedBonus(form.items)
+  const attributeBonuses = {
+    strength: form.attributesPlus.strength + equippedItemAttributeBonuses.strength,
+    condition: form.attributesPlus.condition + equippedItemAttributeBonuses.condition,
+    dexterity: form.attributesPlus.dexterity + equippedItemAttributeBonuses.dexterity,
+    intelligence: form.attributesPlus.intelligence + equippedItemAttributeBonuses.intelligence,
+    wisdom: form.attributesPlus.wisdom + equippedItemAttributeBonuses.wisdom,
+    charisma: form.attributesPlus.charisma + equippedItemAttributeBonuses.charisma,
+  }
+  const effectiveAttributes = buildEffectiveAttributes(normalizedAttributes, attributeBonuses)
   const attributeModifierMap = buildAttributeModifierMap(effectiveAttributes)
   const levelBonusValue = getLevelBonus(form.level)
   const levelBonusLabel = formatModifier(levelBonusValue)
   const hpValue = buildCharacterHp(form.class, form.level, effectiveAttributes.condition)
   const surgeValue = buildCharacterSurge(form.class, attributeModifierMap.condition)
-  const defenseValues = buildDefenseValues(attributeModifierMap, levelBonusValue, form.race, form.class)
-  const defenseBreakdowns = buildDefenseBreakdowns(attributeModifierMap, levelBonusValue, form.race, form.class)
+  const speedValue = clampSpeedValue(buildCharacterSpeed(form.race) + equippedItemSpeedBonus)
+  const defenseValues = buildDefenseValues(
+    attributeModifierMap,
+    levelBonusValue,
+    form.race,
+    form.class,
+    equippedItemDefenseBonuses,
+  )
+  const defenseBreakdowns = buildDefenseBreakdowns(
+    attributeModifierMap,
+    levelBonusValue,
+    form.race,
+    form.class,
+    equippedItemDefenseBonuses,
+  )
   const skillBonuses = buildSkillBonuses(form.level, attributeModifierMap, form.training, form.race)
   const skillModifiers = buildSkillModifiers(skillBonuses)
   const hasChanges = JSON.stringify(form) !== JSON.stringify(initialForm)
+  const attributeBonusTooltips = {
+    strength: buildAttributeTooltip(
+      t('pages.characterEdit.sourceTooltip.raceBonus'),
+      t(`pages.characterEdit.options.race.${form.race}`),
+      form.attributesPlus.strength,
+      t('pages.characterEdit.sourceTooltip.itemBonus'),
+      buildEquippedItemBonusSources(form.items, 'strengthBonusNumber'),
+    ),
+    condition: buildAttributeTooltip(
+      t('pages.characterEdit.sourceTooltip.raceBonus'),
+      t(`pages.characterEdit.options.race.${form.race}`),
+      form.attributesPlus.condition,
+      t('pages.characterEdit.sourceTooltip.itemBonus'),
+      buildEquippedItemBonusSources(form.items, 'conditionBonusNumber'),
+    ),
+    dexterity: buildAttributeTooltip(
+      t('pages.characterEdit.sourceTooltip.raceBonus'),
+      t(`pages.characterEdit.options.race.${form.race}`),
+      form.attributesPlus.dexterity,
+      t('pages.characterEdit.sourceTooltip.itemBonus'),
+      buildEquippedItemBonusSources(form.items, 'dexterityBonusNumber'),
+    ),
+    intelligence: buildAttributeTooltip(
+      t('pages.characterEdit.sourceTooltip.raceBonus'),
+      t(`pages.characterEdit.options.race.${form.race}`),
+      form.attributesPlus.intelligence,
+      t('pages.characterEdit.sourceTooltip.itemBonus'),
+      buildEquippedItemBonusSources(form.items, 'intelligenceBonusNumber'),
+    ),
+    wisdom: buildAttributeTooltip(
+      t('pages.characterEdit.sourceTooltip.raceBonus'),
+      t(`pages.characterEdit.options.race.${form.race}`),
+      form.attributesPlus.wisdom,
+      t('pages.characterEdit.sourceTooltip.itemBonus'),
+      buildEquippedItemBonusSources(form.items, 'wisdomBonusNumber'),
+    ),
+    charisma: buildAttributeTooltip(
+      t('pages.characterEdit.sourceTooltip.raceBonus'),
+      t(`pages.characterEdit.options.race.${form.race}`),
+      form.attributesPlus.charisma,
+      t('pages.characterEdit.sourceTooltip.itemBonus'),
+      buildEquippedItemBonusSources(form.items, 'charismaBonusNumber'),
+    ),
+  } satisfies Record<keyof CharacterAttributeBonuses, string>
   const defenseTooltips: DefenseTooltipValues = {
     kp: buildDefenseTooltip(
       t('pages.characterEdit.fields.kp'),
       t('pages.characterEdit.defenseTooltip.levelBonus'),
       t('pages.characterEdit.defenseTooltip.classBonus'),
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
+      t('pages.characterEdit.defenseTooltip.itemsBonus'),
       t(`pages.characterEdit.options.class.${form.class}`),
       defenseBreakdowns.kp.levelBonus,
       defenseBreakdowns.kp.classBonus,
       defenseBreakdowns.kp.attributeBonus,
+      buildEquippedItemBonusSources(form.items, 'kpBonusNumber'),
       defenseBreakdowns.kp.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
     ),
     fortitude: buildDefenseTooltip(
@@ -724,10 +899,12 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.levelBonus'),
       t('pages.characterEdit.defenseTooltip.classBonus'),
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
+      t('pages.characterEdit.defenseTooltip.itemsBonus'),
       t(`pages.characterEdit.options.class.${form.class}`),
       defenseBreakdowns.fortitude.levelBonus,
       defenseBreakdowns.fortitude.classBonus,
       defenseBreakdowns.fortitude.attributeBonus,
+      buildEquippedItemBonusSources(form.items, 'fortitudeBonusNumber'),
       defenseBreakdowns.fortitude.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
     ),
     reflex: buildDefenseTooltip(
@@ -735,10 +912,12 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.levelBonus'),
       t('pages.characterEdit.defenseTooltip.classBonus'),
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
+      t('pages.characterEdit.defenseTooltip.itemsBonus'),
       t(`pages.characterEdit.options.class.${form.class}`),
       defenseBreakdowns.reflex.levelBonus,
       defenseBreakdowns.reflex.classBonus,
       defenseBreakdowns.reflex.attributeBonus,
+      buildEquippedItemBonusSources(form.items, 'reflexBonusNumber'),
       defenseBreakdowns.reflex.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
     ),
     will: buildDefenseTooltip(
@@ -746,13 +925,21 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.levelBonus'),
       t('pages.characterEdit.defenseTooltip.classBonus'),
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
+      t('pages.characterEdit.defenseTooltip.itemsBonus'),
       t(`pages.characterEdit.options.class.${form.class}`),
       defenseBreakdowns.will.levelBonus,
       defenseBreakdowns.will.classBonus,
       defenseBreakdowns.will.attributeBonus,
+      buildEquippedItemBonusSources(form.items, 'willBonusNumber'),
       defenseBreakdowns.will.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
     ),
   }
+  const speedTooltip = buildSpeedTooltip(
+    t('pages.characterEdit.sourceTooltip.baseSpeed'),
+    buildCharacterSpeed(form.race),
+    t('pages.characterEdit.sourceTooltip.itemBonus'),
+    buildEquippedItemBonusSources(form.items, 'speedBonusNumber'),
+  )
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -824,6 +1011,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
     form,
     loading,
     saving,
+    attributeBonuses,
+    attributeBonusTooltips,
     handleGeneralChange,
     handleAttributeChange,
     handleTrainingChange,
@@ -838,6 +1027,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
     handleSubmit,
     attributeRows,
     levelBonusLabel,
+    speedValue,
+    speedTooltip,
     skillModifiers,
     defenseValues,
     defenseTooltips,
@@ -847,15 +1038,51 @@ export function useCharacterEditPage(): CharacterEditPageState {
   }
 }
 
+function buildAttributeTooltip(
+  raceLabel: string,
+  raceName: string,
+  raceBonus: number,
+  itemLabel: string,
+  itemSources: EquippedItemBonusSource[],
+): string {
+  const lines = [`${raceLabel}: ${formatModifier(raceBonus)} (${raceName})`]
+
+  if (itemSources.length > 0) {
+    lines.push('', buildSourceTooltipLine(itemLabel, itemSources))
+  }
+
+  return lines.join('\n')
+}
+
+function buildSpeedTooltip(
+  baseLabel: string,
+  baseSpeed: number,
+  itemLabel: string,
+  itemSources: EquippedItemBonusSource[],
+): string {
+  const lines = [`${baseLabel}: ${baseSpeed}`]
+
+  if (itemSources.length > 0) {
+    const itemLine = buildSourceTooltipLine(itemLabel, itemSources)
+    if (itemLine) {
+      lines.push('', itemLine)
+    }
+  }
+
+  return lines.join('\n')
+}
+
 function buildDefenseTooltip(
   defenseLabel: string,
   levelLabel: string,
   classLabel: string,
   attributesLabel: string,
+  itemsLabel: string,
   characterClassLabel: string,
   levelBonus: number,
   classBonus: number,
   attributeBonus: number,
+  itemSources: EquippedItemBonusSource[],
   attributeLabels: string[],
 ): string {
   const lines = [
@@ -866,6 +1093,11 @@ function buildDefenseTooltip(
       : `${classLabel}: ${formatModifier(classBonus)}`,
     `${attributesLabel}: ${formatModifier(attributeBonus)} (${attributeLabels.join(' / ')})`,
   ]
+
+  const itemLine = buildSourceTooltipLine(itemsLabel, itemSources)
+  if (itemLine) {
+    lines.push('', itemLine)
+  }
 
   return lines.join('\n')
 }

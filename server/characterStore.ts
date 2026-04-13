@@ -251,6 +251,18 @@ function normalizeItemGroup<T extends CharacterArmor | CharacterWeapon | Charact
     .map((item) => ({
       name: typeof item.name === 'string' ? item.name.trim() : '',
       description: typeof item.description === 'string' ? item.description.trim() : '',
+      equipped: item.equipped === true,
+      strengthBonusNumber: normalizeWeaponBonusNumber(item.strengthBonusNumber),
+      conditionBonusNumber: normalizeWeaponBonusNumber(item.conditionBonusNumber),
+      dexterityBonusNumber: normalizeWeaponBonusNumber(item.dexterityBonusNumber),
+      intelligenceBonusNumber: normalizeWeaponBonusNumber(item.intelligenceBonusNumber),
+      wisdomBonusNumber: normalizeWeaponBonusNumber(item.wisdomBonusNumber),
+      charismaBonusNumber: normalizeWeaponBonusNumber(item.charismaBonusNumber),
+      speedBonusNumber: normalizeWeaponBonusNumber(item.speedBonusNumber),
+      kpBonusNumber: normalizeWeaponBonusNumber(item.kpBonusNumber),
+      fortitudeBonusNumber: normalizeWeaponBonusNumber(item.fortitudeBonusNumber),
+      reflexBonusNumber: normalizeWeaponBonusNumber(item.reflexBonusNumber),
+      willBonusNumber: normalizeWeaponBonusNumber(item.willBonusNumber),
     })) as T[]
 
   return normalized.filter((item) => item.name.length > 0 || item.description.length > 0)
@@ -330,6 +342,32 @@ function normalizeWeaponBonusNumber(value: unknown): number {
   return 0
 }
 
+function normalizeArmorGroup(data: unknown): CharacterArmor[] {
+  if (!Array.isArray(data)) {
+    return []
+  }
+
+  return data
+    .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+    .map((item) => ({
+      name: typeof item.name === 'string' ? item.name.trim() : '',
+      description: typeof item.description === 'string' ? item.description.trim() : '',
+      equipped: item.equipped === true,
+      strengthBonusNumber: normalizeWeaponBonusNumber(item.strengthBonusNumber),
+      conditionBonusNumber: normalizeWeaponBonusNumber(item.conditionBonusNumber),
+      dexterityBonusNumber: normalizeWeaponBonusNumber(item.dexterityBonusNumber),
+      intelligenceBonusNumber: normalizeWeaponBonusNumber(item.intelligenceBonusNumber),
+      wisdomBonusNumber: normalizeWeaponBonusNumber(item.wisdomBonusNumber),
+      charismaBonusNumber: normalizeWeaponBonusNumber(item.charismaBonusNumber),
+      speedBonusNumber: normalizeWeaponBonusNumber(item.speedBonusNumber),
+      kpBonusNumber: normalizeWeaponBonusNumber(item.kpBonusNumber),
+      fortitudeBonusNumber: normalizeWeaponBonusNumber(item.fortitudeBonusNumber),
+      reflexBonusNumber: normalizeWeaponBonusNumber(item.reflexBonusNumber),
+      willBonusNumber: normalizeWeaponBonusNumber(item.willBonusNumber),
+    }))
+    .filter((item) => item.name.length > 0 || item.description.length > 0)
+}
+
 function normalizeWeaponProficiencyBonusNumber(value: unknown): number {
   if (typeof value === 'number' && Number.isFinite(value)) {
     return Math.min(5, Math.max(0, Math.trunc(value)))
@@ -403,7 +441,7 @@ function normalizeItems(data: unknown): {
   const source = data as Partial<Record<'armors' | 'weapons' | 'others', unknown>>
 
   return {
-    armors: normalizeItemGroup(source.armors),
+    armors: normalizeArmorGroup(source.armors),
     weapons: normalizeWeaponGroup(source.weapons),
     others: normalizeItemGroup(source.others),
   }

@@ -67,6 +67,15 @@ export const pl: TranslationDictionary = {
         levelBonus: 'Bonus z poziomu',
         classBonus: 'Bonus z klasy',
         attributesBonus: 'Bonus z atrybutów',
+        itemsBonus: 'Bonusy z przedmiotów:',
+      },
+      skillTooltip: {
+        trainingBonus: 'bonus z wyszkolenia',
+      },
+      sourceTooltip: {
+        raceBonus: 'Rasa',
+        itemBonus: 'Bonusy z przedmiotów:',
+        baseSpeed: 'Szybkość z rasy',
       },
       abilities: {
         title: 'Zdolności',

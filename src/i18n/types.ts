@@ -66,6 +66,15 @@ export interface TranslationDictionary {
         levelBonus: string
         classBonus: string
         attributesBonus: string
+        itemsBonus: string
+      }
+      skillTooltip: {
+        trainingBonus: string
+      }
+      sourceTooltip: {
+        raceBonus: string
+        itemBonus: string
+        baseSpeed: string
       }
       abilities: {
         title: string

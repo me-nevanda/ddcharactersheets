@@ -3,6 +3,12 @@ import styles from '../../style.module.scss'
 import { useCharacterEditPageContext } from '../../characterEditPageContext'
 import { skillDefinitions } from '@dictionaries/characterEditDefinitions'
 import { CharacterClass } from '../../../../types/character'
+import {
+  buildAttributeModifierMap,
+  buildEffectiveAttributes,
+  buildNormalizedAttributes,
+} from '../AttributesSection/attributesSectionLogic'
+import { formatModifier, getLevelBonus } from '../GeneralSection/generalSectionLogic'
 
 const fighterAndBarbarianHighlightedSkillKeys = new Set([
   'athletics',
@@ -66,6 +72,10 @@ const warlordAndBardHighlightedSkillKeys = new Set([
 export function SkillSection() {
   const { t } = useI18n()
   const { form, skillModifiers, handleTrainingChange } = useCharacterEditPageContext()
+  const normalizedAttributes = buildNormalizedAttributes(form.attributes)
+  const effectiveAttributes = buildEffectiveAttributes(normalizedAttributes, form.attributesPlus)
+  const attributeModifierMap = buildAttributeModifierMap(effectiveAttributes)
+  const levelBonusValue = getLevelBonus(form.level)
   const highlightedSkillKeys =
     form.class === CharacterClass.Paladin
       ? paladinHighlightedSkillKeys
@@ -99,6 +109,27 @@ export function SkillSection() {
   const isCleric = form.class === CharacterClass.Cleric
   const isWizard = form.class === CharacterClass.Wizard
 
+  function buildSkillTooltip(attributeKey: keyof typeof attributeModifierMap, trained: boolean): string {
+    const lines: string[] = []
+
+    if (levelBonusValue !== 0) {
+      lines.push(`${t('pages.characterEdit.defenseTooltip.levelBonus')}: ${formatModifier(levelBonusValue)}`)
+    }
+
+    const attributeBonus = attributeModifierMap[attributeKey]
+    if (attributeBonus !== 0) {
+      lines.push(
+        `${t('pages.characterEdit.defenseTooltip.attributesBonus')}: ${formatModifier(attributeBonus)} (${t(`pages.characterEdit.fields.${attributeKey}`)})`,
+      )
+    }
+
+    if (trained) {
+      lines.push(`${t('pages.characterEdit.skillTooltip.trainingBonus')}: +5`)
+    }
+
+    return lines.join('\n')
+  }
+
   return (
     <section className={styles.section}>
       <div className={styles.sectionHeader}>
@@ -106,8 +137,8 @@ export function SkillSection() {
       </div>
 
       <div className={styles.skillGrid}>
-        {skillDefinitions.map((skill) => (
-          <div className={styles.skillCard} key={skill.key}>
+          {skillDefinitions.map((skill) => (
+            <div className={styles.skillCard} key={skill.key}>
             <label className={styles.checkboxField} htmlFor={skill.key}>
               <input
                 className={styles.checkboxInput}
@@ -142,7 +173,13 @@ export function SkillSection() {
                 {t(skill.translationKey)}
               </span>
             </label>
-            <span className={styles.modifierBadge}>{skillModifiers[skill.key]}</span>
+            <span
+              className={styles.modifierBadge}
+              title={buildSkillTooltip(skill.attributeKey, form.training[skill.key])}
+              aria-label={buildSkillTooltip(skill.attributeKey, form.training[skill.key])}
+            >
+              {skillModifiers[skill.key]}
+            </span>
           </div>
         ))}
       </div>

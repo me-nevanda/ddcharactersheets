@@ -72,7 +72,20 @@ export interface CharacterItemBase {
   description: string
 }
 
-export interface CharacterArmor extends CharacterItemBase {}
+export interface CharacterArmor extends CharacterItemBase {
+  equipped: boolean
+  strengthBonusNumber: number
+  conditionBonusNumber: number
+  dexterityBonusNumber: number
+  intelligenceBonusNumber: number
+  wisdomBonusNumber: number
+  charismaBonusNumber: number
+  speedBonusNumber: number
+  kpBonusNumber: number
+  fortitudeBonusNumber: number
+  reflexBonusNumber: number
+  willBonusNumber: number
+}
 
 export interface CharacterWeapon extends CharacterItemBase {
   damageDiceCount: number
@@ -94,7 +107,20 @@ export interface CharacterWeapon extends CharacterItemBase {
   willBonusNumber: number
 }
 
-export interface CharacterOtherItem extends CharacterItemBase {}
+export interface CharacterOtherItem extends CharacterItemBase {
+  equipped: boolean
+  strengthBonusNumber: number
+  conditionBonusNumber: number
+  dexterityBonusNumber: number
+  intelligenceBonusNumber: number
+  wisdomBonusNumber: number
+  charismaBonusNumber: number
+  speedBonusNumber: number
+  kpBonusNumber: number
+  fortitudeBonusNumber: number
+  reflexBonusNumber: number
+  willBonusNumber: number
+}
 
 export interface CharacterItems {
   armors: CharacterArmor[]
@@ -105,7 +131,7 @@ export interface CharacterItems {
 export type CharacterItem = CharacterArmor | CharacterWeapon | CharacterOtherItem
 
 export type CharacterWeaponDamageDiceType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20'
-export type CharacterWeaponBonusFieldName =
+export type CharacterItemBonusFieldName =
   | 'strengthBonusNumber'
   | 'conditionBonusNumber'
   | 'dexterityBonusNumber'
@@ -117,6 +143,8 @@ export type CharacterWeaponBonusFieldName =
   | 'fortitudeBonusNumber'
   | 'reflexBonusNumber'
   | 'willBonusNumber'
+
+export type CharacterWeaponBonusFieldName = CharacterItemBonusFieldName
 
 export type CharacterWeaponFieldName =
   | 'damageDiceCount'
