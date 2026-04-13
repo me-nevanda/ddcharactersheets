@@ -4,7 +4,7 @@ import { useCharacterEditPageContext } from '../../characterEditPageContext'
 
 export function DefensesSection() {
   const { t } = useI18n()
-  const { defenseValues } = useCharacterEditPageContext()
+  const { defenseValues, defenseTooltips } = useCharacterEditPageContext()
 
   return (
     <section className={styles.section}>
@@ -15,22 +15,30 @@ export function DefensesSection() {
       <div className={styles.numericGrid}>
         <div className={styles.defenseCard}>
           <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.kp')}</span>
-          <span className={styles.modifierBadge}>{defenseValues.kp}</span>
+          <span className={styles.modifierBadge} title={defenseTooltips.kp} aria-label={defenseTooltips.kp}>
+            {defenseValues.kp}
+          </span>
         </div>
 
         <div className={styles.defenseCard}>
           <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.fortitude')}</span>
-          <span className={styles.modifierBadge}>{defenseValues.fortitude}</span>
+          <span className={styles.modifierBadge} title={defenseTooltips.fortitude} aria-label={defenseTooltips.fortitude}>
+            {defenseValues.fortitude}
+          </span>
         </div>
 
         <div className={styles.defenseCard}>
           <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.reflex')}</span>
-          <span className={styles.modifierBadge}>{defenseValues.reflex}</span>
+          <span className={styles.modifierBadge} title={defenseTooltips.reflex} aria-label={defenseTooltips.reflex}>
+            {defenseValues.reflex}
+          </span>
         </div>
 
         <div className={styles.defenseCard}>
           <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.will')}</span>
-          <span className={styles.modifierBadge}>{defenseValues.will}</span>
+          <span className={styles.modifierBadge} title={defenseTooltips.will} aria-label={defenseTooltips.will}>
+            {defenseValues.will}
+          </span>
         </div>
       </div>
     </section>

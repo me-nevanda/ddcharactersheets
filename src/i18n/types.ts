@@ -62,6 +62,11 @@ export interface TranslationDictionary {
         defenses: string
         skills: string
       }
+      defenseTooltip: {
+        levelBonus: string
+        classBonus: string
+        attributesBonus: string
+      }
       abilities: {
         title: string
         emptyState: string

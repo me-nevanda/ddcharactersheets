@@ -63,6 +63,11 @@ export const pl: TranslationDictionary = {
         defenses: 'Obrony',
         skills: 'Umiejętności (+ wyszkolenia)',
       },
+      defenseTooltip: {
+        levelBonus: 'Bonus z poziomu',
+        classBonus: 'Bonus z klasy',
+        attributesBonus: 'Bonus z atrybutów',
+      },
       abilities: {
         title: 'Zdolności',
         emptyState: 'Nie dodano jeszcze żadnej zdolności.',

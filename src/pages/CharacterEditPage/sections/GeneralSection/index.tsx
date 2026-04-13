@@ -2,10 +2,12 @@ import { useI18n } from '@i18n/index'
 import styles from '../../style.module.scss'
 import { useCharacterEditPageContext } from '../../characterEditPageContext'
 import { classOptions, raceOptions } from '@dictionaries/characterEditDefinitions'
+import { buildCharacterSpeed } from './generalSectionLogic'
 
 export function GeneralSection() {
   const { t } = useI18n()
   const { form, levelBonusLabel, handleGeneralChange, hpValue, surgeValue } = useCharacterEditPageContext()
+  const speedValue = buildCharacterSpeed(form.race)
 
   return (
     <section className={styles.section}>
@@ -32,21 +34,9 @@ export function GeneralSection() {
           <span className={styles.modifierBadge}>{levelBonusLabel}</span>
         </div>
 
-        <div className={styles.generalCard}>
-          <label className={styles.attributeLabel} htmlFor="speed">
-            {t('pages.characterEdit.fields.speed')}
-          </label>
-          <input
-            className={styles.input}
-            id="speed"
-            name="speed"
-            type="number"
-            min={1}
-            max={12}
-            inputMode="numeric"
-            value={form.speed}
-            onChange={handleGeneralChange}
-          />
+        <div className={styles.generalValueCard}>
+          <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.speed')}</span>
+          <span className={styles.modifierBadge}>{speedValue}</span>
         </div>
 
         <div className={styles.generalCard}>

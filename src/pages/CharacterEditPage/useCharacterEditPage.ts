@@ -23,14 +23,18 @@ import {
   buildNormalizedAttributes,
   clampAttributeValue,
 } from './sections/AttributesSection/attributesSectionLogic'
-import { buildDefenseValues, normalizeDefenses } from './sections/DefensesSection/defensesSectionLogic'
+import {
+  buildDefenseBreakdowns,
+  buildDefenseValues,
+  normalizeDefenses,
+} from './sections/DefensesSection/defensesSectionLogic'
 import { buildSkillBonuses, buildSkillModifiers } from './sections/SkillSection/skillSectionLogic'
 import {
   buildRaceAttributeBonuses,
   buildCharacterHp,
   buildCharacterSurge,
+  buildCharacterSpeed,
   clampLevelValue,
-  clampSpeedValue,
   formatModifier,
   getLevelBonus,
   normalizeClassValue,
@@ -57,6 +61,7 @@ import type {
   CharacterEditPageState,
   CharacterGeneralChangeEvent,
   CharacterGeneralFieldName,
+  DefenseTooltipValues,
   CharacterSkillFieldName,
   SkillModifierMap,
 } from './types'
@@ -179,7 +184,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
           const nextForm: CharacterEditFormData = {
             ...characterData,
             level: clampLevelValue(character.level),
-            speed: clampSpeedValue(character.speed),
+            speed: buildCharacterSpeed(character.race),
             hp: character.hp ?? 0,
             surge: character.surge ?? 0,
             attributes: buildNormalizedAttributes(character.attributes),
@@ -310,14 +315,6 @@ export function useCharacterEditPage(): CharacterEditPageState {
         ...currentForm,
         class: normalizeClassValue(value),
         training: emptyTraining,
-      }))
-      return
-    }
-
-    if (fieldName === 'speed') {
-      setForm((currentForm) => ({
-        ...currentForm,
-        speed: clampSpeedValue(Number.parseInt(value, 10) || 1),
       }))
       return
     }
@@ -500,9 +497,56 @@ export function useCharacterEditPage(): CharacterEditPageState {
   const hpValue = buildCharacterHp(form.class, form.level, effectiveAttributes.condition)
   const surgeValue = buildCharacterSurge(form.class, attributeModifierMap.condition)
   const defenseValues = buildDefenseValues(attributeModifierMap, levelBonusValue, form.race, form.class)
+  const defenseBreakdowns = buildDefenseBreakdowns(attributeModifierMap, levelBonusValue, form.race, form.class)
   const skillBonuses = buildSkillBonuses(form.level, attributeModifierMap, form.training, form.race)
   const skillModifiers = buildSkillModifiers(skillBonuses)
   const hasChanges = JSON.stringify(form) !== JSON.stringify(initialForm)
+  const defenseTooltips: DefenseTooltipValues = {
+    kp: buildDefenseTooltip(
+      t('pages.characterEdit.fields.kp'),
+      t('pages.characterEdit.defenseTooltip.levelBonus'),
+      t('pages.characterEdit.defenseTooltip.classBonus'),
+      t('pages.characterEdit.defenseTooltip.attributesBonus'),
+      t(`pages.characterEdit.options.class.${form.class}`),
+      defenseBreakdowns.kp.levelBonus,
+      defenseBreakdowns.kp.classBonus,
+      defenseBreakdowns.kp.attributeBonus,
+      defenseBreakdowns.kp.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
+    ),
+    fortitude: buildDefenseTooltip(
+      t('pages.characterEdit.fields.fortitude'),
+      t('pages.characterEdit.defenseTooltip.levelBonus'),
+      t('pages.characterEdit.defenseTooltip.classBonus'),
+      t('pages.characterEdit.defenseTooltip.attributesBonus'),
+      t(`pages.characterEdit.options.class.${form.class}`),
+      defenseBreakdowns.fortitude.levelBonus,
+      defenseBreakdowns.fortitude.classBonus,
+      defenseBreakdowns.fortitude.attributeBonus,
+      defenseBreakdowns.fortitude.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
+    ),
+    reflex: buildDefenseTooltip(
+      t('pages.characterEdit.fields.reflex'),
+      t('pages.characterEdit.defenseTooltip.levelBonus'),
+      t('pages.characterEdit.defenseTooltip.classBonus'),
+      t('pages.characterEdit.defenseTooltip.attributesBonus'),
+      t(`pages.characterEdit.options.class.${form.class}`),
+      defenseBreakdowns.reflex.levelBonus,
+      defenseBreakdowns.reflex.classBonus,
+      defenseBreakdowns.reflex.attributeBonus,
+      defenseBreakdowns.reflex.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
+    ),
+    will: buildDefenseTooltip(
+      t('pages.characterEdit.fields.will'),
+      t('pages.characterEdit.defenseTooltip.levelBonus'),
+      t('pages.characterEdit.defenseTooltip.classBonus'),
+      t('pages.characterEdit.defenseTooltip.attributesBonus'),
+      t(`pages.characterEdit.options.class.${form.class}`),
+      defenseBreakdowns.will.levelBonus,
+      defenseBreakdowns.will.classBonus,
+      defenseBreakdowns.will.attributeBonus,
+      defenseBreakdowns.will.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
+    ),
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -521,7 +565,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
         ...form,
         name: form.name.trim(),
         level: clampLevelValue(form.level),
-        speed: clampSpeedValue(form.speed),
+        speed: buildCharacterSpeed(form.race),
         hp: hpValue,
         surge: surgeValue,
         attributes: normalizedAttributes,
@@ -582,8 +626,32 @@ export function useCharacterEditPage(): CharacterEditPageState {
     levelBonusLabel,
     skillModifiers,
     defenseValues,
+    defenseTooltips,
     hpValue,
     surgeValue,
     hasChanges,
   }
+}
+
+function buildDefenseTooltip(
+  defenseLabel: string,
+  levelLabel: string,
+  classLabel: string,
+  attributesLabel: string,
+  characterClassLabel: string,
+  levelBonus: number,
+  classBonus: number,
+  attributeBonus: number,
+  attributeLabels: string[],
+): string {
+  const lines = [
+    defenseLabel,
+    `${levelLabel}: ${formatModifier(levelBonus)}`,
+    classBonus > 0
+      ? `${classLabel}: ${formatModifier(classBonus)} (${characterClassLabel})`
+      : `${classLabel}: ${formatModifier(classBonus)}`,
+    `${attributesLabel}: ${formatModifier(attributeBonus)} (${attributeLabels.join(' / ')})`,
+  ]
+
+  return lines.join('\n')
 }

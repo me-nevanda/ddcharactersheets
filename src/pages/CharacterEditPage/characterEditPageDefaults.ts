@@ -1,4 +1,5 @@
 import { CharacterClass, CharacterRace } from '../../types/character'
+import { buildCharacterSpeed } from './sections/GeneralSection/generalSectionLogic'
 import type {
   CharacterAbility,
   CharacterAbilityAction,
@@ -116,7 +117,7 @@ export const emptyForm: CharacterEditFormData = {
   class: CharacterClass.Warlock,
   hp: 0,
   surge: 0,
-  speed: 6,
+  speed: buildCharacterSpeed(CharacterRace.Human),
   attributes: {
     strength: 10,
     condition: 10,

@@ -6,12 +6,41 @@ export function clampDefenseValue(value: number): number {
   return Math.min(30, Math.max(0, Math.trunc(value)))
 }
 
+type DefenseKey = keyof CharacterDefenses
+type AttributeKey = keyof CharacterAttributeBonuses
+
+export interface DefenseBreakdown {
+  value: number
+  levelBonus: number
+  classBonus: number
+  attributeBonus: number
+  attributeKeys: AttributeKey[]
+}
+
+export type DefenseBreakdowns = Record<DefenseKey, DefenseBreakdown>
+
 export function buildDefenseValues(
   attributeModifiers: CharacterAttributeBonuses,
   levelBonus: number,
   race: CharacterRace,
   characterClass: CharacterClass,
 ): DefenseValues {
+  const breakdowns = buildDefenseBreakdowns(attributeModifiers, levelBonus, race, characterClass)
+
+  return {
+    kp: breakdowns.kp.value,
+    fortitude: breakdowns.fortitude.value,
+    reflex: breakdowns.reflex.value,
+    will: breakdowns.will.value,
+  }
+}
+
+export function buildDefenseBreakdowns(
+  attributeModifiers: CharacterAttributeBonuses,
+  levelBonus: number,
+  race: CharacterRace,
+  characterClass: CharacterClass,
+): DefenseBreakdowns {
   const humanDefenseBonus = race === CharacterRace.Human ? 1 : 0
   const fortitudeClassBonus =
     characterClass === CharacterClass.Fighter ||
@@ -28,39 +57,77 @@ export function buildDefenseValues(
   const warlockWillBonus = characterClass === CharacterClass.Warlock ? 1 : 0
   const warlockReflexBonus = characterClass === CharacterClass.Warlock ? 1 : 0
 
+  const fortitudeAttributeBonus = Math.max(attributeModifiers.strength, attributeModifiers.condition)
+  const reflexAttributeBonus = Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence)
+  const willAttributeBonus = Math.max(attributeModifiers.wisdom, attributeModifiers.charisma)
+
   return {
-    kp: clampDefenseValue(
-      10 + Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence) + levelBonus,
-    ),
-    fortitude: clampDefenseValue(
-      10 +
-        Math.max(attributeModifiers.strength, attributeModifiers.condition) +
-        levelBonus +
-        humanDefenseBonus +
-        fortitudeClassBonus +
-        warlordAndBardDefenseBonus +
-        paladinDefenseBonus,
-    ),
-    reflex: clampDefenseValue(
-      10 +
-        Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence) +
-        levelBonus +
-        humanDefenseBonus +
-        paladinDefenseBonus +
-        warlockReflexBonus +
-        rogueReflexBonus,
-    ),
-    will: clampDefenseValue(
-      10 +
-        Math.max(attributeModifiers.wisdom, attributeModifiers.charisma) +
-        levelBonus +
-        humanDefenseBonus +
-        warlordAndBardDefenseBonus +
-        clericWillBonus +
-        wizardWillBonus +
-        warlockWillBonus,
-    ),
+    kp: {
+      value: clampDefenseValue(10 + reflexAttributeBonus + levelBonus),
+      levelBonus,
+      classBonus: 0,
+      attributeBonus: reflexAttributeBonus,
+      attributeKeys: getMaxAttributeKeys(attributeModifiers.dexterity, attributeModifiers.intelligence, [
+        'dexterity',
+        'intelligence',
+      ]),
+    },
+    fortitude: {
+      value: clampDefenseValue(
+        10 +
+          fortitudeAttributeBonus +
+          levelBonus +
+          humanDefenseBonus +
+          fortitudeClassBonus +
+          warlordAndBardDefenseBonus +
+          paladinDefenseBonus,
+      ),
+      levelBonus,
+      classBonus: humanDefenseBonus + fortitudeClassBonus + warlordAndBardDefenseBonus + paladinDefenseBonus,
+      attributeBonus: fortitudeAttributeBonus,
+      attributeKeys: getMaxAttributeKeys(attributeModifiers.strength, attributeModifiers.condition, [
+        'strength',
+        'condition',
+      ]),
+    },
+    reflex: {
+      value: clampDefenseValue(
+        10 + reflexAttributeBonus + levelBonus + humanDefenseBonus + paladinDefenseBonus + warlockReflexBonus + rogueReflexBonus,
+      ),
+      levelBonus,
+      classBonus: humanDefenseBonus + paladinDefenseBonus + warlockReflexBonus + rogueReflexBonus,
+      attributeBonus: reflexAttributeBonus,
+      attributeKeys: getMaxAttributeKeys(attributeModifiers.dexterity, attributeModifiers.intelligence, [
+        'dexterity',
+        'intelligence',
+      ]),
+    },
+    will: {
+      value: clampDefenseValue(
+        10 + willAttributeBonus + levelBonus + humanDefenseBonus + warlordAndBardDefenseBonus + clericWillBonus + wizardWillBonus + warlockWillBonus,
+      ),
+      levelBonus,
+      classBonus:
+        humanDefenseBonus + warlordAndBardDefenseBonus + clericWillBonus + wizardWillBonus + warlockWillBonus,
+      attributeBonus: willAttributeBonus,
+      attributeKeys: getMaxAttributeKeys(attributeModifiers.wisdom, attributeModifiers.charisma, [
+        'wisdom',
+        'charisma',
+      ]),
+    },
   }
+}
+
+function getMaxAttributeKeys(firstValue: number, secondValue: number, keys: [AttributeKey, AttributeKey]): AttributeKey[] {
+  if (firstValue > secondValue) {
+    return [keys[0]]
+  }
+
+  if (secondValue > firstValue) {
+    return [keys[1]]
+  }
+
+  return keys
 }
 
 export function normalizeDefenses(

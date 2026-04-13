@@ -16,7 +16,7 @@ export interface CharacterEditFormData extends Omit<Character, 'id' | 'updatedAt
   bonuses: CharacterBonuses
 }
 
-export type CharacterGeneralFieldName = 'name' | 'level' | 'speed' | 'race' | 'class'
+export type CharacterGeneralFieldName = 'name' | 'level' | 'race' | 'class'
 
 export type CharacterAttributeFieldName = keyof CharacterAttributes
 
@@ -70,6 +70,7 @@ export interface CharacterEditPageState {
   skillModifiers: SkillModifierMap
   levelBonusLabel: string
   defenseValues: DefenseValues
+  defenseTooltips: DefenseTooltipValues
   hpValue: number
   surgeValue: number
   hasChanges: boolean
@@ -80,4 +81,11 @@ export interface DefenseValues {
   fortitude: number
   reflex: number
   will: number
+}
+
+export interface DefenseTooltipValues {
+  kp: string
+  fortitude: string
+  reflex: string
+  will: string
 }

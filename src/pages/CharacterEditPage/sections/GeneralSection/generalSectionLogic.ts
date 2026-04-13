@@ -9,6 +9,18 @@ export function clampSpeedValue(value: number): number {
   return Math.min(12, Math.max(1, Math.trunc(value)))
 }
 
+export function buildCharacterSpeed(race: CharacterRace): number {
+  if (race === CharacterRace.Elf) {
+    return 7
+  }
+
+  if (race === CharacterRace.Dwarf) {
+    return 5
+  }
+
+  return 6
+}
+
 export function getLevelBonus(value: number): number {
   return Math.floor(Math.min(30, Math.max(1, Math.trunc(value))) / 2)
 }
