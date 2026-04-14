@@ -283,6 +283,7 @@ function normalizeFeats(data: unknown): CharacterFeat[] {
           id: globalThis.crypto.randomUUID(),
           name: item.trim(),
           description: item.trim(),
+          visible: true,
         }
       }
 
@@ -291,6 +292,7 @@ function normalizeFeats(data: unknown): CharacterFeat[] {
         id: typeof item.id === 'string' && item.id.length > 0 ? item.id : globalThis.crypto.randomUUID(),
         name: typeof item.name === 'string' ? item.name.trim() : '',
         description: typeof item.description === 'string' ? item.description.trim() : '',
+        visible: item.visible !== false,
         speedBonusNumber: normalizeWeaponBonusNumber(item.speedBonusNumber),
         hpBonusNumber: normalizeWeaponBonusNumber(item.hpBonusNumber),
         kpBonusNumber: normalizeWeaponBonusNumber(item.kpBonusNumber),
@@ -377,6 +379,7 @@ function normalizeArmorGroup(group: unknown): CharacterArmor[] {
           name: typeof entry.name === 'string' ? entry.name : '',
           description: typeof entry.description === 'string' ? entry.description : '',
           equipped: entry.equipped === true,
+          storyItem: entry.storyItem === true,
           strengthBonusNumber: normalizeWeaponBonusNumber(entry.strengthBonusNumber),
           conditionBonusNumber: normalizeWeaponBonusNumber(entry.conditionBonusNumber),
           dexterityBonusNumber: normalizeWeaponBonusNumber(entry.dexterityBonusNumber),
@@ -473,6 +476,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
           name: typeof entry.name === 'string' ? entry.name : '',
           description: typeof entry.description === 'string' ? entry.description : '',
           equipped: entry.equipped === true,
+          storyItem: entry.storyItem === true,
           strengthBonusNumber: normalizeWeaponBonusNumber(entry.strengthBonusNumber),
           conditionBonusNumber: normalizeWeaponBonusNumber(entry.conditionBonusNumber),
           dexterityBonusNumber: normalizeWeaponBonusNumber(entry.dexterityBonusNumber),
@@ -906,6 +910,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
         {
           ...emptyFeat,
           id: globalThis.crypto.randomUUID(),
+          visible: true,
         },
       ],
     }))
@@ -961,6 +966,21 @@ export function useCharacterEditPage(): CharacterEditPageState {
           itemIndex === index
             ? {
                 ...item,
+                ...(group === 'others' && fieldName === 'storyItem' && value === true
+                  ? {
+                      strengthBonusNumber: 0,
+                      conditionBonusNumber: 0,
+                      dexterityBonusNumber: 0,
+                      intelligenceBonusNumber: 0,
+                      wisdomBonusNumber: 0,
+                      charismaBonusNumber: 0,
+                      speedBonusNumber: 0,
+                      kpBonusNumber: 0,
+                      fortitudeBonusNumber: 0,
+                      reflexBonusNumber: 0,
+                      willBonusNumber: 0,
+                    }
+                  : {}),
                 [fieldName]: value,
               }
             : item,

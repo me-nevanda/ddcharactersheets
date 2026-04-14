@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
 import { useCharacterPrintPage } from './useCharacterPrintPage'
@@ -139,9 +138,6 @@ export function CharacterPrintPage() {
         </div>
       </article>
 
-      <Link className={styles.backLink} to={`/characters/${character.id}/edit`}>
-        {t('pages.characterPrint.back')}
-      </Link>
     </main>
   )
 }

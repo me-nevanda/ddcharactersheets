@@ -168,6 +168,8 @@ export interface TranslationDictionary {
         emptyState: string
         addButton: string
         removeButton: string
+        visibleLabel: string
+        invisibleLabel: string
         removeDialog: {
           title: string
           body: string
@@ -202,6 +204,7 @@ export interface TranslationDictionary {
         bonusesLabel: string
         equippedLabel: string
         unequippedLabel: string
+        storyItemLabel: string
         namePlaceholder: string
         descriptionPlaceholder: string
       }
@@ -277,7 +280,6 @@ export interface TranslationDictionary {
       title: string
       loading: string
       error: string
-      back: string
       pdLabel: string
       printButtonLabel: string
     }
@@ -285,7 +287,6 @@ export interface TranslationDictionary {
       title: string
       loading: string
       error: string
-      back: string
       printButtonLabel: string
       emptyState: string
       attackLabel: string
@@ -297,6 +298,19 @@ export interface TranslationDictionary {
       sections: {
         offensive: string
         utility: string
+        feats: string
+      }
+    }
+    characterItemsPrint: {
+      title: string
+      loading: string
+      error: string
+      printButtonLabel: string
+      emptyState: string
+      sections: {
+        armors: string
+        weapons: string
+        others: string
       }
     }
   }

@@ -8,6 +8,12 @@ export interface PrintAbilityDetailRow {
   value: string
 }
 
+export interface PrintFeatRow {
+  key: string
+  name: string
+  description: string
+}
+
 export interface PrintAbilityRow {
   key: string
   name: string
@@ -29,7 +35,10 @@ export interface CharacterAbilitiesPrintPageState {
   error: string
   character: Character | null
   abilityRows: PrintAbilityRow[]
+  featRows: PrintFeatRow[]
   abilityCount: number
+  featCount: number
   hasAbilities: boolean
+  hasFeats: boolean
   title: string
 }

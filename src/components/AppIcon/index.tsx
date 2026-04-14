@@ -25,6 +25,35 @@ function getIconPath(name: AppIconProps['name']) {
           strokeWidth="1.9"
         />
       )
+    case 'document':
+      return (
+        <>
+          <path
+            d="M7 3.75h6.5L17.5 7v13.25H7Z"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.9"
+          />
+          <path
+            d="M13.5 3.75V7H17.5"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.9"
+          />
+          <path
+            d="M9 11h6M9 14h6M9 17h4"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.9"
+          />
+        </>
+      )
     case 'shirt':
       return (
         <>

@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
 import { useCharacterAbilitiesPrintPage } from './useCharacterAbilitiesPrintPage'
@@ -6,7 +5,8 @@ import styles from './style.module.scss'
 
 export function CharacterAbilitiesPrintPage() {
   const { t } = useI18n()
-  const { character, loading, error, abilityRows, hasAbilities, title } = useCharacterAbilitiesPrintPage()
+  const { character, loading, error, abilityRows, featRows, hasAbilities, hasFeats, title } =
+    useCharacterAbilitiesPrintPage()
   const offensiveAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.kind === 'offensive'))
   const utilityAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.kind === 'utility'))
 
@@ -95,7 +95,7 @@ export function CharacterAbilitiesPrintPage() {
         </header>
 
         <section className={styles.section}>
-          {hasAbilities ? (
+          {hasAbilities || hasFeats ? (
             <div className={styles.sectionStack}>
               {hasAbilities ? (
                 <>
@@ -200,6 +200,19 @@ export function CharacterAbilitiesPrintPage() {
                 </>
               ) : null}
 
+              {hasFeats ? (
+                <section className={styles.sectionGroup}>
+                  <h2 className={styles.sectionTitle}>{t('pages.characterAbilitiesPrint.sections.feats')}</h2>
+                  <div className={styles.featGrid}>
+                    {featRows.map((feat) => (
+                      <article key={feat.key} className={styles.featCard}>
+                        <h3 className={styles.featName}>{feat.name}</h3>
+                        {feat.description ? <p className={styles.featDescription}>{feat.description}</p> : null}
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
             </div>
           ) : (
             <p className={styles.emptyState}>{t('pages.characterAbilitiesPrint.emptyState')}</p>
@@ -207,9 +220,6 @@ export function CharacterAbilitiesPrintPage() {
         </section>
       </article>
 
-      <Link className={styles.backLink} to={`/characters/${character.id}/edit`}>
-        {t('pages.characterAbilitiesPrint.back')}
-      </Link>
     </main>
   )
 }

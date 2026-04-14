@@ -75,6 +75,7 @@ export interface CharacterFeat {
   id: string
   name: string
   description: string
+  visible: boolean
   speedBonusNumber: number
   hpBonusNumber: number
   kpBonusNumber: number
@@ -143,6 +144,7 @@ export interface CharacterWeapon extends CharacterItemBase {
 
 export interface CharacterOtherItem extends CharacterItemBase {
   equipped: boolean
+  storyItem: boolean
   strengthBonusNumber: number
   conditionBonusNumber: number
   dexterityBonusNumber: number

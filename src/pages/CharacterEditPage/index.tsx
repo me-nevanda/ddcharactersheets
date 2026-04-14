@@ -70,6 +70,16 @@ function CharacterEditPageContent() {
     window.open(`/characters/${characterId}/print/abilities`, '_blank')
   }
 
+  function handlePrintItems() {
+    setPrintMenuOpen(false)
+
+    if (!characterId) {
+      return
+    }
+
+    window.open(`/characters/${characterId}/print/items`, '_blank')
+  }
+
   return (
     <main className={styles.editorLayout}>
       <section className={styles.editorCard}>
@@ -91,10 +101,7 @@ function CharacterEditPageContent() {
             </label>
           </div>
           <div className={styles.headerActions}>
-            <Link className={styles.ghostLink} to="/">
-              {t('common.actions.backToList')}
-            </Link>
-            <div className={styles.printMenu} ref={printMenuRef}>
+            <div className={styles.printAction} ref={printMenuRef}>
               <button
                 aria-expanded={isPrintMenuOpen}
                 aria-haspopup="menu"
@@ -123,7 +130,7 @@ function CharacterEditPageContent() {
                   >
                     {t('pages.characterEdit.printMenu.abilitiesAndFeats')}
                   </button>
-                  <button className={styles.printMenuItem} type="button" onClick={handlePrintSheet}>
+                  <button className={styles.printMenuItem} type="button" onClick={handlePrintItems}>
                     {t('pages.characterEdit.printMenu.items')}
                   </button>
                 </div>
@@ -131,6 +138,10 @@ function CharacterEditPageContent() {
             </div>
           </div>
         </div>
+
+        <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/">
+          {t('common.actions.backToList')}
+        </Link>
 
         <div className={styles.floatingSaveAction}>
           <button className={styles.primaryButton} form="character-edit-form" type="submit" disabled={saving || !hasChanges}>

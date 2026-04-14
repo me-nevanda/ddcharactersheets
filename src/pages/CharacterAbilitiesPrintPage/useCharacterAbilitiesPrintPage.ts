@@ -9,7 +9,7 @@ import {
   buildEffectiveAttributes,
   buildNormalizedAttributes,
 } from '../CharacterEditPage/sections/AttributesSection/attributesSectionLogic'
-import type { CharacterAbilitiesPrintPageState, PrintAbilityDetailRow, PrintAbilityRow } from './types'
+import type { CharacterAbilitiesPrintPageState, PrintAbilityDetailRow, PrintAbilityRow, PrintFeatRow } from './types'
 
 function buildAbilityMeta(t: ReturnType<typeof useI18n>['t'], ability: CharacterAbility): string[] {
   return [
@@ -180,8 +180,9 @@ function buildAbilityDamage(
 
   const damageTypeLabel = buildDamageTypeLabel(t, ability.weaponDamageType)
   const attributeModifierLookup = buildAttributeModifierLookup(character)
+  const levelBonusValue = character.bonuses?.level ?? 0
   const attributeBonusValue = ability.weaponAttributeBonus
-    ? attributeModifierLookup[ability.weaponAttributeBonus as keyof CharacterAttributeBonuses] ?? 0
+    ? (attributeModifierLookup[ability.weaponAttributeBonus as keyof CharacterAttributeBonuses] ?? 0) + levelBonusValue
     : 0
   const damageCoreParts = [
     ability.weaponDamageDiceType ? buildDamageDiceLabel(t, ability.weaponDamageDiceType) : '',
@@ -326,8 +327,11 @@ export function useCharacterAbilitiesPrintPage(): CharacterAbilitiesPrintPageSta
         error,
         character,
         abilityRows: [],
+        featRows: [],
         abilityCount: 0,
+        featCount: 0,
         hasAbilities: false,
+        hasFeats: false,
         title: t('pages.characterAbilitiesPrint.title'),
       }
     }
@@ -347,14 +351,24 @@ export function useCharacterAbilitiesPrintPage(): CharacterAbilitiesPrintPageSta
       details: buildAbilityDetails(t, ability),
       offensiveNotes: buildOffensiveNotes(t, ability),
     }))
+    const featRows: PrintFeatRow[] = (character.feats ?? [])
+      .filter((feat) => feat.visible)
+      .map((feat, index) => ({
+        key: feat.id || `feat-${index}`,
+        name: feat.name,
+        description: feat.description,
+      }))
 
     return {
       loading,
       error,
       character,
       abilityRows,
+      featRows,
       abilityCount: abilityRows.length,
+      featCount: featRows.length,
       hasAbilities: abilityRows.length > 0,
+      hasFeats: featRows.length > 0,
       title: t('pages.characterAbilitiesPrint.title'),
     }
   }, [character, error, loading, t])

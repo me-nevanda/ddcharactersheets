@@ -1,7 +1,7 @@
 import { AppIcon } from '@components/AppIcon'
 import { skillDefinitions } from '@dictionaries/characterEditDefinitions'
+import { type CharacterFeatBonusFieldName } from '../../featsLogic'
 import styles from '../../style.module.scss'
-import type { CharacterFeatFieldName } from '../../types'
 import localStyles from './style.module.scss'
 import { useFeatsTab } from './useFeatsTab'
 
@@ -14,12 +14,12 @@ const featCoreFields = [
   { fieldName: 'fortitudeBonusNumber', labelKey: 'pages.characterEdit.fields.fortitude' },
   { fieldName: 'reflexBonusNumber', labelKey: 'pages.characterEdit.fields.reflex' },
   { fieldName: 'willBonusNumber', labelKey: 'pages.characterEdit.fields.will' },
-] satisfies ReadonlyArray<{ fieldName: CharacterFeatFieldName; labelKey: string }>
+] satisfies ReadonlyArray<{ fieldName: CharacterFeatBonusFieldName; labelKey: string }>
 
 const featSkillFields = skillDefinitions.map((skill) => ({
-  fieldName: `${skill.key}BonusNumber` as CharacterFeatFieldName,
+  fieldName: `${skill.key}BonusNumber` as CharacterFeatBonusFieldName,
   labelKey: skill.translationKey,
-})) satisfies ReadonlyArray<{ fieldName: CharacterFeatFieldName; labelKey: string }>
+})) satisfies ReadonlyArray<{ fieldName: CharacterFeatBonusFieldName; labelKey: string }>
 
 export function FeatsTab() {
   const {
@@ -56,15 +56,31 @@ export function FeatsTab() {
                   placeholder={t('pages.characterEdit.feats.namePlaceholder')}
                   onChange={(event) => handleFeatChange(index, 'name', event.target.value)}
                 />
-                <button
-                  className={styles.abilityRemoveButton}
-                  type="button"
-                  aria-label={t('pages.characterEdit.feats.removeButton')}
-                  title={t('pages.characterEdit.feats.removeButton')}
-                  onClick={() => handleRemoveFeat(index)}
-                >
-                  <AppIcon name="delete" />
-                </button>
+                <div className={styles.itemCardActions}>
+                  <button
+                    className={`${styles.weaponEquipButton} ${
+                      feat.visible ? styles.weaponEquipButtonActive : styles.weaponEquipButtonInactive
+                    }`}
+                    type="button"
+                    aria-pressed={feat.visible}
+                    aria-label={
+                      feat.visible ? t('pages.characterEdit.feats.visibleLabel') : t('pages.characterEdit.feats.invisibleLabel')
+                    }
+                    title={feat.visible ? t('pages.characterEdit.feats.visibleLabel') : t('pages.characterEdit.feats.invisibleLabel')}
+                    onClick={() => handleFeatChange(index, 'visible', !feat.visible)}
+                  >
+                    <AppIcon name="document" />
+                  </button>
+                  <button
+                    className={styles.abilityRemoveButton}
+                    type="button"
+                    aria-label={t('pages.characterEdit.feats.removeButton')}
+                    title={t('pages.characterEdit.feats.removeButton')}
+                    onClick={() => handleRemoveFeat(index)}
+                  >
+                    <AppIcon name="delete" />
+                  </button>
+                </div>
               </div>
 
               <div className={localStyles.featFieldsGrid}>

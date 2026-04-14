@@ -30,6 +30,7 @@ export function OtherItemCard({
   onDescriptionChange,
   onRemove,
   onEquipChange,
+  onStoryItemChange,
   onBonusChange,
 }: OtherItemCardProps) {
   const { t } = useI18n()
@@ -67,28 +68,45 @@ export function OtherItemCard({
         </div>
       </div>
 
-      <div className={styles.weaponBonusSection}>
-        <span className={styles.weaponBonusSectionTitle}>{t('pages.characterEdit.items.bonusesLabel')}</span>
-        <div className={styles.weaponBonusGrid}>
-          {otherBonusFields.map((field) => (
-            <label key={field.fieldName} className={styles.weaponBonusField} htmlFor={`item-others-${field.fieldName}-${index}`}>
-              <span className={styles.weaponBonusLabel}>{t(field.labelKey)}</span>
-              <select
-                className={`${styles.abilityHeaderSelect} ${styles.weaponBonusSelect}`}
-                id={`item-others-${field.fieldName}-${index}`}
-                value={item[field.fieldName]}
-                onChange={(event) => onBonusChange(index, field.fieldName, Number.parseInt(event.target.value, 10))}
+      <label className={styles.checkboxField} htmlFor={`item-others-story-item-${index}`}>
+        <input
+          className={styles.checkboxInput}
+          id={`item-others-story-item-${index}`}
+          type="checkbox"
+          checked={item.storyItem}
+          onChange={(event) => onStoryItemChange(index, event.target.checked)}
+        />
+        <span className={styles.checkboxLabel}>{t('pages.characterEdit.items.storyItemLabel')}</span>
+      </label>
+
+      {item.storyItem ? null : (
+        <div className={styles.weaponBonusSection}>
+          <span className={styles.weaponBonusSectionTitle}>{t('pages.characterEdit.items.bonusesLabel')}</span>
+          <div className={styles.weaponBonusGrid}>
+            {otherBonusFields.map((field) => (
+              <label
+                key={field.fieldName}
+                className={styles.weaponBonusField}
+                htmlFor={`item-others-${field.fieldName}-${index}`}
               >
-                {otherBonusOptions.map((bonus) => (
-                  <option key={bonus} value={bonus}>
-                    {bonus}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ))}
+                <span className={styles.weaponBonusLabel}>{t(field.labelKey)}</span>
+                <select
+                  className={`${styles.abilityHeaderSelect} ${styles.weaponBonusSelect}`}
+                  id={`item-others-${field.fieldName}-${index}`}
+                  value={item[field.fieldName]}
+                  onChange={(event) => onBonusChange(index, field.fieldName, Number.parseInt(event.target.value, 10))}
+                >
+                  {otherBonusOptions.map((bonus) => (
+                    <option key={bonus} value={bonus}>
+                      {bonus}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <label className={styles.abilityField} htmlFor={`item-others-description-${index}`}>
         <span className={styles.attributeLabel}>{t('pages.characterEdit.items.descriptionLabel')}</span>

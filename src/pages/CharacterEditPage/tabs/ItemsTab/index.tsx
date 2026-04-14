@@ -109,6 +109,7 @@ export function ItemsTab() {
                           }
                           onRemove={(itemIndex, name) => handleRemoveItem(group, itemIndex, name)}
                           onEquipChange={(itemIndex, value) => handleItemChange(group, itemIndex, 'equipped', value)}
+                          onStoryItemChange={(itemIndex, value) => handleItemChange(group, itemIndex, 'storyItem', value)}
                           onBonusChange={(itemIndex, fieldName, value) =>
                             handleItemChange(group, itemIndex, fieldName, value)
                           }
