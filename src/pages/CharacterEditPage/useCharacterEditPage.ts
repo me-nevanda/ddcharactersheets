@@ -6,6 +6,8 @@ import { getErrorMessage } from '@lib/errors'
 import {
   emptyAbilities,
   emptyArmor,
+  emptyFeat,
+  emptyFeats,
   emptyOtherItem,
   emptyItems,
   emptyWeapon,
@@ -55,6 +57,8 @@ import {
   normalizeClassValue,
   normalizeRaceValue,
 } from './sections/GeneralSection/generalSectionLogic'
+import { buildFeatBonusSources, sumFeatBonus, type CharacterFeatBonusFieldName } from './featsLogic'
+import { skillDefinitions } from '@dictionaries/characterEditDefinitions'
 import {
   CharacterClass,
   type CharacterAbility,
@@ -64,6 +68,7 @@ import {
   type CharacterArmorBonusFieldName,
   type CharacterArmor,
   type CharacterDefenses,
+  type CharacterFeat,
   type CharacterWeapon,
   type CharacterOtherItem,
   type CharacterItems,
@@ -71,11 +76,13 @@ import {
   type CharacterWeaponFieldName,
   type CharacterWeaponDamageDiceType,
   type CharacterWeaponDamageType,
+  type CharacterSkillBonuses,
 } from '../../types/character'
 import type {
   AttributeRow,
   CharacterAttributeFieldName,
   CharacterAbilityFieldName,
+  CharacterFeatFieldName,
   CharacterItemGroupKey,
   CharacterItemFieldName,
   CharacterEditFormData,
@@ -226,6 +233,92 @@ function normalizeAbilityWeaponArea(value: unknown): CharacterAbilityAreaType {
   }
 
   return defaultAbilityWeaponArea
+}
+
+function clampDefenseValue(value: number): number {
+  return Math.min(30, Math.max(0, Math.trunc(value)))
+}
+
+function hasFeatContent(feat: CharacterFeat): boolean {
+  return (
+    feat.name.length > 0 ||
+    feat.description.length > 0 ||
+    feat.speedBonusNumber !== 0 ||
+    feat.hpBonusNumber !== 0 ||
+    feat.kpBonusNumber !== 0 ||
+    feat.fortitudeBonusNumber !== 0 ||
+    feat.reflexBonusNumber !== 0 ||
+    feat.willBonusNumber !== 0 ||
+    feat.acrobaticsBonusNumber !== 0 ||
+    feat.arcanaBonusNumber !== 0 ||
+    feat.athleticsBonusNumber !== 0 ||
+    feat.diplomacyBonusNumber !== 0 ||
+    feat.historyBonusNumber !== 0 ||
+    feat.healingBonusNumber !== 0 ||
+    feat.deceptionBonusNumber !== 0 ||
+    feat.perceptionBonusNumber !== 0 ||
+    feat.enduranceBonusNumber !== 0 ||
+    feat.dungeoneeringBonusNumber !== 0 ||
+    feat.natureBonusNumber !== 0 ||
+    feat.religionBonusNumber !== 0 ||
+    feat.insightBonusNumber !== 0 ||
+    feat.stealthBonusNumber !== 0 ||
+    feat.streetwiseBonusNumber !== 0 ||
+    feat.intimidationBonusNumber !== 0 ||
+    feat.thieveryBonusNumber !== 0
+  )
+}
+
+function normalizeFeats(data: unknown): CharacterFeat[] {
+  if (!Array.isArray(data)) {
+    return []
+  }
+
+  return data
+    .filter((item): item is Record<string, unknown> | string => typeof item === 'string' || (typeof item === 'object' && item !== null))
+    .map((item) => {
+      if (typeof item === 'string') {
+        return {
+          ...emptyFeat,
+          id: globalThis.crypto.randomUUID(),
+          name: item.trim(),
+          description: item.trim(),
+        }
+      }
+
+      const nextFeat: CharacterFeat = {
+        ...emptyFeat,
+        id: typeof item.id === 'string' && item.id.length > 0 ? item.id : globalThis.crypto.randomUUID(),
+        name: typeof item.name === 'string' ? item.name.trim() : '',
+        description: typeof item.description === 'string' ? item.description.trim() : '',
+        speedBonusNumber: normalizeWeaponBonusNumber(item.speedBonusNumber),
+        hpBonusNumber: normalizeWeaponBonusNumber(item.hpBonusNumber),
+        kpBonusNumber: normalizeWeaponBonusNumber(item.kpBonusNumber),
+        fortitudeBonusNumber: normalizeWeaponBonusNumber(item.fortitudeBonusNumber),
+        reflexBonusNumber: normalizeWeaponBonusNumber(item.reflexBonusNumber),
+        willBonusNumber: normalizeWeaponBonusNumber(item.willBonusNumber),
+        acrobaticsBonusNumber: normalizeWeaponBonusNumber(item.acrobaticsBonusNumber),
+        arcanaBonusNumber: normalizeWeaponBonusNumber(item.arcanaBonusNumber),
+        athleticsBonusNumber: normalizeWeaponBonusNumber(item.athleticsBonusNumber),
+        diplomacyBonusNumber: normalizeWeaponBonusNumber(item.diplomacyBonusNumber),
+        historyBonusNumber: normalizeWeaponBonusNumber(item.historyBonusNumber),
+        healingBonusNumber: normalizeWeaponBonusNumber(item.healingBonusNumber),
+        deceptionBonusNumber: normalizeWeaponBonusNumber(item.deceptionBonusNumber),
+        perceptionBonusNumber: normalizeWeaponBonusNumber(item.perceptionBonusNumber),
+        enduranceBonusNumber: normalizeWeaponBonusNumber(item.enduranceBonusNumber),
+        dungeoneeringBonusNumber: normalizeWeaponBonusNumber(item.dungeoneeringBonusNumber),
+        natureBonusNumber: normalizeWeaponBonusNumber(item.natureBonusNumber),
+        religionBonusNumber: normalizeWeaponBonusNumber(item.religionBonusNumber),
+        insightBonusNumber: normalizeWeaponBonusNumber(item.insightBonusNumber),
+        stealthBonusNumber: normalizeWeaponBonusNumber(item.stealthBonusNumber),
+        streetwiseBonusNumber: normalizeWeaponBonusNumber(item.streetwiseBonusNumber),
+        intimidationBonusNumber: normalizeWeaponBonusNumber(item.intimidationBonusNumber),
+        thieveryBonusNumber: normalizeWeaponBonusNumber(item.thieveryBonusNumber),
+      }
+
+      return nextFeat
+    })
+    .filter(hasFeatContent)
 }
 
 function normalizeWeaponRange(value: unknown): number {
@@ -531,6 +624,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
               weaponRange: normalizeAbilityWeaponRange(ability.weaponRange),
               weaponArea: normalizeAbilityWeaponArea(ability.weaponArea),
             })),
+            feats: normalizeFeats(character.feats ?? emptyFeats),
             items: normalizeItems(character.items),
             defenses: character.defenses ?? zeroDefenses,
             training: {
@@ -804,6 +898,40 @@ export function useCharacterEditPage(): CharacterEditPageState {
     }))
   }
 
+  function handleFeatCreateEmpty() {
+    setForm((currentForm) => ({
+      ...currentForm,
+      feats: [
+        ...currentForm.feats,
+        {
+          ...emptyFeat,
+          id: globalThis.crypto.randomUUID(),
+        },
+      ],
+    }))
+  }
+
+  function handleFeatChange(index: number, fieldName: CharacterFeatFieldName, value: string | number | boolean) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      feats: currentForm.feats.map((feat, featIndex) =>
+        featIndex === index
+          ? {
+              ...feat,
+              [fieldName]: value,
+            }
+          : feat,
+      ),
+    }))
+  }
+
+  function handleFeatRemove(index: number) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      feats: currentForm.feats.filter((_, featIndex) => featIndex !== index),
+    }))
+  }
+
   function handleItemCreateEmpty(group: CharacterItemGroupKey) {
     setForm((currentForm) => ({
       ...currentForm,
@@ -909,16 +1037,56 @@ export function useCharacterEditPage(): CharacterEditPageState {
   const attributeModifierMap = buildAttributeModifierMap(effectiveAttributes)
   const levelBonusValue = getLevelBonus(form.level)
   const levelBonusLabel = formatModifier(levelBonusValue)
-  const hpValue = buildCharacterHp(form.class, form.level, effectiveAttributes.condition)
+  const featSpeedBonus = sumFeatBonus(form.feats, 'speedBonusNumber')
+  const featHpBonus = sumFeatBonus(form.feats, 'hpBonusNumber')
+  const featDefenseBonuses = {
+    kp: sumFeatBonus(form.feats, 'kpBonusNumber'),
+    fortitude: sumFeatBonus(form.feats, 'fortitudeBonusNumber'),
+    reflex: sumFeatBonus(form.feats, 'reflexBonusNumber'),
+    will: sumFeatBonus(form.feats, 'willBonusNumber'),
+  }
+  const featSkillBonuses = skillDefinitions.reduce<CharacterSkillBonuses>(
+    (acc, skill) => {
+      acc[skill.key] = sumFeatBonus(form.feats, `${skill.key}BonusNumber` as CharacterFeatBonusFieldName)
+      return acc
+    },
+    {
+      acrobatics: 0,
+      arcana: 0,
+      athletics: 0,
+      diplomacy: 0,
+      history: 0,
+      healing: 0,
+      deception: 0,
+      perception: 0,
+      endurance: 0,
+      dungeoneering: 0,
+      nature: 0,
+      religion: 0,
+      insight: 0,
+      stealth: 0,
+      streetwise: 0,
+      intimidation: 0,
+      thievery: 0,
+    },
+  )
+  const baseHpValue = buildCharacterHp(form.class, form.level, effectiveAttributes.condition)
+  const hpValue = Math.max(0, baseHpValue + featHpBonus)
   const surgeValue = buildCharacterSurge(form.class, attributeModifierMap.condition)
-  const speedValue = clampSpeedValue(buildCharacterSpeed(form.race) + equippedItemSpeedBonus)
-  const defenseValues = buildDefenseValues(
+  const speedValue = clampSpeedValue(buildCharacterSpeed(form.race) + equippedItemSpeedBonus + featSpeedBonus)
+  const baseDefenseValues = buildDefenseValues(
     attributeModifierMap,
     levelBonusValue,
     form.race,
     form.class,
     equippedItemDefenseBonuses,
   )
+  const defenseValues = {
+    kp: clampDefenseValue(baseDefenseValues.kp + featDefenseBonuses.kp),
+    fortitude: clampDefenseValue(baseDefenseValues.fortitude + featDefenseBonuses.fortitude),
+    reflex: clampDefenseValue(baseDefenseValues.reflex + featDefenseBonuses.reflex),
+    will: clampDefenseValue(baseDefenseValues.will + featDefenseBonuses.will),
+  }
   const defenseBreakdowns = buildDefenseBreakdowns(
     attributeModifierMap,
     levelBonusValue,
@@ -933,7 +1101,26 @@ export function useCharacterEditPage(): CharacterEditPageState {
     form.race,
     form.items,
   )
-  const skillModifiers = buildSkillModifiers(skillBonuses)
+  const skillBonusesWithFeats: CharacterSkillBonuses = {
+    acrobatics: skillBonuses.acrobatics + featSkillBonuses.acrobatics,
+    arcana: skillBonuses.arcana + featSkillBonuses.arcana,
+    athletics: skillBonuses.athletics + featSkillBonuses.athletics,
+    diplomacy: skillBonuses.diplomacy + featSkillBonuses.diplomacy,
+    history: skillBonuses.history + featSkillBonuses.history,
+    healing: skillBonuses.healing + featSkillBonuses.healing,
+    deception: skillBonuses.deception + featSkillBonuses.deception,
+    perception: skillBonuses.perception + featSkillBonuses.perception,
+    endurance: skillBonuses.endurance + featSkillBonuses.endurance,
+    dungeoneering: skillBonuses.dungeoneering + featSkillBonuses.dungeoneering,
+    nature: skillBonuses.nature + featSkillBonuses.nature,
+    religion: skillBonuses.religion + featSkillBonuses.religion,
+    insight: skillBonuses.insight + featSkillBonuses.insight,
+    stealth: skillBonuses.stealth + featSkillBonuses.stealth,
+    streetwise: skillBonuses.streetwise + featSkillBonuses.streetwise,
+    intimidation: skillBonuses.intimidation + featSkillBonuses.intimidation,
+    thievery: skillBonuses.thievery + featSkillBonuses.thievery,
+  }
+  const skillModifiers = buildSkillModifiers(skillBonusesWithFeats)
   const hasChanges = JSON.stringify(form) !== JSON.stringify(initialForm)
   const attributeBonusTooltips = {
     strength: buildAttributeTooltip(
@@ -979,6 +1166,14 @@ export function useCharacterEditPage(): CharacterEditPageState {
       buildEquippedItemBonusSources(form.items, 'charismaBonusNumber'),
     ),
   } satisfies Record<keyof CharacterAttributeBonuses, string>
+  const featSpeedSources = buildFeatBonusSources(form.feats, 'speedBonusNumber')
+  const featHpSources = buildFeatBonusSources(form.feats, 'hpBonusNumber')
+  const featDefenseSources = {
+    kp: buildFeatBonusSources(form.feats, 'kpBonusNumber'),
+    fortitude: buildFeatBonusSources(form.feats, 'fortitudeBonusNumber'),
+    reflex: buildFeatBonusSources(form.feats, 'reflexBonusNumber'),
+    will: buildFeatBonusSources(form.feats, 'willBonusNumber'),
+  }
   const defenseTooltips: DefenseTooltipValues = {
     kp: buildDefenseTooltip(
       t('pages.characterEdit.fields.kp'),
@@ -986,11 +1181,13 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.classBonus'),
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
       t('pages.characterEdit.defenseTooltip.itemsBonus'),
+      t('pages.characterEdit.sourceTooltip.featBonuses'),
       t(`pages.characterEdit.options.class.${form.class}`),
       defenseBreakdowns.kp.levelBonus,
       defenseBreakdowns.kp.classBonus,
       defenseBreakdowns.kp.attributeBonus,
       buildEquippedItemBonusSources(form.items, 'kpBonusNumber'),
+      featDefenseSources.kp,
       defenseBreakdowns.kp.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
     ),
     fortitude: buildDefenseTooltip(
@@ -999,11 +1196,13 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.classBonus'),
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
       t('pages.characterEdit.defenseTooltip.itemsBonus'),
+      t('pages.characterEdit.sourceTooltip.featBonuses'),
       t(`pages.characterEdit.options.class.${form.class}`),
       defenseBreakdowns.fortitude.levelBonus,
       defenseBreakdowns.fortitude.classBonus,
       defenseBreakdowns.fortitude.attributeBonus,
       buildEquippedItemBonusSources(form.items, 'fortitudeBonusNumber'),
+      featDefenseSources.fortitude,
       defenseBreakdowns.fortitude.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
     ),
     reflex: buildDefenseTooltip(
@@ -1012,11 +1211,13 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.classBonus'),
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
       t('pages.characterEdit.defenseTooltip.itemsBonus'),
+      t('pages.characterEdit.sourceTooltip.featBonuses'),
       t(`pages.characterEdit.options.class.${form.class}`),
       defenseBreakdowns.reflex.levelBonus,
       defenseBreakdowns.reflex.classBonus,
       defenseBreakdowns.reflex.attributeBonus,
       buildEquippedItemBonusSources(form.items, 'reflexBonusNumber'),
+      featDefenseSources.reflex,
       defenseBreakdowns.reflex.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
     ),
     will: buildDefenseTooltip(
@@ -1025,11 +1226,13 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.classBonus'),
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
       t('pages.characterEdit.defenseTooltip.itemsBonus'),
+      t('pages.characterEdit.sourceTooltip.featBonuses'),
       t(`pages.characterEdit.options.class.${form.class}`),
       defenseBreakdowns.will.levelBonus,
       defenseBreakdowns.will.classBonus,
       defenseBreakdowns.will.attributeBonus,
       buildEquippedItemBonusSources(form.items, 'willBonusNumber'),
+      featDefenseSources.will,
       defenseBreakdowns.will.attributeKeys.map((key) => t(`pages.characterEdit.fields.${key}`)),
     ),
   }
@@ -1038,6 +1241,14 @@ export function useCharacterEditPage(): CharacterEditPageState {
     buildCharacterSpeed(form.race),
     t('pages.characterEdit.sourceTooltip.itemBonus'),
     buildEquippedItemBonusSources(form.items, 'speedBonusNumber'),
+    t('pages.characterEdit.sourceTooltip.featBonuses'),
+    featSpeedSources,
+  )
+  const hpTooltip = buildHpTooltip(
+    t('pages.characterEdit.fields.hp'),
+    hpValue,
+    t('pages.characterEdit.sourceTooltip.featBonuses'),
+    featHpSources,
   )
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -1049,7 +1260,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
       const bonuses: CharacterBonuses = {
         level: levelBonusValue,
         attributes: attributeModifierMap,
-        skills: skillBonuses,
+        skills: skillBonusesWithFeats,
         defenses: defenseValues,
       }
 
@@ -1084,6 +1295,11 @@ export function useCharacterEditPage(): CharacterEditPageState {
               }
             : ability,
         ),
+        feats: form.feats.map((feat) => ({
+          ...feat,
+          name: feat.name.trim(),
+          description: feat.description.trim(),
+        })).filter(hasFeatContent),
         items: form.items,
         defenses: normalizeDefenses(
           {
@@ -1123,6 +1339,9 @@ export function useCharacterEditPage(): CharacterEditPageState {
     handleAbilityAdd,
     handleAbilityChange,
     handleAbilityRemove,
+    handleFeatCreateEmpty,
+    handleFeatChange,
+    handleFeatRemove,
     handleItemCreateEmpty,
     handleItemChange,
     handleArmorBonusChange,
@@ -1133,6 +1352,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
     levelBonusLabel,
     speedValue,
     speedTooltip,
+    hpTooltip,
     skillModifiers,
     defenseValues,
     defenseTooltips,
@@ -1163,6 +1383,8 @@ function buildSpeedTooltip(
   baseSpeed: number,
   itemLabel: string,
   itemSources: EquippedItemBonusSource[],
+  featLabel: string,
+  featSources: EquippedItemBonusSource[],
 ): string {
   const lines = [`${baseLabel}: ${baseSpeed}`]
 
@@ -1171,6 +1393,27 @@ function buildSpeedTooltip(
     if (itemLine) {
       lines.push('', itemLine)
     }
+  }
+
+  const featLine = buildSourceTooltipLine(featLabel, featSources)
+  if (featLine) {
+    lines.push('', featLine)
+  }
+
+  return lines.join('\n')
+}
+
+function buildHpTooltip(
+  hpLabel: string,
+  hpValue: number,
+  featLabel: string,
+  featSources: EquippedItemBonusSource[],
+): string {
+  const lines = [`${hpLabel}: ${hpValue}`]
+
+  const featLine = buildSourceTooltipLine(featLabel, featSources)
+  if (featLine) {
+    lines.push('', featLine)
   }
 
   return lines.join('\n')
@@ -1182,11 +1425,13 @@ function buildDefenseTooltip(
   classLabel: string,
   attributesLabel: string,
   itemsLabel: string,
+  featLabel: string,
   characterClassLabel: string,
   levelBonus: number,
   classBonus: number,
   attributeBonus: number,
   itemSources: EquippedItemBonusSource[],
+  featSources: EquippedItemBonusSource[],
   attributeLabels: string[],
 ): string {
   const lines = [
@@ -1201,6 +1446,11 @@ function buildDefenseTooltip(
   const itemLine = buildSourceTooltipLine(itemsLabel, itemSources)
   if (itemLine) {
     lines.push('', itemLine)
+  }
+
+  const featLine = buildSourceTooltipLine(featLabel, featSources)
+  if (featLine) {
+    lines.push('', featLine)
   }
 
   return lines.join('\n')

@@ -82,6 +82,7 @@ export const en: TranslationDictionary = {
       sourceTooltip: {
         raceBonus: 'Race',
         itemBonus: 'Item bonuses:',
+        featBonuses: 'Feats:',
         baseSpeed: 'Base speed from race',
       },
       abilities: {
@@ -162,6 +163,20 @@ export const en: TranslationDictionary = {
         descriptionLabel: 'Description',
         namePlaceholder: 'e.g. Shield Bash',
         descriptionPlaceholder: 'Short ability description',
+      },
+      feats: {
+        title: 'Feats',
+        emptyState: 'No feats have been added yet.',
+        addButton: 'Add feat',
+        removeButton: 'Remove',
+        removeDialog: {
+          title: 'Delete this feat?',
+          body: 'The feat "{name}" will be deleted permanently.',
+        },
+        nameLabel: 'Name',
+        namePlaceholder: 'e.g. Cold Blood',
+        descriptionLabel: 'Description',
+        descriptionPlaceholder: 'Short feat description',
       },
       items: {
         title: 'Items',

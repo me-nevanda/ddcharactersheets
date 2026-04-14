@@ -81,6 +81,7 @@ export interface TranslationDictionary {
       sourceTooltip: {
         raceBonus: string
         itemBonus: string
+        featBonuses: string
         baseSpeed: string
       }
       abilities: {
@@ -160,6 +161,20 @@ export interface TranslationDictionary {
         nameLabel: string
         descriptionLabel: string
         namePlaceholder: string
+        descriptionPlaceholder: string
+      }
+      feats: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeButton: string
+        removeDialog: {
+          title: string
+          body: string
+        }
+        nameLabel: string
+        namePlaceholder: string
+        descriptionLabel: string
         descriptionPlaceholder: string
       }
       items: {

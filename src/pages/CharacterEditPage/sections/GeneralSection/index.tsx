@@ -5,7 +5,7 @@ import { classOptions, raceOptions } from '@dictionaries/characterEditDefinition
 
 export function GeneralSection() {
   const { t } = useI18n()
-  const { form, levelBonusLabel, handleGeneralChange, hpValue, surgeValue, speedValue, speedTooltip } =
+  const { form, levelBonusLabel, handleGeneralChange, hpValue, hpTooltip, surgeValue, speedValue, speedTooltip } =
     useCharacterEditPageContext()
   const surgeHealingValue = Math.ceil(Math.max(0, hpValue) / 4)
 
@@ -89,7 +89,9 @@ export function GeneralSection() {
 
         <div className={styles.generalValueCard}>
           <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.hp')}</span>
-          <span className={styles.modifierBadge}>{hpValue}</span>
+          <span className={styles.modifierBadge} title={hpTooltip} aria-label={hpTooltip}>
+            {hpValue}
+          </span>
         </div>
 
         <div className={styles.generalValueCard}>

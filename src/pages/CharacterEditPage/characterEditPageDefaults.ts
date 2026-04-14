@@ -13,6 +13,7 @@ import type {
   CharacterWeapon,
   CharacterItems,
   CharacterOtherItem,
+  CharacterFeat,
   CharacterSkillBonuses,
   CharacterTraining,
   CharacterWeaponDamageType,
@@ -75,6 +76,35 @@ export const zeroBonuses: CharacterBonuses = {
 }
 
 export const emptyAbilities: CharacterAbility[] = []
+export const emptyFeats: CharacterFeat[] = []
+export const emptyFeat: CharacterFeat = {
+  id: '',
+  name: '',
+  description: '',
+  speedBonusNumber: 0,
+  hpBonusNumber: 0,
+  kpBonusNumber: 0,
+  fortitudeBonusNumber: 0,
+  reflexBonusNumber: 0,
+  willBonusNumber: 0,
+  acrobaticsBonusNumber: 0,
+  arcanaBonusNumber: 0,
+  athleticsBonusNumber: 0,
+  diplomacyBonusNumber: 0,
+  historyBonusNumber: 0,
+  healingBonusNumber: 0,
+  deceptionBonusNumber: 0,
+  perceptionBonusNumber: 0,
+  enduranceBonusNumber: 0,
+  dungeoneeringBonusNumber: 0,
+  natureBonusNumber: 0,
+  religionBonusNumber: 0,
+  insightBonusNumber: 0,
+  stealthBonusNumber: 0,
+  streetwiseBonusNumber: 0,
+  intimidationBonusNumber: 0,
+  thieveryBonusNumber: 0,
+}
 export const emptyItems: CharacterItems = {
   armors: [],
   weapons: [],
@@ -192,6 +222,7 @@ export const emptyForm: CharacterEditFormData = {
   },
   attributesPlus: zeroAttributeBonuses,
   abilities: emptyAbilities,
+  feats: emptyFeats,
   items: emptyItems,
   defenses: zeroDefenses,
   bonuses: zeroBonuses,

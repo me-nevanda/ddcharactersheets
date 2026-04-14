@@ -3,6 +3,7 @@ import styles from '../../style.module.scss'
 import { useCharacterEditPageContext } from '../../characterEditPageContext'
 import { skillDefinitions } from '@dictionaries/characterEditDefinitions'
 import { CharacterClass } from '../../../../types/character'
+import { buildFeatBonusSources, type CharacterFeatBonusFieldName } from '../../featsLogic'
 import {
   buildAttributeModifierMap,
   buildEffectiveAttributes,
@@ -153,6 +154,17 @@ export function SkillSection() {
           ].join('\n'),
         )
       }
+    }
+
+    const featSources = buildFeatBonusSources(form.feats, `${skillKey}BonusNumber` as CharacterFeatBonusFieldName)
+    if (featSources.length > 0) {
+      lines.push(
+        '',
+        [
+          t('pages.characterEdit.sourceTooltip.featBonuses'),
+          ...featSources.map((feat) => `${feat.name}: ${formatModifier(feat.bonus)}`),
+        ].join('\n'),
+      )
     }
 
     return lines.join('\n')

@@ -9,6 +9,7 @@ import type {
   CharacterItemBase,
   CharacterItems,
   CharacterItemBonusFieldName,
+  CharacterFeat,
   CharacterWeaponFieldName,
   CharacterWeaponDamageDiceType,
   CharacterTraining,
@@ -27,6 +28,8 @@ export type CharacterSkillFieldName = keyof CharacterTraining
 export type CharacterGeneralChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement>
 
 export type CharacterAbilityFieldName = keyof CharacterAbility
+
+export type CharacterFeatFieldName = Exclude<keyof CharacterFeat, 'id'>
 
 export type CharacterItemFieldName = keyof CharacterItemBase | 'equipped'
 
@@ -56,6 +59,9 @@ export interface CharacterEditPageState {
   handleAbilityAdd: (ability: CharacterAbility) => void
   handleAbilityChange: (index: number, fieldName: CharacterAbilityFieldName, value: string | number) => void
   handleAbilityRemove: (index: number) => void
+  handleFeatCreateEmpty: () => void
+  handleFeatChange: (index: number, fieldName: CharacterFeatFieldName, value: string | number | boolean) => void
+  handleFeatRemove: (index: number) => void
   handleItemCreateEmpty: (group: CharacterItemGroupKey) => void
   handleItemChange: (
     group: CharacterItemGroupKey,
@@ -80,6 +86,7 @@ export interface CharacterEditPageState {
   levelBonusLabel: string
   speedValue: number
   speedTooltip: string
+  hpTooltip: string
   defenseValues: DefenseValues
   defenseTooltips: DefenseTooltipValues
   hpValue: number

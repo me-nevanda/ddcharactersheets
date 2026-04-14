@@ -1,3 +1,152 @@
+import { AppIcon } from '@components/AppIcon'
+import { skillDefinitions } from '@dictionaries/characterEditDefinitions'
+import styles from '../../style.module.scss'
+import type { CharacterFeatFieldName } from '../../types'
+import localStyles from './style.module.scss'
+import { useFeatsTab } from './useFeatsTab'
+
+const featBonusOptions = Array.from({ length: 16 }, (_, index) => index - 5)
+
+const featCoreFields = [
+  { fieldName: 'speedBonusNumber', labelKey: 'pages.characterEdit.fields.speed' },
+  { fieldName: 'hpBonusNumber', labelKey: 'pages.characterEdit.fields.hp' },
+  { fieldName: 'kpBonusNumber', labelKey: 'pages.characterEdit.fields.kp' },
+  { fieldName: 'fortitudeBonusNumber', labelKey: 'pages.characterEdit.fields.fortitude' },
+  { fieldName: 'reflexBonusNumber', labelKey: 'pages.characterEdit.fields.reflex' },
+  { fieldName: 'willBonusNumber', labelKey: 'pages.characterEdit.fields.will' },
+] satisfies ReadonlyArray<{ fieldName: CharacterFeatFieldName; labelKey: string }>
+
+const featSkillFields = skillDefinitions.map((skill) => ({
+  fieldName: `${skill.key}BonusNumber` as CharacterFeatFieldName,
+  labelKey: skill.translationKey,
+})) satisfies ReadonlyArray<{ fieldName: CharacterFeatFieldName; labelKey: string }>
+
 export function FeatsTab() {
-  return null
+  const {
+    t,
+    form,
+    handleFeatChange,
+    pendingRemoval,
+    handleAddFeat,
+    handleRemoveFeat,
+    handleConfirmRemoveFeat,
+    handleCancelRemoveFeat,
+  } = useFeatsTab()
+
+  return (
+    <div className={styles.section}>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>{t('pages.characterEdit.feats.title')}</h2>
+        <button className={styles.primaryButton} type="button" onClick={handleAddFeat}>
+          {t('pages.characterEdit.feats.addButton')}
+        </button>
+      </div>
+
+      {form.feats.length === 0 ? <p className={styles.loadingText}>{t('pages.characterEdit.feats.emptyState')}</p> : null}
+
+      {form.feats.length > 0 ? (
+        <div className={localStyles.featsGrid}>
+          {form.feats.map((feat, index) => (
+            <article key={feat.id} className={styles.abilityCard}>
+              <div className={`${styles.sectionHeader} ${localStyles.featCardHeader}`}>
+                <input
+                  className={styles.abilityCardTitleInput}
+                  id={`feat-name-${index}`}
+                  value={feat.name}
+                  placeholder={t('pages.characterEdit.feats.namePlaceholder')}
+                  onChange={(event) => handleFeatChange(index, 'name', event.target.value)}
+                />
+                <button
+                  className={styles.abilityRemoveButton}
+                  type="button"
+                  aria-label={t('pages.characterEdit.feats.removeButton')}
+                  title={t('pages.characterEdit.feats.removeButton')}
+                  onClick={() => handleRemoveFeat(index)}
+                >
+                  <AppIcon name="delete" />
+                </button>
+              </div>
+
+              <div className={localStyles.featFieldsGrid}>
+                <label className={`${localStyles.featField} ${localStyles.featDescriptionField}`} htmlFor={`feat-description-${index}`}>
+                  <span className={styles.attributeLabel}>{t('pages.characterEdit.feats.descriptionLabel')}</span>
+                  <textarea
+                    className={`${styles.input} ${styles.abilityTextarea}`}
+                    id={`feat-description-${index}`}
+                    value={feat.description}
+                    placeholder={t('pages.characterEdit.feats.descriptionPlaceholder')}
+                    onChange={(event) => handleFeatChange(index, 'description', event.target.value)}
+                  />
+                </label>
+
+                {featCoreFields.map((field) => (
+                  <label key={field.fieldName} className={localStyles.featField} htmlFor={`feat-${field.fieldName}-${index}`}>
+                    <span className={styles.attributeLabel}>{t(field.labelKey)}</span>
+                    <select
+                      className={`${styles.input} ${styles.selectChevronInset} ${localStyles.featSelect}`}
+                      id={`feat-${field.fieldName}-${index}`}
+                      value={feat[field.fieldName]}
+                      onChange={(event) =>
+                        handleFeatChange(index, field.fieldName, Number.parseInt(event.target.value, 10))
+                      }
+                    >
+                      {featBonusOptions.map((bonus) => (
+                        <option key={bonus} value={bonus}>
+                          {bonus}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ))}
+
+                {featSkillFields.map((field) => (
+                  <label key={field.fieldName} className={localStyles.featField} htmlFor={`feat-${field.fieldName}-${index}`}>
+                    <span className={styles.attributeLabel}>{t(field.labelKey)}</span>
+                    <select
+                      className={`${styles.input} ${styles.selectChevronInset} ${localStyles.featSelect}`}
+                      id={`feat-${field.fieldName}-${index}`}
+                      value={feat[field.fieldName]}
+                      onChange={(event) =>
+                        handleFeatChange(index, field.fieldName, Number.parseInt(event.target.value, 10))
+                      }
+                    >
+                      {featBonusOptions.map((bonus) => (
+                        <option key={bonus} value={bonus}>
+                          {bonus}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : null}
+
+      {pendingRemoval ? (
+        <div className={styles.deleteBackdrop} role="presentation">
+          <div className={styles.deleteDialog} role="dialog" aria-modal="true" aria-labelledby="delete-feat-title">
+            <h2 className={styles.deleteDialogTitle} id="delete-feat-title">
+              {t('pages.characterEdit.feats.removeDialog.title')}
+            </h2>
+            <p className={styles.deleteDialogText}>
+              {t('pages.characterEdit.feats.removeDialog.body', {
+                name: form.feats[pendingRemoval.index]?.name || t('pages.characterEdit.feats.title'),
+              })}
+            </p>
+
+            <div className={styles.deleteDialogActions}>
+              <button className={styles.deleteDialogSecondaryButton} type="button" onClick={handleCancelRemoveFeat}>
+                {t('common.actions.cancel')}
+              </button>
+              <button className={styles.deleteDialogDangerButton} type="button" onClick={handleConfirmRemoveFeat}>
+                {t('common.actions.delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  )
 }

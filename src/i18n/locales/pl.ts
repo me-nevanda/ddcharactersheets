@@ -82,6 +82,7 @@ export const pl: TranslationDictionary = {
       sourceTooltip: {
         raceBonus: 'Rasa',
         itemBonus: 'Bonusy z przedmiotów:',
+        featBonuses: 'Atuty:',
         baseSpeed: 'Szybkość z rasy',
       },
       abilities: {
@@ -162,6 +163,20 @@ export const pl: TranslationDictionary = {
         descriptionLabel: 'Opis',
         namePlaceholder: 'Np. Uderzenie tarczą',
         descriptionPlaceholder: 'Krótki opis zdolności',
+      },
+      feats: {
+        title: 'Atuty',
+        emptyState: 'Nie dodano jeszcze żadnego atutu.',
+        addButton: 'Dodaj atut',
+        removeButton: 'Usuń',
+        removeDialog: {
+          title: 'Usunąć atut?',
+          body: 'Atut „{name}” zostanie usunięty na stałe.',
+        },
+        nameLabel: 'Nazwa',
+        namePlaceholder: 'Np. Zimna krew',
+        descriptionLabel: 'Opis',
+        descriptionPlaceholder: 'Krótki opis atutu',
       },
       items: {
         title: 'Przedmioty',

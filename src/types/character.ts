@@ -71,6 +71,35 @@ export interface CharacterAbility {
   weaponArea: CharacterAbilityAreaType
 }
 
+export interface CharacterFeat {
+  id: string
+  name: string
+  description: string
+  speedBonusNumber: number
+  hpBonusNumber: number
+  kpBonusNumber: number
+  fortitudeBonusNumber: number
+  reflexBonusNumber: number
+  willBonusNumber: number
+  acrobaticsBonusNumber: number
+  arcanaBonusNumber: number
+  athleticsBonusNumber: number
+  diplomacyBonusNumber: number
+  historyBonusNumber: number
+  healingBonusNumber: number
+  deceptionBonusNumber: number
+  perceptionBonusNumber: number
+  enduranceBonusNumber: number
+  dungeoneeringBonusNumber: number
+  natureBonusNumber: number
+  religionBonusNumber: number
+  insightBonusNumber: number
+  stealthBonusNumber: number
+  streetwiseBonusNumber: number
+  intimidationBonusNumber: number
+  thieveryBonusNumber: number
+}
+
 export interface CharacterItemBase {
   name: string
   description: string
@@ -263,6 +292,7 @@ export interface CharacterData {
   attributes: CharacterAttributes
   attributesPlus: CharacterAttributeBonuses
   abilities: CharacterAbility[]
+  feats: CharacterFeat[]
   items: CharacterItems
   bonuses?: CharacterBonuses
   defenses: CharacterDefenses

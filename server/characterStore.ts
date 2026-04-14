@@ -14,6 +14,7 @@ import type {
   CharacterData,
   CharacterDefenses,
   CharacterArmor,
+  CharacterFeat,
   CharacterWeapon,
   CharacterOtherItem,
   CharacterWeaponDamageDiceType,
@@ -254,6 +255,107 @@ function normalizeAbilities(
       weaponArea: normalizeAbilityWeaponArea(item.weaponArea),
     }))
     .filter((ability) => ability.name.length > 0 || ability.description.length > 0)
+}
+
+function hasFeatContent(feat: CharacterFeat): boolean {
+  return (
+    feat.name.length > 0 ||
+    feat.description.length > 0 ||
+    feat.speedBonusNumber !== 0 ||
+    feat.hpBonusNumber !== 0 ||
+    feat.kpBonusNumber !== 0 ||
+    feat.fortitudeBonusNumber !== 0 ||
+    feat.reflexBonusNumber !== 0 ||
+    feat.willBonusNumber !== 0 ||
+    feat.acrobaticsBonusNumber !== 0 ||
+    feat.arcanaBonusNumber !== 0 ||
+    feat.athleticsBonusNumber !== 0 ||
+    feat.diplomacyBonusNumber !== 0 ||
+    feat.historyBonusNumber !== 0 ||
+    feat.healingBonusNumber !== 0 ||
+    feat.deceptionBonusNumber !== 0 ||
+    feat.perceptionBonusNumber !== 0 ||
+    feat.enduranceBonusNumber !== 0 ||
+    feat.dungeoneeringBonusNumber !== 0 ||
+    feat.natureBonusNumber !== 0 ||
+    feat.religionBonusNumber !== 0 ||
+    feat.insightBonusNumber !== 0 ||
+    feat.stealthBonusNumber !== 0 ||
+    feat.streetwiseBonusNumber !== 0 ||
+    feat.intimidationBonusNumber !== 0 ||
+    feat.thieveryBonusNumber !== 0
+  )
+}
+
+function normalizeFeats(data: unknown): CharacterFeat[] {
+  if (!Array.isArray(data)) {
+    return []
+  }
+
+  return data
+    .filter((item): item is Record<string, unknown> | string => typeof item === 'string' || (typeof item === 'object' && item !== null))
+    .map((item) => {
+      if (typeof item === 'string') {
+        return {
+          id: randomUUID(),
+          name: item.trim(),
+          description: item.trim(),
+          speedBonusNumber: 0,
+          hpBonusNumber: 0,
+          kpBonusNumber: 0,
+          fortitudeBonusNumber: 0,
+          reflexBonusNumber: 0,
+          willBonusNumber: 0,
+          acrobaticsBonusNumber: 0,
+          arcanaBonusNumber: 0,
+          athleticsBonusNumber: 0,
+          diplomacyBonusNumber: 0,
+          historyBonusNumber: 0,
+          healingBonusNumber: 0,
+          deceptionBonusNumber: 0,
+          perceptionBonusNumber: 0,
+          enduranceBonusNumber: 0,
+          dungeoneeringBonusNumber: 0,
+          natureBonusNumber: 0,
+          religionBonusNumber: 0,
+          insightBonusNumber: 0,
+          stealthBonusNumber: 0,
+          streetwiseBonusNumber: 0,
+          intimidationBonusNumber: 0,
+          thieveryBonusNumber: 0,
+        }
+      }
+
+      return {
+        id: typeof item.id === 'string' && item.id.length > 0 ? item.id : randomUUID(),
+        name: typeof item.name === 'string' ? item.name.trim() : '',
+        description: typeof item.description === 'string' ? item.description.trim() : '',
+        speedBonusNumber: normalizeWeaponBonusNumber(item.speedBonusNumber),
+        hpBonusNumber: normalizeWeaponBonusNumber(item.hpBonusNumber),
+        kpBonusNumber: normalizeWeaponBonusNumber(item.kpBonusNumber),
+        fortitudeBonusNumber: normalizeWeaponBonusNumber(item.fortitudeBonusNumber),
+        reflexBonusNumber: normalizeWeaponBonusNumber(item.reflexBonusNumber),
+        willBonusNumber: normalizeWeaponBonusNumber(item.willBonusNumber),
+        acrobaticsBonusNumber: normalizeWeaponBonusNumber(item.acrobaticsBonusNumber),
+        arcanaBonusNumber: normalizeWeaponBonusNumber(item.arcanaBonusNumber),
+        athleticsBonusNumber: normalizeWeaponBonusNumber(item.athleticsBonusNumber),
+        diplomacyBonusNumber: normalizeWeaponBonusNumber(item.diplomacyBonusNumber),
+        historyBonusNumber: normalizeWeaponBonusNumber(item.historyBonusNumber),
+        healingBonusNumber: normalizeWeaponBonusNumber(item.healingBonusNumber),
+        deceptionBonusNumber: normalizeWeaponBonusNumber(item.deceptionBonusNumber),
+        perceptionBonusNumber: normalizeWeaponBonusNumber(item.perceptionBonusNumber),
+        enduranceBonusNumber: normalizeWeaponBonusNumber(item.enduranceBonusNumber),
+        dungeoneeringBonusNumber: normalizeWeaponBonusNumber(item.dungeoneeringBonusNumber),
+        natureBonusNumber: normalizeWeaponBonusNumber(item.natureBonusNumber),
+        religionBonusNumber: normalizeWeaponBonusNumber(item.religionBonusNumber),
+        insightBonusNumber: normalizeWeaponBonusNumber(item.insightBonusNumber),
+        stealthBonusNumber: normalizeWeaponBonusNumber(item.stealthBonusNumber),
+        streetwiseBonusNumber: normalizeWeaponBonusNumber(item.streetwiseBonusNumber),
+        intimidationBonusNumber: normalizeWeaponBonusNumber(item.intimidationBonusNumber),
+        thieveryBonusNumber: normalizeWeaponBonusNumber(item.thieveryBonusNumber),
+      }
+    })
+    .filter(hasFeatContent)
 }
 
 function normalizeWeaponAttributeBonus(value: unknown): keyof CharacterAttributes | '' {
@@ -686,6 +788,7 @@ function normalizeCharacter(
       ? normalizeTraining(data.training as Partial<Record<keyof CharacterTraining, unknown>>)
       : normalizeTraining()
   const abilities = normalizeAbilities((data as Record<string, unknown>).abilities)
+  const feats = normalizeFeats((data as Record<string, unknown>).feats)
   const items = normalizeItems((data as Record<string, unknown>).items)
   const attributeBonuses = buildAttributeBonuses(attributes)
   const race =
@@ -737,6 +840,7 @@ function normalizeCharacter(
     attributes,
     attributesPlus: normalizeAttributeBonuses(attributesPlusData, buildZeroAttributeBonuses()),
     abilities,
+    feats,
     items,
     bonuses,
     defenses:
