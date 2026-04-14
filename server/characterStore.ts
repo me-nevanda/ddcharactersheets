@@ -390,6 +390,7 @@ function normalizeArmorGroup(data: unknown): CharacterArmor[] {
       wisdomBonusNumber: normalizeWeaponBonusNumber(item.wisdomBonusNumber),
       charismaBonusNumber: normalizeWeaponBonusNumber(item.charismaBonusNumber),
       speedBonusNumber: normalizeWeaponBonusNumber(item.speedBonusNumber),
+      armorPenaltyNumber: normalizeWeaponBonusNumber(item.armorPenaltyNumber),
       kpBonusNumber: normalizeWeaponBonusNumber(item.kpBonusNumber),
       fortitudeBonusNumber: normalizeWeaponBonusNumber(item.fortitudeBonusNumber),
       reflexBonusNumber: normalizeWeaponBonusNumber(item.reflexBonusNumber),

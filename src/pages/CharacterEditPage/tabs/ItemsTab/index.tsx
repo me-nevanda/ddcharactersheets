@@ -11,7 +11,14 @@ const itemGroups = ['weapons', 'armors', 'others'] as const
 
 export function ItemsTab() {
   const { t } = useI18n()
-  const { form, handleItemCreateEmpty, handleItemChange, handleWeaponDamageChange, handleItemRemove } =
+  const {
+    form,
+    handleItemCreateEmpty,
+    handleItemChange,
+    handleWeaponDamageChange,
+    handleItemRemove,
+    handleArmorBonusChange,
+  } =
     useCharacterEditPageContext()
   const [pendingRemoval, setPendingRemoval] = useState<{
     group: (typeof itemGroups)[number]
@@ -88,9 +95,7 @@ export function ItemsTab() {
                           }
                           onRemove={(armorIndex, name) => handleRemoveItem(group, armorIndex, name)}
                           onEquipChange={(armorIndex, value) => handleItemChange(group, armorIndex, 'equipped', value)}
-                          onBonusChange={(armorIndex, fieldName, value) =>
-                            handleItemChange(group, armorIndex, fieldName, value)
-                          }
+                          onBonusChange={handleArmorBonusChange}
                         />
                       ) : null}
 

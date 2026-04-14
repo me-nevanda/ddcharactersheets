@@ -1,11 +1,11 @@
 import { useI18n } from '@i18n/index'
 import { AppIcon } from '@components/AppIcon'
 import type { ArmorItemCardProps } from './types'
-import type { CharacterItemBonusFieldName } from '../../../../../types/character'
+import type { CharacterArmorBonusFieldName } from '../../../../../types/character'
 import styles from '../../../style.module.scss'
 
 const armorBonusFields: Array<{
-  fieldName: CharacterItemBonusFieldName
+  fieldName: CharacterArmorBonusFieldName
   labelKey: string
 }> = [
   { fieldName: 'strengthBonusNumber', labelKey: 'pages.characterEdit.fields.strength' },
@@ -15,6 +15,7 @@ const armorBonusFields: Array<{
   { fieldName: 'wisdomBonusNumber', labelKey: 'pages.characterEdit.fields.wisdom' },
   { fieldName: 'charismaBonusNumber', labelKey: 'pages.characterEdit.fields.charisma' },
   { fieldName: 'speedBonusNumber', labelKey: 'pages.characterEdit.fields.speed' },
+  { fieldName: 'armorPenaltyNumber', labelKey: 'pages.characterEdit.fields.armorPenalty' },
   { fieldName: 'kpBonusNumber', labelKey: 'pages.characterEdit.fields.kp' },
   { fieldName: 'fortitudeBonusNumber', labelKey: 'pages.characterEdit.fields.fortitude' },
   { fieldName: 'reflexBonusNumber', labelKey: 'pages.characterEdit.fields.reflex' },

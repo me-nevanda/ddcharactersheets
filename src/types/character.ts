@@ -85,6 +85,7 @@ export interface CharacterArmor extends CharacterItemBase {
   wisdomBonusNumber: number
   charismaBonusNumber: number
   speedBonusNumber: number
+  armorPenaltyNumber: number
   kpBonusNumber: number
   fortitudeBonusNumber: number
   reflexBonusNumber: number
@@ -149,6 +150,7 @@ export type CharacterItemBonusFieldName =
   | 'willBonusNumber'
 
 export type CharacterWeaponBonusFieldName = CharacterItemBonusFieldName
+export type CharacterArmorBonusFieldName = CharacterItemBonusFieldName | 'armorPenaltyNumber'
 
 export type CharacterWeaponFieldName =
   | 'damageDiceCount'

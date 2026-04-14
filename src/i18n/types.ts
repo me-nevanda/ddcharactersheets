@@ -76,6 +76,7 @@ export interface TranslationDictionary {
       }
       skillTooltip: {
         trainingBonus: string
+        armorPenalty: string
       }
       sourceTooltip: {
         raceBonus: string
@@ -207,6 +208,7 @@ export interface TranslationDictionary {
         fortitude: string
         reflex: string
         will: string
+        armorPenalty: string
         acrobatics: string
         arcana: string
         athletics: string

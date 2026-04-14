@@ -7,6 +7,7 @@ import {
   buildEffectiveAttributes,
   buildNormalizedAttributes,
 } from '../../sections/AttributesSection/attributesSectionLogic'
+import { formatModifier, getLevelBonus } from '../../sections/GeneralSection/generalSectionLogic'
 import styles from '../../style.module.scss'
 
 export function AbilitiesTab() {
@@ -17,33 +18,34 @@ export function AbilitiesTab() {
   const normalizedAttributes = buildNormalizedAttributes(form.attributes)
   const effectiveAttributes = buildEffectiveAttributes(normalizedAttributes, form.attributesPlus)
   const attributeModifierMap = buildAttributeModifierMap(effectiveAttributes)
+  const levelBonusValue = getLevelBonus(form.level)
   const weaponOptions = form.items.weapons
     .map((weapon) => weapon.name.trim())
     .filter((weaponName, index, array) => weaponName.length > 0 && array.indexOf(weaponName) === index)
   const attributeOptions = [
     {
       value: 'strength',
-      label: `${t('pages.characterEdit.fields.strength')} (${attributeModifierMap.strength})`,
+      label: `${t('pages.characterEdit.fields.strength')} (${formatModifier(attributeModifierMap.strength + levelBonusValue)})`,
     },
     {
       value: 'condition',
-      label: `${t('pages.characterEdit.fields.condition')} (${attributeModifierMap.condition})`,
+      label: `${t('pages.characterEdit.fields.condition')} (${formatModifier(attributeModifierMap.condition + levelBonusValue)})`,
     },
     {
       value: 'dexterity',
-      label: `${t('pages.characterEdit.fields.dexterity')} (${attributeModifierMap.dexterity})`,
+      label: `${t('pages.characterEdit.fields.dexterity')} (${formatModifier(attributeModifierMap.dexterity + levelBonusValue)})`,
     },
     {
       value: 'intelligence',
-      label: `${t('pages.characterEdit.fields.intelligence')} (${attributeModifierMap.intelligence})`,
+      label: `${t('pages.characterEdit.fields.intelligence')} (${formatModifier(attributeModifierMap.intelligence + levelBonusValue)})`,
     },
     {
       value: 'wisdom',
-      label: `${t('pages.characterEdit.fields.wisdom')} (${attributeModifierMap.wisdom})`,
+      label: `${t('pages.characterEdit.fields.wisdom')} (${formatModifier(attributeModifierMap.wisdom + levelBonusValue)})`,
     },
     {
       value: 'charisma',
-      label: `${t('pages.characterEdit.fields.charisma')} (${attributeModifierMap.charisma})`,
+      label: `${t('pages.characterEdit.fields.charisma')} (${formatModifier(attributeModifierMap.charisma + levelBonusValue)})`,
     },
   ]
   const defenseOptions = [

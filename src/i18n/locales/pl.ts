@@ -77,6 +77,7 @@ export const pl: TranslationDictionary = {
       },
       skillTooltip: {
         trainingBonus: 'bonus z wyszkolenia',
+        armorPenalty: 'Pancerz kara',
       },
       sourceTooltip: {
         raceBonus: 'Rasa',
@@ -208,6 +209,7 @@ export const pl: TranslationDictionary = {
         fortitude: 'Wytrwałość',
         reflex: 'Refleks',
         will: 'Wola',
+        armorPenalty: 'Pancerz kara',
         acrobatics: 'Akrobatyka',
         arcana: 'Arkana',
         athletics: 'Atletyka',

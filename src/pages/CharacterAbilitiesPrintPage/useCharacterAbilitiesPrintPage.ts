@@ -22,6 +22,7 @@ function buildAttackAttributeLabel(
   t: ReturnType<typeof useI18n>['t'],
   attribute: CharacterAbility['weaponAttackAttribute'],
   attributeModifierLookup: CharacterAttributeBonuses,
+  levelBonus: number,
 ): string {
   if (!attribute) {
     return ''
@@ -36,7 +37,7 @@ function buildAttackAttributeLabel(
     charisma: t('pages.characterEdit.fields.charisma'),
   }
 
-  return `${labelMap[attribute]} (${attributeModifierLookup[attribute] ?? 0})`
+  return `${labelMap[attribute]} (${(attributeModifierLookup[attribute] ?? 0) + levelBonus})`
 }
 
 function buildDefenseLabel(
@@ -67,7 +68,12 @@ function buildAttackDisplayLabel(
   }
 
   const attributeModifierLookup = buildAttributeModifierLookup(character)
-  const attackAttributeLabel = buildAttackAttributeLabel(t, ability.weaponAttackAttribute, attributeModifierLookup)
+  const attackAttributeLabel = buildAttackAttributeLabel(
+    t,
+    ability.weaponAttackAttribute,
+    attributeModifierLookup,
+    character.bonuses?.level ?? 0,
+  )
   const attackDefenseLabel = buildDefenseLabel(t, ability.weaponAttackDefense)
 
   if (!attackAttributeLabel || !attackDefenseLabel) {

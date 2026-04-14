@@ -139,7 +139,13 @@ export function useCharacterPrintPage(): CharacterPrintPageState {
       will: sumEquippedItemBonus(character.items, 'willBonusNumber'),
     }
     const skillTraining = normalizeSkillTraining(character.training)
-    const skillBonuses = buildSkillBonuses(character.level, attributeModifierMap, skillTraining, character.race)
+    const skillBonuses = buildSkillBonuses(
+      character.level,
+      attributeModifierMap,
+      skillTraining,
+      character.race,
+      character.items,
+    )
     const defenseValues = buildDefenseValues(
       attributeModifierMap,
       levelBonus,

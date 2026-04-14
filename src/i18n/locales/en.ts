@@ -77,6 +77,7 @@ export const en: TranslationDictionary = {
       },
       skillTooltip: {
         trainingBonus: 'training bonus',
+        armorPenalty: 'Armor penalty',
       },
       sourceTooltip: {
         raceBonus: 'Race',
@@ -208,6 +209,7 @@ export const en: TranslationDictionary = {
         fortitude: 'Fortitude',
         reflex: 'Reflex',
         will: 'Will',
+        armorPenalty: 'Armor penalty',
         acrobatics: 'Acrobatics',
         arcana: 'Arcana',
         athletics: 'Athletics',

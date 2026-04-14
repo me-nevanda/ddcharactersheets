@@ -1,6 +1,6 @@
 import type {
+  CharacterArmorBonusFieldName,
   CharacterArmor,
-  CharacterItemBonusFieldName,
 } from '../../../../../types/character'
 
 export interface ArmorItemCardProps {
@@ -10,5 +10,5 @@ export interface ArmorItemCardProps {
   onDescriptionChange: (index: number, value: string) => void
   onRemove: (index: number, name: string) => void
   onEquipChange: (index: number, value: boolean) => void
-  onBonusChange: (index: number, fieldName: CharacterItemBonusFieldName, value: number) => void
+  onBonusChange: (index: number, fieldName: CharacterArmorBonusFieldName, value: number) => void
 }

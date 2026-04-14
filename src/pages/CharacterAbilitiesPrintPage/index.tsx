@@ -7,8 +7,8 @@ import styles from './style.module.scss'
 export function CharacterAbilitiesPrintPage() {
   const { t } = useI18n()
   const { character, loading, error, abilityRows, hasAbilities, title } = useCharacterAbilitiesPrintPage()
-  const offensiveAbilities = abilityRows.filter((ability) => ability.kind === 'offensive')
-  const utilityAbilities = abilityRows.filter((ability) => ability.kind === 'utility')
+  const offensiveAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.kind === 'offensive'))
+  const utilityAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.kind === 'utility'))
 
   function getAbilityTypeClass(type: 'unlimited' | 'encounter' | 'daily') {
     if (type === 'encounter') {
@@ -32,6 +32,27 @@ export function CharacterAbilitiesPrintPage() {
     }
 
     return styles.typeBadgeUnlimited
+  }
+
+  function sortAbilitiesByType(abilities: typeof abilityRows): typeof abilityRows {
+    const typeRank: Record<'unlimited' | 'encounter' | 'daily', number> = {
+      unlimited: 0,
+      encounter: 1,
+      daily: 2,
+    }
+
+    return abilities
+      .map((ability, index) => ({ ability, index }))
+      .sort((left, right) => {
+        const typeDiff = typeRank[left.ability.type] - typeRank[right.ability.type]
+
+        if (typeDiff !== 0) {
+          return typeDiff
+        }
+
+        return left.index - right.index
+      })
+      .map(({ ability }) => ability)
   }
 
   if (loading) {
@@ -92,7 +113,7 @@ export function CharacterAbilitiesPrintPage() {
                             </span>
                           </div>
                         </div>
-                        <div className={styles.detailList}>
+                        <div className={styles.detailListInline}>
                           {ability.details.map((detail) => (
                             <div key={detail.label} className={styles.detailRow}>
                               <span className={styles.detailLabel}>{detail.label}:</span>
@@ -151,7 +172,7 @@ export function CharacterAbilitiesPrintPage() {
                             </span>
                           </div>
                         </div>
-                        <div className={styles.detailList}>
+                        <div className={styles.detailListInline}>
                           {ability.details.map((detail) => (
                             <div key={detail.label} className={styles.detailRow}>
                               <span className={styles.detailLabel}>{detail.label}:</span>

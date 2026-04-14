@@ -61,6 +61,7 @@ import {
   type CharacterAbilityAreaType,
   type CharacterAttributeBonuses,
   type CharacterBonuses,
+  type CharacterArmorBonusFieldName,
   type CharacterArmor,
   type CharacterDefenses,
   type CharacterWeapon,
@@ -277,24 +278,25 @@ function normalizeArmorGroup(group: unknown): CharacterArmor[] {
     return []
   }
 
-  return group
-    .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
-    .map((entry) => ({
-      name: typeof entry.name === 'string' ? entry.name : '',
-      description: typeof entry.description === 'string' ? entry.description : '',
-      equipped: entry.equipped === true,
-      strengthBonusNumber: normalizeWeaponBonusNumber(entry.strengthBonusNumber),
-      conditionBonusNumber: normalizeWeaponBonusNumber(entry.conditionBonusNumber),
-      dexterityBonusNumber: normalizeWeaponBonusNumber(entry.dexterityBonusNumber),
-      intelligenceBonusNumber: normalizeWeaponBonusNumber(entry.intelligenceBonusNumber),
-      wisdomBonusNumber: normalizeWeaponBonusNumber(entry.wisdomBonusNumber),
-      charismaBonusNumber: normalizeWeaponBonusNumber(entry.charismaBonusNumber),
-      speedBonusNumber: normalizeWeaponBonusNumber(entry.speedBonusNumber),
-      kpBonusNumber: normalizeWeaponBonusNumber(entry.kpBonusNumber),
-      fortitudeBonusNumber: normalizeWeaponBonusNumber(entry.fortitudeBonusNumber),
-      reflexBonusNumber: normalizeWeaponBonusNumber(entry.reflexBonusNumber),
-      willBonusNumber: normalizeWeaponBonusNumber(entry.willBonusNumber),
-    }))
+      return group
+        .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
+        .map((entry) => ({
+          name: typeof entry.name === 'string' ? entry.name : '',
+          description: typeof entry.description === 'string' ? entry.description : '',
+          equipped: entry.equipped === true,
+          strengthBonusNumber: normalizeWeaponBonusNumber(entry.strengthBonusNumber),
+          conditionBonusNumber: normalizeWeaponBonusNumber(entry.conditionBonusNumber),
+          dexterityBonusNumber: normalizeWeaponBonusNumber(entry.dexterityBonusNumber),
+          intelligenceBonusNumber: normalizeWeaponBonusNumber(entry.intelligenceBonusNumber),
+          wisdomBonusNumber: normalizeWeaponBonusNumber(entry.wisdomBonusNumber),
+          charismaBonusNumber: normalizeWeaponBonusNumber(entry.charismaBonusNumber),
+          speedBonusNumber: normalizeWeaponBonusNumber(entry.speedBonusNumber),
+          armorPenaltyNumber: normalizeWeaponBonusNumber(entry.armorPenaltyNumber),
+          kpBonusNumber: normalizeWeaponBonusNumber(entry.kpBonusNumber),
+          fortitudeBonusNumber: normalizeWeaponBonusNumber(entry.fortitudeBonusNumber),
+          reflexBonusNumber: normalizeWeaponBonusNumber(entry.reflexBonusNumber),
+          willBonusNumber: normalizeWeaponBonusNumber(entry.willBonusNumber),
+        }))
 }
 
 type EquippedItemBonusSource = {
@@ -839,6 +841,27 @@ export function useCharacterEditPage(): CharacterEditPageState {
     }))
   }
 
+  function handleArmorBonusChange(
+    index: number,
+    fieldName: CharacterArmorBonusFieldName,
+    value: number,
+  ) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      items: {
+        ...currentForm.items,
+        armors: currentForm.items.armors.map((armor, armorIndex) =>
+          armorIndex === index
+            ? {
+                ...armor,
+                [fieldName]: value,
+              }
+            : armor,
+        ),
+      },
+    }))
+  }
+
   function handleWeaponDamageChange(
     index: number,
     fieldName: CharacterWeaponFieldName,
@@ -903,7 +926,13 @@ export function useCharacterEditPage(): CharacterEditPageState {
     form.class,
     equippedItemDefenseBonuses,
   )
-  const skillBonuses = buildSkillBonuses(form.level, attributeModifierMap, form.training, form.race)
+  const skillBonuses = buildSkillBonuses(
+    form.level,
+    attributeModifierMap,
+    form.training,
+    form.race,
+    form.items,
+  )
   const skillModifiers = buildSkillModifiers(skillBonuses)
   const hasChanges = JSON.stringify(form) !== JSON.stringify(initialForm)
   const attributeBonusTooltips = {
@@ -1096,6 +1125,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
     handleAbilityRemove,
     handleItemCreateEmpty,
     handleItemChange,
+    handleArmorBonusChange,
     handleWeaponDamageChange,
     handleItemRemove,
     handleSubmit,

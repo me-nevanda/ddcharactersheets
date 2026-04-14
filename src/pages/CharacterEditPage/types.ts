@@ -4,6 +4,7 @@ import type {
   Character,
   CharacterBonuses,
   CharacterAttributes,
+  CharacterArmorBonusFieldName,
   CharacterDefenses,
   CharacterItemBase,
   CharacterItems,
@@ -61,6 +62,11 @@ export interface CharacterEditPageState {
     index: number,
     fieldName: CharacterItemFieldName | CharacterItemBonusFieldName,
     value: string | number | boolean,
+  ) => void
+  handleArmorBonusChange: (
+    index: number,
+    fieldName: CharacterArmorBonusFieldName,
+    value: number,
   ) => void
   handleWeaponDamageChange: (
     index: number,

@@ -10,6 +10,14 @@ import {
 } from '../AttributesSection/attributesSectionLogic'
 import { formatModifier, getLevelBonus } from '../GeneralSection/generalSectionLogic'
 
+const armorPenaltySkillKeys = new Set([
+  'acrobatics',
+  'athletics',
+  'endurance',
+  'stealth',
+  'thievery',
+])
+
 const fighterAndBarbarianHighlightedSkillKeys = new Set([
   'athletics',
   'endurance',
@@ -109,7 +117,11 @@ export function SkillSection() {
   const isCleric = form.class === CharacterClass.Cleric
   const isWizard = form.class === CharacterClass.Wizard
 
-  function buildSkillTooltip(attributeKey: keyof typeof attributeModifierMap, trained: boolean): string {
+  function buildSkillTooltip(
+    attributeKey: keyof typeof attributeModifierMap,
+    skillKey: keyof typeof skillModifiers,
+    trained: boolean,
+  ): string {
     const lines: string[] = []
 
     if (levelBonusValue !== 0) {
@@ -125,6 +137,22 @@ export function SkillSection() {
 
     if (trained) {
       lines.push(`${t('pages.characterEdit.skillTooltip.trainingBonus')}: +5`)
+    }
+
+    if (armorPenaltySkillKeys.has(skillKey)) {
+      const armorPenaltySources = form.items.armors
+        .filter((armor) => armor.equipped)
+        .filter((armor) => armor.armorPenaltyNumber !== 0)
+
+      if (armorPenaltySources.length > 0) {
+        lines.push(
+          '',
+          [
+            `${t('pages.characterEdit.skillTooltip.armorPenalty')}:`,
+            ...armorPenaltySources.map((armor) => `${armor.name || '—'}: ${formatModifier(armor.armorPenaltyNumber)}`),
+          ].join('\n'),
+        )
+      }
     }
 
     return lines.join('\n')
@@ -175,8 +203,8 @@ export function SkillSection() {
             </label>
             <span
               className={styles.modifierBadge}
-              title={buildSkillTooltip(skill.attributeKey, form.training[skill.key])}
-              aria-label={buildSkillTooltip(skill.attributeKey, form.training[skill.key])}
+              title={buildSkillTooltip(skill.attributeKey, skill.key, form.training[skill.key])}
+              aria-label={buildSkillTooltip(skill.attributeKey, skill.key, form.training[skill.key])}
             >
               {skillModifiers[skill.key]}
             </span>

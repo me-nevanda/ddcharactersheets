@@ -92,6 +92,7 @@ export const emptyArmor: CharacterArmor = {
   wisdomBonusNumber: 0,
   charismaBonusNumber: 0,
   speedBonusNumber: 0,
+  armorPenaltyNumber: 0,
   kpBonusNumber: 0,
   fortitudeBonusNumber: 0,
   reflexBonusNumber: 0,

@@ -2,21 +2,34 @@ import { skillDefinitions } from '@dictionaries/characterEditDefinitions'
 import {
   CharacterRace,
   type CharacterAttributeBonuses,
+  type CharacterItems,
   type CharacterSkillBonuses,
   type CharacterTraining,
 } from '../../../../types/character'
 import { formatModifier, getLevelBonus } from '../GeneralSection/generalSectionLogic'
+
+const armorPenaltySkillKeys = new Set([
+  'acrobatics',
+  'athletics',
+  'endurance',
+  'stealth',
+  'thievery',
+])
 
 export function buildSkillBonuses(
   level: number,
   attributeBonuses: CharacterAttributeBonuses,
   training: CharacterTraining,
   race: CharacterRace,
+  items: CharacterItems,
 ): CharacterSkillBonuses {
   const levelBonus = getLevelBonus(level)
   const dwarfSkillBonus = race === CharacterRace.Dwarf ? 2 : 0
   const halflingSkillBonus = race === CharacterRace.Halfling ? 2 : 0
   const halfElfSkillBonus = race === CharacterRace.HalfElf ? 2 : 0
+  const armorPenaltyBonus = items.armors
+    .filter((armor) => armor.equipped)
+    .reduce((total, armor) => total + armor.armorPenaltyNumber, 0)
 
   const racialSkillBonuses: Partial<Record<keyof CharacterSkillBonuses, number>> = {
     acrobatics: halflingSkillBonus,
@@ -40,11 +53,13 @@ export function buildSkillBonuses(
 
   return skillDefinitions.reduce((acc, definition) => {
     const racialBonus = racialSkillBonuses[definition.key] ?? 0
+    const armorPenalty = armorPenaltySkillKeys.has(definition.key) ? armorPenaltyBonus : 0
 
     acc[definition.key] =
       attributeBonuses[definition.attributeKey] +
       levelBonus +
       racialBonus +
+      armorPenalty +
       (training[definition.key] ? 5 : 0)
     return acc
   }, {} as CharacterSkillBonuses)
