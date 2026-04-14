@@ -129,13 +129,16 @@ function CharacterEditPageContent() {
                 </div>
               ) : null}
             </div>
-            <button className={styles.primaryButton} form="character-edit-form" type="submit" disabled={saving || !hasChanges}>
-              <span className={styles.buttonContent}>
-                <AppIcon name="save" />
-                <span>{saving ? t('common.states.saving') : t('common.actions.save')}</span>
-              </span>
-            </button>
           </div>
+        </div>
+
+        <div className={styles.floatingSaveAction}>
+          <button className={styles.primaryButton} form="character-edit-form" type="submit" disabled={saving || !hasChanges}>
+            <span className={styles.buttonContent}>
+              <AppIcon name="save" />
+              <span>{saving ? t('common.states.saving') : t('common.actions.save')}</span>
+            </span>
+          </button>
         </div>
 
         {error ? <p className={styles.status}>{error}</p> : null}

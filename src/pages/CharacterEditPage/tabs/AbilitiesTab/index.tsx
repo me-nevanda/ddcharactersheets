@@ -501,13 +501,6 @@ export function AbilitiesTab() {
                         </div>
                       </div>
 
-                      {ability.weaponName.length > 0 ? (
-                        <div className={styles.abilityDamageSection}>
-                          <span className={styles.attributeLabel}>{t('pages.characterEdit.fields.damage')}</span>
-                          <strong className={styles.abilityDamageValue}>{buildAbilityDamage(ability)}</strong>
-                        </div>
-                      ) : null}
-
                       <div className={styles.abilityWeaponTextAreaSoloRow}>
                         <label className={styles.abilityWeaponTextAreaField} htmlFor={`ability-weapon-provocation-${index}`}>
                           <span className={styles.attributeLabel}>

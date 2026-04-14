@@ -31,6 +31,13 @@
   position: relative;
 }
 
+.floatingSaveAction {
+  position: fixed;
+  top: calc(4.15rem + 16px);
+  right: 1rem;
+  z-index: 19;
+}
+
 .headerCopy {
   display: grid;
   gap: 0.35rem;
@@ -1009,6 +1016,11 @@
 
   .headerActions > * {
     width: 100%;
+  }
+
+  .floatingSaveAction {
+    top: calc(4.45rem + 16px);
+    right: 0.75rem;
   }
 
   .editorCard {

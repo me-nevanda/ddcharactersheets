@@ -80,7 +80,7 @@ export const en: TranslationDictionary = {
         armorPenalty: 'Armor penalty',
       },
       sourceTooltip: {
-        raceBonus: 'Race',
+        raceBonus: 'Race bonus',
         itemBonus: 'Item bonuses:',
         featBonuses: 'Feats:',
         baseSpeed: 'Base speed from race',

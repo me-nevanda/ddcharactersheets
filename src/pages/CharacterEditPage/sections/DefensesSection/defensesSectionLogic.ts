@@ -12,6 +12,7 @@ type AttributeKey = keyof CharacterAttributeBonuses
 export interface DefenseBreakdown {
   value: number
   levelBonus: number
+  raceBonus: number
   classBonus: number
   attributeBonus: number
   itemBonus: number
@@ -74,10 +75,21 @@ export function buildDefenseBreakdowns(
   const reflexAttributeBonus = Math.max(attributeModifiers.dexterity, attributeModifiers.intelligence)
   const willAttributeBonus = Math.max(attributeModifiers.wisdom, attributeModifiers.charisma)
 
+
+  console.log(
+    fortitudeAttributeBonus,
+    levelBonus,
+    humanDefenseBonus,
+    fortitudeClassBonus,
+    warlordAndBardDefenseBonus,
+    paladinDefenseBonus,
+    itemBonuses.fortitude)
+
   return {
     kp: {
       value: clampDefenseValue(10 + reflexAttributeBonus + levelBonus + itemBonuses.kp),
       levelBonus,
+      raceBonus: 0,
       classBonus: 0,
       attributeBonus: reflexAttributeBonus,
       itemBonus: itemBonuses.kp,
@@ -98,7 +110,8 @@ export function buildDefenseBreakdowns(
           itemBonuses.fortitude,
       ),
       levelBonus,
-      classBonus: humanDefenseBonus + fortitudeClassBonus + warlordAndBardDefenseBonus + paladinDefenseBonus,
+      raceBonus: humanDefenseBonus,
+      classBonus: fortitudeClassBonus + warlordAndBardDefenseBonus + paladinDefenseBonus,
       attributeBonus: fortitudeAttributeBonus,
       itemBonus: itemBonuses.fortitude,
       attributeKeys: getMaxAttributeKeys(attributeModifiers.strength, attributeModifiers.condition, [
@@ -118,7 +131,8 @@ export function buildDefenseBreakdowns(
           itemBonuses.reflex,
       ),
       levelBonus,
-      classBonus: humanDefenseBonus + paladinDefenseBonus + warlockReflexBonus + rogueReflexBonus,
+      raceBonus: humanDefenseBonus,
+      classBonus: paladinDefenseBonus + warlockReflexBonus + rogueReflexBonus,
       attributeBonus: reflexAttributeBonus,
       itemBonus: itemBonuses.reflex,
       attributeKeys: getMaxAttributeKeys(attributeModifiers.dexterity, attributeModifiers.intelligence, [
@@ -139,8 +153,8 @@ export function buildDefenseBreakdowns(
           itemBonuses.will,
       ),
       levelBonus,
-      classBonus:
-        humanDefenseBonus + warlordAndBardDefenseBonus + clericWillBonus + wizardWillBonus + warlockWillBonus,
+      raceBonus: humanDefenseBonus,
+      classBonus: warlordAndBardDefenseBonus + clericWillBonus + wizardWillBonus + warlockWillBonus,
       attributeBonus: willAttributeBonus,
       itemBonus: itemBonuses.will,
       attributeKeys: getMaxAttributeKeys(attributeModifiers.wisdom, attributeModifiers.charisma, [

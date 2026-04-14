@@ -80,7 +80,7 @@ export const pl: TranslationDictionary = {
         armorPenalty: 'Pancerz kara',
       },
       sourceTooltip: {
-        raceBonus: 'Rasa',
+        raceBonus: 'Bonus z rasy',
         itemBonus: 'Bonusy z przedmiotów:',
         featBonuses: 'Atuty:',
         baseSpeed: 'Szybkość z rasy',
