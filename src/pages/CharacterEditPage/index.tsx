@@ -101,6 +101,9 @@ function CharacterEditPageContent() {
             </label>
           </div>
           <div className={styles.headerActions}>
+            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/">
+              {t('common.actions.backToList')}
+            </Link>
             <div className={styles.printAction} ref={printMenuRef}>
               <button
                 aria-expanded={isPrintMenuOpen}
@@ -136,20 +139,15 @@ function CharacterEditPageContent() {
                 </div>
               ) : null}
             </div>
+            <div className={styles.floatingSaveAction}>
+              <button className={styles.primaryButton} form="character-edit-form" type="submit" disabled={saving || !hasChanges}>
+                <span className={styles.buttonContent}>
+                  <AppIcon name="save" />
+                  <span>{saving ? t('common.states.saving') : t('common.actions.save')}</span>
+                </span>
+              </button>
+            </div>
           </div>
-        </div>
-
-        <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/">
-          {t('common.actions.backToList')}
-        </Link>
-
-        <div className={styles.floatingSaveAction}>
-          <button className={styles.primaryButton} form="character-edit-form" type="submit" disabled={saving || !hasChanges}>
-            <span className={styles.buttonContent}>
-              <AppIcon name="save" />
-              <span>{saving ? t('common.states.saving') : t('common.actions.save')}</span>
-            </span>
-          </button>
         </div>
 
         {error ? <p className={styles.status}>{error}</p> : null}

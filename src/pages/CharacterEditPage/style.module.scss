@@ -1017,20 +1017,27 @@
   }
 }
 
-@media (max-width: 720px) {
-  .editorHeader,
+@media (max-width: 1800px) {
   .headerActions {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
   }
 
   .headerActions > * {
-    width: 100%;
+    width: auto;
+  }
+
+  .floatingBackAction,
+  .floatingSaveAction,
+  .printAction {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
   }
 
   .floatingSaveAction {
-    top: calc(4.45rem + 16px);
-    right: 0.75rem;
+    z-index: 19;
   }
 
   .editorCard {
