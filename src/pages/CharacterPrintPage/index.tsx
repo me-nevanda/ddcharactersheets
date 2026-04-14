@@ -36,7 +36,10 @@ export function CharacterPrintPage() {
         title={t('pages.characterPrint.printButtonLabel')}
         onClick={() => window.print()}
       >
-        <AppIcon name="print" />
+        <span className={styles.printButtonContent}>
+          <AppIcon name="print" />
+          <span>{t('pages.characterPrint.printButtonLabel')}</span>
+        </span>
       </button>
 
       <article className={styles.sheet}>

@@ -80,7 +80,10 @@ export function CharacterAbilitiesPrintPage() {
         title={t('pages.characterAbilitiesPrint.printButtonLabel')}
         onClick={() => window.print()}
       >
-        <AppIcon name="print"/>
+        <span className={styles.printButtonContent}>
+          <AppIcon name="print" />
+          <span>{t('pages.characterAbilitiesPrint.printButtonLabel')}</span>
+        </span>
       </button>
 
       <article className={styles.sheet}>
@@ -105,14 +108,16 @@ export function CharacterAbilitiesPrintPage() {
                             <div className={styles.abilityHeader}>
                               <div className={styles.abilityHeaderRow}>
                                 <h3 className={styles.abilityName}>{ability.name}</h3>
-                                <span
-                                  className={`${styles.metaTag} ${ability.action === 'action' ? styles.actionTagAction : styles.actionTagNoAction}`}
-                                >
-                                  {ability.meta[0]}
-                                </span>
-                                <span className={`${styles.typeBadge} ${getTypeBadgeClass(ability.type)}`}>
-                                  {t(`pages.characterEdit.abilities.typeOptions.${ability.type}`)}
-                                </span>
+                                <div className={styles.abilityBadges}>
+                                  <span
+                                    className={`${styles.metaTag} ${ability.action === 'action' ? styles.actionTagAction : styles.actionTagNoAction}`}
+                                  >
+                                    {ability.meta[0]}
+                                  </span>
+                                  <span className={`${styles.typeBadge} ${getTypeBadgeClass(ability.type)}`}>
+                                    {t(`pages.characterEdit.abilities.typeOptions.${ability.type}`)}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                             <div className={styles.detailListInline}>
@@ -166,12 +171,14 @@ export function CharacterAbilitiesPrintPage() {
                             <div className={styles.abilityHeader}>
                               <div className={styles.abilityHeaderRow}>
                                 <h3 className={styles.abilityName}>{ability.name}</h3>
-                                <span className={`${styles.metaTag} ${ability.action === 'action' ? styles.actionTagAction : styles.actionTagNoAction}`}>
-                                  {ability.meta[0]}
-                                </span>
-                                <span className={`${styles.typeBadge} ${getTypeBadgeClass(ability.type)}`}>
-                                  {t(`pages.characterEdit.abilities.typeOptions.${ability.type}`)}
-                                </span>
+                                <div className={styles.abilityBadges}>
+                                  <span className={`${styles.metaTag} ${ability.action === 'action' ? styles.actionTagAction : styles.actionTagNoAction}`}>
+                                    {ability.meta[0]}
+                                  </span>
+                                  <span className={`${styles.typeBadge} ${getTypeBadgeClass(ability.type)}`}>
+                                    {t(`pages.characterEdit.abilities.typeOptions.${ability.type}`)}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                             <div className={styles.detailListInline}>

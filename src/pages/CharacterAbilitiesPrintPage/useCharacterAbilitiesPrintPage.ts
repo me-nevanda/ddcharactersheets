@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getCharacter } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
@@ -202,8 +202,8 @@ function buildAbilityDamage(
   const damageParts = [
     ability.weaponName.trim().length > 0
       ? ability.weaponCount > 0
-        ? `${ability.weaponCount} x ${buildWeaponDamageLabel(t, ability.weaponName, character.items.weapons)}`
-        : buildWeaponDamageLabel(t, ability.weaponName, character.items.weapons)
+        ? `(${ability.weaponCount} x ${buildWeaponDamageLabel(t, ability.weaponName, character.items.weapons)})`
+        : `(${buildWeaponDamageLabel(t, ability.weaponName, character.items.weapons)})`
       : '',
     damageCoreParts.join(' + '),
   ].filter((part) => part.length > 0)
@@ -285,7 +285,6 @@ export function useCharacterAbilitiesPrintPage(): CharacterAbilitiesPrintPageSta
   const [character, setCharacter] = useState<CharacterAbilitiesPrintPageState['character']>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const printedRef = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -315,18 +314,6 @@ export function useCharacterAbilitiesPrintPage(): CharacterAbilitiesPrintPageSta
       cancelled = true
     }
   }, [characterId, t])
-
-  useEffect(() => {
-    if (!character || loading || error || printedRef.current) {
-      return
-    }
-
-    printedRef.current = true
-
-    window.setTimeout(() => {
-      window.print()
-    }, 250)
-  }, [character, loading, error])
 
   useEffect(() => {
     document.title = t('pages.characterAbilitiesPrint.title')

@@ -18,9 +18,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 3rem;
+  min-width: 7.2rem;
   height: 3rem;
-  padding: 0;
+  padding: 0 0.95rem;
   border: 1px solid var(--border-soft);
   border-radius: 999px;
   background: linear-gradient(135deg, #a64a2e 0%, #d9a441 100%);
@@ -30,6 +30,14 @@
 
 .printButton:hover {
   transform: translateY(-1px);
+}
+
+.printButtonContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+  font-weight: 700;
 }
 
 .sheet {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getCharacter } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
@@ -73,7 +73,6 @@ export function useCharacterPrintPage(): CharacterPrintPageState {
   const [character, setCharacter] = useState<Character | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const printedRef = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -103,18 +102,6 @@ export function useCharacterPrintPage(): CharacterPrintPageState {
       cancelled = true
     }
   }, [characterId, t])
-
-  useEffect(() => {
-    if (!character || loading || error || printedRef.current) {
-      return
-    }
-
-    printedRef.current = true
-
-    window.setTimeout(() => {
-      window.print()
-    }, 250)
-  }, [character, loading, error])
 
   useEffect(() => {
     if (!character) {
