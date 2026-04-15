@@ -105,7 +105,8 @@ export const pl: TranslationDictionary = {
         weaponAreaLabel: 'Obszar',
         typeLabel: 'Typ',
         typeOptions: {
-          unlimited: 'Nieograniczona',
+          standard: 'Standardowa',
+          unlimited: 'Zawsze',
           encounter: 'Spotkaniowa',
           daily: 'Dzienna',
         },
@@ -115,6 +116,7 @@ export const pl: TranslationDictionary = {
           utility: 'Użytkowa',
         },
         weaponAttackAttributeLabel: 'Atrybut ataku',
+        weaponAttackBonusLabel: 'Bonus',
         weaponAgainstLabel: 'przeciw',
         weaponAttackDefenseLabel: 'Obrona',
         weaponLabel: 'Obrażenia jednorazowe',
@@ -297,8 +299,10 @@ export const pl: TranslationDictionary = {
         type: 'typu',
       },
       sections: {
-        offensive: 'Ofensywne',
-        utility: 'Użytkowe',
+        standard: 'Standardowe',
+        unlimited: 'Nieograniczone',
+        encounter: 'Spotkaniowe',
+        daily: 'Dzienne',
         feats: 'Atuty',
       },
     },
@@ -308,6 +312,9 @@ export const pl: TranslationDictionary = {
       error: 'Nie udało się przygotować wydruku przedmiotów.',
       printButtonLabel: 'Drukuj',
       emptyState: 'Nie dodano jeszcze żadnych przedmiotów.',
+      extraSlots: {
+        goldCoins: 'Złote monety',
+      },
       sections: {
         armors: 'Zbroje',
         weapons: 'Bronie',

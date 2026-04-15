@@ -114,10 +114,28 @@
   align-items: start;
 }
 
+.extraGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+
 .itemCard {
   display: grid;
   gap: 0.3rem;
   padding: 0.85rem 0.95rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 1rem;
+  background: rgba(255, 248, 235, 0.03);
+  break-inside: avoid;
+}
+
+.extraSlot {
+  display: grid;
+  align-content: start;
+  min-height: 90px;
+  padding: 0.75rem 0.95rem;
   border: 1px solid var(--border-soft);
   border-radius: 1rem;
   background: rgba(255, 248, 235, 0.03);
@@ -163,6 +181,20 @@
     display: none !important;
   }
 
+  .sheet {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .sheet * {
+    font-family: inherit;
+  }
+
+  .title,
+  .sectionTitle,
+  .itemName {
+    font-family: var(--font-heading);
+  }
+
   .printButton {
     display: none;
   }
@@ -198,7 +230,8 @@
   }
 
   .section,
-  .itemCard {
+  .itemCard,
+  .extraSlot {
     gap: 0.25rem;
     padding: 0.4rem 0.45rem;
     border-color: #bbb;
@@ -234,6 +267,16 @@
 
   .itemGrid {
     gap: 0.35rem;
+  }
+
+  .extraGrid {
+    gap: 0.35rem;
+  }
+
+  .extraSlot {
+    height: 90px;
+    min-height: 90px;
+    padding: 0.35rem 0.45rem;
   }
 
 }

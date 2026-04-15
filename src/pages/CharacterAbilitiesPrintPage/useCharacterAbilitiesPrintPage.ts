@@ -9,6 +9,7 @@ import {
   buildEffectiveAttributes,
   buildNormalizedAttributes,
 } from '../CharacterEditPage/sections/AttributesSection/attributesSectionLogic'
+import { formatModifier } from '../CharacterEditPage/sections/GeneralSection/generalSectionLogic'
 import type { CharacterAbilitiesPrintPageState, PrintAbilityDetailRow, PrintAbilityRow, PrintFeatRow } from './types'
 
 function buildAbilityMeta(t: ReturnType<typeof useI18n>['t'], ability: CharacterAbility): string[] {
@@ -23,6 +24,7 @@ function buildAttackAttributeLabel(
   attribute: CharacterAbility['weaponAttackAttribute'],
   attributeModifierLookup: CharacterAttributeBonuses,
   levelBonus: number,
+  attackBonus: number,
 ): string {
   if (!attribute) {
     return ''
@@ -37,7 +39,7 @@ function buildAttackAttributeLabel(
     charisma: t('pages.characterEdit.fields.charisma'),
   }
 
-  return `${labelMap[attribute]} (${(attributeModifierLookup[attribute] ?? 0) + levelBonus})`
+  return `${labelMap[attribute]} (${formatModifier((attributeModifierLookup[attribute] ?? 0) + levelBonus + attackBonus)})`
 }
 
 function buildDefenseLabel(
@@ -73,6 +75,7 @@ function buildAttackDisplayLabel(
     ability.weaponAttackAttribute,
     attributeModifierLookup,
     character.bonuses?.level ?? 0,
+    ability.weaponAttackBonusNumber,
   )
   const attackDefenseLabel = buildDefenseLabel(t, ability.weaponAttackDefense)
 

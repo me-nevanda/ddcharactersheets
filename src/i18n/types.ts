@@ -104,6 +104,7 @@ export interface TranslationDictionary {
         weaponAreaLabel: string
         typeLabel: string
         typeOptions: {
+          standard: string
           unlimited: string
           encounter: string
           daily: string
@@ -114,6 +115,7 @@ export interface TranslationDictionary {
           utility: string
         }
         weaponAttackAttributeLabel: string
+        weaponAttackBonusLabel: string
         weaponAgainstLabel: string
         weaponAttackDefenseLabel: string
         weaponLabel: string
@@ -296,8 +298,10 @@ export interface TranslationDictionary {
         type: string
       }
       sections: {
-        offensive: string
-        utility: string
+        standard: string
+        unlimited: string
+        encounter: string
+        daily: string
         feats: string
       }
     }
@@ -307,6 +311,9 @@ export interface TranslationDictionary {
       error: string
       printButtonLabel: string
       emptyState: string
+      extraSlots: {
+        goldCoins: string
+      }
       sections: {
         armors: string
         weapons: string

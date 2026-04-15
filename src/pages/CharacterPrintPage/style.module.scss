@@ -240,6 +240,19 @@
     display: none !important;
   }
 
+  .sheet {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .sheet * {
+    font-family: inherit;
+  }
+
+  .title,
+  .sectionTitle {
+    font-family: var(--font-heading);
+  }
+
   .printButton {
     display: none;
   }

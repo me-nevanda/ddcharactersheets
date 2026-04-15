@@ -7,10 +7,16 @@ export function CharacterAbilitiesPrintPage() {
   const { t } = useI18n()
   const { character, loading, error, abilityRows, featRows, hasAbilities, hasFeats, title } =
     useCharacterAbilitiesPrintPage()
-  const offensiveAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.kind === 'offensive'))
-  const utilityAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.kind === 'utility'))
+  const standardAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.type === 'standard'))
+  const unlimitedAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.type === 'unlimited'))
+  const encounterAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.type === 'encounter'))
+  const dailyAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.type === 'daily'))
 
-  function getAbilityTypeClass(type: 'unlimited' | 'encounter' | 'daily') {
+  function getAbilityTypeClass(type: 'standard' | 'unlimited' | 'encounter' | 'daily') {
+    if (type === 'standard') {
+      return styles.abilityCardStandard
+    }
+
     if (type === 'encounter') {
       return styles.abilityCardEncounter
     }
@@ -22,7 +28,11 @@ export function CharacterAbilitiesPrintPage() {
     return styles.abilityCardUnlimited
   }
 
-  function getTypeBadgeClass(type: 'unlimited' | 'encounter' | 'daily') {
+  function getTypeBadgeClass(type: 'standard' | 'unlimited' | 'encounter' | 'daily') {
+    if (type === 'standard') {
+      return styles.typeBadgeStandard
+    }
+
     if (type === 'encounter') {
       return styles.typeBadgeEncounter
     }
@@ -35,10 +45,11 @@ export function CharacterAbilitiesPrintPage() {
   }
 
   function sortAbilitiesByType(abilities: typeof abilityRows): typeof abilityRows {
-    const typeRank: Record<'unlimited' | 'encounter' | 'daily', number> = {
-      unlimited: 0,
-      encounter: 1,
-      daily: 2,
+    const typeRank: Record<'standard' | 'unlimited' | 'encounter' | 'daily', number> = {
+      standard: 0,
+      unlimited: 1,
+      encounter: 2,
+      daily: 3,
     }
 
     return abilities
@@ -53,6 +64,71 @@ export function CharacterAbilitiesPrintPage() {
         return left.index - right.index
       })
       .map(({ ability }) => ability)
+  }
+
+  function renderAbilitySection(titleKey: string, abilities: typeof abilityRows) {
+    if (abilities.length === 0) {
+      return null
+    }
+
+    return (
+      <section className={styles.sectionGroup}>
+        <h2 className={styles.sectionTitle}>{t(titleKey)}</h2>
+        <div className={styles.abilityGrid}>
+          {abilities.map((ability) => (
+            <article key={ability.key} className={`${styles.abilityCard} ${getAbilityTypeClass(ability.type)}`}>
+              <div className={styles.abilityHeader}>
+                <div className={styles.abilityHeaderRow}>
+                  <h3 className={styles.abilityName}>{ability.name}</h3>
+                  <div className={styles.abilityBadges}>
+                    <span
+                      className={`${styles.metaTag} ${ability.action === 'action' ? styles.actionTagAction : styles.actionTagNoAction}`}
+                    >
+                      {ability.meta[0]}
+                    </span>
+                    <span className={`${styles.typeBadge} ${getTypeBadgeClass(ability.type)}`}>
+                      {t(`pages.characterEdit.abilities.typeOptions.${ability.type}`)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.detailListInline}>
+                {ability.details.map((detail) => (
+                  <div key={detail.label} className={styles.detailRow}>
+                    <span className={styles.detailLabel}>{detail.label}:</span>
+                    <strong className={styles.detailValue}>{detail.value}</strong>
+                  </div>
+                ))}
+              </div>
+              {ability.kind === 'offensive' && ability.weaponAttackDisplay.length > 0 ? (
+                <div className={styles.attackSection}>
+                  <span className={styles.damageLabel}>{`${t('pages.characterAbilitiesPrint.attackLabel')}:`}</span>
+                  <strong className={styles.damageValue}>{ability.weaponAttackDisplay}</strong>
+                </div>
+              ) : null}
+              {ability.damage.length > 0 ? (
+                <div className={styles.damageSection}>
+                  <span className={styles.damageLabel}>{`${t('pages.characterAbilitiesPrint.damageLabel')}:`}</span>
+                  <strong className={styles.damageValue}>{ability.damage}</strong>
+                </div>
+              ) : null}
+              {ability.offensiveNotes.length > 0 ? (
+                <div className={styles.offensiveNotes}>
+                  {ability.offensiveNotes.map((note) => (
+                    <div key={note.label} className={styles.detailRow}>
+                      <span className={styles.detailLabel}>{note.label}:</span>
+                      <strong className={styles.detailValue}>{note.value}</strong>
+                    </div>
+                  ))}
+                </div>
+              ) : ability.description ? (
+                <p className={styles.abilityDescription}>{ability.description}</p>
+              ) : null}
+            </article>
+          ))}
+        </div>
+      </section>
+    )
   }
 
   if (loading) {
@@ -99,104 +175,10 @@ export function CharacterAbilitiesPrintPage() {
             <div className={styles.sectionStack}>
               {hasAbilities ? (
                 <>
-                  <section className={styles.sectionGroup}>
-                    <h2 className={styles.sectionTitle}>{t('pages.characterAbilitiesPrint.sections.offensive')}</h2>
-                    {offensiveAbilities.length > 0 ? (
-                      <div className={styles.abilityGrid}>
-                        {offensiveAbilities.map((ability) => (
-                          <article key={ability.key} className={`${styles.abilityCard} ${getAbilityTypeClass(ability.type)}`}>
-                            <div className={styles.abilityHeader}>
-                              <div className={styles.abilityHeaderRow}>
-                                <h3 className={styles.abilityName}>{ability.name}</h3>
-                                <div className={styles.abilityBadges}>
-                                  <span
-                                    className={`${styles.metaTag} ${ability.action === 'action' ? styles.actionTagAction : styles.actionTagNoAction}`}
-                                  >
-                                    {ability.meta[0]}
-                                  </span>
-                                  <span className={`${styles.typeBadge} ${getTypeBadgeClass(ability.type)}`}>
-                                    {t(`pages.characterEdit.abilities.typeOptions.${ability.type}`)}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className={styles.detailListInline}>
-                              {ability.details.map((detail) => (
-                                <div key={detail.label} className={styles.detailRow}>
-                                  <span className={styles.detailLabel}>{detail.label}:</span>
-                                  <strong className={styles.detailValue}>{detail.value}</strong>
-                                </div>
-                              ))}
-                            </div>
-                            {ability.kind === 'offensive' && ability.weaponAttackDisplay.length > 0 ? (
-                              <div className={styles.attackSection}>
-                                <span className={styles.damageLabel}>{`${t('pages.characterAbilitiesPrint.attackLabel')}:`}</span>
-                                <strong className={styles.damageValue}>{ability.weaponAttackDisplay}</strong>
-                              </div>
-                            ) : null}
-                            {ability.damage.length > 0 ? (
-                              <div className={styles.damageSection}>
-                                <span className={styles.damageLabel}>{`${t('pages.characterAbilitiesPrint.damageLabel')}:`}</span>
-                                <strong className={styles.damageValue}>{ability.damage}</strong>
-                              </div>
-                            ) : null}
-                            {ability.kind === 'offensive' ? (
-                              ability.offensiveNotes.length > 0 ? (
-                                <div className={styles.offensiveNotes}>
-                                  {ability.offensiveNotes.map((note) => (
-                                    <div key={note.label} className={styles.detailRow}>
-                                      <span className={styles.detailLabel}>{note.label}:</span>
-                                      <strong className={styles.detailValue}>{note.value}</strong>
-                                    </div>
-                                  ))}
-                                </div>
-                              ) : null
-                            ) : ability.description ? (
-                              <p className={styles.abilityDescription}>{ability.description}</p>
-                            ) : null}
-                          </article>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className={styles.emptyState}>{t('pages.characterAbilitiesPrint.emptyState')}</p>
-                    )}
-                  </section>
-
-                  <section className={styles.sectionGroup}>
-                    <h2 className={styles.sectionTitle}>{t('pages.characterAbilitiesPrint.sections.utility')}</h2>
-                    {utilityAbilities.length > 0 ? (
-                      <div className={styles.abilityGrid}>
-                        {utilityAbilities.map((ability) => (
-                          <article key={ability.key} className={`${styles.abilityCard} ${getAbilityTypeClass(ability.type)}`}>
-                            <div className={styles.abilityHeader}>
-                              <div className={styles.abilityHeaderRow}>
-                                <h3 className={styles.abilityName}>{ability.name}</h3>
-                                <div className={styles.abilityBadges}>
-                                  <span className={`${styles.metaTag} ${ability.action === 'action' ? styles.actionTagAction : styles.actionTagNoAction}`}>
-                                    {ability.meta[0]}
-                                  </span>
-                                  <span className={`${styles.typeBadge} ${getTypeBadgeClass(ability.type)}`}>
-                                    {t(`pages.characterEdit.abilities.typeOptions.${ability.type}`)}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className={styles.detailListInline}>
-                              {ability.details.map((detail) => (
-                                <div key={detail.label} className={styles.detailRow}>
-                                  <span className={styles.detailLabel}>{detail.label}:</span>
-                                  <strong className={styles.detailValue}>{detail.value}</strong>
-                                </div>
-                              ))}
-                            </div>
-                            {ability.description ? <p className={styles.abilityDescription}>{ability.description}</p> : null}
-                          </article>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className={styles.emptyState}>{t('pages.characterAbilitiesPrint.emptyState')}</p>
-                    )}
-                  </section>
+                  {renderAbilitySection('pages.characterAbilitiesPrint.sections.standard', standardAbilities)}
+                  {renderAbilitySection('pages.characterAbilitiesPrint.sections.unlimited', unlimitedAbilities)}
+                  {renderAbilitySection('pages.characterAbilitiesPrint.sections.encounter', encounterAbilities)}
+                  {renderAbilitySection('pages.characterAbilitiesPrint.sections.daily', dailyAbilities)}
                 </>
               ) : null}
 
@@ -219,7 +201,6 @@ export function CharacterAbilitiesPrintPage() {
           )}
         </section>
       </article>
-
     </main>
   )
 }

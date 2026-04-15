@@ -22,6 +22,7 @@ import {
   defaultAbilityWeaponRecurringDamageCount,
   defaultAbilityWeaponRecurringDamageType,
   defaultAbilityWeaponAttackAttribute,
+  defaultAbilityWeaponAttackBonusNumber,
   defaultAbilityWeaponAttackDefense,
   defaultAbilityWeaponHit,
   defaultAbilityWeaponMiss,
@@ -188,6 +189,29 @@ function normalizeAbilityWeaponAttackDefense(
   }
 
   return ''
+}
+
+function normalizeAbilityWeaponAttackBonusNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(10, Math.max(-5, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(10, Math.max(-5, Math.trunc(parsed)))
+    }
+  }
+
+  return defaultAbilityWeaponAttackBonusNumber
+}
+
+function normalizeAbilityType(value: unknown): CharacterAbility['type'] {
+  if (value === 'standard' || value === 'unlimited' || value === 'encounter' || value === 'daily') {
+    return value
+  }
+
+  return defaultAbilityType
 }
 
 function normalizeAbilityWeaponRange(value: unknown): number {
@@ -595,7 +619,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
               ...ability,
               id: ability.id || globalThis.crypto.randomUUID(),
               action: ability.action ?? defaultAbilityAction,
-              type: ability.type ?? defaultAbilityType,
+              type: normalizeAbilityType(ability.type),
               kind: ability.kind ?? defaultAbilityKind,
               weaponCount: ability.weaponCount ?? 1,
               weaponName: ability.weaponName ?? '',
@@ -614,6 +638,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
                 ability.weaponDamageType,
                 defaultAbilityWeaponDamageType,
               ),
+              weaponAttackBonusNumber: normalizeAbilityWeaponAttackBonusNumber(ability.weaponAttackBonusNumber),
               weaponRecurringDamageCount: normalizeAbilityWeaponRecurringDamageCount(
                 ability.weaponRecurringDamageCount,
                 defaultAbilityWeaponRecurringDamageCount,
@@ -788,7 +813,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
       name: ability.name.trim(),
       description: ability.description.trim(),
       action: ability.action,
-      type: ability.type,
+      type: normalizeAbilityType(ability.type),
       kind: ability.kind,
       weaponCount: ability.weaponCount,
       weaponName: ability.weaponName.trim(),
@@ -798,6 +823,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
       weaponAttackAttribute: normalizeAbilityWeaponAttackAttribute(ability.weaponAttackAttribute),
       weaponAttackDefense: normalizeAbilityWeaponAttackDefense(ability.weaponAttackDefense),
       weaponDamageType: ability.weaponDamageType,
+      weaponAttackBonusNumber: normalizeAbilityWeaponAttackBonusNumber(ability.weaponAttackBonusNumber),
       weaponRecurringDamageCount: ability.weaponRecurringDamageCount,
       weaponRecurringDamageType: ability.weaponRecurringDamageType,
       weaponHit: ability.weaponHit,
@@ -834,8 +860,9 @@ export function useCharacterEditPage(): CharacterEditPageState {
           weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
           weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
           weaponAttributeBonus: '',
-          weaponAttackAttribute: defaultAbilityWeaponAttackAttribute,
-          weaponAttackDefense: defaultAbilityWeaponAttackDefense,
+          weaponAttackAttribute: 'strength',
+          weaponAttackBonusNumber: defaultAbilityWeaponAttackBonusNumber,
+          weaponAttackDefense: 'kp',
           weaponDamageType: defaultAbilityWeaponDamageType,
           weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
           weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,
@@ -857,38 +884,36 @@ export function useCharacterEditPage(): CharacterEditPageState {
           ? {
               ...ability,
               [fieldName]: value,
-              ...(fieldName === 'kind' && value === 'utility'
-                ? {
-                    weaponCount: 1,
-                    weaponName: '',
-                    weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
-                    weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
-                    weaponAttributeBonus: '',
-                    weaponAttackAttribute: defaultAbilityWeaponAttackAttribute,
-                    weaponAttackDefense: defaultAbilityWeaponAttackDefense,
-                    weaponDamageType: defaultAbilityWeaponDamageType,
-                    weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
-                    weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,
-                    weaponHit: defaultAbilityWeaponHit,
-                    weaponMiss: defaultAbilityWeaponMiss,
-                    weaponProvocation: defaultAbilityWeaponProvocation,
-                    weaponRange: defaultAbilityWeaponRange,
-                    weaponArea: defaultAbilityWeaponArea,
-                  }
-                : fieldName === 'weaponName' && value === ''
+                ...(fieldName === 'kind' && value === 'utility'
                   ? {
+                      weaponCount: 1,
+                      weaponName: '',
                       weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
                       weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
+                      weaponAttributeBonus: '',
+                      weaponAttackAttribute: defaultAbilityWeaponAttackAttribute,
+                      weaponAttackBonusNumber: defaultAbilityWeaponAttackBonusNumber,
+                      weaponAttackDefense: defaultAbilityWeaponAttackDefense,
                       weaponDamageType: defaultAbilityWeaponDamageType,
                       weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
                       weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,
                       weaponHit: defaultAbilityWeaponHit,
                       weaponMiss: defaultAbilityWeaponMiss,
                       weaponProvocation: defaultAbilityWeaponProvocation,
-                      weaponRange: defaultAbilityWeaponRange,
-                      weaponArea: defaultAbilityWeaponArea,
                     }
-                : null),
+                  : fieldName === 'weaponName' && value === ''
+                    ? {
+                        weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
+                        weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
+                        weaponDamageType: defaultAbilityWeaponDamageType,
+                        weaponAttackBonusNumber: defaultAbilityWeaponAttackBonusNumber,
+                        weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
+                        weaponRecurringDamageType: defaultAbilityWeaponRecurringDamageType,
+                        weaponHit: defaultAbilityWeaponHit,
+                        weaponMiss: defaultAbilityWeaponMiss,
+                        weaponProvocation: defaultAbilityWeaponProvocation,
+                      }
+                    : null),
             }
           : ability,
       ),
@@ -1308,13 +1333,19 @@ export function useCharacterEditPage(): CharacterEditPageState {
         abilities: form.abilities.map((ability) =>
           ability.kind === 'utility'
             ? {
-                ...ability,
+                id: ability.id,
+                name: ability.name,
+                description: ability.description,
+                action: ability.action,
+                type: ability.type,
+                kind: ability.kind,
                 weaponCount: 1,
                 weaponName: '',
                 weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
                 weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
                 weaponAttributeBonus: '',
                 weaponAttackAttribute: defaultAbilityWeaponAttackAttribute,
+                weaponAttackBonusNumber: defaultAbilityWeaponAttackBonusNumber,
                 weaponAttackDefense: defaultAbilityWeaponAttackDefense,
                 weaponDamageType: defaultAbilityWeaponDamageType,
                 weaponRecurringDamageCount: defaultAbilityWeaponRecurringDamageCount,
@@ -1322,10 +1353,33 @@ export function useCharacterEditPage(): CharacterEditPageState {
                 weaponHit: defaultAbilityWeaponHit,
                 weaponMiss: defaultAbilityWeaponMiss,
                 weaponProvocation: defaultAbilityWeaponProvocation,
-                weaponRange: defaultAbilityWeaponRange,
-                weaponArea: defaultAbilityWeaponArea,
+                weaponRange: ability.weaponRange,
+                weaponArea: ability.weaponArea,
               }
-            : ability,
+            : {
+                id: ability.id,
+                name: ability.name,
+                description: ability.description,
+                action: ability.action,
+                type: ability.type,
+                kind: ability.kind,
+                weaponCount: ability.weaponCount,
+                weaponName: ability.weaponName,
+                weaponDamageDiceType: ability.weaponDamageDiceType,
+                weaponDamageDiceCount: ability.weaponDamageDiceCount,
+                weaponAttributeBonus: ability.weaponAttributeBonus,
+                weaponAttackAttribute: ability.weaponAttackAttribute,
+                weaponAttackBonusNumber: ability.weaponAttackBonusNumber,
+                weaponAttackDefense: ability.weaponAttackDefense,
+                weaponDamageType: ability.weaponDamageType,
+                weaponRecurringDamageCount: ability.weaponRecurringDamageCount,
+                weaponRecurringDamageType: ability.weaponRecurringDamageType,
+                weaponHit: ability.weaponHit,
+                weaponMiss: ability.weaponMiss,
+                weaponProvocation: ability.weaponProvocation,
+                weaponRange: ability.weaponRange,
+                weaponArea: ability.weaponArea,
+              },
         ),
         feats: form.feats.map((feat) => ({
           ...feat,

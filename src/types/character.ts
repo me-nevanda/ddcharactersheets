@@ -59,6 +59,7 @@ export interface CharacterAbility {
   weaponDamageDiceType: CharacterWeaponDamageDiceType | ''
   weaponDamageDiceCount: number
   weaponAttributeBonus: string
+  weaponAttackBonusNumber: number
   weaponAttackAttribute: keyof CharacterAttributes | ''
   weaponAttackDefense: keyof CharacterDefenses | ''
   weaponDamageType: CharacterWeaponDamageType
@@ -205,7 +206,7 @@ export type CharacterWeaponDamageType =
   | 'thunder'
 
 export type CharacterAbilityAction = 'action' | 'noAction'
-export type CharacterAbilityType = 'unlimited' | 'encounter' | 'daily'
+export type CharacterAbilityType = 'standard' | 'unlimited' | 'encounter' | 'daily'
 export type CharacterAbilityKind = 'offensive' | 'utility'
 export type CharacterAbilityAreaType =
   | 'point'

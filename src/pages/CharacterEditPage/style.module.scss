@@ -336,6 +336,24 @@
   min-width: 0;
 }
 
+.abilityWeaponAttackBonusGroup {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.abilityWeaponAttackBonusControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.weaponAttackBonusPlus {
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
 .abilityWeaponRowSecondary {
   display: flex;
   flex-wrap: wrap;
@@ -503,6 +521,11 @@
 .abilityHeaderUnlimited {
   background: linear-gradient(135deg, rgba(126, 217, 87, 0.18), rgba(126, 217, 87, 0.06));
   border-color: rgba(126, 217, 87, 0.28);
+}
+
+.abilityHeaderStandard {
+  background: linear-gradient(135deg, rgba(154, 160, 166, 0.24), rgba(154, 160, 166, 0.1));
+  border-color: rgba(154, 160, 166, 0.34);
 }
 
 .abilityHeaderEncounter {
@@ -756,6 +779,12 @@
   width: auto;
   min-width: 10.5rem;
   flex: 0 1 10.5rem;
+}
+
+.abilityWeaponAttackBonusSelect {
+  width: auto;
+  min-width: 4.75rem;
+  flex: 0 0 4.75rem;
 }
 
 .weaponAttackAgainstLabel {

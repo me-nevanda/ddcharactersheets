@@ -160,6 +160,21 @@ function normalizeAbilityWeaponAttackAttribute(value: unknown): CharacterAbility
   return ''
 }
 
+function normalizeAbilityWeaponAttackBonusNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.min(10, Math.max(-5, Math.trunc(value)))
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) {
+      return Math.min(10, Math.max(-5, Math.trunc(parsed)))
+    }
+  }
+
+  return 0
+}
+
 function normalizeAbilityWeaponAttackDefense(value: unknown): CharacterAbility['weaponAttackDefense'] {
   if (value === 'kp' || value === 'fortitude' || value === 'reflex' || value === 'will') {
     return value
@@ -213,6 +228,19 @@ function normalizeAbilityWeaponArea(value: unknown): CharacterAbilityAreaType {
   return 'point'
 }
 
+function normalizeAbilityType(value: unknown): CharacterAbilityType {
+  if (
+    value === 'standard' ||
+    value === 'unlimited' ||
+    value === 'encounter' ||
+    value === 'daily'
+  ) {
+    return value
+  }
+
+  return 'unlimited'
+}
+
 function normalizeAbilities(
   data: unknown,
 ): CharacterAbility[] {
@@ -227,7 +255,7 @@ function normalizeAbilities(
       name: typeof item.name === 'string' ? item.name : '',
       description: typeof item.description === 'string' ? item.description : '',
       action: (item.action === 'noAction' ? 'noAction' : 'action') as CharacterAbilityAction,
-      type: (item.type === 'encounter' || item.type === 'daily' ? item.type : 'unlimited') as CharacterAbilityType,
+      type: normalizeAbilityType(item.type),
       kind: (item.kind === 'utility' ? 'utility' : 'offensive') as CharacterAbilityKind,
       weaponCount:
         typeof item.weaponCount === 'number' && Number.isFinite(item.weaponCount)
@@ -240,6 +268,7 @@ function normalizeAbilities(
           ? Math.min(20, Math.max(0, Math.trunc(item.weaponDamageDiceCount)))
           : 0,
       weaponAttributeBonus: normalizeWeaponAttributeBonus(item.weaponAttributeBonus),
+      weaponAttackBonusNumber: normalizeAbilityWeaponAttackBonusNumber(item.weaponAttackBonusNumber),
       weaponAttackAttribute: normalizeAbilityWeaponAttackAttribute(item.weaponAttackAttribute),
       weaponAttackDefense: normalizeAbilityWeaponAttackDefense(item.weaponAttackDefense),
       weaponDamageType: normalizeAbilityWeaponDamageType(item.weaponDamageType),

@@ -135,6 +135,10 @@
   border-top: 0.32rem solid #3d8b4a;
 }
 
+.abilityCardStandard {
+  border-top: 0.32rem solid #9aa0a6;
+}
+
 .abilityCardEncounter {
   border-top: 0.32rem solid #b03a34;
 }
@@ -204,6 +208,10 @@
 
 .typeBadgeUnlimited {
   background: #3d8b4a;
+}
+
+.typeBadgeStandard {
+  background: #9aa0a6;
 }
 
 .typeBadgeEncounter {
@@ -357,6 +365,21 @@
     display: none !important;
   }
 
+  .sheet {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .sheet * {
+    font-family: inherit;
+  }
+
+  .title,
+  .sectionTitle,
+  .abilityName,
+  .featName {
+    font-family: var(--font-heading);
+  }
+
   .printButton {
     display: none;
   }
@@ -426,6 +449,10 @@
     border-top-color: #3d8b4a;
   }
 
+  .abilityCardStandard {
+    border-top-color: #9aa0a6;
+  }
+
   .abilityCardEncounter {
     border-top-color: #b03a34;
   }
@@ -477,6 +504,11 @@
 
   .typeBadgeUnlimited {
     background: rgba(61, 139, 74, 0.18);
+    color: #111;
+  }
+
+  .typeBadgeStandard {
+    background: rgba(154, 160, 166, 0.18);
     color: #111;
   }
 

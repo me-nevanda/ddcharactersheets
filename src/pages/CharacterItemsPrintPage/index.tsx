@@ -6,6 +6,14 @@ import styles from './style.module.scss'
 export function CharacterItemsPrintPage() {
   const { t } = useI18n()
   const { character, loading, error, title, hasItems, armors, weapons, others } = useCharacterItemsPrintPage()
+  const extraSlots = [
+    t('pages.characterItemsPrint.extraSlots.goldCoins'),
+    '',
+    '',
+    '',
+    '',
+    '',
+  ]
 
   if (loading) {
     return (
@@ -94,6 +102,16 @@ export function CharacterItemsPrintPage() {
           ) : (
             <p className={styles.emptyState}>{t('pages.characterItemsPrint.emptyState')}</p>
           )}
+
+          <div className={styles.sectionGroup}>
+            <div className={styles.extraGrid}>
+              {extraSlots.map((label, index) => (
+                <article key={`${label || 'empty'}-${index}`} className={styles.extraSlot}>
+                  {label ? <h3 className={styles.itemName}>{label}</h3> : null}
+                </article>
+              ))}
+            </div>
+          </div>
         </section>
       </article>
 

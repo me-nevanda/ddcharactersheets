@@ -105,6 +105,7 @@ export const en: TranslationDictionary = {
         weaponAreaLabel: 'Area',
         typeLabel: 'Type',
         typeOptions: {
+          standard: 'Standard',
           unlimited: 'Unlimited',
           encounter: 'Encounter',
           daily: 'Daily',
@@ -115,6 +116,7 @@ export const en: TranslationDictionary = {
           utility: 'Utility',
         },
         weaponAttackAttributeLabel: 'Attack attribute',
+        weaponAttackBonusLabel: 'Bonus',
         weaponAgainstLabel: 'against',
         weaponAttackDefenseLabel: 'Defense',
         weaponLabel: 'Single-use damage',
@@ -297,8 +299,10 @@ export const en: TranslationDictionary = {
         type: 'type',
       },
       sections: {
-        offensive: 'Offensive',
-        utility: 'Utility',
+        standard: 'Standard',
+        unlimited: 'Unlimited',
+        encounter: 'Encounter',
+        daily: 'Daily',
         feats: 'Feats',
       },
     },
@@ -308,6 +312,9 @@ export const en: TranslationDictionary = {
       error: 'Could not prepare the items print view.',
       printButtonLabel: 'Print',
       emptyState: 'No items have been added yet.',
+      extraSlots: {
+        goldCoins: 'Gold coins',
+      },
       sections: {
         armors: 'Armors',
         weapons: 'Weapons',

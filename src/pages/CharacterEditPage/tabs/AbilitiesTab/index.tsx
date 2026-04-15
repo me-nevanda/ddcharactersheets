@@ -54,6 +54,7 @@ export function AbilitiesTab() {
     { value: 'reflex', label: t('pages.characterEdit.fields.reflex') },
     { value: 'will', label: t('pages.characterEdit.fields.will') },
   ]
+  const attackBonusOptions = Array.from({ length: 16 }, (_, bonus) => bonus - 5)
   const weaponDamageTypeOptions = [
     { value: 'normal', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.normal') },
     { value: 'acid', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.acid') },
@@ -138,7 +139,11 @@ export function AbilitiesTab() {
     setPendingRemoval(null)
   }
 
-  function getAbilityHeaderClass(type: 'unlimited' | 'encounter' | 'daily') {
+  function getAbilityHeaderClass(type: 'standard' | 'unlimited' | 'encounter' | 'daily') {
+    if (type === 'standard') {
+      return styles.abilityHeaderStandard
+    }
+
     if (type === 'encounter') {
       return styles.abilityHeaderEncounter
     }
@@ -217,13 +222,16 @@ export function AbilitiesTab() {
                           handleAbilityChange(
                             index,
                             'type',
-                            event.target.value === 'encounter' || event.target.value === 'daily'
+                            event.target.value === 'standard' ||
+                              event.target.value === 'encounter' ||
+                              event.target.value === 'daily'
                               ? event.target.value
                               : 'unlimited',
                           )
                         }
                       >
                         <option value="unlimited">{t('pages.characterEdit.abilities.typeOptions.unlimited')}</option>
+                        <option value="standard">{t('pages.characterEdit.abilities.typeOptions.standard')}</option>
                         <option value="encounter">{t('pages.characterEdit.abilities.typeOptions.encounter')}</option>
                         <option value="daily">{t('pages.characterEdit.abilities.typeOptions.daily')}</option>
                       </select>
@@ -303,6 +311,32 @@ export function AbilitiesTab() {
                             ))}
                           </select>
                         </label>
+                        <div className={styles.abilityWeaponAttackBonusGroup}>
+                          <span className={styles.attributeLabel}>
+                            {t('pages.characterEdit.abilities.weaponAttackBonusLabel')}
+                          </span>
+                          <div className={styles.abilityWeaponAttackBonusControl}>
+                            <span className={styles.weaponAttackBonusPlus}>+</span>
+                            <select
+                              className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponAttackBonusSelect}`}
+                              id={`ability-weapon-attack-bonus-${index}`}
+                              value={ability.weaponAttackBonusNumber}
+                              onChange={(event) =>
+                                handleAbilityChange(
+                                  index,
+                                  'weaponAttackBonusNumber',
+                                  Number.parseInt(event.target.value, 10) || 0,
+                                )
+                              }
+                            >
+                              {attackBonusOptions.map((bonus) => (
+                                <option key={bonus} value={bonus}>
+                                  {bonus}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
                         <span className={styles.weaponAttackAgainstLabel}>
                           {t('pages.characterEdit.abilities.weaponAgainstLabel')}
                         </span>

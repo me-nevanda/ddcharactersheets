@@ -179,6 +179,7 @@ export const defaultAbilityWeaponDamageType: CharacterWeaponDamageType = 'normal
 export const defaultAbilityWeaponRecurringDamageCount = 0
 export const defaultAbilityWeaponRecurringDamageType: CharacterWeaponDamageType = 'normal'
 export const defaultAbilityWeaponAttackAttribute = ''
+export const defaultAbilityWeaponAttackBonusNumber = 0
 export const defaultAbilityWeaponAttackDefense = ''
 export const defaultAbilityWeaponHit = ''
 export const defaultAbilityWeaponMiss = ''
