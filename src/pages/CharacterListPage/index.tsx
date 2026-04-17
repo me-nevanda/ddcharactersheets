@@ -49,6 +49,7 @@ function CharacterListPageContent({
     <>
       <main className={styles.pageShell}>
         <header className={styles.hero}>
+          <div><img className={styles.headerLogo} src="/favicon.png" alt="" aria-hidden="true" /></div>
           <div className={styles.heroCopy}>
             <p className={styles.eyebrow}>{t('pages.characterList.eyebrow')}</p>
             <h1 className={styles.title}>{t('pages.characterList.title')}</h1>

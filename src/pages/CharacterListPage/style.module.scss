@@ -16,7 +16,15 @@
 
 .heroCopy {
   display: grid;
-  gap: 0.3rem;
+ flex:0 0 auto
+}
+
+.headerLogo {
+  width: clamp(3.1rem, 5vw, 10.25rem);
+  height: clamp(3.1rem, 5vw, 10.25rem);
+
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .eyebrow {

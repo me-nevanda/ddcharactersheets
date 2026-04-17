@@ -61,8 +61,8 @@
 }
 
 .headerLogo {
-  width: clamp(3.1rem, 5vw, 4.25rem);
-  height: clamp(3.1rem, 5vw, 4.25rem);
+  width: clamp(3.1rem, 5vw, 8.25rem);
+  height: clamp(3.1rem, 5vw, 8.25rem);
   object-fit: contain;
   flex: 0 0 auto;
 }
@@ -97,7 +97,7 @@
   background: transparent;
   color: var(--text-strong);
   font: inherit;
-  font-size: clamp(1.9rem, 3vw, 2.7rem);
+  font-size: clamp(1.9rem, 3vw, 5.7rem);
   line-height: 0.9;
   outline: none;
 }
