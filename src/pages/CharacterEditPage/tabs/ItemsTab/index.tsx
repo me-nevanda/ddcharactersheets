@@ -57,21 +57,27 @@ export function ItemsTab() {
         <h2 className={styles.sectionTitle}>{t('pages.characterEdit.items.title')}</h2>
       </div>
 
-      <div className={styles.itemsGroupTabs} role="tablist" aria-label={t('pages.characterEdit.items.title')}>
-        {itemGroups.map((group) => (
-          <button
-            key={group}
-            id={`items-tab-${group}`}
-            className={`${styles.itemsGroupTabButton} ${activeGroup === group ? styles.itemsGroupTabButtonActive : ''}`}
-            type="button"
-            role="tab"
-            aria-selected={activeGroup === group}
-            aria-controls={`items-panel-${group}`}
-            onClick={() => setActiveGroup(group)}
-          >
-            {t(`pages.characterEdit.items.groups.${group}`)}
-          </button>
-        ))}
+      <div className={styles.itemsGroupTabsRow}>
+        <div className={styles.itemsGroupTabs} role="tablist" aria-label={t('pages.characterEdit.items.title')}>
+          {itemGroups.map((group) => (
+            <button
+              key={group}
+              id={`items-tab-${group}`}
+              className={`${styles.itemsGroupTabButton} ${activeGroup === group ? styles.itemsGroupTabButtonActive : ''}`}
+              type="button"
+              role="tab"
+              aria-selected={activeGroup === group}
+              aria-controls={`items-panel-${group}`}
+              onClick={() => setActiveGroup(group)}
+            >
+              {t(`pages.characterEdit.items.groups.${group}`)}
+            </button>
+          ))}
+        </div>
+
+        <button className={styles.primaryButton} type="button" onClick={() => handleItemCreateEmpty(activeGroup)}>
+          {t('pages.characterEdit.items.addButton')}
+        </button>
       </div>
 
       <section
@@ -80,12 +86,6 @@ export function ItemsTab() {
         role="tabpanel"
         aria-labelledby={`items-tab-${activeGroup}`}
       >
-        <div className={styles.sectionItemsHeader}>
-          <button className={styles.primaryButton} type="button" onClick={() => handleItemCreateEmpty(activeGroup)}>
-            {t('pages.characterEdit.items.addButton')}
-          </button>
-        </div>
-
         {activeItems.length === 0 ? <p className={styles.loadingText}>{t('pages.characterEdit.items.emptyState')}</p> : null}
         {activeItems.length > 0 ? (
           <div className={styles.abilityGrid}>

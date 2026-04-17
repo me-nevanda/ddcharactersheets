@@ -245,8 +245,16 @@
 
 .itemsGroupTabs {
   display: flex;
+  flex: 1 1 auto;
   flex-wrap: wrap;
   gap: 0.55rem;
+}
+
+.itemsGroupTabsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: space-between;
 }
 
 .itemsGroupTabButton {
@@ -279,12 +287,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.sectionItemsHeader {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
 }
 
 .sectionTitle {
@@ -1137,6 +1139,11 @@
 @media (max-width: 900px) {
   .editorBody {
     grid-template-columns: 1fr;
+  }
+
+  .itemsGroupTabsRow {
+    flex-wrap: wrap;
+    align-items: stretch;
   }
 
   .tabRail {
