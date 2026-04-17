@@ -243,6 +243,29 @@
   gap: 0.85rem;
 }
 
+.itemsGroupTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.itemsGroupTabButton {
+  @include pill-button;
+  background: rgba(255, 248, 235, 0.03);
+  border-color: rgba(255, 248, 235, 0.08);
+  color: var(--text-strong);
+}
+
+.itemsGroupTabButtonActive {
+  background: linear-gradient(135deg, rgba(166, 74, 46, 0.25), rgba(217, 164, 65, 0.22));
+  border-color: rgba(240, 198, 111, 0.5);
+}
+
+.itemsGroupTabButton:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
 .section {
   @include surface-card;
   display: grid;
@@ -256,6 +279,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.sectionItemsHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
 .sectionTitle {

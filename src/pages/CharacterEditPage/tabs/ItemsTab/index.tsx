@@ -21,6 +21,7 @@ export function ItemsTab() {
     handleArmorBonusChange,
   } =
     useCharacterEditPageContext()
+  const [activeGroup, setActiveGroup] = useState<(typeof itemGroups)[number]>('weapons')
   const [pendingRemoval, setPendingRemoval] = useState<{
     group: (typeof itemGroups)[number]
     index: number
@@ -48,90 +49,104 @@ export function ItemsTab() {
     setPendingRemoval(null)
   }
 
+  const activeItems = form.items[activeGroup]
+
   return (
     <div className={styles.section}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>{t('pages.characterEdit.items.title')}</h2>
       </div>
 
-      <div className={styles.itemsGroupsLayout}>
-        {itemGroups.map((group) => {
-          const items = form.items[group]
-
-          return (
-            <section key={group} className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <h3 className={styles.sectionTitle}>{t(`pages.characterEdit.items.groups.${group}`)}</h3>
-                <button className={styles.primaryButton} type="button" onClick={() => handleItemCreateEmpty(group)}>
-                  {t('pages.characterEdit.items.addButton')}
-                </button>
-              </div>
-
-              {items.length === 0 ? <p className={styles.loadingText}>{t('pages.characterEdit.items.emptyState')}</p> : null}
-
-              {items.length > 0 ? (
-                <div className={styles.abilityGrid}>
-                  {items.map((item, index) => (
-                    <div key={`${group}-${index}`}>
-                      {group === 'weapons' ? (
-                        <WeaponItemCard
-                          index={index}
-                          weapon={item as CharacterWeapon}
-                          onNameChange={(weaponIndex, value) => handleItemChange(group, weaponIndex, 'name', value)}
-                          onDescriptionChange={(weaponIndex, value) =>
-                            handleItemChange(group, weaponIndex, 'description', value)
-                          }
-                          onRemove={(weaponIndex, name) => handleRemoveItem(group, weaponIndex, name)}
-                          onDamageChange={handleWeaponDamageChange}
-                          onBonusFieldChange={(weaponIndex, previousFieldName, nextFieldName) =>
-                            handleItemBonusFieldChange(group, weaponIndex, previousFieldName, nextFieldName)
-                          }
-                        />
-                      ) : null}
-
-                      {group === 'armors' ? (
-                        <ArmorItemCard
-                          index={index}
-                          armor={item as CharacterArmor}
-                          onNameChange={(armorIndex, value) => handleItemChange(group, armorIndex, 'name', value)}
-                          onDescriptionChange={(armorIndex, value) =>
-                            handleItemChange(group, armorIndex, 'description', value)
-                          }
-                          onRemove={(armorIndex, name) => handleRemoveItem(group, armorIndex, name)}
-                          onEquipChange={(armorIndex, value) => handleItemChange(group, armorIndex, 'equipped', value)}
-                          onBonusChange={handleArmorBonusChange}
-                          onBonusFieldChange={(armorIndex, previousFieldName, nextFieldName) =>
-                            handleItemBonusFieldChange(group, armorIndex, previousFieldName, nextFieldName)
-                          }
-                        />
-                      ) : null}
-
-                      {group === 'others' ? (
-                        <OtherItemCard
-                          index={index}
-                          item={item as CharacterOtherItem}
-                          onNameChange={(itemIndex, value) => handleItemChange(group, itemIndex, 'name', value)}
-                          onDescriptionChange={(itemIndex, value) =>
-                            handleItemChange(group, itemIndex, 'description', value)
-                          }
-                          onRemove={(itemIndex, name) => handleRemoveItem(group, itemIndex, name)}
-                          onEquipChange={(itemIndex, value) => handleItemChange(group, itemIndex, 'equipped', value)}
-                          onBonusChange={(itemIndex, fieldName, value) =>
-                            handleItemChange(group, itemIndex, fieldName, value)
-                          }
-                          onBonusFieldChange={(itemIndex, previousFieldName, nextFieldName) =>
-                            handleItemBonusFieldChange(group, itemIndex, previousFieldName, nextFieldName)
-                          }
-                        />
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </section>
-          )
-        })}
+      <div className={styles.itemsGroupTabs} role="tablist" aria-label={t('pages.characterEdit.items.title')}>
+        {itemGroups.map((group) => (
+          <button
+            key={group}
+            id={`items-tab-${group}`}
+            className={`${styles.itemsGroupTabButton} ${activeGroup === group ? styles.itemsGroupTabButtonActive : ''}`}
+            type="button"
+            role="tab"
+            aria-selected={activeGroup === group}
+            aria-controls={`items-panel-${group}`}
+            onClick={() => setActiveGroup(group)}
+          >
+            {t(`pages.characterEdit.items.groups.${group}`)}
+          </button>
+        ))}
       </div>
+
+      <section
+        className={styles.section}
+        id={`items-panel-${activeGroup}`}
+        role="tabpanel"
+        aria-labelledby={`items-tab-${activeGroup}`}
+      >
+        <div className={styles.sectionItemsHeader}>
+          <button className={styles.primaryButton} type="button" onClick={() => handleItemCreateEmpty(activeGroup)}>
+            {t('pages.characterEdit.items.addButton')}
+          </button>
+        </div>
+
+        {activeItems.length === 0 ? <p className={styles.loadingText}>{t('pages.characterEdit.items.emptyState')}</p> : null}
+        {activeItems.length > 0 ? (
+          <div className={styles.abilityGrid}>
+            {activeItems.map((item, index) => (
+              <div key={`${activeGroup}-${index}`}>
+                {activeGroup === 'weapons' ? (
+                  <WeaponItemCard
+                    index={index}
+                    weapon={item as CharacterWeapon}
+                    onNameChange={(weaponIndex, value) => handleItemChange(activeGroup, weaponIndex, 'name', value)}
+                    onDescriptionChange={(weaponIndex, value) =>
+                      handleItemChange(activeGroup, weaponIndex, 'description', value)
+                    }
+                    onRemove={(weaponIndex, name) => handleRemoveItem(activeGroup, weaponIndex, name)}
+                    onDamageChange={handleWeaponDamageChange}
+                    onBonusFieldChange={(weaponIndex, previousFieldName, nextFieldName) =>
+                      handleItemBonusFieldChange(activeGroup, weaponIndex, previousFieldName, nextFieldName)
+                    }
+                  />
+                ) : null}
+
+                {activeGroup === 'armors' ? (
+                  <ArmorItemCard
+                    index={index}
+                    armor={item as CharacterArmor}
+                    onNameChange={(armorIndex, value) => handleItemChange(activeGroup, armorIndex, 'name', value)}
+                    onDescriptionChange={(armorIndex, value) =>
+                      handleItemChange(activeGroup, armorIndex, 'description', value)
+                    }
+                    onRemove={(armorIndex, name) => handleRemoveItem(activeGroup, armorIndex, name)}
+                    onEquipChange={(armorIndex, value) => handleItemChange(activeGroup, armorIndex, 'equipped', value)}
+                    onBonusChange={handleArmorBonusChange}
+                    onBonusFieldChange={(armorIndex, previousFieldName, nextFieldName) =>
+                      handleItemBonusFieldChange(activeGroup, armorIndex, previousFieldName, nextFieldName)
+                    }
+                  />
+                ) : null}
+
+                {activeGroup === 'others' ? (
+                  <OtherItemCard
+                    index={index}
+                    item={item as CharacterOtherItem}
+                    onNameChange={(itemIndex, value) => handleItemChange(activeGroup, itemIndex, 'name', value)}
+                    onDescriptionChange={(itemIndex, value) =>
+                      handleItemChange(activeGroup, itemIndex, 'description', value)
+                    }
+                    onRemove={(itemIndex, name) => handleRemoveItem(activeGroup, itemIndex, name)}
+                    onEquipChange={(itemIndex, value) => handleItemChange(activeGroup, itemIndex, 'equipped', value)}
+                    onBonusChange={(itemIndex, fieldName, value) =>
+                      handleItemChange(activeGroup, itemIndex, fieldName, value)
+                    }
+                    onBonusFieldChange={(itemIndex, previousFieldName, nextFieldName) =>
+                      handleItemBonusFieldChange(activeGroup, itemIndex, previousFieldName, nextFieldName)
+                    }
+                  />
+                ) : null}
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </section>
 
       {pendingRemoval ? (
         <div className={styles.deleteBackdrop} role="presentation">
