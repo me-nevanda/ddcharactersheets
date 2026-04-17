@@ -1,6 +1,7 @@
 import type { ChangeEvent, FormEvent } from 'react'
 import type {
   CharacterAbility,
+  CharacterAbilityType,
   Character,
   CharacterBonuses,
   CharacterAttributes,
@@ -56,7 +57,7 @@ export interface CharacterEditPageState {
   handleGeneralChange: (event: CharacterGeneralChangeEvent) => void
   handleAttributeChange: (event: ChangeEvent<HTMLInputElement>) => void
   handleTrainingChange: (event: ChangeEvent<HTMLInputElement>) => void
-  handleAbilityCreateEmpty: () => void
+  handleAbilityCreateEmpty: (type?: CharacterAbilityType) => void
   handleAbilityAdd: (ability: CharacterAbility) => void
   handleAbilityChange: (index: number, fieldName: CharacterAbilityFieldName, value: string | number) => void
   handleAbilityRemove: (index: number) => void

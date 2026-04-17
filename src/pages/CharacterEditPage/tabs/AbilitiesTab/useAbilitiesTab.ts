@@ -11,6 +11,7 @@ import styles from '../../style.module.scss'
 import type {
   PendingAbilityRemoval,
   SelectOption,
+  VisibleAbilityEntry,
 } from './types'
 import type {
   CharacterAttributes,
@@ -24,6 +25,7 @@ export function useAbilitiesTab() {
   const { t } = useI18n()
   const { form, handleAbilityCreateEmpty, handleAbilityChange, handleAbilityRemove } =
     useCharacterEditPageContext()
+  const [activeType, setActiveType] = useState<CharacterAbilityType>('unlimited')
   const [pendingRemoval, setPendingRemoval] = useState<PendingAbilityRemoval | null>(null)
 
   const normalizedAttributes = buildNormalizedAttributes(form.attributes)
@@ -97,8 +99,12 @@ export function useAbilitiesTab() {
     })),
   ]
 
+  const visibleAbilities: VisibleAbilityEntry[] = form.abilities
+    .map((ability, index) => ({ ability, index }))
+    .filter(({ ability }) => ability.type === activeType)
+
   function handleAddAbility() {
-    handleAbilityCreateEmpty()
+    handleAbilityCreateEmpty(activeType)
   }
 
   function handleRemoveAbility(index: number, abilityName: string) {
@@ -140,13 +146,16 @@ export function useAbilitiesTab() {
   return {
     t,
     form,
+    activeType,
     weaponOptions,
     attributeOptions,
     defenseOptions,
     attackBonusOptions,
     weaponDamageTypeOptions,
     weaponAreaOptions,
+    visibleAbilities,
     pendingRemoval,
+    setActiveType,
     handleAbilityChange,
     handleAddAbility,
     handleRemoveAbility,

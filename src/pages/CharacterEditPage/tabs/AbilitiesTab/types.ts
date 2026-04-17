@@ -13,6 +13,11 @@ export interface PendingAbilityRemoval {
   name: string
 }
 
+export interface VisibleAbilityEntry {
+  ability: CharacterAbility
+  index: number
+}
+
 export interface SelectOption<TValue extends string | number> {
   value: TValue
   label: string

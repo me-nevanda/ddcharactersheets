@@ -23,30 +23,7 @@ export function AbilityActionFields({
           <option value="action">{t('pages.characterEdit.abilities.actionOptions.action')}</option>
           <option value="noAction">{t('pages.characterEdit.abilities.actionOptions.noAction')}</option>
         </select>
-        <label className={styles.abilityActionTypeGroup} htmlFor={`ability-type-${index}`}>
-          <span className={styles.attributeLabel}>{t('pages.characterEdit.abilities.typeLabel')}</span>
-          <select
-            className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityActionTypeSelect}`}
-            id={`ability-type-${index}`}
-            value={ability.type}
-            onChange={(event) =>
-              onAbilityChange(
-                index,
-                'type',
-                event.target.value === 'standard' ||
-                event.target.value === 'encounter' ||
-                event.target.value === 'daily'
-                  ? event.target.value
-                  : 'unlimited',
-              )
-            }
-          >
-            <option value="unlimited">{t('pages.characterEdit.abilities.typeOptions.unlimited')}</option>
-            <option value="standard">{t('pages.characterEdit.abilities.typeOptions.standard')}</option>
-            <option value="encounter">{t('pages.characterEdit.abilities.typeOptions.encounter')}</option>
-            <option value="daily">{t('pages.characterEdit.abilities.typeOptions.daily')}</option>
-          </select>
-        </label>
+
         <label className={styles.abilityActionKindGroup} htmlFor={`ability-kind-${index}`}>
           <span className={styles.attributeLabel}>{t('pages.characterEdit.abilities.kindLabel')}</span>
           <select

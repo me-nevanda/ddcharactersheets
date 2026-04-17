@@ -64,6 +64,7 @@ import {
   CharacterClass,
   type CharacterAbility,
   type CharacterAbilityAreaType,
+  type CharacterAbilityType,
   type CharacterAttributeBonuses,
   type CharacterBonuses,
   type CharacterArmorBonusFieldName,
@@ -841,7 +842,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
     }))
   }
 
-  function handleAbilityCreateEmpty() {
+  function handleAbilityCreateEmpty(type: CharacterAbilityType = defaultAbilityType) {
     setForm((currentForm) => ({
       ...currentForm,
       abilities: [
@@ -851,7 +852,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
           name: '',
           description: '',
           action: defaultAbilityAction,
-          type: defaultAbilityType,
+          type,
           kind: defaultAbilityKind,
           weaponCount: 1,
           weaponName: '',
