@@ -145,7 +145,6 @@ export interface CharacterWeapon extends CharacterItemBase {
 
 export interface CharacterOtherItem extends CharacterItemBase {
   equipped: boolean
-  storyItem: boolean
   strengthBonusNumber: number
   conditionBonusNumber: number
   dexterityBonusNumber: number

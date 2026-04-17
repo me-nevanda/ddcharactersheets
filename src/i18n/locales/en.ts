@@ -210,7 +210,6 @@ export const en: TranslationDictionary = {
         bonusValueLabel: 'Bonus value',
         equippedLabel: 'Equipped',
         unequippedLabel: 'Unequipped',
-        storyItemLabel: 'Story item',
         namePlaceholder: 'e.g. Healing potion',
         descriptionPlaceholder: 'Short item description',
       },

@@ -134,7 +134,6 @@ export const emptyOtherItem: CharacterOtherItem = {
   name: '',
   description: '',
   equipped: false,
-  storyItem: false,
   strengthBonusNumber: 0,
   conditionBonusNumber: 0,
   dexterityBonusNumber: 0,

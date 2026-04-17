@@ -209,7 +209,6 @@ export interface TranslationDictionary {
         bonusValueLabel: string
         equippedLabel: string
         unequippedLabel: string
-        storyItemLabel: string
         namePlaceholder: string
         descriptionPlaceholder: string
       }

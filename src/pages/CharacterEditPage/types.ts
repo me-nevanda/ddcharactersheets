@@ -31,7 +31,7 @@ export type CharacterAbilityFieldName = keyof CharacterAbility
 
 export type CharacterFeatFieldName = Exclude<keyof CharacterFeat, 'id'>
 
-export type CharacterItemFieldName = keyof CharacterItemBase | 'equipped' | 'storyItem'
+export type CharacterItemFieldName = keyof CharacterItemBase | 'equipped'
 
 export type CharacterItemGroupKey = keyof CharacterItems
 

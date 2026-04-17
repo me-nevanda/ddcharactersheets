@@ -403,7 +403,6 @@ function normalizeArmorGroup(group: unknown): CharacterArmor[] {
           name: typeof entry.name === 'string' ? entry.name : '',
           description: typeof entry.description === 'string' ? entry.description : '',
           equipped: entry.equipped === true,
-          storyItem: entry.storyItem === true,
           strengthBonusNumber: normalizeWeaponBonusNumber(entry.strengthBonusNumber),
           conditionBonusNumber: normalizeWeaponBonusNumber(entry.conditionBonusNumber),
           dexterityBonusNumber: normalizeWeaponBonusNumber(entry.dexterityBonusNumber),
@@ -500,7 +499,6 @@ export function useCharacterEditPage(): CharacterEditPageState {
           name: typeof entry.name === 'string' ? entry.name : '',
           description: typeof entry.description === 'string' ? entry.description : '',
           equipped: entry.equipped === true,
-          storyItem: entry.storyItem === true,
           strengthBonusNumber: normalizeWeaponBonusNumber(entry.strengthBonusNumber),
           conditionBonusNumber: normalizeWeaponBonusNumber(entry.conditionBonusNumber),
           dexterityBonusNumber: normalizeWeaponBonusNumber(entry.dexterityBonusNumber),
@@ -991,21 +989,6 @@ export function useCharacterEditPage(): CharacterEditPageState {
           itemIndex === index
             ? {
                 ...item,
-                ...(group === 'others' && fieldName === 'storyItem' && value === true
-                  ? {
-                      strengthBonusNumber: 0,
-                      conditionBonusNumber: 0,
-                      dexterityBonusNumber: 0,
-                      intelligenceBonusNumber: 0,
-                      wisdomBonusNumber: 0,
-                      charismaBonusNumber: 0,
-                      speedBonusNumber: 0,
-                      kpBonusNumber: 0,
-                      fortitudeBonusNumber: 0,
-                      reflexBonusNumber: 0,
-                      willBonusNumber: 0,
-                    }
-                  : {}),
                 [fieldName]: value,
               }
             : item,

@@ -12,7 +12,6 @@ export function OtherItemCard({
   onDescriptionChange,
   onRemove,
   onEquipChange,
-  onStoryItemChange,
   onBonusChange,
   onBonusFieldChange,
 }: OtherItemCardProps) {
@@ -51,28 +50,15 @@ export function OtherItemCard({
         </div>
       </div>
 
-      <label className={styles.checkboxField} htmlFor={`item-others-story-item-${index}`}>
-        <input
-          className={styles.checkboxInput}
-          id={`item-others-story-item-${index}`}
-          type="checkbox"
-          checked={item.storyItem}
-          onChange={(event) => onStoryItemChange(index, event.target.checked)}
-        />
-        <span className={styles.checkboxLabel}>{t('pages.characterEdit.items.storyItemLabel')}</span>
-      </label>
-
-      {item.storyItem ? null : (
-        <ItemBonusEditor
-          bonusFields={otherBonusFields}
-          getBonusValue={(fieldName) => item[fieldName]}
-          idPrefix={`item-others-${index}`}
-          onBonusFieldChange={(previousFieldName, nextFieldName) =>
-            onBonusFieldChange(index, previousFieldName, nextFieldName)
-          }
-          onBonusValueChange={(fieldName, value) => onBonusChange(index, fieldName, value)}
-        />
-      )}
+      <ItemBonusEditor
+        bonusFields={otherBonusFields}
+        getBonusValue={(fieldName) => item[fieldName]}
+        idPrefix={`item-others-${index}`}
+        onBonusFieldChange={(previousFieldName, nextFieldName) =>
+          onBonusFieldChange(index, previousFieldName, nextFieldName)
+        }
+        onBonusValueChange={(fieldName, value) => onBonusChange(index, fieldName, value)}
+      />
 
       <label className={styles.abilityField} htmlFor={`item-others-description-${index}`}>
         <span className={styles.attributeLabel}>{t('pages.characterEdit.items.descriptionLabel')}</span>
