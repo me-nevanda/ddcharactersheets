@@ -35,7 +35,7 @@ export function WeaponItemCard({
             title={weapon.equipped ? t('pages.characterEdit.items.equippedLabel') : t('pages.characterEdit.items.unequippedLabel')}
             onClick={() => onDamageChange(index, 'equipped', !weapon.equipped)}
           >
-            <AppIcon name="shirt" />
+            <AppIcon name="clothes" />
           </button>
           <button
             className={styles.abilityRemoveButton}

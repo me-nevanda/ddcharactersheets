@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
 import { useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext'
 import { ArmorItemCard } from './ArmorItemCard'
@@ -76,7 +77,10 @@ export function ItemsTab() {
         </div>
 
         <button className={styles.primaryButton} type="button" onClick={() => handleItemCreateEmpty(activeGroup)}>
-          {t('pages.characterEdit.items.addButton')}
+          <span className={styles.buttonContent}>
+            <AppIcon name="plus" />
+            <span>{t('pages.characterEdit.items.addButton')}</span>
+          </span>
         </button>
       </div>
 

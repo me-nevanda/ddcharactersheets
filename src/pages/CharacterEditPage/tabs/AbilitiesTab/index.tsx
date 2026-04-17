@@ -1,3 +1,4 @@
+import { AppIcon } from '@components/AppIcon'
 import styles from '../../style.module.scss'
 import { AbilityCard } from './AbilityCard'
 import { AbilityRemoveDialog } from './AbilityRemoveDialog'
@@ -56,7 +57,10 @@ export function AbilitiesTab() {
         </div>
 
         <button className={styles.primaryButton} type="button" onClick={handleAddAbility}>
-          {t('pages.characterEdit.abilities.addButton')}
+          <span className={styles.buttonContent}>
+            <AppIcon name="plus" />
+            <span>{t('pages.characterEdit.abilities.addButton')}</span>
+          </span>
         </button>
       </div>
 

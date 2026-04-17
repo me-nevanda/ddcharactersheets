@@ -1,23 +1,14 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
-import { getIntlLocale, useI18n } from '@i18n/index'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Edit02Icon } from '@hugeicons/core-free-icons'
+import { useI18n } from '@i18n/index'
 import { CharacterClass, CharacterRace } from '../../types/character'
 import type { Character } from '../../types/character'
 import styles from './style.module.scss'
 import type { CharacterListPageState } from './types'
 import { useCharacterListPage } from './useCharacterListPage'
-
-function formatUpdatedAt(value: string, locale: string, t: (key: string) => string): string {
-  if (!value) {
-    return t('pages.characterList.missingUpdatedAt')
-  }
-
-  return new Intl.DateTimeFormat(getIntlLocale(locale), {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value))
-}
 
 function getCharacterLabel(character: Character | null, t: (key: string) => string): string {
   return character?.name || t('pages.characterList.unnamedCharacter')
@@ -51,7 +42,8 @@ function CharacterListPageContent({
   handleCreateCharacter,
   handleOpenDeleteDialog,
 }: CharacterListPageState) {
-  const { locale, t } = useI18n()
+  const navigate = useNavigate()
+  const { t } = useI18n()
 
   return (
     <>
@@ -91,18 +83,28 @@ function CharacterListPageContent({
         {!loading && characters.length > 0 ? (
           <section className={styles.characterGrid}>
             {characters.map((character) => (
-              <article className={styles.characterCard} key={character.id}>
+              <article
+                className={styles.characterCard}
+                key={character.id}
+                role="link"
+                tabIndex={0}
+                onClick={() => navigate(`/characters/${character.id}/edit`)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    navigate(`/characters/${character.id}/edit`)
+                  }
+                }}
+              >
                 <div className={styles.characterSummary}>
                   <h2 className={styles.characterName}>{getCharacterLabel(character, t)}</h2>
                   <div className={styles.cardMeta}>
+                    <span className={styles.cardMetaItem}>{getRaceLabel(character, t)}</span>
+                    <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
+                    <span className={styles.cardMetaItem}>{getClassLabel(character, t)}</span>
+                    <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
                     <span className={styles.cardMetaItem}>
-                      {getRaceLabel(character, t)}
-                    </span>
-                    <span className={styles.cardMetaItem}>
-                      {getClassLabel(character, t)}
-                    </span>
-                    <span className={styles.cardMetaItem}>
-                      {formatUpdatedAt(character.updatedAt, locale, t)}
+                      {t('pages.characterEdit.fields.level')} {character.level}
                     </span>
                   </div>
                 </div>
@@ -113,16 +115,28 @@ function CharacterListPageContent({
                     className={`${styles.dangerButton} ${styles.iconOnlyButton}`}
                     type="button"
                     title={t('common.actions.delete')}
-                    onClick={() => handleOpenDeleteDialog(character)}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      handleOpenDeleteDialog(character)
+                    }}
                     disabled={deletingId === character.id}
                   >
                     <AppIcon name="trash" />
                   </button>
-                  <Link className={styles.secondaryButton} to={`/characters/${character.id}/edit`}>
-                    <span className={styles.buttonContent}>
-                      <AppIcon name="edit" />
-                      <span>{t('common.actions.edit')}</span>
-                    </span>
+                  <Link
+                    aria-label={t('common.actions.edit')}
+                    className={`${styles.secondaryButton} ${styles.iconOnlyButton}`}
+                    title={t('common.actions.edit')}
+                    to={`/characters/${character.id}/edit`}
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <HugeiconsIcon
+                      aria-hidden="true"
+                      className={styles.actionIcon}
+                      color="currentColor"
+                      icon={Edit02Icon}
+                      strokeWidth={1.9}
+                    />
                   </Link>
                 </div>
               </article>

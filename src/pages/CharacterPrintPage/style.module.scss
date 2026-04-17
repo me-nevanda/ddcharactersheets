@@ -23,9 +23,10 @@
   padding: 0 0.95rem;
   border: 1px solid var(--border-soft);
   border-radius: 999px;
-  background: linear-gradient(135deg, #a64a2e 0%, #d9a441 100%);
-  color: #1d120e;
-  box-shadow: 0 12px 30px rgba(166, 74, 46, 0.28);
+  background: linear-gradient(135deg, #714232 0%, #a27748 100%);
+  border-color: rgba(240, 198, 111, 0.3);
+  color: #f8ead7;
+  box-shadow: 0 12px 26px rgba(84, 49, 37, 0.3);
 }
 
 .printButton:hover {

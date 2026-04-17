@@ -86,6 +86,12 @@
   gap: 0.45rem;
 }
 
+.actionIcon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+
 .iconOnlyButton {
   min-width: 2.6rem;
   padding-inline: 0.65rem;
@@ -115,6 +121,7 @@
 .characterGrid {
   display: grid;
   gap: 0.55rem;
+  margin-top: 2.25rem;
 }
 
 .characterCard {
@@ -125,6 +132,17 @@
   gap: 0.75rem;
   padding: 0.8rem 0.9rem;
   border-radius: 0.95rem;
+  cursor: pointer;
+}
+
+.characterCard:hover {
+  border-color: var(--border-strong);
+}
+
+.characterCard:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
 }
 
 .characterSummary {
@@ -136,7 +154,7 @@
 .characterName {
   margin: 0;
   color: var(--text-strong);
-  font-size: 1rem;
+  font-size: 1.18rem;
   line-height: 1.05;
 }
 
@@ -146,7 +164,7 @@
   gap: 0.2rem 0.45rem;
   margin: 0;
   color: var(--text-soft);
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   line-height: 1.2;
 }
 
@@ -154,6 +172,12 @@
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
+}
+
+.cardMetaSeparator {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255, 248, 235, 0.34);
 }
 
 .cardActions {

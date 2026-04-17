@@ -3,21 +3,22 @@ import { useI18n } from '@i18n/index'
 import { useCharacterItemsPrintPage } from './useCharacterItemsPrintPage'
 import styles from './style.module.scss'
 
-function getItemEmoji(category: 'weapon' | 'armor' | 'other') {
+function getItemIconName(category: 'weapon' | 'armor' | 'other') {
   if (category === 'weapon') {
-    return '⚔️'
+    return 'sword'
   }
 
   if (category === 'armor') {
-    return '🛡️'
+    return 'shield'
   }
 
-  return '📿'
+  return 'shirt'
 }
 
 export function CharacterItemsPrintPage() {
   const { t } = useI18n()
-  const { character, loading, error, title, characterName, hasItems, armors, weapons, others } = useCharacterItemsPrintPage()
+  const { character, loading, error, title, characterName, hasItems, armors, weapons, others } =
+    useCharacterItemsPrintPage()
   const extraSlots = [
     t('pages.characterItemsPrint.extraSlots.goldCoins'),
     '',
@@ -77,9 +78,7 @@ export function CharacterItemsPrintPage() {
                     {weapons.map((item) => (
                       <article key={item.key} className={styles.itemCard}>
                         <h3 className={styles.itemName}>
-                          <span className={styles.itemEmoji} aria-hidden="true">
-                            {getItemEmoji(item.category)}
-                          </span>
+                          <AppIcon className={styles.itemIcon} name={getItemIconName(item.category)} />
                           <span>{item.name}</span>
                         </h3>
                         {item.description ? <p className={styles.itemDescription}>{item.description}</p> : null}
@@ -96,9 +95,7 @@ export function CharacterItemsPrintPage() {
                     {armors.map((item) => (
                       <article key={item.key} className={styles.itemCard}>
                         <h3 className={styles.itemName}>
-                          <span className={styles.itemEmoji} aria-hidden="true">
-                            {getItemEmoji(item.category)}
-                          </span>
+                          <AppIcon className={styles.itemIcon} name={getItemIconName(item.category)} />
                           <span>{item.name}</span>
                         </h3>
                         {item.description ? <p className={styles.itemDescription}>{item.description}</p> : null}
@@ -115,9 +112,7 @@ export function CharacterItemsPrintPage() {
                     {others.map((item) => (
                       <article key={item.key} className={styles.itemCard}>
                         <h3 className={styles.itemName}>
-                          <span className={styles.itemEmoji} aria-hidden="true">
-                            {getItemEmoji(item.category)}
-                          </span>
+                          <AppIcon className={styles.itemIcon} name={getItemIconName(item.category)} />
                           <span>{item.name}</span>
                         </h3>
                         {item.description ? <p className={styles.itemDescription}>{item.description}</p> : null}
@@ -137,9 +132,7 @@ export function CharacterItemsPrintPage() {
                 <article key={`${label || 'empty'}-${index}`} className={styles.extraSlot}>
                   {label ? (
                     <h3 className={styles.itemName}>
-                      <span className={styles.itemEmoji} aria-hidden="true">
-                        🪙
-                      </span>
+                      <AppIcon className={styles.itemIcon} name="coins" />
                       <span>{label}</span>
                     </h3>
                   ) : null}
@@ -149,7 +142,6 @@ export function CharacterItemsPrintPage() {
           </div>
         </section>
       </article>
-
     </main>
   )
 }

@@ -1,5 +1,7 @@
 export type AppIconName =
+  | 'coins'
   | 'check'
+  | 'clothes'
   | 'circle'
   | 'delete'
   | 'document'
@@ -7,7 +9,9 @@ export type AppIconName =
   | 'plus'
   | 'print'
   | 'save'
+  | 'shield'
   | 'shirt'
+  | 'sword'
   | 'trash'
 
 export interface AppIconProps {

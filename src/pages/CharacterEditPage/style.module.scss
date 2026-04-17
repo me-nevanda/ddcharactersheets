@@ -143,14 +143,30 @@
   box-shadow: 0 12px 30px rgba(166, 74, 46, 0.3);
 }
 
+.printPrimaryButton {
+  @include pill-button;
+  background: linear-gradient(135deg, #714232 0%, #a27748 100%);
+  border-color: rgba(240, 198, 111, 0.3);
+  color: #f8ead7;
+  font-weight: 700;
+  box-shadow: 0 12px 26px rgba(84, 49, 37, 0.3);
+}
+
 .ghostLink:hover,
 .secondaryButton:hover,
-.primaryButton:hover {
+.primaryButton:hover,
+.printPrimaryButton:hover {
   transform: translateY(-1px);
   border-color: var(--border-strong);
 }
 
 .primaryButton:disabled {
+  cursor: default;
+  opacity: 0.72;
+  transform: none;
+}
+
+.printPrimaryButton:disabled {
   cursor: default;
   opacity: 0.72;
   transform: none;
@@ -660,8 +676,8 @@
 
 .abilityHeaderDaily .abilityRemoveButton {
   color: #f6f1ea;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(122, 32, 32, 0.32);
+  border-color: rgba(243, 165, 165, 0.26);
 }
 
 .abilityCardTitleInput {
@@ -727,9 +743,15 @@
 .abilityRemoveButton {
   @include pill-button;
   padding-inline: 0.75rem;
-  background: rgba(255, 248, 235, 0.04);
-  border-color: rgba(255, 248, 235, 0.08);
-  color: var(--text-strong);
+  background: rgba(122, 32, 32, 0.18);
+  border-color: rgba(243, 165, 165, 0.28);
+  color: #ffe1e1;
+}
+
+.abilityRemoveButton:hover {
+  transform: translateY(-1px);
+  border-color: rgba(243, 165, 165, 0.42);
+  background: rgba(122, 32, 32, 0.24);
 }
 
 .abilityTextarea {

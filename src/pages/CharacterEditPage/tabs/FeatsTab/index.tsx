@@ -40,7 +40,10 @@ export function FeatsTab() {
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>{t('pages.characterEdit.feats.title')}</h2>
         <button className={styles.primaryButton} type="button" onClick={handleAddFeat}>
-          {t('pages.characterEdit.feats.addButton')}
+          <span className={styles.buttonContent}>
+            <AppIcon name="plus" />
+            <span>{t('pages.characterEdit.feats.addButton')}</span>
+          </span>
         </button>
       </div>
 
@@ -65,13 +68,11 @@ export function FeatsTab() {
                     }`}
                     type="button"
                     aria-pressed={feat.visible}
-                    aria-label={
-                      feat.visible ? t('pages.characterEdit.feats.visibleLabel') : t('pages.characterEdit.feats.invisibleLabel')
-                    }
-                    title={feat.visible ? t('pages.characterEdit.feats.visibleLabel') : t('pages.characterEdit.feats.invisibleLabel')}
+                    aria-label="Widoczność na wydruku"
+                    title="Widoczność na wydruku"
                     onClick={() => handleFeatChange(index, 'visible', !feat.visible)}
                   >
-                    <AppIcon name="document" />
+                    <AppIcon name={feat.visible ? 'check' : 'circle'} />
                   </button>
                   <button
                     className={styles.abilityRemoveButton}

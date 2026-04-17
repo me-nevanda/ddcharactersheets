@@ -111,7 +111,7 @@ function CharacterEditPageContent() {
               <button
                 aria-expanded={isPrintMenuOpen}
                 aria-haspopup="menu"
-                className={styles.primaryButton}
+                className={styles.printPrimaryButton}
                 type="button"
                 onClick={() => setPrintMenuOpen((current) => !current)}
               >

@@ -36,7 +36,7 @@ export function OtherItemCard({
             title={item.equipped ? t('pages.characterEdit.items.equippedLabel') : t('pages.characterEdit.items.unequippedLabel')}
             onClick={() => onEquipChange(index, !item.equipped)}
           >
-            <AppIcon name="shirt" />
+            <AppIcon name="clothes" />
           </button>
           <button
             className={styles.abilityRemoveButton}
