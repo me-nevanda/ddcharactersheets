@@ -96,6 +96,7 @@ export interface TranslationDictionary {
           body: string
         }
         actionLabel: string
+        areaLabel: string
         actionOptions: {
           action: string
           noAction: string
@@ -119,6 +120,7 @@ export interface TranslationDictionary {
         weaponAgainstLabel: string
         weaponAttackDefenseLabel: string
         weaponLabel: string
+        attackLabel: string
         weaponDamageDiceLabel: string
         weaponDamageCountLabel: string
         weaponDamageTypeLabel: string

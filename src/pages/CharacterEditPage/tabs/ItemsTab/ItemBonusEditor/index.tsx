@@ -61,7 +61,8 @@ export function ItemBonusEditor<TFieldName extends string>({
   return (
     <div className={styles.weaponBonusSection}>
       <div className={styles.bonusSectionHeader}>
-        <span className={styles.weaponBonusSectionTitle}>{t('pages.characterEdit.items.bonusesLabel')}</span>
+        <div className={styles.divider} data-label={t('pages.characterEdit.items.bonusesLabel')} />
+
         {availableFields.length > 0 ? (
           <button
             className={styles.bonusAddButton}

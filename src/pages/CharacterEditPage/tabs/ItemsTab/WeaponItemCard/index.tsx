@@ -50,7 +50,7 @@ export function WeaponItemCard({
       </div>
 
       <div className={styles.weaponDamageSection}>
-        <span className={styles.weaponBonusSectionTitle}>{t('pages.characterEdit.items.damageLabel')}</span>
+        <div className={styles.divider} data-label={t('pages.characterEdit.items.damageLabel')} />
         <div className={styles.weaponDamageRow}>
         <select
           className={styles.abilityHeaderSelect}

@@ -396,6 +396,15 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.75rem;
+  border-radius: 0.85rem;
+  border: 1px solid transparent;
+}
+
+.abilityCardRichHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
   padding: 0.7rem 0.8rem;
   border-radius: 0.85rem;
   border: 1px solid transparent;
@@ -683,9 +692,8 @@
   padding: 1.35rem;
   border: 1px solid var(--border-strong);
   border-radius: 1.25rem;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent),
-    var(--bg-panel-strong);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent),
+  var(--bg-panel-strong);
   box-shadow: var(--shadow);
 }
 
@@ -739,6 +747,35 @@
 
 .abilitySelect {
   min-width: 0;
+}
+
+.divider {
+  $line-color: rgba(240, 198, 111, 0.28);
+  $badge-background: rgba(240, 198, 111, 0.9);
+  $text-color: #1d120e;
+  $font-size: 14px;
+
+  position: relative;
+  border-top: 1px solid $line-color;
+  margin: 20px 0;
+  width: 100%;
+
+  &::before {
+    content: attr(data-label);
+    position: absolute;
+    top: -14px;
+    left: 0;
+    border-radius: 15px;
+    border: 1px solid rgba(240, 198, 111, 0.32);
+    background: $badge-background;
+    box-shadow: 0 10px 22px rgba(166, 74, 46, 0.2);
+    padding: 2px 9px 2px 7px;
+    font-weight: 600;
+    color: $text-color;
+    letter-spacing: 0.04em;
+    font-family: inherit;
+    font-size: $font-size;
+  }
 }
 
 .abilityActionRow {

@@ -97,6 +97,7 @@ export const en: TranslationDictionary = {
           body: 'The ability "{name}" will be deleted permanently.',
         },
         actionLabel: 'Action type',
+        areaLabel: 'Area',
         actionOptions: {
           action: 'Action',
           noAction: 'No action',
@@ -120,6 +121,7 @@ export const en: TranslationDictionary = {
         weaponAgainstLabel: 'against',
         weaponAttackDefenseLabel: 'Defense',
         weaponLabel: 'Single-use damage',
+        attackLabel: 'Attack',
         weaponDamageDiceLabel: 'Die',
         weaponDamageCountLabel: 'Count',
         weaponDamageTypeLabel: 'Damage type',

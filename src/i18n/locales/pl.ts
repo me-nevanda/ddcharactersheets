@@ -97,6 +97,7 @@ export const pl: TranslationDictionary = {
           body: 'Zdolność „{name}” zostanie usunięta na stałe.',
         },
         actionLabel: 'Rodzaj akcji',
+        areaLabel: 'Obszar',
         actionOptions: {
           action: 'Akcja',
           noAction: 'Bez akcji',
@@ -120,6 +121,7 @@ export const pl: TranslationDictionary = {
         weaponAgainstLabel: 'przeciw',
         weaponAttackDefenseLabel: 'Obrona',
         weaponLabel: 'Obrażenia jednorazowe',
+        attackLabel: 'Atak',
         weaponDamageDiceLabel: 'Kostka',
         weaponDamageCountLabel: 'Liczba',
         weaponDamageTypeLabel: 'Typ obrażeń',

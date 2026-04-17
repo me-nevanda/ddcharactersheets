@@ -87,7 +87,7 @@ export function FeatsTab() {
 
               <div className={localStyles.featCardBody}>
                 <label className={localStyles.featDescriptionField} htmlFor={`feat-description-${index}`}>
-                  <span className={styles.attributeLabel}>{t('pages.characterEdit.feats.descriptionLabel')}</span>
+                  <div className={styles.divider} data-label={t('pages.characterEdit.feats.descriptionLabel')} />
                   <textarea
                     className={`${styles.input} ${styles.abilityTextarea}`}
                     id={`feat-description-${index}`}
