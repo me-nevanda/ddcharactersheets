@@ -69,6 +69,12 @@ export interface CharacterEditPageState {
     fieldName: CharacterItemFieldName | CharacterItemBonusFieldName,
     value: string | number | boolean,
   ) => void
+  handleItemBonusFieldChange: (
+    group: CharacterItemGroupKey,
+    index: number,
+    previousFieldName: CharacterArmorBonusFieldName,
+    nextFieldName: CharacterArmorBonusFieldName,
+  ) => void
   handleArmorBonusChange: (
     index: number,
     fieldName: CharacterArmorBonusFieldName,

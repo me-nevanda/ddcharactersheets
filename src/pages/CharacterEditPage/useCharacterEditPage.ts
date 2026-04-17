@@ -1014,6 +1014,33 @@ export function useCharacterEditPage(): CharacterEditPageState {
     }))
   }
 
+  function handleItemBonusFieldChange(
+    group: CharacterItemGroupKey,
+    index: number,
+    previousFieldName: CharacterArmorBonusFieldName,
+    nextFieldName: CharacterArmorBonusFieldName,
+  ) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      items: {
+        ...currentForm.items,
+        [group]: currentForm.items[group].map((item, itemIndex) => {
+          if (itemIndex !== index || previousFieldName === nextFieldName) {
+            return item
+          }
+
+          const previousValue = item[previousFieldName as keyof typeof item]
+
+          return {
+            ...item,
+            [previousFieldName]: 0,
+            [nextFieldName]: typeof previousValue === 'number' ? previousValue : 0,
+          }
+        }),
+      },
+    }))
+  }
+
   function handleArmorBonusChange(
     index: number,
     fieldName: CharacterArmorBonusFieldName,
@@ -1430,6 +1457,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
     handleFeatRemove,
     handleItemCreateEmpty,
     handleItemChange,
+    handleItemBonusFieldChange,
     handleArmorBonusChange,
     handleWeaponDamageChange,
     handleItemRemove,

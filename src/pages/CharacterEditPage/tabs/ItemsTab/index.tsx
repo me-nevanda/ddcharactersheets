@@ -15,6 +15,7 @@ export function ItemsTab() {
     form,
     handleItemCreateEmpty,
     handleItemChange,
+    handleItemBonusFieldChange,
     handleWeaponDamageChange,
     handleItemRemove,
     handleArmorBonusChange,
@@ -82,6 +83,9 @@ export function ItemsTab() {
                           }
                           onRemove={(weaponIndex, name) => handleRemoveItem(group, weaponIndex, name)}
                           onDamageChange={handleWeaponDamageChange}
+                          onBonusFieldChange={(weaponIndex, previousFieldName, nextFieldName) =>
+                            handleItemBonusFieldChange(group, weaponIndex, previousFieldName, nextFieldName)
+                          }
                         />
                       ) : null}
 
@@ -96,6 +100,9 @@ export function ItemsTab() {
                           onRemove={(armorIndex, name) => handleRemoveItem(group, armorIndex, name)}
                           onEquipChange={(armorIndex, value) => handleItemChange(group, armorIndex, 'equipped', value)}
                           onBonusChange={handleArmorBonusChange}
+                          onBonusFieldChange={(armorIndex, previousFieldName, nextFieldName) =>
+                            handleItemBonusFieldChange(group, armorIndex, previousFieldName, nextFieldName)
+                          }
                         />
                       ) : null}
 
@@ -112,6 +119,9 @@ export function ItemsTab() {
                           onStoryItemChange={(itemIndex, value) => handleItemChange(group, itemIndex, 'storyItem', value)}
                           onBonusChange={(itemIndex, fieldName, value) =>
                             handleItemChange(group, itemIndex, fieldName, value)
+                          }
+                          onBonusFieldChange={(itemIndex, previousFieldName, nextFieldName) =>
+                            handleItemBonusFieldChange(group, itemIndex, previousFieldName, nextFieldName)
                           }
                         />
                       ) : null}

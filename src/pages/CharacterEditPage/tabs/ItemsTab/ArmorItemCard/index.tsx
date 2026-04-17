@@ -1,28 +1,9 @@
 import { useI18n } from '@i18n/index'
 import { AppIcon } from '@components/AppIcon'
 import type { ArmorItemCardProps } from './types'
-import type { CharacterArmorBonusFieldName } from '../../../../../types/character'
+import { ItemBonusEditor } from '../ItemBonusEditor'
+import { armorBonusFields } from '../itemBonusFields'
 import styles from '../../../style.module.scss'
-
-const armorBonusFields: Array<{
-  fieldName: CharacterArmorBonusFieldName
-  labelKey: string
-}> = [
-  { fieldName: 'strengthBonusNumber', labelKey: 'pages.characterEdit.fields.strength' },
-  { fieldName: 'conditionBonusNumber', labelKey: 'pages.characterEdit.fields.condition' },
-  { fieldName: 'dexterityBonusNumber', labelKey: 'pages.characterEdit.fields.dexterity' },
-  { fieldName: 'intelligenceBonusNumber', labelKey: 'pages.characterEdit.fields.intelligence' },
-  { fieldName: 'wisdomBonusNumber', labelKey: 'pages.characterEdit.fields.wisdom' },
-  { fieldName: 'charismaBonusNumber', labelKey: 'pages.characterEdit.fields.charisma' },
-  { fieldName: 'speedBonusNumber', labelKey: 'pages.characterEdit.fields.speed' },
-  { fieldName: 'armorPenaltyNumber', labelKey: 'pages.characterEdit.fields.armorPenalty' },
-  { fieldName: 'kpBonusNumber', labelKey: 'pages.characterEdit.fields.kp' },
-  { fieldName: 'fortitudeBonusNumber', labelKey: 'pages.characterEdit.fields.fortitude' },
-  { fieldName: 'reflexBonusNumber', labelKey: 'pages.characterEdit.fields.reflex' },
-  { fieldName: 'willBonusNumber', labelKey: 'pages.characterEdit.fields.will' },
-]
-
-const armorBonusOptions = Array.from({ length: 16 }, (_, bonus) => bonus - 5)
 
 export function ArmorItemCard({
   armor,
@@ -32,6 +13,7 @@ export function ArmorItemCard({
   onRemove,
   onEquipChange,
   onBonusChange,
+  onBonusFieldChange,
 }: ArmorItemCardProps) {
   const { t } = useI18n()
 
@@ -68,28 +50,15 @@ export function ArmorItemCard({
         </div>
       </div>
 
-      <div className={styles.weaponBonusSection}>
-        <span className={styles.weaponBonusSectionTitle}>{t('pages.characterEdit.items.bonusesLabel')}</span>
-        <div className={styles.weaponBonusGrid}>
-          {armorBonusFields.map((field) => (
-            <label key={field.fieldName} className={styles.weaponBonusField} htmlFor={`item-armors-${field.fieldName}-${index}`}>
-              <span className={styles.weaponBonusLabel}>{t(field.labelKey)}</span>
-              <select
-                className={`${styles.abilityHeaderSelect} ${styles.weaponBonusSelect}`}
-                id={`item-armors-${field.fieldName}-${index}`}
-                value={armor[field.fieldName]}
-                onChange={(event) => onBonusChange(index, field.fieldName, Number.parseInt(event.target.value, 10))}
-              >
-                {armorBonusOptions.map((bonus) => (
-                  <option key={bonus} value={bonus}>
-                    {bonus}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ))}
-        </div>
-      </div>
+      <ItemBonusEditor
+        bonusFields={armorBonusFields}
+        getBonusValue={(fieldName) => armor[fieldName]}
+        idPrefix={`item-armors-${index}`}
+        onBonusFieldChange={(previousFieldName, nextFieldName) =>
+          onBonusFieldChange(index, previousFieldName, nextFieldName)
+        }
+        onBonusValueChange={(fieldName, value) => onBonusChange(index, fieldName, value)}
+      />
 
       <label className={styles.abilityField} htmlFor={`item-armors-description-${index}`}>
         <span className={styles.attributeLabel}>{t('pages.characterEdit.items.descriptionLabel')}</span>

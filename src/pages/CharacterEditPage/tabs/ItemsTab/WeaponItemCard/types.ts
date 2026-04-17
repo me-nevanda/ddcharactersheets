@@ -1,5 +1,6 @@
 import type {
   CharacterWeapon,
+  CharacterWeaponBonusFieldName,
   CharacterWeaponFieldName,
   CharacterWeaponDamageDiceType,
 } from '../../../../../types/character'
@@ -14,5 +15,10 @@ export interface WeaponItemCardProps {
     index: number,
     fieldName: CharacterWeaponFieldName,
     value: number | CharacterWeaponDamageDiceType | boolean,
+  ) => void
+  onBonusFieldChange: (
+    index: number,
+    previousFieldName: CharacterWeaponBonusFieldName,
+    nextFieldName: CharacterWeaponBonusFieldName,
   ) => void
 }

@@ -12,4 +12,9 @@ export interface OtherItemCardProps {
   onEquipChange: (index: number, value: boolean) => void
   onStoryItemChange: (index: number, value: boolean) => void
   onBonusChange: (index: number, fieldName: CharacterItemBonusFieldName, value: number) => void
+  onBonusFieldChange: (
+    index: number,
+    previousFieldName: CharacterItemBonusFieldName,
+    nextFieldName: CharacterItemBonusFieldName,
+  ) => void
 }

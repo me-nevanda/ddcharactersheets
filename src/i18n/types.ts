@@ -204,6 +204,9 @@ export interface TranslationDictionary {
         rangeLabel: string
         proficiencyLabel: string
         bonusesLabel: string
+        addBonusButton: string
+        bonusTypeLabel: string
+        bonusValueLabel: string
         equippedLabel: string
         unequippedLabel: string
         storyItemLabel: string
