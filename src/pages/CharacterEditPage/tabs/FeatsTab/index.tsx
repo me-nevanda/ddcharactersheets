@@ -1,11 +1,10 @@
 import { AppIcon } from '@components/AppIcon'
 import { skillDefinitions } from '@dictionaries/characterEditDefinitions'
 import { type CharacterFeatBonusFieldName } from '../../featsLogic'
+import { ItemBonusEditor } from '../ItemsTab/ItemBonusEditor'
 import styles from '../../style.module.scss'
 import localStyles from './style.module.scss'
 import { useFeatsTab } from './useFeatsTab'
-
-const featBonusOptions = Array.from({ length: 16 }, (_, index) => index - 5)
 
 const featCoreFields = [
   { fieldName: 'speedBonusNumber', labelKey: 'pages.characterEdit.fields.speed' },
@@ -21,11 +20,14 @@ const featSkillFields = skillDefinitions.map((skill) => ({
   labelKey: skill.translationKey,
 })) satisfies ReadonlyArray<{ fieldName: CharacterFeatBonusFieldName; labelKey: string }>
 
+const featBonusFields = [...featCoreFields, ...featSkillFields]
+
 export function FeatsTab() {
   const {
     t,
     form,
     handleFeatChange,
+    handleFeatBonusFieldChange,
     pendingRemoval,
     handleAddFeat,
     handleRemoveFeat,
@@ -83,8 +85,8 @@ export function FeatsTab() {
                 </div>
               </div>
 
-              <div className={localStyles.featFieldsGrid}>
-                <label className={`${localStyles.featField} ${localStyles.featDescriptionField}`} htmlFor={`feat-description-${index}`}>
+              <div className={localStyles.featCardBody}>
+                <label className={localStyles.featDescriptionField} htmlFor={`feat-description-${index}`}>
                   <span className={styles.attributeLabel}>{t('pages.characterEdit.feats.descriptionLabel')}</span>
                   <textarea
                     className={`${styles.input} ${styles.abilityTextarea}`}
@@ -95,45 +97,15 @@ export function FeatsTab() {
                   />
                 </label>
 
-                {featCoreFields.map((field) => (
-                  <label key={field.fieldName} className={localStyles.featField} htmlFor={`feat-${field.fieldName}-${index}`}>
-                    <span className={styles.attributeLabel}>{t(field.labelKey)}</span>
-                    <select
-                      className={`${styles.input} ${styles.selectChevronInset} ${localStyles.featSelect}`}
-                      id={`feat-${field.fieldName}-${index}`}
-                      value={feat[field.fieldName]}
-                      onChange={(event) =>
-                        handleFeatChange(index, field.fieldName, Number.parseInt(event.target.value, 10))
-                      }
-                    >
-                      {featBonusOptions.map((bonus) => (
-                        <option key={bonus} value={bonus}>
-                          {bonus}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ))}
-
-                {featSkillFields.map((field) => (
-                  <label key={field.fieldName} className={localStyles.featField} htmlFor={`feat-${field.fieldName}-${index}`}>
-                    <span className={styles.attributeLabel}>{t(field.labelKey)}</span>
-                    <select
-                      className={`${styles.input} ${styles.selectChevronInset} ${localStyles.featSelect}`}
-                      id={`feat-${field.fieldName}-${index}`}
-                      value={feat[field.fieldName]}
-                      onChange={(event) =>
-                        handleFeatChange(index, field.fieldName, Number.parseInt(event.target.value, 10))
-                      }
-                    >
-                      {featBonusOptions.map((bonus) => (
-                        <option key={bonus} value={bonus}>
-                          {bonus}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ))}
+                <ItemBonusEditor
+                  bonusFields={featBonusFields}
+                  getBonusValue={(fieldName) => feat[fieldName]}
+                  idPrefix={`feat-${index}`}
+                  onBonusFieldChange={(previousFieldName, nextFieldName) =>
+                    handleFeatBonusFieldChange(index, previousFieldName, nextFieldName)
+                  }
+                  onBonusValueChange={(fieldName, value) => handleFeatChange(index, fieldName, value)}
+                />
               </div>
             </article>
           ))}

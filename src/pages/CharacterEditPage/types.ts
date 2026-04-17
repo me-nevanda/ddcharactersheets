@@ -14,6 +14,7 @@ import type {
   CharacterWeaponDamageDiceType,
   CharacterTraining,
 } from '../../types/character'
+import type { CharacterFeatBonusFieldName } from './featsLogic'
 
 export interface CharacterEditFormData extends Omit<Character, 'id' | 'updatedAt'> {
   bonuses: CharacterBonuses
@@ -61,6 +62,11 @@ export interface CharacterEditPageState {
   handleAbilityRemove: (index: number) => void
   handleFeatCreateEmpty: () => void
   handleFeatChange: (index: number, fieldName: CharacterFeatFieldName, value: string | number | boolean) => void
+  handleFeatBonusFieldChange: (
+    index: number,
+    previousFieldName: CharacterFeatBonusFieldName,
+    nextFieldName: CharacterFeatBonusFieldName,
+  ) => void
   handleFeatRemove: (index: number) => void
   handleItemCreateEmpty: (group: CharacterItemGroupKey) => void
   handleItemChange: (

@@ -10,23 +10,12 @@
   border: 0;
 }
 
-.featFieldsGrid {
+.featCardBody {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.6rem;
 }
 
 .featDescriptionField {
-  grid-column: 1 / -1;
-}
-
-.featField {
   display: grid;
   gap: 0.35rem;
-  min-width: 0;
-}
-
-.featSelect {
-  width: 100%;
-  min-width: 0;
 }

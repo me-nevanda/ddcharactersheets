@@ -953,6 +953,27 @@ export function useCharacterEditPage(): CharacterEditPageState {
     }))
   }
 
+  function handleFeatBonusFieldChange(
+    index: number,
+    previousFieldName: CharacterFeatBonusFieldName,
+    nextFieldName: CharacterFeatBonusFieldName,
+  ) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      feats: currentForm.feats.map((feat, featIndex) => {
+        if (featIndex !== index || previousFieldName === nextFieldName) {
+          return feat
+        }
+
+        return {
+          ...feat,
+          [previousFieldName]: 0,
+          [nextFieldName]: feat[previousFieldName],
+        }
+      }),
+    }))
+  }
+
   function handleFeatRemove(index: number) {
     setForm((currentForm) => ({
       ...currentForm,
@@ -1437,6 +1458,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
     handleAbilityRemove,
     handleFeatCreateEmpty,
     handleFeatChange,
+    handleFeatBonusFieldChange,
     handleFeatRemove,
     handleItemCreateEmpty,
     handleItemChange,
