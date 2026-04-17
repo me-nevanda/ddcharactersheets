@@ -81,7 +81,7 @@ export function ItemBonusEditor<TFieldName extends string>({
           {visibleFields.map((fieldName) => (
             <div key={`${idPrefix}-${fieldName}`} className={styles.bonusRow}>
               <select
-                className={`${styles.abilityHeaderSelect} ${styles.bonusTypeSelect}`}
+                className={`${styles.input} ${styles.selectChevronInset} ${styles.bonusTypeSelect}`}
                 aria-label={t('pages.characterEdit.items.bonusTypeLabel')}
                 id={`${idPrefix}-${fieldName}-type`}
                 value={fieldName}
@@ -97,7 +97,7 @@ export function ItemBonusEditor<TFieldName extends string>({
               </select>
 
               <select
-                className={`${styles.abilityHeaderSelect} ${styles.bonusValueSelect}`}
+                className={`${styles.input} ${styles.selectChevronInset} ${styles.bonusValueSelect}`}
                 aria-label={t('pages.characterEdit.items.bonusValueLabel')}
                 id={`${idPrefix}-${fieldName}-value`}
                 value={getBonusValue(fieldName)}

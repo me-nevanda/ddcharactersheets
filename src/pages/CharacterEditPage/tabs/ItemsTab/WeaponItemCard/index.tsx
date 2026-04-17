@@ -53,7 +53,7 @@ export function WeaponItemCard({
         <div className={styles.divider} data-label={t('pages.characterEdit.items.damageLabel')} />
         <div className={styles.weaponDamageRow}>
         <select
-          className={styles.abilityHeaderSelect}
+          className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponDiceSelect}`}
           value={weapon.damageDiceType}
           onChange={(event) =>
             onDamageChange(
@@ -71,7 +71,7 @@ export function WeaponItemCard({
         </select>
         <span className={styles.weaponDamageSeparator}>+</span>
         <select
-          className={styles.abilityHeaderSelect}
+          className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponAttackBonusSelect}`}
           value={weapon.damageBonusNumber}
           onChange={(event) => onDamageChange(index, 'damageBonusNumber', Number.parseInt(event.target.value, 10))}
         >
@@ -83,7 +83,7 @@ export function WeaponItemCard({
         </select>
         <span className={styles.weaponDamageTypeLabel}>{t('pages.characterEdit.items.rangeLabel')}</span>
         <select
-          className={styles.abilityHeaderSelect}
+          className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponRangeSelect}`}
           value={weapon.range}
           aria-label={t('pages.characterEdit.items.rangeLabel')}
           onChange={(event) => onDamageChange(index, 'range', Number.parseInt(event.target.value, 10))}
@@ -96,7 +96,7 @@ export function WeaponItemCard({
         </select>
         <span className={styles.weaponDamageTypeLabel}>{t('pages.characterEdit.items.proficiencyLabel')}</span>
         <select
-          className={styles.abilityHeaderSelect}
+          className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponAttackBonusSelect}`}
           value={weapon.weaponProficiencyBonusNumber}
           aria-label={t('pages.characterEdit.items.proficiencyLabel')}
           onChange={(event) =>

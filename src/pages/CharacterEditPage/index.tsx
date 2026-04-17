@@ -84,21 +84,24 @@ function CharacterEditPageContent() {
     <main className={styles.editorLayout}>
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
-          <div className={styles.headerCopy}>
-            <p className={styles.eyebrow}>{t('pages.characterEdit.eyebrow')}</p>
-            <label className={styles.titleField} htmlFor="name">
-              <span className={styles.srOnly}>{t('pages.characterEdit.fields.name')}</span>
-              <input
-                className={styles.titleInput}
-                id="name"
-                name="name"
-                type="text"
-                value={form.name}
-                onChange={handleGeneralChange}
-                placeholder={t('pages.characterEdit.placeholders.titleName')}
-                autoComplete="off"
-              />
-            </label>
+          <div className={styles.headerBrand}>
+            <img className={styles.headerLogo} src="/favicon.png" alt="" aria-hidden="true" />
+            <div className={styles.headerCopy}>
+              <p className={styles.eyebrow}>{t('pages.characterEdit.eyebrow')}</p>
+              <label className={styles.titleField} htmlFor="name">
+                <span className={styles.srOnly}>{t('pages.characterEdit.fields.name')}</span>
+                <input
+                  className={styles.titleInput}
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={form.name}
+                  onChange={handleGeneralChange}
+                  placeholder={t('pages.characterEdit.placeholders.titleName')}
+                  autoComplete="off"
+                />
+              </label>
+            </div>
           </div>
           <div className={styles.headerActions}>
             <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/">
