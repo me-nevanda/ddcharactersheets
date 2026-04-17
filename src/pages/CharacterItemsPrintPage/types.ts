@@ -4,6 +4,7 @@ export interface PrintItemRow {
   key: string
   name: string
   description: string
+  category: 'weapon' | 'armor' | 'other'
 }
 
 export interface CharacterItemsPrintPageState {
@@ -11,6 +12,7 @@ export interface CharacterItemsPrintPageState {
   error: string
   character: Character | null
   title: string
+  characterName: string
   hasItems: boolean
   armors: PrintItemRow[]
   weapons: PrintItemRow[]

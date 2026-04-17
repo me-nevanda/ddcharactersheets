@@ -320,8 +320,12 @@ export function useCharacterAbilitiesPrintPage(): CharacterAbilitiesPrintPageSta
   }, [characterId, t])
 
   useEffect(() => {
-    document.title = t('pages.characterAbilitiesPrint.title')
-  }, [t])
+    if (!character) {
+      return
+    }
+
+    document.title = `${t('pages.characterAbilitiesPrint.title')} - ${character.name || t('pages.characterList.unnamedCharacter')}`
+  }, [character, t])
 
   const computedState = useMemo<CharacterAbilitiesPrintPageState>(() => {
     if (!character) {
@@ -329,13 +333,14 @@ export function useCharacterAbilitiesPrintPage(): CharacterAbilitiesPrintPageSta
         loading,
         error,
         character,
+        title: t('pages.characterAbilitiesPrint.title'),
+        characterName: t('pages.characterList.unnamedCharacter'),
         abilityRows: [],
         featRows: [],
         abilityCount: 0,
         featCount: 0,
         hasAbilities: false,
         hasFeats: false,
-        title: t('pages.characterAbilitiesPrint.title'),
       }
     }
 
@@ -366,13 +371,14 @@ export function useCharacterAbilitiesPrintPage(): CharacterAbilitiesPrintPageSta
       loading,
       error,
       character,
+      title: t('pages.characterAbilitiesPrint.title'),
+      characterName: character.name || t('pages.characterList.unnamedCharacter'),
       abilityRows,
       featRows,
       abilityCount: abilityRows.length,
       featCount: featRows.length,
       hasAbilities: abilityRows.length > 0,
       hasFeats: featRows.length > 0,
-      title: t('pages.characterAbilitiesPrint.title'),
     }
   }, [character, error, loading, t])
 

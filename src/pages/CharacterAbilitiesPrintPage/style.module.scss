@@ -64,6 +64,11 @@
   gap: 0.3rem;
 }
 
+.printHeader {
+  display: none;
+  margin: 0;
+}
+
 .eyebrow {
   margin: 0;
   color: var(--accent-strong);
@@ -412,6 +417,14 @@
 
   .header {
     display: none;
+  }
+
+  .printHeader {
+    display: block;
+    color: #111;
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
   }
 
   .section,

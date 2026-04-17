@@ -3,9 +3,21 @@ import { useI18n } from '@i18n/index'
 import { useCharacterItemsPrintPage } from './useCharacterItemsPrintPage'
 import styles from './style.module.scss'
 
+function getItemEmoji(category: 'weapon' | 'armor' | 'other') {
+  if (category === 'weapon') {
+    return '⚔️'
+  }
+
+  if (category === 'armor') {
+    return '🛡️'
+  }
+
+  return '📿'
+}
+
 export function CharacterItemsPrintPage() {
   const { t } = useI18n()
-  const { character, loading, error, title, hasItems, armors, weapons, others } = useCharacterItemsPrintPage()
+  const { character, loading, error, title, characterName, hasItems, armors, weapons, others } = useCharacterItemsPrintPage()
   const extraSlots = [
     t('pages.characterItemsPrint.extraSlots.goldCoins'),
     '',
@@ -47,10 +59,11 @@ export function CharacterItemsPrintPage() {
       </button>
 
       <article className={styles.sheet}>
+        <p className={styles.printHeader}>{`${title} - ${characterName}`}</p>
         <header className={styles.header}>
           <div className={styles.headerCopy}>
-            <p className={styles.eyebrow}>{t('pages.characterItemsPrint.title')}</p>
-            <h1 className={styles.title}>{title}</h1>
+            <p className={styles.eyebrow}>{title}</p>
+            <h1 className={styles.title}>{characterName}</h1>
           </div>
         </header>
 
@@ -63,7 +76,12 @@ export function CharacterItemsPrintPage() {
                   <div className={styles.itemGrid}>
                     {weapons.map((item) => (
                       <article key={item.key} className={styles.itemCard}>
-                        <h3 className={styles.itemName}>{item.name}</h3>
+                        <h3 className={styles.itemName}>
+                          <span className={styles.itemEmoji} aria-hidden="true">
+                            {getItemEmoji(item.category)}
+                          </span>
+                          <span>{item.name}</span>
+                        </h3>
                         {item.description ? <p className={styles.itemDescription}>{item.description}</p> : null}
                       </article>
                     ))}
@@ -77,7 +95,12 @@ export function CharacterItemsPrintPage() {
                   <div className={styles.itemGrid}>
                     {armors.map((item) => (
                       <article key={item.key} className={styles.itemCard}>
-                        <h3 className={styles.itemName}>{item.name}</h3>
+                        <h3 className={styles.itemName}>
+                          <span className={styles.itemEmoji} aria-hidden="true">
+                            {getItemEmoji(item.category)}
+                          </span>
+                          <span>{item.name}</span>
+                        </h3>
                         {item.description ? <p className={styles.itemDescription}>{item.description}</p> : null}
                       </article>
                     ))}
@@ -91,7 +114,12 @@ export function CharacterItemsPrintPage() {
                   <div className={styles.itemGrid}>
                     {others.map((item) => (
                       <article key={item.key} className={styles.itemCard}>
-                        <h3 className={styles.itemName}>{item.name}</h3>
+                        <h3 className={styles.itemName}>
+                          <span className={styles.itemEmoji} aria-hidden="true">
+                            {getItemEmoji(item.category)}
+                          </span>
+                          <span>{item.name}</span>
+                        </h3>
                         {item.description ? <p className={styles.itemDescription}>{item.description}</p> : null}
                       </article>
                     ))}
@@ -107,7 +135,14 @@ export function CharacterItemsPrintPage() {
             <div className={styles.extraGrid}>
               {extraSlots.map((label, index) => (
                 <article key={`${label || 'empty'}-${index}`} className={styles.extraSlot}>
-                  {label ? <h3 className={styles.itemName}>{label}</h3> : null}
+                  {label ? (
+                    <h3 className={styles.itemName}>
+                      <span className={styles.itemEmoji} aria-hidden="true">
+                        🪙
+                      </span>
+                      <span>{label}</span>
+                    </h3>
+                  ) : null}
                 </article>
               ))}
             </div>

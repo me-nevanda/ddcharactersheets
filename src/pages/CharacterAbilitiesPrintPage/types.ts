@@ -34,11 +34,12 @@ export interface CharacterAbilitiesPrintPageState {
   loading: boolean
   error: string
   character: Character | null
+  title: string
+  characterName: string
   abilityRows: PrintAbilityRow[]
   featRows: PrintFeatRow[]
   abilityCount: number
   featCount: number
   hasAbilities: boolean
   hasFeats: boolean
-  title: string
 }

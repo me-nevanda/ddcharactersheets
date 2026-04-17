@@ -6,13 +6,17 @@ import { useI18n } from '@i18n/index'
 import { type Character } from '../../types/character'
 import type { CharacterItemsPrintPageState, PrintItemRow } from './types'
 
-function buildItemRows(items: Array<{ name: string; description: string }>): PrintItemRow[] {
+function buildItemRows(
+  items: Array<{ name: string; description: string }>,
+  category: PrintItemRow['category'],
+): PrintItemRow[] {
   return items
     .filter((item) => item.name.trim().length > 0 || item.description.trim().length > 0)
     .map((item, index) => ({
       key: `${item.name.trim() || 'item'}-${index}`,
       name: item.name,
       description: item.description,
+      category,
     }))
 }
 
@@ -67,6 +71,7 @@ export function useCharacterItemsPrintPage(): CharacterItemsPrintPageState {
         error,
         character,
         title: t('pages.characterItemsPrint.title'),
+        characterName: t('pages.characterList.unnamedCharacter'),
         hasItems: false,
         armors: [],
         weapons: [],
@@ -74,15 +79,16 @@ export function useCharacterItemsPrintPage(): CharacterItemsPrintPageState {
       }
     }
 
-    const armors = buildItemRows(character.items.armors)
-    const weapons = buildItemRows(character.items.weapons)
-    const others = buildItemRows(character.items.others)
+    const armors = buildItemRows(character.items.armors, 'armor')
+    const weapons = buildItemRows(character.items.weapons, 'weapon')
+    const others = buildItemRows(character.items.others, 'other')
 
     return {
       loading,
       error,
       character,
       title: t('pages.characterItemsPrint.title'),
+      characterName: character.name || t('pages.characterList.unnamedCharacter'),
       hasItems: armors.length > 0 || weapons.length > 0 || others.length > 0,
       armors,
       weapons,

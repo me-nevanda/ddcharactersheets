@@ -5,7 +5,7 @@ import styles from './style.module.scss'
 
 export function CharacterAbilitiesPrintPage() {
   const { t } = useI18n()
-  const { character, loading, error, abilityRows, featRows, hasAbilities, hasFeats, title } =
+  const { character, loading, error, abilityRows, featRows, hasAbilities, hasFeats, title, characterName } =
     useCharacterAbilitiesPrintPage()
   const standardAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.type === 'standard'))
   const unlimitedAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.type === 'unlimited'))
@@ -163,10 +163,11 @@ export function CharacterAbilitiesPrintPage() {
       </button>
 
       <article className={styles.sheet}>
+        <p className={styles.printHeader}>{`${title} - ${characterName}`}</p>
         <header className={styles.header}>
           <div className={styles.headerCopy}>
-            <p className={styles.eyebrow}>{t('pages.characterEdit.tabs.abilities')}</p>
-            <h1 className={styles.title}>{title}</h1>
+            <p className={styles.eyebrow}>{title}</p>
+            <h1 className={styles.title}>{characterName}</h1>
           </div>
         </header>
 
