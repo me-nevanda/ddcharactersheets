@@ -1,206 +1,42 @@
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  CheckCircle,
+  Circle,
+  ClothesIcon,
+  Delete,
+  FileText,
+  PencilEdit01Icon,
+  Plus,
+  Printer,
+  Save,
+} from '@hugeicons/core-free-icons'
+import type { IconSvgElement } from '@hugeicons/react'
 import type { AppIconProps } from './types'
 import styles from './style.module.scss'
 
-function getIconPath(name: AppIconProps['name']) {
-  switch (name) {
-    case 'check':
-      return (
-        <path
-          d="m5 13 4 4L19 7"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.9"
-        />
-      )
-    case 'circle':
-      return (
-        <circle
-          cx="12"
-          cy="12"
-          r="7.25"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.9"
-        />
-      )
-    case 'document':
-      return (
-        <>
-          <path
-            d="M7 3.75h6.5L17.5 7v13.25H7Z"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-          <path
-            d="M13.5 3.75V7H17.5"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-          <path
-            d="M9 11h6M9 14h6M9 17h4"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-        </>
-      )
-    case 'shirt':
-      return (
-        <>
-          <path
-            d="M9.5 5.5 12 7l2.5-1.5L18 8l-2 3v8H8V11L6 8Z"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-          <path
-            d="M12 7v4"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-        </>
-      )
-    case 'plus':
-      return (
-        <path
-          d="M12 5v14M5 12h14"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.9"
-        />
-      )
-    case 'print':
-      return (
-        <>
-          <path
-            d="M7 9V5h10v4"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-          <path
-            d="M7 17H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-          <path
-            d="M8 13h8v6H8z"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-        </>
-      )
-    case 'edit':
-      return (
-        <>
-          <path
-            d="M12 20h9"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-          <path
-            d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-        </>
-      )
-    case 'save':
-      return (
-        <>
-          <path
-            d="M5 4h11l3 3v13H5Z"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-          <path
-            d="M9 4v6h6V4M9 20v-6h6v6"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-        </>
-      )
-    case 'trash':
-    case 'delete':
-      return (
-        <>
-          <path
-            d="M4 7h16"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-          <path
-            d="M9 7V5h6v2m-8 0 1 12h8l1-12"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-          <path
-            d="M10 11v5M14 11v5"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.9"
-          />
-        </>
-      )
-  }
+const iconMap: Record<AppIconProps['name'], IconSvgElement> = {
+  check: CheckCircle,
+  circle: Circle,
+  delete: Delete,
+  document: FileText,
+  edit: PencilEdit01Icon,
+  plus: Plus,
+  print: Printer,
+  save: Save,
+  shirt: ClothesIcon,
+  trash: Delete,
 }
 
 export function AppIcon({ className, name }: AppIconProps) {
   const iconClassName = [styles.icon, className].filter(Boolean).join(' ')
 
   return (
-    <svg
+    <HugeiconsIcon
       aria-hidden="true"
       className={iconClassName}
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {getIconPath(name)}
-    </svg>
+      color="currentColor"
+      icon={iconMap[name]}
+      strokeWidth={1.9}
+    />
   )
 }

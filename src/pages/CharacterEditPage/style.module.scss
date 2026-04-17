@@ -159,7 +159,13 @@
 .buttonContent {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.55rem;
+}
+
+.buttonContent svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex-shrink: 0;
 }
 
 .printMenuList {
@@ -470,6 +476,14 @@
 .weaponEquipButton {
   @include pill-button;
   padding-inline: 0.75rem;
+}
+
+.weaponEquipButton svg,
+.abilityRemoveButton svg,
+.bonusAddButton svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
 }
 
 .weaponEquipButtonInactive {
