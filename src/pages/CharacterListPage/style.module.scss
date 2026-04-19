@@ -94,12 +94,6 @@
   gap: 0.45rem;
 }
 
-.actionIcon {
-  width: 1.1rem;
-  height: 1.1rem;
-  flex-shrink: 0;
-}
-
 .iconOnlyButton {
   min-width: 2.6rem;
   padding-inline: 0.65rem;
@@ -128,6 +122,7 @@
 
 .characterGrid {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.55rem;
   margin-top: 2.25rem;
 }
@@ -141,6 +136,18 @@
   padding: 0.8rem 0.9rem;
   border-radius: 0.95rem;
   cursor: pointer;
+}
+
+.cardBody {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.cardPortrait {
+  height: 95px;
 }
 
 .characterCard:hover {
@@ -159,10 +166,15 @@
   min-width: 0;
 }
 
+.cardMetaGroup {
+  display: grid;
+  gap: 0.15rem;
+}
+
 .characterName {
   margin: 0;
   color: var(--text-strong);
-  font-size: 1.18rem;
+  font-size: 1.4rem;
   line-height: 1.05;
 }
 
@@ -203,6 +215,10 @@
     align-items: stretch;
   }
 
+  .characterGrid {
+    grid-template-columns: 1fr;
+  }
+
   .iconOnlyButton {
     width: 100%;
   }
@@ -210,6 +226,16 @@
   .characterCard {
     grid-template-columns: 1fr;
     align-items: stretch;
+  }
+
+  .cardBody {
+    grid-template-columns: 68px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .cardPortrait {
+    width: 68px;
+    height: 96px;
   }
 
   .cardMeta {

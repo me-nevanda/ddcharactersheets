@@ -1,7 +1,7 @@
 import { useI18n } from '@i18n/index'
 import styles from '../../style.module.scss'
 import { useCharacterEditPageContext } from '../../characterEditPageContext'
-import { classOptions, raceOptions } from '@dictionaries/characterEditDefinitions'
+import { alignmentOptions, classOptions, genderOptions, raceOptions } from '@dictionaries/characterEditDefinitions'
 
 export function GeneralSection() {
   const { t } = useI18n()
@@ -77,6 +77,52 @@ export function GeneralSection() {
           >
             {classOptions.map((optionKey) => {
               const label = t(`pages.characterEdit.options.class.${optionKey}`)
+
+              return (
+                <option key={optionKey} value={optionKey}>
+                  {label}
+                </option>
+              )
+            })}
+          </select>
+        </div>
+
+        <div className={styles.generalCard}>
+          <label className={styles.attributeLabel} htmlFor="gender">
+            {t('pages.characterEdit.fields.gender')}
+          </label>
+          <select
+            className={`${styles.input} ${styles.selectChevronInset}`}
+            id="gender"
+            name="gender"
+            value={form.gender}
+            onChange={handleGeneralChange}
+          >
+            {genderOptions.map((optionKey) => {
+              const label = t(`pages.characterEdit.options.gender.${optionKey}`)
+
+              return (
+                <option key={optionKey} value={optionKey}>
+                  {label}
+                </option>
+              )
+            })}
+          </select>
+        </div>
+
+        <div className={styles.generalCard}>
+          <label className={styles.attributeLabel} htmlFor="alignment">
+            {t('pages.characterEdit.fields.alignment')}
+          </label>
+          <select
+            className={`${styles.input} ${styles.selectChevronInset}`}
+            id="alignment"
+            name="alignment"
+            value={form.alignment}
+            onChange={handleGeneralChange}
+          >
+            {alignmentOptions.map((optionKey) => {
+              const label = t(`pages.characterEdit.options.alignment.${optionKey}`)
 
               return (
                 <option key={optionKey} value={optionKey}>

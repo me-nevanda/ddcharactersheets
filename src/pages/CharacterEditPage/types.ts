@@ -21,7 +21,7 @@ export interface CharacterEditFormData extends Omit<Character, 'id' | 'updatedAt
   bonuses: CharacterBonuses
 }
 
-export type CharacterGeneralFieldName = 'name' | 'level' | 'race' | 'class'
+export type CharacterGeneralFieldName = 'name' | 'level' | 'race' | 'class' | 'gender' | 'alignment'
 
 export type CharacterAttributeFieldName = keyof CharacterAttributes
 

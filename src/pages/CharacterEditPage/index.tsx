@@ -85,7 +85,7 @@ function CharacterEditPageContent() {
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
           <div className={styles.headerBrand}>
-            <img className={styles.headerLogo} src="/favicon.png" alt="" aria-hidden="true" />
+            <img className={styles.headerLogo} src="/e1.png" alt="" aria-hidden="true" />
             <div className={styles.headerCopy}>
               <p className={styles.eyebrow}>{t('pages.characterEdit.eyebrow')}</p>
               <label className={styles.titleField} htmlFor="name">

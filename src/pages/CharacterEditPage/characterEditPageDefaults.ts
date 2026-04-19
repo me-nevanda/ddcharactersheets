@@ -1,4 +1,4 @@
-import { CharacterClass, CharacterRace } from '../../types/character'
+import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace } from '../../types/character'
 import { buildCharacterSpeed } from './sections/GeneralSection/generalSectionLogic'
 import type {
   CharacterArmor,
@@ -211,6 +211,8 @@ export const emptyForm: CharacterEditFormData = {
   level: 1,
   race: CharacterRace.Human,
   class: CharacterClass.Warlock,
+  gender: CharacterGender.Unspecified,
+  alignment: CharacterAlignment.TrueNeutral,
   hp: 0,
   surge: 0,
   speed: buildCharacterSpeed(CharacterRace.Human),

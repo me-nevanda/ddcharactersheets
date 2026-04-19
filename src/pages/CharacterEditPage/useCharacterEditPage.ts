@@ -61,6 +61,7 @@ import {
 import { buildFeatBonusSources, sumFeatBonus, type CharacterFeatBonusFieldName } from './featsLogic'
 import { skillDefinitions } from '@dictionaries/characterEditDefinitions'
 import {
+  CharacterAlignment,
   CharacterClass,
   type CharacterAbility,
   type CharacterAbilityAreaType,
@@ -71,6 +72,7 @@ import {
   type CharacterArmor,
   type CharacterDefenses,
   type CharacterFeat,
+  CharacterGender,
   type CharacterWeapon,
   type CharacterOtherItem,
   type CharacterItems,
@@ -190,6 +192,32 @@ function normalizeAbilityWeaponAttackDefense(
   }
 
   return ''
+}
+
+function normalizeGenderValue(value: unknown): CharacterGender {
+  if (value === CharacterGender.Male || value === CharacterGender.Female || value === CharacterGender.Unspecified) {
+    return value
+  }
+
+  return CharacterGender.Unspecified
+}
+
+function normalizeAlignmentValue(value: unknown): CharacterAlignment {
+  if (
+    value === CharacterAlignment.LawfulGood ||
+    value === CharacterAlignment.LawfulNeutral ||
+    value === CharacterAlignment.LawfulEvil ||
+    value === CharacterAlignment.NeutralGood ||
+    value === CharacterAlignment.TrueNeutral ||
+    value === CharacterAlignment.NeutralEvil ||
+    value === CharacterAlignment.ChaoticGood ||
+    value === CharacterAlignment.ChaoticNeutral ||
+    value === CharacterAlignment.ChaoticEvil
+  ) {
+    return value
+  }
+
+  return CharacterAlignment.TrueNeutral
 }
 
 function normalizeAbilityWeaponAttackBonusNumber(value: unknown): number {
@@ -769,6 +797,22 @@ export function useCharacterEditPage(): CharacterEditPageState {
         ...currentForm,
         class: normalizeClassValue(value),
         training: emptyTraining,
+      }))
+      return
+    }
+
+    if (fieldName === 'gender') {
+      setForm((currentForm) => ({
+        ...currentForm,
+        gender: normalizeGenderValue(value),
+      }))
+      return
+    }
+
+    if (fieldName === 'alignment') {
+      setForm((currentForm) => ({
+        ...currentForm,
+        alignment: normalizeAlignmentValue(value),
       }))
       return
     }
@@ -1357,6 +1401,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
         ...form,
         name: form.name.trim(),
         level: clampLevelValue(form.level),
+        gender: normalizeGenderValue(form.gender),
+        alignment: normalizeAlignmentValue(form.alignment),
         speed: buildCharacterSpeed(form.race),
         hp: hpValue,
         surge: surgeValue,

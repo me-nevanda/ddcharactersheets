@@ -22,6 +22,24 @@ export enum CharacterClass {
   Barbarian = 'barbarian',
 }
 
+export enum CharacterGender {
+  Male = 'male',
+  Female = 'female',
+  Unspecified = 'unspecified',
+}
+
+export enum CharacterAlignment {
+  LawfulGood = 'lawfulGood',
+  LawfulNeutral = 'lawfulNeutral',
+  LawfulEvil = 'lawfulEvil',
+  NeutralGood = 'neutralGood',
+  TrueNeutral = 'trueNeutral',
+  NeutralEvil = 'neutralEvil',
+  ChaoticGood = 'chaoticGood',
+  ChaoticNeutral = 'chaoticNeutral',
+  ChaoticEvil = 'chaoticEvil',
+}
+
 export interface CharacterAttributes {
   strength: number
   condition: number
@@ -289,6 +307,8 @@ export interface CharacterData {
   level: number
   race: CharacterRace
   class: CharacterClass
+  gender: CharacterGender
+  alignment: CharacterAlignment
   hp: number
   surge: number
   attributes: CharacterAttributes

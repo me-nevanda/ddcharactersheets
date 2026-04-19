@@ -1,5 +1,5 @@
 import type { AttributeDefinition, SkillDefinition } from './types'
-import { CharacterClass, CharacterRace } from '../types/character'
+import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace } from '../types/character'
 
 export const attributeDefinitions: AttributeDefinition[] = [
   { key: 'strength', translationKey: 'pages.characterEdit.fields.strength' },
@@ -122,4 +122,22 @@ export const classOptions: CharacterClass[] = [
   CharacterClass.Paladin,
   CharacterClass.Fighter,
   CharacterClass.Barbarian,
+]
+
+export const genderOptions: CharacterGender[] = [
+  CharacterGender.Male,
+  CharacterGender.Female,
+  CharacterGender.Unspecified,
+]
+
+export const alignmentOptions: CharacterAlignment[] = [
+  CharacterAlignment.LawfulGood,
+  CharacterAlignment.LawfulNeutral,
+  CharacterAlignment.LawfulEvil,
+  CharacterAlignment.NeutralGood,
+  CharacterAlignment.TrueNeutral,
+  CharacterAlignment.NeutralEvil,
+  CharacterAlignment.ChaoticGood,
+  CharacterAlignment.ChaoticNeutral,
+  CharacterAlignment.ChaoticEvil,
 ]

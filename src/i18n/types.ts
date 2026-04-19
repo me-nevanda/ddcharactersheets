@@ -222,6 +222,8 @@ export interface TranslationDictionary {
         surge: string
         race: string
         class: string
+        gender: string
+        alignment: string
         strength: string
         condition: string
         dexterity: string
@@ -279,6 +281,22 @@ export interface TranslationDictionary {
           paladin: string
           fighter: string
           barbarian: string
+        }
+        gender: {
+          male: string
+          female: string
+          unspecified: string
+        }
+        alignment: {
+          lawfulGood: string
+          lawfulNeutral: string
+          lawfulEvil: string
+          neutralGood: string
+          trueNeutral: string
+          neutralEvil: string
+          chaoticGood: string
+          chaoticNeutral: string
+          chaoticEvil: string
         }
       }
     }

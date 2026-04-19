@@ -24,7 +24,9 @@ import type {
   CharacterDefenseBonuses,
 } from '../src/types/character'
 import {
+  CharacterAlignment,
   CharacterClass as CharacterClassValue,
+  CharacterGender,
   CharacterRace as CharacterRaceValue,
 } from '../src/types/character'
 import { CharacterClass, CharacterRace } from '../src/types/character'
@@ -806,6 +808,26 @@ function normalizeClassValue(value: unknown): CharacterClass {
   return CharacterClass.Warlock
 }
 
+function normalizeGenderValue(value: unknown): CharacterGender {
+  if (typeof value === 'string') {
+    if (Object.values(CharacterGender).includes(value as CharacterGender)) {
+      return value as CharacterGender
+    }
+  }
+
+  return CharacterGender.Unspecified
+}
+
+function normalizeAlignmentValue(value: unknown): CharacterAlignment {
+  if (typeof value === 'string') {
+    if (Object.values(CharacterAlignment).includes(value as CharacterAlignment)) {
+      return value as CharacterAlignment
+    }
+  }
+
+  return CharacterAlignment.TrueNeutral
+}
+
 function normalizeCharacter(
   data: Partial<Record<keyof CharacterData, unknown>> = {},
 ): CharacterData {
@@ -865,6 +887,8 @@ function normalizeCharacter(
     level,
     race,
     class: clazz,
+    gender: normalizeGenderValue(data.gender),
+    alignment: normalizeAlignmentValue(data.alignment),
     hp: normalizeReadOnlyValue(data.hp),
     surge: normalizeReadOnlyValue(data.surge),
     speed,

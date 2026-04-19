@@ -1,10 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Edit02Icon } from '@hugeicons/core-free-icons'
 import { useI18n } from '@i18n/index'
-import { CharacterClass, CharacterRace } from '../../types/character'
+import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace } from '../../types/character'
 import type { Character } from '../../types/character'
 import styles from './style.module.scss'
 import type { CharacterListPageState } from './types'
@@ -28,6 +26,22 @@ function getClassLabel(character: Character, t: (key: string) => string): string
   }
 
   return t(`pages.characterEdit.options.class.${character.class}`)
+}
+
+function getGenderLabel(character: Character, t: (key: string) => string): string {
+  if (!Object.values(CharacterGender).includes(character.gender)) {
+    return t('pages.characterEdit.options.gender.unspecified')
+  }
+
+  return t(`pages.characterEdit.options.gender.${character.gender}`)
+}
+
+function getAlignmentLabel(character: Character, t: (key: string) => string): string {
+  if (!Object.values(CharacterAlignment).includes(character.alignment)) {
+    return t('pages.characterEdit.options.alignment.trueNeutral')
+  }
+
+  return t(`pages.characterEdit.options.alignment.${character.alignment}`)
 }
 
 function CharacterListPageContent({
@@ -97,16 +111,32 @@ function CharacterListPageContent({
                   }
                 }}
               >
-                <div className={styles.characterSummary}>
-                  <h2 className={styles.characterName}>{getCharacterLabel(character, t)}</h2>
-                  <div className={styles.cardMeta}>
-                    <span className={styles.cardMetaItem}>{getRaceLabel(character, t)}</span>
-                    <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
-                    <span className={styles.cardMetaItem}>{getClassLabel(character, t)}</span>
-                    <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
-                    <span className={styles.cardMetaItem}>
-                      {t('pages.characterEdit.fields.level')} {character.level}
-                    </span>
+                <div className={styles.cardBody}>
+                  <img
+                    className={styles.cardPortrait}
+                    src="/c1.png"
+                    alt=""
+                    aria-hidden="true"
+                  />
+
+                  <div className={styles.characterSummary}>
+                    <h2 className={styles.characterName}>{getCharacterLabel(character, t)}</h2>
+                    <div className={styles.cardMetaGroup}>
+                      <div className={styles.cardMeta}>
+                        <span className={styles.cardMetaItem}>{getRaceLabel(character, t)}</span>
+                        <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
+                        <span className={styles.cardMetaItem}>{getClassLabel(character, t)}</span>
+                        <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
+                        <span className={styles.cardMetaItem}>{getGenderLabel(character, t)}</span>
+                      </div>
+                      <div className={styles.cardMeta}>
+                        <span className={styles.cardMetaItem}>{getAlignmentLabel(character, t)}</span>
+                        <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
+                        <span className={styles.cardMetaItem}>
+                          {t('pages.characterEdit.fields.level')} {character.level}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -124,21 +154,6 @@ function CharacterListPageContent({
                   >
                     <AppIcon name="trash" />
                   </button>
-                  <Link
-                    aria-label={t('common.actions.edit')}
-                    className={`${styles.secondaryButton} ${styles.iconOnlyButton}`}
-                    title={t('common.actions.edit')}
-                    to={`/characters/${character.id}/edit`}
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    <HugeiconsIcon
-                      aria-hidden="true"
-                      className={styles.actionIcon}
-                      color="currentColor"
-                      icon={Edit02Icon}
-                      strokeWidth={1.9}
-                    />
-                  </Link>
                 </div>
               </article>
             ))}
