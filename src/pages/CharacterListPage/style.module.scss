@@ -140,14 +140,16 @@
 
 .cardBody {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 0.9rem;
   min-width: 0;
 }
 
 .cardPortrait {
-  height: 95px;
+  display: block;
+  height: 130px;
+
 }
 
 .characterCard:hover {
@@ -229,13 +231,13 @@
   }
 
   .cardBody {
-    grid-template-columns: 68px minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: start;
   }
 
   .cardPortrait {
-    width: 68px;
     height: 96px;
+    max-width: 6.8rem;
   }
 
   .cardMeta {

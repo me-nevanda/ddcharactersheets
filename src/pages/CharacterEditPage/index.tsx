@@ -4,11 +4,30 @@ import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
 import { CharacterEditPageProvider, useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext'
 import styles from './style.module.scss'
+import { CharacterGender, CharacterRace } from '../../types/character'
 import type { CharacterEditTabKey } from '@pages/CharacterEditPage/types'
 import { AbilitiesTab } from '@pages/CharacterEditPage/tabs/AbilitiesTab'
 import { GeneralTab } from '@pages/CharacterEditPage/tabs/GeneralTab'
 import { FeatsTab } from '@pages/CharacterEditPage/tabs/FeatsTab'
 import { ItemsTab } from '@pages/CharacterEditPage/tabs/ItemsTab'
+
+function getCharacterPortraitSrc(race: CharacterRace, gender: CharacterGender): string {
+  const raceKeyByCharacterRace: Record<CharacterRace, string> = {
+    [CharacterRace.Human]: 'human',
+    [CharacterRace.Tiefling]: 'thiefling',
+    [CharacterRace.Dragonborn]: 'dracon',
+    [CharacterRace.Eladrin]: 'eladrin',
+    [CharacterRace.Elf]: 'elf',
+    [CharacterRace.Dwarf]: 'dwarf',
+    [CharacterRace.Halfling]: 'halfing',
+    [CharacterRace.HalfElf]: 'halfelf',
+  }
+
+  const raceKey = raceKeyByCharacterRace[race] ?? raceKeyByCharacterRace[CharacterRace.Human]
+  const genderKey = gender === CharacterGender.Female ? 'female' : 'male'
+
+  return `/${raceKey}_${genderKey}.png`
+}
 
 function CharacterEditPageContent() {
   const { t } = useI18n()
@@ -85,7 +104,12 @@ function CharacterEditPageContent() {
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
           <div className={styles.headerBrand}>
-            <img className={styles.headerLogo} src="/e1.png" alt="" aria-hidden="true" />
+            <img
+              className={styles.headerLogo}
+              src={getCharacterPortraitSrc(form.race, form.gender)}
+              alt=""
+              aria-hidden="true"
+            />
             <div className={styles.headerCopy}>
               <p className={styles.eyebrow}>{t('pages.characterEdit.eyebrow')}</p>
               <label className={styles.titleField} htmlFor="name">

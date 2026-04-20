@@ -44,6 +44,24 @@ function getAlignmentLabel(character: Character, t: (key: string) => string): st
   return t(`pages.characterEdit.options.alignment.${character.alignment}`)
 }
 
+function getCharacterPortraitSrc(character: Character): string {
+  const raceKeyByCharacterRace: Record<CharacterRace, string> = {
+    [CharacterRace.Human]: 'human',
+    [CharacterRace.Tiefling]: 'thiefling',
+    [CharacterRace.Dragonborn]: 'dracon',
+    [CharacterRace.Eladrin]: 'eladrin',
+    [CharacterRace.Elf]: 'elf',
+    [CharacterRace.Dwarf]: 'dwarf',
+    [CharacterRace.Halfling]: 'halfing',
+    [CharacterRace.HalfElf]: 'halfelf',
+  }
+
+  const raceKey = raceKeyByCharacterRace[character.race] ?? raceKeyByCharacterRace[CharacterRace.Human]
+  const genderKey = character.gender === CharacterGender.Female ? 'female' : 'male'
+
+  return `/${raceKey}_${genderKey}.png`
+}
+
 function CharacterListPageContent({
   characters,
   creating,
@@ -114,7 +132,7 @@ function CharacterListPageContent({
                 <div className={styles.cardBody}>
                   <img
                     className={styles.cardPortrait}
-                    src="/c1.png"
+                    src={getCharacterPortraitSrc(character)}
                     alt=""
                     aria-hidden="true"
                   />
