@@ -146,10 +146,21 @@
   min-width: 0;
 }
 
-.cardPortrait {
-  display: block;
-  height: 130px;
+.cardPortraitStack {
+  display: grid;
+  align-content: start;
+}
 
+.cardPortrait {
+  grid-area: 1 / 1;
+  display: block;
+  height: 120px;
+}
+
+.cardClass {
+  grid-area: 1 / 1;
+  display: block;
+  height: 120px;
 }
 
 .characterCard:hover {
@@ -235,9 +246,14 @@
     align-items: start;
   }
 
-  .cardPortrait {
+  .cardPortraitStack {
+    align-content: start;
+  }
+
+  .cardPortrait,
+  .cardClass {
+    width: 96px;
     height: 96px;
-    max-width: 6.8rem;
   }
 
   .cardMeta {

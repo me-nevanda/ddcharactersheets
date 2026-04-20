@@ -27,6 +27,12 @@
   min-width: 0;
 }
 
+.headerPortraitStack {
+  display: grid;
+  align-content: start;
+  flex: 0 0 auto;
+}
+
 .headerActions {
   display: flex;
   flex-wrap: wrap;
@@ -60,10 +66,16 @@
 
 }
 
-.headerLogo {
+.headerPortrait {
+  grid-area: 1 / 1;
   display: block;
-  height: 130px;
-  flex: 0 0 auto;
+  height: 120px;
+}
+
+.headerClass {
+  grid-area: 1 / 1;
+  display: block;
+  height: 120px;
 }
 
 .eyebrow {

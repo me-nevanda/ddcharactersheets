@@ -62,6 +62,23 @@ function getCharacterPortraitSrc(character: Character): string {
   return `/${raceKey}_${genderKey}.png`
 }
 
+function getCharacterClassSrc(character: Character): string {
+  const classImageByCharacterClass: Record<CharacterClass, string> = {
+    [CharacterClass.Barbarian]: '/barbarian.png',
+    [CharacterClass.Bard]: '/bard.png',
+    [CharacterClass.Cleric]: '/cleric.png',
+    [CharacterClass.Fighter]: '/fighter.png',
+    [CharacterClass.Paladin]: '/paladin.png',
+    [CharacterClass.Ranger]: '/ranger.png',
+    [CharacterClass.Rogue]: '/rogue.png',
+    [CharacterClass.Warlock]: '/warlock.png',
+    [CharacterClass.Warlord]: '/warlord.png',
+    [CharacterClass.Wizard]: '/wizard.png',
+  }
+
+  return classImageByCharacterClass[character.class] ?? '/unnamed.png'
+}
+
 function CharacterListPageContent({
   characters,
   creating,
@@ -130,12 +147,26 @@ function CharacterListPageContent({
                 }}
               >
                 <div className={styles.cardBody}>
-                  <img
-                    className={styles.cardPortrait}
-                    src={getCharacterPortraitSrc(character)}
-                    alt=""
-                    aria-hidden="true"
-                  />
+                  <div className={styles.cardPortraitStack}>
+                    <img
+                      className={styles.cardPortrait}
+                      src={getCharacterPortraitSrc(character)}
+                      alt=""
+                      aria-hidden="true"
+                      onError={(event) => {
+                        event.currentTarget.src = '/unnamed.png'
+                      }}
+                    />
+                    <img
+                      className={styles.cardClass}
+                      src={getCharacterClassSrc(character)}
+                      alt=""
+                      aria-hidden="true"
+                      onError={(event) => {
+                        event.currentTarget.src = '/unnamed.png'
+                      }}
+                    />
+                  </div>
 
                   <div className={styles.characterSummary}>
                     <h2 className={styles.characterName}>{getCharacterLabel(character, t)}</h2>

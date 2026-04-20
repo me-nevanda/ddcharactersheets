@@ -4,7 +4,7 @@ import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
 import { CharacterEditPageProvider, useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext'
 import styles from './style.module.scss'
-import { CharacterGender, CharacterRace } from '../../types/character'
+import { CharacterClass, CharacterGender, CharacterRace } from '../../types/character'
 import type { CharacterEditTabKey } from '@pages/CharacterEditPage/types'
 import { AbilitiesTab } from '@pages/CharacterEditPage/tabs/AbilitiesTab'
 import { GeneralTab } from '@pages/CharacterEditPage/tabs/GeneralTab'
@@ -27,6 +27,23 @@ function getCharacterPortraitSrc(race: CharacterRace, gender: CharacterGender): 
   const genderKey = gender === CharacterGender.Female ? 'female' : 'male'
 
   return `/${raceKey}_${genderKey}.png`
+}
+
+function getCharacterClassSrc(characterClass: CharacterClass): string {
+  const classImageByCharacterClass: Record<CharacterClass, string> = {
+    [CharacterClass.Barbarian]: '/barbarian.png',
+    [CharacterClass.Bard]: '/bard.png',
+    [CharacterClass.Cleric]: '/cleric.png',
+    [CharacterClass.Fighter]: '/fighter.png',
+    [CharacterClass.Paladin]: '/paladin.png',
+    [CharacterClass.Ranger]: '/ranger.png',
+    [CharacterClass.Rogue]: '/rogue.png',
+    [CharacterClass.Warlock]: '/warlock.png',
+    [CharacterClass.Warlord]: '/warlord.png',
+    [CharacterClass.Wizard]: '/wizard.png',
+  }
+
+  return classImageByCharacterClass[characterClass] ?? '/unnamed.png'
 }
 
 function CharacterEditPageContent() {
@@ -104,12 +121,26 @@ function CharacterEditPageContent() {
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
           <div className={styles.headerBrand}>
-            <img
-              className={styles.headerLogo}
-              src={getCharacterPortraitSrc(form.race, form.gender)}
-              alt=""
-              aria-hidden="true"
-            />
+            <div className={styles.headerPortraitStack}>
+              <img
+                className={styles.headerPortrait}
+                src={getCharacterPortraitSrc(form.race, form.gender)}
+                alt=""
+                aria-hidden="true"
+                onError={(event) => {
+                  event.currentTarget.src = '/unnamed.png'
+                }}
+              />
+              <img
+                className={styles.headerClass}
+                src={getCharacterClassSrc(form.class)}
+                alt=""
+                aria-hidden="true"
+                onError={(event) => {
+                  event.currentTarget.src = '/unnamed.png'
+                }}
+              />
+            </div>
             <div className={styles.headerCopy}>
               <p className={styles.eyebrow}>{t('pages.characterEdit.eyebrow')}</p>
               <label className={styles.titleField} htmlFor="name">
