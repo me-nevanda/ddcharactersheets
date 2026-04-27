@@ -1,44 +1,28 @@
-import { AppIcon } from '@components/AppIcon'
-import { useI18n } from '@i18n/index'
-import { useCharacterPresentation } from '@pages/characterPresentationHooks'
-import { useCharacterPrintPage } from './useCharacterPrintPage'
-import styles from './style.module.scss'
-
-export function CharacterPrintPage() {
-  const { t } = useI18n()
-  const { getCharacterLabel, getClassLabel, getRaceLabel } = useCharacterPresentation()
-  const { character, loading, error, levelBonus, speedValue, hpValue, surgeValue, attributeRows, defenseRows, skillRows } =
-    useCharacterPrintPage()
-  const surgeHealingValue = Math.ceil(Math.max(0, hpValue) / 4)
-  const surgeLabel = `${t('pages.characterEdit.fields.surge')} (${surgeHealingValue} HP)`
-
-  if (loading) {
-    return (
-      <main className={styles.pageShell}>
+import { AppIcon } from '@components/AppIcon';
+import { useI18n } from '@i18n/index';
+import { useCharacterPresentation } from '@pages/characterPresentationHooks';
+import { useCharacterPrintPage } from './useCharacterPrintPage';
+import styles from './style.module.scss';
+export const CharacterPrintPage = () => {
+    const { t } = useI18n();
+    const { getCharacterLabel, getClassLabel, getRaceLabel } = useCharacterPresentation();
+    const { character, loading, error, levelBonus, speedValue, hpValue, surgeValue, attributeRows, defenseRows, skillRows } = useCharacterPrintPage();
+    const surgeHealingValue = Math.ceil(Math.max(0, hpValue) / 4);
+    const surgeLabel = `${t('pages.characterEdit.fields.surge')} (${surgeHealingValue} HP)`;
+    if (loading) {
+        return (<main className={styles.pageShell}>
         <p className={styles.status}>{t('pages.characterPrint.loading')}</p>
-      </main>
-    )
-  }
-
-  if (error || !character) {
-    return (
-      <main className={styles.pageShell}>
+      </main>);
+    }
+    if (error || !character) {
+        return (<main className={styles.pageShell}>
         <p className={styles.status}>{error || t('pages.characterPrint.error')}</p>
-      </main>
-    )
-  }
-
-  return (
-    <main className={styles.pageShell}>
-      <button
-        className={styles.printButton}
-        type="button"
-        aria-label={t('pages.characterPrint.printButtonLabel')}
-        title={t('pages.characterPrint.printButtonLabel')}
-        onClick={() => window.print()}
-      >
+      </main>);
+    }
+    return (<main className={styles.pageShell}>
+      <button className={styles.printButton} type="button" aria-label={t('pages.characterPrint.printButtonLabel')} title={t('pages.characterPrint.printButtonLabel')} onClick={() => window.print()}>
         <span className={styles.printButtonContent}>
-          <AppIcon name="print" />
+          <AppIcon name="print"/>
           <span>{t('pages.characterPrint.printButtonLabel')}</span>
         </span>
       </button>
@@ -57,7 +41,7 @@ export function CharacterPrintPage() {
             </div>
             <div className={styles.metaCard}>
               <span className={styles.metaLabel}>{t('pages.characterPrint.pdLabel')}</span>
-              <span className={styles.metaPlaceholder} aria-hidden="true" />
+              <span className={styles.metaPlaceholder} aria-hidden="true"/>
             </div>
             <div className={styles.metaCard}>
               <span className={styles.metaLabel}>{t('pages.characterEdit.fields.race')}</span>
@@ -75,12 +59,10 @@ export function CharacterPrintPage() {
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Umiejętności (K20+)</h2>
               <div className={styles.skillGrid}>
-                {skillRows.map((row) => (
-                  <div key={row.key} className={styles.skillCard}>
+                {skillRows.map((row) => (<div key={row.key} className={styles.skillCard}>
                     <span className={styles.skillLabel}>{row.label}</span>
                     <span className={styles.skillValue}>{row.value}</span>
-                  </div>
-                ))}
+                  </div>))}
               </div>
             </section>
           </section>
@@ -109,37 +91,32 @@ export function CharacterPrintPage() {
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Atrybuty</h2>
               <div className={styles.attributeGrid}>
-                {attributeRows.map((row) => (
-                  <div key={row.key} className={styles.attributeCard}>
+                {attributeRows.map((row) => (<div key={row.key} className={styles.attributeCard}>
                     <span className={styles.statLabel}>{row.label}</span>
                     <span className={styles.attributeValue}>
                       {row.value} ({row.modifier > 0 ? `+${row.modifier}` : row.modifier})
                     </span>
-                  </div>
-                ))}
+                  </div>))}
               </div>
             </section>
 
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Obrony</h2>
               <div className={styles.defenseGrid}>
-                {defenseRows.map((row) => (
-                  <div key={row.key} className={styles.defenseCard}>
+                {defenseRows.map((row) => (<div key={row.key} className={styles.defenseCard}>
                     <span className={styles.statLabel}>{row.label}</span>
                     <span className={styles.defenseValue}>{row.value}</span>
-                  </div>
-                ))}
+                  </div>))}
               </div>
             </section>
 
             <section className={`${styles.section} ${styles.otherPrintSection}`}>
               <h2 className={styles.sectionTitle}>Inne</h2>
-              <div className={styles.emptyPrintBlock} aria-hidden="true" />
+              <div className={styles.emptyPrintBlock} aria-hidden="true"/>
             </section>
           </section>
         </div>
       </article>
 
-    </main>
-  )
-}
+    </main>);
+};

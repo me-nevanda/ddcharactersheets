@@ -1,13 +1,10 @@
-import { useI18n } from '@i18n/index'
-import styles from '../../style.module.scss'
-import { useCharacterEditPageContext } from '../../characterEditPageContext'
-
-export function DefensesSection() {
-  const { t } = useI18n()
-  const { defenseValues, defenseTooltips } = useCharacterEditPageContext()
-
-  return (
-    <section className={styles.section}>
+import { useI18n } from '@i18n/index';
+import styles from '../../style.module.scss';
+import { useCharacterEditPageContext } from '../../characterEditPageContext';
+export const DefensesSection = () => {
+    const { t } = useI18n();
+    const { defenseValues, defenseTooltips } = useCharacterEditPageContext();
+    return (<section className={styles.section}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>{t('pages.characterEdit.sections.defenses')}</h2>
       </div>
@@ -41,6 +38,5 @@ export function DefensesSection() {
           </span>
         </div>
       </div>
-    </section>
-  )
-}
+    </section>);
+};

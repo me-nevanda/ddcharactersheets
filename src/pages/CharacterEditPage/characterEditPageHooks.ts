@@ -30,7 +30,7 @@ import {
 } from '@dictionaries/characterEditDefinitions'
 import { CharacterClass, CharacterRace } from '../../types/character'
 
-const emptyForm: CharacterEditFormData = {
+const emptyForm = CharacterEditFormData = {
   name: '',
   level: 1,
   race: CharacterRace.Human,
@@ -115,7 +115,7 @@ const emptyForm: CharacterEditFormData = {
   },
 }
 
-const zeroAttributeBonuses: CharacterAttributeBonuses = {
+const zeroAttributeBonuses = CharacterAttributeBonuses = {
   strength: 0,
   condition: 0,
   dexterity: 0,
@@ -124,14 +124,14 @@ const zeroAttributeBonuses: CharacterAttributeBonuses = {
   charisma: 0,
 }
 
-const zeroDefenseBonuses: CharacterDefenseBonuses = {
+const zeroDefenseBonuses = CharacterDefenseBonuses = {
   kp: 0,
   fortitude: 0,
   reflex: 0,
   will: 0,
 }
 
-const zeroDefenses: CharacterDefenses = {
+const zeroDefenses = CharacterDefenses = {
   kp: 0,
   fortitude: 0,
   reflex: 0,
@@ -181,7 +181,7 @@ function buildDefenseValues(
   levelBonus: number,
   race: CharacterRace,
 ): DefenseValues {
-  const racialDefenseBonuses: Partial<Record<keyof DefenseValues, number>> = {
+  const racialDefenseBonuses = Partial<Record<keyof DefenseValues, number>> = {
     kp: 0,
     fortitude: race === CharacterRace.Human ? 1 : 0,
     reflex: race === CharacterRace.Human ? 1 : 0,
@@ -373,7 +373,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
   const dwarfSkillBonus = form.race === CharacterRace.Dwarf ? 2 : 0
   const halflingSkillBonus = form.race === CharacterRace.Halfling ? 2 : 0
   const halfElfSkillBonus = form.race === CharacterRace.HalfElf ? 2 : 0
-  const racialSkillBonuses: Partial<Record<keyof CharacterSkillBonuses, number>> = {
+  const racialSkillBonuses = Partial<Record<keyof CharacterSkillBonuses, number>> = {
     acrobatics: form.race === CharacterRace.Halfling ? 2 : 0,
     arcana: form.race === CharacterRace.Eladrin ? 2 : 0,
     athletics: 0,
@@ -393,7 +393,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
     thievery: halflingSkillBonus,
   }
 
-  const skillBonuses: CharacterSkillBonuses = trainingDefinitions.reduce((acc, definition) => {
+  const skillBonuses = CharacterSkillBonuses = trainingDefinitions.reduce((acc, definition) => {
     const racialBonus = racialSkillBonuses[definition.key] ?? 0
 
     acc[definition.key] =
@@ -410,7 +410,7 @@ export function useCharacterEditPage(): CharacterEditPageState {
     setError('')
 
     try {
-      const bonuses: CharacterBonuses = {
+      const bonuses = CharacterBonuses = {
         level: levelBonusValue,
         attributes: attributeModifierMap,
         skills: skillBonuses,
@@ -444,13 +444,13 @@ export function useCharacterEditPage(): CharacterEditPageState {
     }
   }
 
-  const attributeRows: AttributeRow[] = attributeDefinitions.map(({ key }) => ({
+  const attributeRows = AttributeRow[] = attributeDefinitions.map(({ key }) => ({
     key,
     value: normalizedAttributes[key],
     modifierLabel: formatModifier(attributeModifierMap[key]),
   }))
 
-  const skillModifiers: SkillModifierMap = trainingDefinitions.reduce<SkillModifierMap>(
+  const skillModifiers = SkillModifierMap = trainingDefinitions.reduce<SkillModifierMap>(
     (acc, training) => {
       acc[training.key] = formatModifier(skillBonuses[training.key])
       return acc

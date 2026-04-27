@@ -1,0 +1,4 @@
+interface:
+  display_name: "Arrow Functions"
+  short_description: "Prefer arrow functions in JS and TS edits"
+  default_prompt: "Use $arrow-functions while editing this project so functions are written as arrow functions by default."
