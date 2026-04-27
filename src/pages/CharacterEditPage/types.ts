@@ -1,8 +1,9 @@
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from 'react'
 import type {
   CharacterAbility,
   CharacterAbilityType,
   Character,
+  CharacterAttributeBonuses,
   CharacterBonuses,
   CharacterAttributes,
   CharacterArmorBonusFieldName,
@@ -11,6 +12,7 @@ import type {
   CharacterItems,
   CharacterItemBonusFieldName,
   CharacterFeat,
+  CharacterSkillBonuses,
   CharacterWeaponFieldName,
   CharacterWeaponDamageDiceType,
   CharacterTraining,
@@ -119,4 +121,51 @@ export interface DefenseTooltipValues {
   fortitude: string
   reflex: string
   will: string
+}
+
+export type CharacterEditPageSetForm = Dispatch<SetStateAction<CharacterEditFormData>>
+
+export type CharacterEditPageSetBoolean = Dispatch<SetStateAction<boolean>>
+
+export type CharacterEditPageSetString = Dispatch<SetStateAction<string>>
+
+export type CharacterEditPageHandlerKeys =
+  | 'handleGeneralChange'
+  | 'handleAttributeChange'
+  | 'handleTrainingChange'
+  | 'handleAbilityCreateEmpty'
+  | 'handleAbilityAdd'
+  | 'handleAbilityChange'
+  | 'handleAbilityRemove'
+  | 'handleFeatCreateEmpty'
+  | 'handleFeatChange'
+  | 'handleFeatBonusFieldChange'
+  | 'handleFeatRemove'
+  | 'handleItemCreateEmpty'
+  | 'handleItemChange'
+  | 'handleItemBonusFieldChange'
+  | 'handleArmorBonusChange'
+  | 'handleWeaponDamageChange'
+  | 'handleItemRemove'
+
+export type CharacterEditPageHandlers = Pick<CharacterEditPageState, CharacterEditPageHandlerKeys>
+
+export interface CharacterEditPageComputedState {
+  attributeBonuses: CharacterAttributes
+  attributeBonusTooltips: Record<CharacterAttributeFieldName, string>
+  attributeModifierMap: CharacterAttributeBonuses
+  attributeRows: AttributeRow[]
+  defenseTooltips: DefenseTooltipValues
+  defenseValues: DefenseValues
+  hasChanges: boolean
+  hpTooltip: string
+  hpValue: number
+  levelBonusLabel: string
+  levelBonusValue: number
+  normalizedAttributes: CharacterAttributes
+  skillBonusesWithFeats: CharacterSkillBonuses
+  skillModifiers: SkillModifierMap
+  speedTooltip: string
+  speedValue: number
+  surgeValue: number
 }
