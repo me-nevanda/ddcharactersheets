@@ -1,22 +1,22 @@
-import type { Character, CharacterAbility, CharacterItems } from '../../types/character'
+import type { Character, CharacterAbility, CharacterItems } from '../../../types/character'
 
 export type CharacterItemGroupKey = keyof CharacterItems
 
 export interface PrintAttributeRow {
-  key: keyof Character['attributes']
+  key: Extract<keyof Character['attributes'], string>
   label: string
   value: number
   modifier: number
 }
 
 export interface PrintDefenseRow {
-  key: keyof Character['defenses']
+  key: Extract<keyof Character['defenses'], string>
   label: string
   value: number
 }
 
 export interface PrintSkillRow {
-  key: keyof Character['training']
+  key: Extract<keyof Character['training'], string>
   label: string
   value: number
   trained: boolean

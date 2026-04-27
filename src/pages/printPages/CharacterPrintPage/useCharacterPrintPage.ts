@@ -8,24 +8,24 @@ import {
   buildAttributeModifierMap,
   buildEffectiveAttributes,
   buildNormalizedAttributes,
-} from '../CharacterEditPage/sections/AttributesSection/attributesSectionLogic'
-import { buildDefenseValues, clampDefenseValue } from '../CharacterEditPage/sections/DefensesSection/defensesSectionLogic'
-import { buildSkillBonuses } from '../CharacterEditPage/sections/SkillSection/skillSectionLogic'
+} from '@pages/CharacterEditPage/sections/AttributesSection/attributesSectionLogic'
+import { buildDefenseValues, clampDefenseValue } from '@pages/CharacterEditPage/sections/DefensesSection/defensesSectionLogic'
+import { buildSkillBonuses } from '@pages/CharacterEditPage/sections/SkillSection/skillSectionLogic'
 import {
   buildCharacterHp,
   buildCharacterSpeed,
   buildCharacterSurge,
   clampSpeedValue,
   getLevelBonus,
-} from '../CharacterEditPage/sections/GeneralSection/generalSectionLogic'
-import { sumFeatBonus } from '../CharacterEditPage/featsLogic'
+} from '@pages/CharacterEditPage/sections/GeneralSection/generalSectionLogic'
+import { sumFeatBonus } from '@pages/CharacterEditPage/featsLogic'
 import type {
   Character,
   CharacterItemBonusFieldName,
   CharacterItems,
   CharacterSkillBonuses,
   CharacterTraining,
-} from '../../types/character'
+} from '../../../types/character'
 import type { CharacterPrintPageState } from './types'
 
 function sumEquippedItemBonus(items: CharacterItems, fieldName: CharacterItemBonusFieldName): number {

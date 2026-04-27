@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { getCharacter } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useI18n } from '@i18n/index'
-import { type Character } from '../../types/character'
+import { type Character } from '../../../types/character'
 import type { CharacterItemsPrintPageState, PrintItemRow } from './types'
 
 function buildItemRows(

@@ -1,10 +1,10 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { LanguageSwitcher } from './components/LanguageSwitcher'
-import { CharacterEditPage } from './pages/CharacterEditPage'
-import { CharacterAbilitiesPrintPage } from './pages/CharacterAbilitiesPrintPage'
-import { CharacterItemsPrintPage } from './pages/CharacterItemsPrintPage'
-import { CharacterListPage } from './pages/CharacterListPage'
-import { CharacterPrintPage } from './pages/CharacterPrintPage'
+import { LanguageSwitcher } from '@components/LanguageSwitcher'
+import { CharacterEditPage } from '@pages/CharacterEditPage'
+import { CharacterListPage } from '@pages/CharacterListPage'
+import { CharacterAbilitiesPrintPage } from '@pages/printPages/CharacterAbilitiesPrintPage'
+import { CharacterItemsPrintPage } from '@pages/printPages/CharacterItemsPrintPage'
+import { CharacterPrintPage } from '@pages/printPages/CharacterPrintPage'
 
 export default function App() {
   return (

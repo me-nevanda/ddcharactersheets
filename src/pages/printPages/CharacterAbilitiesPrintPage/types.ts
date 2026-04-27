@@ -1,4 +1,4 @@
-import type { CharacterAbility, Character } from '../../types/character'
+import type { CharacterAbility, Character } from '../../../types/character'
 
 export type PrintAbilityType = CharacterAbility['type']
 export type PrintAbilityKind = CharacterAbility['kind']

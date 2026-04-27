@@ -3,13 +3,13 @@ import { useParams } from 'react-router-dom'
 import { getCharacter } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useI18n } from '@i18n/index'
-import { type Character, type CharacterAbility, type CharacterAttributeBonuses } from '../../types/character'
+import { type Character, type CharacterAbility, type CharacterAttributeBonuses } from '../../../types/character'
 import {
   buildAttributeModifierMap,
   buildEffectiveAttributes,
   buildNormalizedAttributes,
-} from '../CharacterEditPage/sections/AttributesSection/attributesSectionLogic'
-import { formatModifier } from '../CharacterEditPage/sections/GeneralSection/generalSectionLogic'
+} from '@pages/CharacterEditPage/sections/AttributesSection/attributesSectionLogic'
+import { formatModifier } from '@pages/CharacterEditPage/sections/GeneralSection/generalSectionLogic'
 import type { CharacterAbilitiesPrintPageState, PrintAbilityDetailRow, PrintAbilityRow, PrintFeatRow } from './types'
 
 function buildAbilityMeta(t: ReturnType<typeof useI18n>['t'], ability: CharacterAbility): string[] {

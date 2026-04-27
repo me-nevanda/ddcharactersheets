@@ -1,5 +1,6 @@
 import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
+import type { PrintAbilityRow, PrintAbilityType } from './types'
 import { useCharacterAbilitiesPrintPage } from './useCharacterAbilitiesPrintPage'
 import styles from './style.module.scss'
 
@@ -12,7 +13,7 @@ export function CharacterAbilitiesPrintPage() {
   const encounterAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.type === 'encounter'))
   const dailyAbilities = sortAbilitiesByType(abilityRows.filter((ability) => ability.type === 'daily'))
 
-  function getAbilityTypeClass(type: 'standard' | 'unlimited' | 'encounter' | 'daily') {
+  function getAbilityTypeClass(type: PrintAbilityType) {
     if (type === 'standard') {
       return styles.abilityCardStandard
     }
@@ -28,7 +29,7 @@ export function CharacterAbilitiesPrintPage() {
     return styles.abilityCardUnlimited
   }
 
-  function getTypeBadgeClass(type: 'standard' | 'unlimited' | 'encounter' | 'daily') {
+  function getTypeBadgeClass(type: PrintAbilityType) {
     if (type === 'standard') {
       return styles.typeBadgeStandard
     }
@@ -44,8 +45,8 @@ export function CharacterAbilitiesPrintPage() {
     return styles.typeBadgeUnlimited
   }
 
-  function sortAbilitiesByType(abilities: typeof abilityRows): typeof abilityRows {
-    const typeRank: Record<'standard' | 'unlimited' | 'encounter' | 'daily', number> = {
+  function sortAbilitiesByType(abilities: PrintAbilityRow[]): PrintAbilityRow[] {
+    const typeRank: Record<PrintAbilityType, number> = {
       standard: 0,
       unlimited: 1,
       encounter: 2,
@@ -66,7 +67,7 @@ export function CharacterAbilitiesPrintPage() {
       .map(({ ability }) => ability)
   }
 
-  function renderAbilitySection(titleKey: string, abilities: typeof abilityRows) {
+  function renderAbilitySection(titleKey: string, abilities: PrintAbilityRow[]) {
     if (abilities.length === 0) {
       return null
     }

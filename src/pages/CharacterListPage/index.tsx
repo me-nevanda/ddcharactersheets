@@ -1,97 +1,25 @@
-import { useNavigate } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
 import { useI18n } from '@i18n/index'
-import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace } from '../../types/character'
-import type { Character } from '../../types/character'
 import styles from './style.module.scss'
 import type { CharacterListPageState } from './types'
 import { useCharacterListPage } from './useCharacterListPage'
 
-function getCharacterLabel(character: Character | null, t: (key: string) => string): string {
-  return character?.name || t('pages.characterList.unnamedCharacter')
-}
-
-function getRaceLabel(character: Character, t: (key: string) => string): string {
-  if (!Object.values(CharacterRace).includes(character.race)) {
-    return t('pages.characterList.missingRace')
-  }
-
-  return t(`pages.characterEdit.options.race.${character.race}`)
-}
-
-function getClassLabel(character: Character, t: (key: string) => string): string {
-  if (!Object.values(CharacterClass).includes(character.class)) {
-    return t('pages.characterList.missingClass')
-  }
-
-  return t(`pages.characterEdit.options.class.${character.class}`)
-}
-
-function getGenderLabel(character: Character, t: (key: string) => string): string {
-  if (!Object.values(CharacterGender).includes(character.gender)) {
-    return t('pages.characterEdit.options.gender.unspecified')
-  }
-
-  return t(`pages.characterEdit.options.gender.${character.gender}`)
-}
-
-function getAlignmentLabel(character: Character, t: (key: string) => string): string {
-  if (!Object.values(CharacterAlignment).includes(character.alignment)) {
-    return t('pages.characterEdit.options.alignment.trueNeutral')
-  }
-
-  return t(`pages.characterEdit.options.alignment.${character.alignment}`)
-}
-
-function getCharacterPortraitSrc(character: Character): string {
-  const raceKeyByCharacterRace: Record<CharacterRace, string> = {
-    [CharacterRace.Human]: 'human',
-    [CharacterRace.Tiefling]: 'thiefling',
-    [CharacterRace.Dragonborn]: 'dracon',
-    [CharacterRace.Eladrin]: 'eladrin',
-    [CharacterRace.Elf]: 'elf',
-    [CharacterRace.Dwarf]: 'dwarf',
-    [CharacterRace.Halfling]: 'halfing',
-    [CharacterRace.HalfElf]: 'halfelf',
-  }
-
-  const raceKey = raceKeyByCharacterRace[character.race] ?? raceKeyByCharacterRace[CharacterRace.Human]
-  const genderKey = character.gender === CharacterGender.Female ? 'female' : 'male'
-
-  return `/${raceKey}_${genderKey}.png`
-}
-
-function getCharacterClassSrc(character: Character): string {
-  const classImageByCharacterClass: Record<CharacterClass, string> = {
-    [CharacterClass.Barbarian]: '/barbarian.png',
-    [CharacterClass.Bard]: '/bard.png',
-    [CharacterClass.Cleric]: '/cleric.png',
-    [CharacterClass.Fighter]: '/fighter.png',
-    [CharacterClass.Paladin]: '/paladin.png',
-    [CharacterClass.Ranger]: '/ranger.png',
-    [CharacterClass.Rogue]: '/rogue.png',
-    [CharacterClass.Warlock]: '/warlock.png',
-    [CharacterClass.Warlord]: '/warlord.png',
-    [CharacterClass.Wizard]: '/wizard.png',
-  }
-
-  return classImageByCharacterClass[character.class] ?? '/unnamed.png'
-}
-
 function CharacterListPageContent({
-  characters,
+  cards,
   creating,
   deletingId,
+  deleteDialogCharacterName,
   error,
+  handleCardImageError,
   loading,
   characterToDelete,
   handleCloseDeleteDialog,
   handleConfirmDeleteCharacter,
   handleCreateCharacter,
-  handleOpenDeleteDialog,
+  showCharacterGrid,
+  showEmptyState,
 }: CharacterListPageState) {
-  const navigate = useNavigate()
   const { t } = useI18n()
 
   return (
@@ -124,65 +52,56 @@ function CharacterListPageContent({
           </section>
         ) : null}
 
-        {!loading && characters.length === 0 ? (
+        {showEmptyState ? (
           <section className={styles.emptyState}>
             <p className={styles.emptyText}>{t('pages.characterList.emptyState')}</p>
           </section>
         ) : null}
 
-        {!loading && characters.length > 0 ? (
+        {showCharacterGrid ? (
           <section className={styles.characterGrid}>
-            {characters.map((character) => (
+            {cards.map((card) => (
               <article
                 className={styles.characterCard}
-                key={character.id}
+                key={card.id}
                 role="link"
                 tabIndex={0}
-                onClick={() => navigate(`/characters/${character.id}/edit`)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    navigate(`/characters/${character.id}/edit`)
-                  }
-                }}
+                onClick={card.onOpen}
+                onKeyDown={card.onKeyDown}
               >
                 <div className={styles.cardBody}>
                   <div className={styles.cardPortraitStack}>
                     <img
                       className={styles.cardPortrait}
-                      src={getCharacterPortraitSrc(character)}
+                      src={card.portraitSrc}
                       alt=""
                       aria-hidden="true"
-                      onError={(event) => {
-                        event.currentTarget.src = '/unnamed.png'
-                      }}
+                      onError={handleCardImageError}
                     />
                     <img
                       className={styles.cardClass}
-                      src={getCharacterClassSrc(character)}
+                      src={card.classSrc}
                       alt=""
                       aria-hidden="true"
-                      onError={(event) => {
-                        event.currentTarget.src = '/unnamed.png'
-                      }}
+                      onError={handleCardImageError}
                     />
                   </div>
 
                   <div className={styles.characterSummary}>
-                    <h2 className={styles.characterName}>{getCharacterLabel(character, t)}</h2>
+                    <h2 className={styles.characterName}>{card.label}</h2>
                     <div className={styles.cardMetaGroup}>
                       <div className={styles.cardMeta}>
-                        <span className={styles.cardMetaItem}>{getRaceLabel(character, t)}</span>
+                        <span className={styles.cardMetaItem}>{card.raceLabel}</span>
                         <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
-                        <span className={styles.cardMetaItem}>{getClassLabel(character, t)}</span>
+                        <span className={styles.cardMetaItem}>{card.classLabel}</span>
                         <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
-                        <span className={styles.cardMetaItem}>{getGenderLabel(character, t)}</span>
+                        <span className={styles.cardMetaItem}>{card.genderLabel}</span>
                       </div>
                       <div className={styles.cardMeta}>
-                        <span className={styles.cardMetaItem}>{getAlignmentLabel(character, t)}</span>
+                        <span className={styles.cardMetaItem}>{card.alignmentLabel}</span>
                         <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
                         <span className={styles.cardMetaItem}>
-                          {t('pages.characterEdit.fields.level')} {character.level}
+                          {t('pages.characterEdit.fields.level')} {card.level}
                         </span>
                       </div>
                     </div>
@@ -195,11 +114,8 @@ function CharacterListPageContent({
                     className={`${styles.dangerButton} ${styles.iconOnlyButton}`}
                     type="button"
                     title={t('common.actions.delete')}
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      handleOpenDeleteDialog(character)
-                    }}
-                    disabled={deletingId === character.id}
+                    onClick={card.onDeleteClick}
+                    disabled={card.deleting || deletingId === card.id}
                   >
                     <AppIcon name="trash" />
                   </button>
@@ -211,7 +127,7 @@ function CharacterListPageContent({
       </main>
 
       <DeleteCharacterDialog
-        characterName={getCharacterLabel(characterToDelete, t)}
+        characterName={deleteDialogCharacterName}
         deleting={deletingId === characterToDelete?.id}
         open={Boolean(characterToDelete)}
         onCancel={handleCloseDeleteDialog}
