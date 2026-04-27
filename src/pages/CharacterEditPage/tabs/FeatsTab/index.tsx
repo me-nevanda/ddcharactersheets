@@ -4,7 +4,7 @@ import { type CharacterFeatBonusFieldName } from '../../featsLogic';
 import { ItemBonusEditor } from '../ItemsTab/ItemBonusEditor';
 import styles from '../../style.module.scss';
 import localStyles from './style.module.scss';
-import { useFeatsTab } from './useFeatsTab';
+import { useFeatsTab } from './featsTabHooks';
 const featCoreFields = [
     { fieldName: 'speedBonusNumber', labelKey: 'pages.characterEdit.fields.speed' },
     { fieldName: 'hpBonusNumber', labelKey: 'pages.characterEdit.fields.hp' },

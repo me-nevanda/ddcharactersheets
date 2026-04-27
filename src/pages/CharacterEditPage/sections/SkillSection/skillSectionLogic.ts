@@ -26,7 +26,7 @@ export const buildSkillBonuses = (level: number, attributeBonuses: CharacterAttr
         deception: race === CharacterRace.Tiefling ? 2 : 0,
         perception: race === CharacterRace.Elf ? 2 : 0,
         endurance: dwarfSkillBonus,
-        dungeoneering: dwarfSkillBonus,
+        dungeons: dwarfSkillBonus,
         nature: race === CharacterRace.Elf ? 2 : 0,
         religion: 0,
         insight: 0,

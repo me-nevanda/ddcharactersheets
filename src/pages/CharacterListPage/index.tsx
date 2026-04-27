@@ -4,7 +4,7 @@ import { CharacterListCard } from './CharacterListCard';
 import { CharacterListHeader } from './CharacterListHeader';
 import styles from './style.module.scss';
 import type { CharacterListPageState } from './types';
-import { useCharacterListPage } from './useCharacterListPage';
+import { useCharacterListPage } from './characterListPageStateHooks';
 const CharacterListPageContent = ({ cards, creating, deletingId, deleteDialogCharacterName, error, handleCardImageError, loading, characterToDelete, handleCloseDeleteDialog, handleConfirmDeleteCharacter, handleCreateCharacter, showCharacterGrid, showEmptyState, }: CharacterListPageState) => {
     const { t } = useI18n();
     return (<>

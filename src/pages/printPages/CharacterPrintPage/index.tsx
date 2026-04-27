@@ -1,7 +1,7 @@
 import { AppIcon } from '@components/AppIcon';
 import { useI18n } from '@i18n/index';
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
-import { useCharacterPrintPage } from './useCharacterPrintPage';
+import { useCharacterPrintPage } from './characterPrintPageHooks';
 import styles from './style.module.scss';
 export const CharacterPrintPage = () => {
     const { t } = useI18n();

@@ -57,9 +57,9 @@ export const skillDefinitions: SkillDefinition[] = [
     translationKey: 'pages.characterEdit.fields.endurance',
   },
   {
-    key: 'dungeoneering',
+    key: 'dungeons',
     attributeKey: 'intelligence',
-    translationKey: 'pages.characterEdit.fields.dungeoneering',
+    translationKey: 'pages.characterEdit.fields.dungeons',
   },
   {
     key: 'nature',

@@ -244,7 +244,7 @@ export interface TranslationDictionary {
         deception: string
         perception: string
         endurance: string
-        dungeoneering: string
+        dungeons: string
         nature: string
         religion: string
         insight: string

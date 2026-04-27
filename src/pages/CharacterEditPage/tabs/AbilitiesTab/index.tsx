@@ -2,7 +2,7 @@ import { AppIcon } from '@components/AppIcon';
 import styles from '../../style.module.scss';
 import { AbilityCard } from './AbilityCard';
 import { AbilityRemoveDialog } from './AbilityRemoveDialog';
-import { useAbilitiesTab } from './useAbilitiesTab';
+import { useAbilitiesTab } from './abilitiesTabHooks';
 export const AbilitiesTab = () => {
     const { t, activeType, weaponOptions, attributeOptions, defenseOptions, attackBonusOptions, weaponDamageTypeOptions, weaponAreaOptions, visibleAbilities, pendingRemoval, setActiveType, handleAbilityChange, handleAddAbility, handleRemoveAbility, handleConfirmRemoveAbility, handleCancelRemoveAbility, getAbilityHeaderClass, } = useAbilitiesTab();
     const abilityTypeTabs = [

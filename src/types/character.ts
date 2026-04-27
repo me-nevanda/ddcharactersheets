@@ -49,14 +49,7 @@ export interface CharacterAttributes {
   charisma: number
 }
 
-export interface CharacterAttributeBonuses {
-  strength: number
-  condition: number
-  dexterity: number
-  intelligence: number
-  wisdom: number
-  charisma: number
-}
+export interface CharacterAttributeBonuses extends CharacterAttributes {}
 
 export interface CharacterBonuses {
   level: number
@@ -110,7 +103,7 @@ export interface CharacterFeat {
   deceptionBonusNumber: number
   perceptionBonusNumber: number
   enduranceBonusNumber: number
-  dungeoneeringBonusNumber: number
+  dungeonsBonusNumber: number
   natureBonusNumber: number
   religionBonusNumber: number
   insightBonusNumber: number
@@ -181,8 +174,6 @@ export interface CharacterItems {
   weapons: CharacterWeapon[]
   others: CharacterOtherItem[]
 }
-
-export type CharacterItem = CharacterArmor | CharacterWeapon | CharacterOtherItem
 
 export type CharacterWeaponDamageDiceType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20'
 export type CharacterItemBonusFieldName =
@@ -265,7 +256,7 @@ export interface CharacterSkillBonuses {
   deception: number
   perception: number
   endurance: number
-  dungeoneering: number
+  dungeons: number
   nature: number
   religion: number
   insight: number
@@ -292,7 +283,7 @@ export interface CharacterTraining {
   deception: boolean
   perception: boolean
   endurance: boolean
-  dungeoneering: boolean
+  dungeons: boolean
   nature: boolean
   religion: boolean
   insight: boolean

@@ -1,6 +1,6 @@
 import { AppIcon } from '@components/AppIcon';
 import { useI18n } from '@i18n/index';
-import { useCharacterItemsPrintPage } from './useCharacterItemsPrintPage';
+import { useCharacterItemsPrintPage } from './characterItemsPrintPageHooks';
 import styles from './style.module.scss';
 const getItemIconName = (category: 'weapon' | 'armor' | 'other') => {
     if (category === 'weapon') {

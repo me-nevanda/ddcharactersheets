@@ -1,5 +1,5 @@
 import { createContext, useContext, type PropsWithChildren } from 'react';
-import { useCharacterEditPage } from './useCharacterEditPage';
+import { useCharacterEditPage } from './characterEditPageHooks';
 import type { CharacterEditPageState } from './types';
 const CharacterEditPageContext = createContext<CharacterEditPageState | null>(null);
 export const CharacterEditPageProvider = ({ children }: PropsWithChildren) => {

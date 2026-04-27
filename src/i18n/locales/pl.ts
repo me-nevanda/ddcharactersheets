@@ -245,7 +245,7 @@ export const pl: TranslationDictionary = {
         deception: 'Oszustwo',
         perception: 'Percepcja',
         endurance: 'Wytrzymałość',
-        dungeoneering: 'Podziemia',
+        dungeons: 'Podziemia',
         nature: 'Przyroda',
         religion: 'Religia',
         insight: 'Rozeznanie',

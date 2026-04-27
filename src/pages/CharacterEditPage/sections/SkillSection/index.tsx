@@ -32,7 +32,7 @@ const paladinHighlightedSkillKeys = new Set([
 const rangerHighlightedSkillKeys = new Set([
     'acrobatics',
     'athletics',
-    'dungeoneering',
+    'dungeons',
     'endurance',
     'healing',
     'nature',
@@ -43,7 +43,7 @@ const rogueHighlightedSkillKeys = new Set([
     'acrobatics',
     'athletics',
     'deception',
-    'dungeoneering',
+    'dungeons',
     'insight',
     'intimidation',
     'perception',
@@ -56,7 +56,7 @@ const rangerForcedSkillKeys = new Set(['nature']);
 const paladinForcedSkillKeys = new Set(['religion']);
 const clericHighlightedSkillKeys = new Set(['arcana', 'diplomacy', 'healing', 'history', 'insight']);
 const clericForcedSkillKeys = new Set(['religion']);
-const wizardHighlightedSkillKeys = new Set(['arcana', 'diplomacy', 'dungeoneering', 'history', 'insight', 'nature', 'religion']);
+const wizardHighlightedSkillKeys = new Set(['arcana', 'diplomacy', 'dungeons', 'history', 'insight', 'nature', 'religion']);
 const wizardForcedSkillKeys = new Set(['arcana']);
 const warlockHighlightedSkillKeys = new Set(['arcana', 'deception', 'history', 'insight', 'intimidation', 'religion', 'streetwise', 'thievery']);
 const warlordAndBardHighlightedSkillKeys = new Set([

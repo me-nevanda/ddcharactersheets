@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+﻿import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { CharacterAbility, CharacterAbilityAreaType, Character, CharacterAbilityAction, CharacterAbilityKind, CharacterAbilityType, CharacterAttributeBonuses, CharacterAttributes, CharacterBonuses, CharacterData, CharacterDefenses, CharacterArmor, CharacterFeat, CharacterWeapon, CharacterOtherItem, CharacterWeaponDamageDiceType, CharacterWeaponDamageType, CharacterSkillBonuses, CharacterTraining, CharacterDefenseBonuses, } from '../src/types/character';
@@ -224,7 +224,7 @@ const hasFeatContent = (feat: CharacterFeat): boolean => {
         feat.deceptionBonusNumber !== 0 ||
         feat.perceptionBonusNumber !== 0 ||
         feat.enduranceBonusNumber !== 0 ||
-        feat.dungeoneeringBonusNumber !== 0 ||
+        feat.dungeonsBonusNumber !== 0 ||
         feat.natureBonusNumber !== 0 ||
         feat.religionBonusNumber !== 0 ||
         feat.insightBonusNumber !== 0 ||
@@ -261,7 +261,7 @@ const normalizeFeats = (data: unknown): CharacterFeat[] => {
                 deceptionBonusNumber: 0,
                 perceptionBonusNumber: 0,
                 enduranceBonusNumber: 0,
-                dungeoneeringBonusNumber: 0,
+                dungeonsBonusNumber: 0,
                 natureBonusNumber: 0,
                 religionBonusNumber: 0,
                 insightBonusNumber: 0,
@@ -291,7 +291,7 @@ const normalizeFeats = (data: unknown): CharacterFeat[] => {
             deceptionBonusNumber: normalizeWeaponBonusNumber(item.deceptionBonusNumber),
             perceptionBonusNumber: normalizeWeaponBonusNumber(item.perceptionBonusNumber),
             enduranceBonusNumber: normalizeWeaponBonusNumber(item.enduranceBonusNumber),
-            dungeoneeringBonusNumber: normalizeWeaponBonusNumber(item.dungeoneeringBonusNumber),
+            dungeonsBonusNumber: normalizeWeaponBonusNumber(item.dungeonsBonusNumber),
             natureBonusNumber: normalizeWeaponBonusNumber(item.natureBonusNumber),
             religionBonusNumber: normalizeWeaponBonusNumber(item.religionBonusNumber),
             insightBonusNumber: normalizeWeaponBonusNumber(item.insightBonusNumber),
@@ -560,7 +560,7 @@ const buildSkillBonuses = (level: number, attributeBonuses: CharacterAttributeBo
         deception: withTraining(attributeBonuses.charisma, training.deception),
         perception: withTraining(attributeBonuses.wisdom, training.perception),
         endurance: withTraining(attributeBonuses.condition, training.endurance),
-        dungeoneering: withTraining(attributeBonuses.intelligence, training.dungeoneering),
+        dungeons: withTraining(attributeBonuses.intelligence, training.dungeons),
         nature: withTraining(attributeBonuses.wisdom, training.nature),
         religion: withTraining(attributeBonuses.intelligence, training.religion),
         insight: withTraining(attributeBonuses.charisma, training.insight),
@@ -587,7 +587,7 @@ const normalizeSkillBonuses = (data: Partial<Record<keyof CharacterSkillBonuses,
         deception: normalizeSkillBonusValue(data?.deception) ?? fallback.deception,
         perception: normalizeSkillBonusValue(data?.perception) ?? fallback.perception,
         endurance: normalizeSkillBonusValue(data?.endurance) ?? fallback.endurance,
-        dungeoneering: normalizeSkillBonusValue(data?.dungeoneering) ?? fallback.dungeoneering,
+        dungeons: normalizeSkillBonusValue(data?.dungeons) ?? fallback.dungeons,
         nature: normalizeSkillBonusValue(data?.nature) ?? fallback.nature,
         religion: normalizeSkillBonusValue(data?.religion) ?? fallback.religion,
         insight: normalizeSkillBonusValue(data?.insight) ?? fallback.insight,
@@ -617,7 +617,7 @@ const normalizeTraining = (data: Partial<Record<keyof CharacterTraining, unknown
         deception: normalizeTrainingValue(data.deception),
         perception: normalizeTrainingValue(data.perception),
         endurance: normalizeTrainingValue(data.endurance),
-        dungeoneering: normalizeTrainingValue(data.dungeoneering),
+        dungeons: normalizeTrainingValue(data.dungeons),
         nature: normalizeTrainingValue(data.nature),
         religion: normalizeTrainingValue(data.religion),
         insight: normalizeTrainingValue(data.insight),

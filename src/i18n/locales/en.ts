@@ -245,7 +245,7 @@ export const en: TranslationDictionary = {
         deception: 'Bluff',
         perception: 'Perception',
         endurance: 'Endurance',
-        dungeoneering: 'Dungeoneering',
+        dungeons: 'Dungeons',
         nature: 'Nature',
         religion: 'Religion',
         insight: 'Insight',

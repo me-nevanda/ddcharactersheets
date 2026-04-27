@@ -1,7 +1,7 @@
 import { AppIcon } from '@components/AppIcon';
 import { useI18n } from '@i18n/index';
 import type { PrintAbilityRow, PrintAbilityType } from './types';
-import { useCharacterAbilitiesPrintPage } from './useCharacterAbilitiesPrintPage';
+import { useCharacterAbilitiesPrintPage } from './characterAbilitiesPrintPageHooks';
 import styles from './style.module.scss';
 export const CharacterAbilitiesPrintPage = () => {
     const { t } = useI18n();
