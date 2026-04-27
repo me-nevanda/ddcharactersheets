@@ -1,10 +1,12 @@
 import { AppIcon } from '@components/AppIcon'
 import { useI18n } from '@i18n/index'
+import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import { useCharacterPrintPage } from './useCharacterPrintPage'
 import styles from './style.module.scss'
 
 export function CharacterPrintPage() {
   const { t } = useI18n()
+  const { getCharacterLabel, getClassLabel, getRaceLabel } = useCharacterPresentation()
   const { character, loading, error, levelBonus, speedValue, hpValue, surgeValue, attributeRows, defenseRows, skillRows } =
     useCharacterPrintPage()
   const surgeHealingValue = Math.ceil(Math.max(0, hpValue) / 4)
@@ -45,7 +47,7 @@ export function CharacterPrintPage() {
         <header className={styles.header}>
           <div className={styles.headerCopy}>
             <p className={styles.eyebrow}>{t('pages.characterPrint.title')}</p>
-            <h1 className={styles.title}>{character.name || t('pages.characterList.unnamedCharacter')}</h1>
+            <h1 className={styles.title}>{getCharacterLabel(character.name)}</h1>
           </div>
 
           <div className={styles.headerMeta}>
@@ -59,11 +61,11 @@ export function CharacterPrintPage() {
             </div>
             <div className={styles.metaCard}>
               <span className={styles.metaLabel}>{t('pages.characterEdit.fields.race')}</span>
-              <span className={styles.metaValue}>{t(`pages.characterEdit.options.race.${character.race}`)}</span>
+              <span className={styles.metaValue}>{getRaceLabel(character.race)}</span>
             </div>
             <div className={styles.metaCard}>
               <span className={styles.metaLabel}>{t('pages.characterEdit.fields.class')}</span>
-              <span className={styles.metaValue}>{t(`pages.characterEdit.options.class.${character.class}`)}</span>
+              <span className={styles.metaValue}>{getClassLabel(character.class)}</span>
             </div>
           </div>
         </header>

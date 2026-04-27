@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { getCharacter, saveCharacter } from '@lib/api'
 import { useI18n } from '@i18n/index'
 import { getErrorMessage } from '@lib/errors'
+import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import {
   emptyAbilities,
   emptyArmor,
@@ -509,6 +510,7 @@ function buildSourceTooltipLine(
 
 export function useCharacterEditPage(): CharacterEditPageState {
   const { t } = useI18n()
+  const { getClassLabel, getRaceLabel } = useCharacterPresentation()
   const { characterId = '' } = useParams()
   const [form, setForm] = useState<CharacterEditFormData>(emptyForm)
   const [initialForm, setInitialForm] = useState<CharacterEditFormData>(emptyForm)
@@ -1243,45 +1245,47 @@ export function useCharacterEditPage(): CharacterEditPageState {
   }
   const skillModifiers = buildSkillModifiers(skillBonusesWithFeats)
   const hasChanges = JSON.stringify(form) !== JSON.stringify(initialForm)
+  const raceLabel = getRaceLabel(form.race)
+  const classLabel = getClassLabel(form.class)
   const attributeBonusTooltips = {
     strength: buildAttributeTooltip(
       t('pages.characterEdit.sourceTooltip.raceBonus'),
-      t(`pages.characterEdit.options.race.${form.race}`),
+      raceLabel,
       form.attributesPlus.strength,
       t('pages.characterEdit.sourceTooltip.itemBonus'),
       buildEquippedItemBonusSources(form.items, 'strengthBonusNumber'),
     ),
     condition: buildAttributeTooltip(
       t('pages.characterEdit.sourceTooltip.raceBonus'),
-      t(`pages.characterEdit.options.race.${form.race}`),
+      raceLabel,
       form.attributesPlus.condition,
       t('pages.characterEdit.sourceTooltip.itemBonus'),
       buildEquippedItemBonusSources(form.items, 'conditionBonusNumber'),
     ),
     dexterity: buildAttributeTooltip(
       t('pages.characterEdit.sourceTooltip.raceBonus'),
-      t(`pages.characterEdit.options.race.${form.race}`),
+      raceLabel,
       form.attributesPlus.dexterity,
       t('pages.characterEdit.sourceTooltip.itemBonus'),
       buildEquippedItemBonusSources(form.items, 'dexterityBonusNumber'),
     ),
     intelligence: buildAttributeTooltip(
       t('pages.characterEdit.sourceTooltip.raceBonus'),
-      t(`pages.characterEdit.options.race.${form.race}`),
+      raceLabel,
       form.attributesPlus.intelligence,
       t('pages.characterEdit.sourceTooltip.itemBonus'),
       buildEquippedItemBonusSources(form.items, 'intelligenceBonusNumber'),
     ),
     wisdom: buildAttributeTooltip(
       t('pages.characterEdit.sourceTooltip.raceBonus'),
-      t(`pages.characterEdit.options.race.${form.race}`),
+      raceLabel,
       form.attributesPlus.wisdom,
       t('pages.characterEdit.sourceTooltip.itemBonus'),
       buildEquippedItemBonusSources(form.items, 'wisdomBonusNumber'),
     ),
     charisma: buildAttributeTooltip(
       t('pages.characterEdit.sourceTooltip.raceBonus'),
-      t(`pages.characterEdit.options.race.${form.race}`),
+      raceLabel,
       form.attributesPlus.charisma,
       t('pages.characterEdit.sourceTooltip.itemBonus'),
       buildEquippedItemBonusSources(form.items, 'charismaBonusNumber'),
@@ -1304,8 +1308,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
       t('pages.characterEdit.defenseTooltip.itemsBonus'),
       t('pages.characterEdit.sourceTooltip.featBonuses'),
-      t(`pages.characterEdit.options.race.${form.race}`),
-      t(`pages.characterEdit.options.class.${form.class}`),
+      raceLabel,
+      classLabel,
       defenseBreakdowns.kp.levelBonus,
       defenseBreakdowns.kp.raceBonus,
       defenseBreakdowns.kp.classBonus,
@@ -1322,8 +1326,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
       t('pages.characterEdit.defenseTooltip.itemsBonus'),
       t('pages.characterEdit.sourceTooltip.featBonuses'),
-      t(`pages.characterEdit.options.race.${form.race}`),
-      t(`pages.characterEdit.options.class.${form.class}`),
+      raceLabel,
+      classLabel,
       defenseBreakdowns.fortitude.levelBonus,
       defenseBreakdowns.fortitude.raceBonus,
       defenseBreakdowns.fortitude.classBonus,
@@ -1340,8 +1344,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
       t('pages.characterEdit.defenseTooltip.itemsBonus'),
       t('pages.characterEdit.sourceTooltip.featBonuses'),
-      t(`pages.characterEdit.options.race.${form.race}`),
-      t(`pages.characterEdit.options.class.${form.class}`),
+      raceLabel,
+      classLabel,
       defenseBreakdowns.reflex.levelBonus,
       defenseBreakdowns.reflex.raceBonus,
       defenseBreakdowns.reflex.classBonus,
@@ -1358,8 +1362,8 @@ export function useCharacterEditPage(): CharacterEditPageState {
       t('pages.characterEdit.defenseTooltip.attributesBonus'),
       t('pages.characterEdit.defenseTooltip.itemsBonus'),
       t('pages.characterEdit.sourceTooltip.featBonuses'),
-      t(`pages.characterEdit.options.race.${form.race}`),
-      t(`pages.characterEdit.options.class.${form.class}`),
+      raceLabel,
+      classLabel,
       defenseBreakdowns.will.levelBonus,
       defenseBreakdowns.will.raceBonus,
       defenseBreakdowns.will.classBonus,

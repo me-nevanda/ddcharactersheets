@@ -1,6 +1,6 @@
 import { useI18n } from '@i18n/index'
 import {
-  getCharacterDialogLabel,
+  useCharacterDialogLabel,
   useCharacterCardImageError,
   useCharacterListActions,
   useCharacterListCards,
@@ -26,14 +26,14 @@ export function useCharacterListPage(): CharacterListPageState {
     deletingId,
     openCharacter,
     handleOpenDeleteDialog,
-    t,
   )
   const handleCardImageError = useCharacterCardImageError()
+  const deleteDialogCharacterName = useCharacterDialogLabel(characterToDelete)
 
   return {
     cards,
     creating,
-    deleteDialogCharacterName: getCharacterDialogLabel(characterToDelete, t),
+    deleteDialogCharacterName,
     deletingId,
     error,
     handleCardImageError,

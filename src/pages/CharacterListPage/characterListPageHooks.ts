@@ -3,85 +3,9 @@ import type { Dispatch, SetStateAction, SyntheticEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createCharacter, deleteCharacter, listCharacters } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
-import {
-  CharacterAlignment,
-  CharacterClass,
-  CharacterGender,
-  CharacterRace,
-} from '../../types/character'
+import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import type { Character } from '../../types/character'
 import type { CharacterListCardViewModel } from './types'
-
-const raceKeyByCharacterRace: Record<CharacterRace, string> = {
-  [CharacterRace.Human]: 'human',
-  [CharacterRace.Tiefling]: 'thiefling',
-  [CharacterRace.Dragonborn]: 'dracon',
-  [CharacterRace.Eladrin]: 'eladrin',
-  [CharacterRace.Elf]: 'elf',
-  [CharacterRace.Dwarf]: 'dwarf',
-  [CharacterRace.Halfling]: 'halfing',
-  [CharacterRace.HalfElf]: 'halfelf',
-}
-
-const classImageByCharacterClass: Record<CharacterClass, string> = {
-  [CharacterClass.Barbarian]: '/barbarian.png',
-  [CharacterClass.Bard]: '/bard.png',
-  [CharacterClass.Cleric]: '/cleric.png',
-  [CharacterClass.Fighter]: '/fighter.png',
-  [CharacterClass.Paladin]: '/paladin.png',
-  [CharacterClass.Ranger]: '/ranger.png',
-  [CharacterClass.Rogue]: '/rogue.png',
-  [CharacterClass.Warlock]: '/warlock.png',
-  [CharacterClass.Warlord]: '/warlord.png',
-  [CharacterClass.Wizard]: '/wizard.png',
-}
-
-function getCharacterLabel(character: Character | null, t: (key: string) => string): string {
-  return character?.name || t('pages.characterList.unnamedCharacter')
-}
-
-function getRaceLabel(character: Character, t: (key: string) => string): string {
-  if (!Object.values(CharacterRace).includes(character.race)) {
-    return t('pages.characterList.missingRace')
-  }
-
-  return t(`pages.characterEdit.options.race.${character.race}`)
-}
-
-function getClassLabel(character: Character, t: (key: string) => string): string {
-  if (!Object.values(CharacterClass).includes(character.class)) {
-    return t('pages.characterList.missingClass')
-  }
-
-  return t(`pages.characterEdit.options.class.${character.class}`)
-}
-
-function getGenderLabel(character: Character, t: (key: string) => string): string {
-  if (!Object.values(CharacterGender).includes(character.gender)) {
-    return t('pages.characterEdit.options.gender.unspecified')
-  }
-
-  return t(`pages.characterEdit.options.gender.${character.gender}`)
-}
-
-function getAlignmentLabel(character: Character, t: (key: string) => string): string {
-  if (!Object.values(CharacterAlignment).includes(character.alignment)) {
-    return t('pages.characterEdit.options.alignment.trueNeutral')
-  }
-
-  return t(`pages.characterEdit.options.alignment.${character.alignment}`)
-}
-
-function getCharacterPortraitSrc(character: Character): string {
-  const raceKey = raceKeyByCharacterRace[character.race] ?? raceKeyByCharacterRace[CharacterRace.Human]
-  const genderKey = character.gender === CharacterGender.Female ? 'female' : 'male'
-
-  return `/${raceKey}_${genderKey}.png`
-}
-
-function getCharacterClassSrc(character: Character): string {
-  return classImageByCharacterClass[character.class] ?? '/unnamed.png'
-}
 
 export function useCharacterListData(t: (key: string) => string) {
   const [characters, setCharacters] = useState<Character[]>([])
@@ -199,15 +123,24 @@ export function useCharacterListCards(
   deletingId: string,
   openCharacter: (characterId: string) => void,
   handleOpenDeleteDialog: (character: Character) => void,
-  t: (key: string) => string,
 ): CharacterListCardViewModel[] {
+  const {
+    getAlignmentLabel,
+    getCharacterClassSrc,
+    getCharacterLabel,
+    getCharacterPortraitSrc,
+    getClassLabel,
+    getGenderLabel,
+    getRaceLabel,
+  } = useCharacterPresentation()
+
   return characters.map((character) => ({
     id: character.id,
-    alignmentLabel: getAlignmentLabel(character, t),
-    classLabel: getClassLabel(character, t),
+    alignmentLabel: getAlignmentLabel(character.alignment),
+    classLabel: getClassLabel(character.class),
     deleting: deletingId === character.id,
-    genderLabel: getGenderLabel(character, t),
-    label: getCharacterLabel(character, t),
+    genderLabel: getGenderLabel(character.gender),
+    label: getCharacterLabel(character.name),
     level: character.level,
     onDeleteClick: (event) => {
       event.stopPropagation()
@@ -222,9 +155,9 @@ export function useCharacterListCards(
     onOpen: () => {
       openCharacter(character.id)
     },
-    portraitSrc: getCharacterPortraitSrc(character),
-    raceLabel: getRaceLabel(character, t),
-    classSrc: getCharacterClassSrc(character),
+    portraitSrc: getCharacterPortraitSrc(character.race, character.gender),
+    raceLabel: getRaceLabel(character.race),
+    classSrc: getCharacterClassSrc(character.class),
   }))
 }
 
@@ -236,6 +169,8 @@ export function useCharacterCardImageError() {
   return handleCardImageError
 }
 
-export function getCharacterDialogLabel(character: Character | null, t: (key: string) => string): string {
-  return getCharacterLabel(character, t)
+export function useCharacterDialogLabel(character: Character | null) {
+  const { getCharacterLabel } = useCharacterPresentation()
+
+  return getCharacterLabel(character?.name)
 }
