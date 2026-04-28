@@ -13,7 +13,7 @@ import {
   emptyItems,
 } from './characterEditPageUtils'
 import { formatModifier } from './sections/GeneralSection/generalSectionLogic'
-import { CharacterAlignment, CharacterGender } from '../../types/character'
+import { CharacterAlignment, CharacterGender, isCharacterWeaponDamageType } from '../../types/character'
 import type {
   CharacterAbility,
   CharacterAbilityAreaType,
@@ -90,19 +90,7 @@ export const normalizeAbilityWeaponDamageType = (
   value: unknown,
   fallback: CharacterWeaponDamageType,
 ): CharacterWeaponDamageType => {
-  if (
-    value === 'normal'
-    || value === 'acid'
-    || value === 'cold'
-    || value === 'fire'
-    || value === 'force'
-    || value === 'lightning'
-    || value === 'necrotic'
-    || value === 'poison'
-    || value === 'psychic'
-    || value === 'radiant'
-    || value === 'thunder'
-  ) {
+  if (isCharacterWeaponDamageType(value)) {
     return value
   }
 

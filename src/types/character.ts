@@ -200,6 +200,7 @@ export type CharacterWeaponFieldName =
   | 'equipped'
   | 'weaponProficiencyBonusNumber'
   | CharacterWeaponBonusFieldName
+
 export type CharacterWeaponDamageType =
   | 'normal'
   | 'acid'
@@ -212,6 +213,24 @@ export type CharacterWeaponDamageType =
   | 'psychic'
   | 'radiant'
   | 'thunder'
+
+export const characterWeaponDamageTypes = [
+  'normal',
+  'acid',
+  'cold',
+  'fire',
+  'force',
+  'lightning',
+  'necrotic',
+  'poison',
+  'psychic',
+  'radiant',
+  'thunder',
+] as const satisfies readonly CharacterWeaponDamageType[]
+
+export const isCharacterWeaponDamageType = (value: unknown): value is CharacterWeaponDamageType => {
+  return typeof value === 'string' && characterWeaponDamageTypes.includes(value as CharacterWeaponDamageType)
+}
 
 export type CharacterAbilityAction = 'action' | 'noAction'
 export type CharacterAbilityType = 'standard' | 'unlimited' | 'encounter' | 'daily'

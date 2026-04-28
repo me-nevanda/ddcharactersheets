@@ -3,7 +3,7 @@ import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promi
 import path from 'node:path';
 import type { CharacterAbility, CharacterAbilityAreaType, Character, CharacterAbilityAction, CharacterAbilityKind, CharacterAbilityType, CharacterAttributeBonuses, CharacterAttributes, CharacterBonuses, CharacterData, CharacterDefenses, CharacterArmor, CharacterFeat, CharacterWeapon, CharacterOtherItem, CharacterWeaponDamageDiceType, CharacterWeaponDamageType, CharacterSkillBonuses, CharacterTraining, CharacterDefenseBonuses, } from '../src/types/character';
 import { CharacterAlignment, CharacterClass as CharacterClassValue, CharacterGender, CharacterRace as CharacterRaceValue, } from '../src/types/character';
-import { CharacterClass, CharacterRace } from '../src/types/character';
+import { CharacterClass, CharacterRace, isCharacterWeaponDamageType } from '../src/types/character';
 interface ApiError extends Error {
     code?: string;
     statusCode?: number;
@@ -77,17 +77,7 @@ const normalizeAbilityWeaponDamageDiceType = (value: unknown): CharacterWeaponDa
     return 'd4';
 };
 const normalizeAbilityWeaponDamageType = (value: unknown): CharacterWeaponDamageType => {
-    if (value === 'normal' ||
-        value === 'acid' ||
-        value === 'cold' ||
-        value === 'fire' ||
-        value === 'force' ||
-        value === 'lightning' ||
-        value === 'necrotic' ||
-        value === 'poison' ||
-        value === 'psychic' ||
-        value === 'radiant' ||
-        value === 'thunder') {
+    if (isCharacterWeaponDamageType(value)) {
         return value;
     }
     return 'normal';
