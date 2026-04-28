@@ -5,9 +5,13 @@ import { SkillSection } from '../../sections/SkillSection';
 import styles from '../../style.module.scss';
 export const GeneralTab = () => {
     return (<div className={styles.sectionsGrid}>
-      <GeneralSection />
-      <AttributesSection />
-      <DefensesSection />
-      <SkillSection />
+      <div className={styles.sectionColumn}>
+        <GeneralSection />
+        <DefensesSection />
+      </div>
+      <div className={styles.sectionColumn}>
+        <AttributesSection />
+        <SkillSection />
+      </div>
     </div>);
 };
