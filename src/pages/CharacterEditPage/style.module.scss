@@ -1241,12 +1241,19 @@
   }
 
   .floatingBackAction,
-  .floatingSaveAction,
-  .printAction {
+  .floatingSaveAction {
     position: static;
     top: auto;
     right: auto;
     left: auto;
+  }
+
+  .printAction {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    z-index: 30;
   }
 
   .floatingSaveAction {
