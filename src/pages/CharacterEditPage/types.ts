@@ -18,6 +18,8 @@ import type {
   CharacterTraining,
 } from '../../types/character'
 import type { CharacterFeatBonusFieldName } from './featsLogic'
+import type { AttributeRow } from './sections/AttributesSection/types'
+import type { DefenseTooltipValues, DefenseValues } from './sections/DefensesSection/types'
 
 export interface CharacterEditFormData extends Omit<Character, 'id' | 'updatedAt'> {
   bonuses: CharacterBonuses
@@ -40,12 +42,6 @@ export type CharacterItemFieldName = keyof CharacterItemBase | 'equipped'
 export type CharacterItemGroupKey = keyof CharacterItems
 
 export type CharacterEditTabKey = 'general' | 'abilities' | 'feats' | 'items'
-
-export interface AttributeRow {
-  key: CharacterAttributeFieldName
-  value: number
-  modifierLabel: string
-}
 
 export type SkillModifierMap = Record<CharacterSkillFieldName, string>
 
@@ -107,20 +103,6 @@ export interface CharacterEditPageState {
   hpValue: number
   surgeValue: number
   hasChanges: boolean
-}
-
-export interface DefenseValues {
-  kp: number
-  fortitude: number
-  reflex: number
-  will: number
-}
-
-export interface DefenseTooltipValues {
-  kp: string
-  fortitude: string
-  reflex: string
-  will: string
 }
 
 export type CharacterEditPageSetForm = Dispatch<SetStateAction<CharacterEditFormData>>

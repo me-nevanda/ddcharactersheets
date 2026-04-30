@@ -1,32 +1,43 @@
-import { useI18n } from '@i18n/index';
-import styles from '../../style.module.scss';
-import { useCharacterEditPageContext } from '../../characterEditPageContext';
-import { attributeDefinitions } from '@dictionaries/characterEditDefinitions';
-const formatSignedValue = (value: number): string => {
-    return value > 0 ? `+${value}` : String(value);
-};
+import styles from '../../style.module.scss'
+import { useAttributesSection } from './attributesSectionHooks'
+
 export const AttributesSection = () => {
-    const { t } = useI18n();
-    const { attributeRows, attributeBonuses, attributeBonusTooltips, handleAttributeChange } = useCharacterEditPageContext();
-    return (<section className={styles.section}>
+  const { t, attributeCards, handleAttributeChange } = useAttributesSection()
+
+  return (
+    <section className={styles.section}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>{t('pages.characterEdit.sections.attributes')}</h2>
       </div>
 
       <div className={styles.attributeGrid}>
-        {attributeDefinitions.map((definition, index) => {
-            const row = attributeRows[index];
-            return (<div className={styles.attributeCard} key={definition.key}>
-              <label className={styles.attributeField} htmlFor={definition.key}>
-                <input className={`${styles.input} ${styles.attributeInput}`} id={definition.key} name={definition.key} type="number" min={0} max={40} inputMode="numeric" value={row.value} onChange={handleAttributeChange}/>
-                <span className={styles.attributePlus} title={attributeBonusTooltips[definition.key]} aria-label={attributeBonusTooltips[definition.key]}>
-                  {formatSignedValue(attributeBonuses[definition.key])}
-                </span>
-                <span className={styles.attributeLabel}>{t(definition.translationKey)}</span>
-              </label>
-              <span className={styles.modifierBadge}>{row.modifierLabel}</span>
-            </div>);
-        })}
+        {attributeCards.map((attributeCard) => (
+          <div className={styles.attributeCard} key={attributeCard.inputId}>
+            <label className={styles.attributeField} htmlFor={attributeCard.inputId}>
+              <input
+                className={`${styles.input} ${styles.attributeInput}`}
+                id={attributeCard.inputId}
+                name={attributeCard.inputId}
+                type="number"
+                min={0}
+                max={40}
+                inputMode="numeric"
+                value={attributeCard.value}
+                onChange={handleAttributeChange}
+              />
+              <span
+                className={styles.attributePlus}
+                title={attributeCard.bonusTooltip}
+                aria-label={attributeCard.bonusTooltip}
+              >
+                {attributeCard.bonusLabel}
+              </span>
+              <span className={styles.attributeLabel}>{attributeCard.label}</span>
+            </label>
+            <span className={styles.modifierBadge}>{attributeCard.modifierLabel}</span>
+          </div>
+        ))}
       </div>
-    </section>);
-};
+    </section>
+  )
+}
