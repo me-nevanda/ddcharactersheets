@@ -4,8 +4,8 @@ import { getErrorMessage } from '@lib/errors';
 import type { TranslationVariables } from '@i18n/types';
 import { emptyAbilities, emptyFeats, emptyForm, defaultAbilityAction, defaultAbilityKind, defaultAbilityWeaponDamageDiceCount, defaultAbilityWeaponDamageDiceType, defaultAbilityWeaponDamageType, defaultAbilityWeaponRecurringDamageCount, defaultAbilityWeaponRecurringDamageType, zeroAttributeBonuses, zeroDefenses, zeroDefenseBonuses, } from '@pages/CharacterEditPage/characterEditPageUtils';
 import { normalizeAbilityType, normalizeAbilityWeaponArea, normalizeAbilityWeaponAttackAttribute, normalizeAbilityWeaponAttackBonusNumber, normalizeAbilityWeaponAttackDefense, normalizeAbilityWeaponDamageDiceCount, normalizeAbilityWeaponDamageDiceType, normalizeAbilityWeaponDamageType, normalizeAbilityWeaponRange, normalizeAbilityWeaponRecurringDamageCount, normalizeFeats, normalizeItems, } from '../characterEditPageLogic';
-import { buildNormalizedAttributes } from '../sections/AttributesSection/attributesSectionLogic';
-import { buildRaceAttributeBonuses, buildCharacterSpeed, clampLevelValue } from '../sections/GeneralSection/generalSectionLogic';
+import { buildNormalizedAttributes } from '../sections/AttributesSection/attributesSectionHooks';
+import { buildRaceAttributeBonuses, buildCharacterSpeed, clampLevelValue } from '../sections/GeneralSection/generalSectionHooks';
 import type { Character } from '../../../types/character';
 import type { CharacterEditFormData, CharacterEditPageSetBoolean, CharacterEditPageSetForm, CharacterEditPageSetString } from '../types';
 

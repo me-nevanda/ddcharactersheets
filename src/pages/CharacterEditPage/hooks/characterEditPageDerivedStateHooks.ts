@@ -1,9 +1,9 @@
 import { buildAttributeTooltip, buildDefenseTooltip, buildEquippedItemBonusSources, buildHpTooltip, buildItemAttributeBonuses, buildItemDefenseBonuses, buildItemSpeedBonus, buildSpeedTooltip, clampDefenseValue } from '../characterEditPageLogic';
 import type { TranslationVariables } from '@i18n/types';
-import { buildAttributeModifierMap, buildAttributeRows, buildEffectiveAttributes, buildNormalizedAttributes } from '../sections/AttributesSection/attributesSectionLogic';
-import { buildDefenseBreakdowns, buildDefenseValues } from '../sections/DefensesSection/defensesSectionLogic';
-import { buildSkillBonuses, buildSkillModifiers } from '../sections/SkillSection/skillSectionLogic';
-import { buildCharacterHp, buildCharacterSpeed, buildCharacterSurge, clampSpeedValue, formatModifier, getLevelBonus } from '../sections/GeneralSection/generalSectionLogic';
+import { buildAttributeModifierMap, buildAttributeRows, buildEffectiveAttributes, buildNormalizedAttributes } from '../sections/AttributesSection/attributesSectionHooks';
+import { buildDefenseBreakdowns, buildDefenseValues } from '../sections/DefensesSection/defensesSectionHooks';
+import { buildSkillBonuses, buildSkillModifiers } from '../sections/SkillSection/skillSectionHooks';
+import { buildCharacterHp, buildCharacterSpeed, buildCharacterSurge, clampSpeedValue, formatModifier, getLevelBonus } from '../sections/GeneralSection/generalSectionHooks';
 import { buildFeatBonusSources, sumFeatBonus, type CharacterFeatBonusFieldName } from '../featsLogic';
 import { skillDefinitions } from '@dictionaries/characterEditDefinitions';
 import type { CharacterAttributeBonuses, CharacterSkillBonuses } from '../../../types/character';

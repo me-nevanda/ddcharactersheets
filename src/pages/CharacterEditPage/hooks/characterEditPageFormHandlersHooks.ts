@@ -1,8 +1,8 @@
 import { useEffect, type ChangeEvent } from 'react';
 import { emptyArmor, emptyFeat, emptyOtherItem, emptyTraining, emptyWeapon, defaultAbilityAction, defaultAbilityKind, defaultAbilityType, defaultAbilityWeaponArea, defaultAbilityWeaponAttackAttribute, defaultAbilityWeaponAttackBonusNumber, defaultAbilityWeaponAttackDefense, defaultAbilityWeaponDamageDiceCount, defaultAbilityWeaponDamageDiceType, defaultAbilityWeaponDamageType, defaultAbilityWeaponHit, defaultAbilityWeaponMiss, defaultAbilityWeaponProvocation, defaultAbilityWeaponRange, defaultAbilityWeaponRecurringDamageCount, defaultAbilityWeaponRecurringDamageType, } from '@pages/CharacterEditPage/characterEditPageUtils';
 import { normalizeAlignmentValue, normalizeAbilityType, normalizeAbilityWeaponAttackAttribute, normalizeAbilityWeaponAttackBonusNumber, normalizeAbilityWeaponAttackDefense, normalizeGenderValue, } from '../characterEditPageLogic';
-import { clampAttributeValue } from '../sections/AttributesSection/attributesSectionLogic';
-import { buildRaceAttributeBonuses, clampLevelValue, normalizeClassValue, normalizeRaceValue } from '../sections/GeneralSection/generalSectionLogic';
+import { clampAttributeValue } from '../sections/AttributesSection/attributesSectionHooks';
+import { buildRaceAttributeBonuses, clampLevelValue, normalizeClassValue, normalizeRaceValue } from '../sections/GeneralSection/generalSectionHooks';
 import { CharacterClass, type CharacterAbility, type CharacterAbilityType, type CharacterArmorBonusFieldName, type CharacterItemBonusFieldName, type CharacterWeaponDamageDiceType, type CharacterWeaponFieldName } from '../../../types/character';
 import type { CharacterEditPageHandlers, CharacterEditPageSetForm, CharacterAbilityFieldName, CharacterAttributeFieldName, CharacterFeatFieldName, CharacterGeneralChangeEvent, CharacterGeneralFieldName, CharacterItemFieldName, CharacterItemGroupKey, CharacterSkillFieldName } from '../types';
 import type { CharacterFeatBonusFieldName } from '../featsLogic';

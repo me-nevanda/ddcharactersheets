@@ -12,7 +12,7 @@ import {
   emptyFeat,
   emptyItems,
 } from './characterEditPageUtils'
-import { formatModifier } from './sections/GeneralSection/generalSectionLogic'
+import { formatModifier } from './sections/GeneralSection/generalSectionHooks'
 import { CharacterAlignment, CharacterGender, isCharacterWeaponDamageType } from '../../types/character'
 import type {
   CharacterAbility,

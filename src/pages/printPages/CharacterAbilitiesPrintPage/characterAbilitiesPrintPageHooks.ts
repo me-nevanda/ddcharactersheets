@@ -4,8 +4,8 @@ import { useI18n } from '@i18n/index';
 import { useCharacterById, useCharacterDocumentTitle } from '@pages/characterPageHooks';
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
 import { type Character, type CharacterAbility, type CharacterAttributeBonuses } from '../../../types/character';
-import { buildAttributeModifierMap, buildEffectiveAttributes, buildNormalizedAttributes, } from '@pages/CharacterEditPage/sections/AttributesSection/attributesSectionLogic';
-import { formatModifier } from '@pages/CharacterEditPage/sections/GeneralSection/generalSectionLogic';
+import { buildAttributeModifierMap, buildEffectiveAttributes, buildNormalizedAttributes, } from '@pages/CharacterEditPage/sections/AttributesSection/attributesSectionHooks';
+import { formatModifier } from '@pages/CharacterEditPage/sections/GeneralSection/generalSectionHooks';
 import type { CharacterAbilitiesPrintPageState, PrintAbilityDetailRow, PrintAbilityRow, PrintFeatRow } from './types';
 const buildAbilityMeta = (t: ReturnType<typeof useI18n>['t'], ability: CharacterAbility): string[] => {
     return [

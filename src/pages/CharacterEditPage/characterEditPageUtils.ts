@@ -1,5 +1,5 @@
 import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace } from '../../types/character'
-import { buildCharacterSpeed } from './sections/GeneralSection/generalSectionLogic'
+import { buildCharacterSpeed } from './sections/GeneralSection/generalSectionHooks'
 import type {
   CharacterArmor,
   CharacterAbility,

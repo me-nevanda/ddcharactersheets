@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useI18n } from '@i18n/index';
 import { useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext';
-import { buildAttributeModifierMap, buildEffectiveAttributes, buildNormalizedAttributes, } from '../../sections/AttributesSection/attributesSectionLogic';
-import { formatModifier, getLevelBonus } from '../../sections/GeneralSection/generalSectionLogic';
+import { buildAttributeModifierMap, buildEffectiveAttributes, buildNormalizedAttributes, } from '../../sections/AttributesSection/attributesSectionHooks';
+import { formatModifier, getLevelBonus } from '../../sections/GeneralSection/generalSectionHooks';
 import styles from '../../style.module.scss';
 import type { PendingAbilityRemoval, SelectOption, VisibleAbilityEntry, } from './types';
 import type { CharacterAttributes, CharacterDefenses, CharacterAbilityAreaType, CharacterWeaponDamageType, CharacterAbilityType, } from '../../../../types/character';

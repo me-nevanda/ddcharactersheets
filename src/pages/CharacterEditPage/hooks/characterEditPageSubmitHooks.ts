@@ -4,8 +4,8 @@ import { getErrorMessage } from '@lib/errors';
 import type { TranslationVariables } from '@i18n/types';
 import { defaultAbilityWeaponAttackAttribute, defaultAbilityWeaponAttackBonusNumber, defaultAbilityWeaponAttackDefense, defaultAbilityWeaponDamageDiceCount, defaultAbilityWeaponDamageDiceType, defaultAbilityWeaponDamageType, defaultAbilityWeaponHit, defaultAbilityWeaponMiss, defaultAbilityWeaponProvocation, defaultAbilityWeaponRecurringDamageCount, defaultAbilityWeaponRecurringDamageType, zeroDefenses } from '@pages/CharacterEditPage/characterEditPageUtils';
 import { hasFeatContent, normalizeAlignmentValue, normalizeGenderValue } from '../characterEditPageLogic';
-import { normalizeDefenses } from '../sections/DefensesSection/defensesSectionLogic';
-import { buildCharacterSpeed, clampLevelValue } from '../sections/GeneralSection/generalSectionLogic';
+import { normalizeDefenses } from '../sections/DefensesSection/defensesSectionHooks';
+import { buildCharacterSpeed, clampLevelValue } from '../sections/GeneralSection/generalSectionHooks';
 import type { CharacterBonuses } from '../../../types/character';
 import type { CharacterEditFormData, CharacterEditPageComputedState, CharacterEditPageSetBoolean, CharacterEditPageSetForm, CharacterEditPageSetString } from '../types';
 
