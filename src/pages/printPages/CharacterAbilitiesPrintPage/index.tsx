@@ -83,6 +83,7 @@ export const CharacterAbilitiesPrintPage = () => {
                   <span className={styles.damageLabel}>{`${t('pages.characterAbilitiesPrint.attackLabel')}:`}</span>
                   <strong className={styles.damageValue}>{ability.weaponAttackDisplay}</strong>
                 </div>) : null}
+              {ability.description ? (<p className={styles.abilityDescription}>{ability.description}</p>) : null}
               {ability.damage.length > 0 ? (<div className={styles.damageSection}>
                   <span className={styles.damageLabel}>{`${t('pages.characterAbilitiesPrint.damageLabel')}:`}</span>
                   <strong className={styles.damageValue}>{ability.damage}</strong>
@@ -92,7 +93,7 @@ export const CharacterAbilitiesPrintPage = () => {
                       <span className={styles.detailLabel}>{note.label}:</span>
                       <strong className={styles.detailValue}>{note.value}</strong>
                     </div>))}
-                </div>) : ability.description ? (<p className={styles.abilityDescription}>{ability.description}</p>) : null}
+                </div>) : null}
             </article>))}
         </div>
       </section>);

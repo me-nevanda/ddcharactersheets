@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useI18n } from '@i18n/index';
 import { useCharacterById, useCharacterDocumentTitle } from '@pages/characterPageHooks';
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
-import { type Character, type CharacterAbility, type CharacterAttributeBonuses } from '../../../types/character';
+import { type Character, type CharacterAbility, type CharacterAttributeBonuses, type CharacterWeapon } from '../../../types/character';
 import { buildAttributeModifierMap, buildEffectiveAttributes, buildNormalizedAttributes, } from '@pages/CharacterEditPage/sections/AttributesSection/attributesSectionHooks';
 import { formatModifier } from '@pages/CharacterEditPage/sections/GeneralSection/generalSectionHooks';
 import type { CharacterAbilitiesPrintPageState, PrintAbilityDetailRow, PrintAbilityRow, PrintFeatRow } from './types';
@@ -41,12 +41,21 @@ const buildDefenseLabel = (t: ReturnType<typeof useI18n>['t'], defense: Characte
             return '';
     }
 };
+const findWeaponByName = (weaponName: string, weapons: CharacterWeapon[]): CharacterWeapon | undefined => {
+    const normalizedWeaponName = weaponName.trim().toLowerCase();
+    if (normalizedWeaponName.length === 0) {
+        return undefined;
+    }
+    return weapons.find((entry) => entry.name.trim().toLowerCase() === normalizedWeaponName);
+};
 const buildAttackDisplayLabel = (t: ReturnType<typeof useI18n>['t'], ability: CharacterAbility, character: CharacterAbilitiesPrintPageState['character']): string => {
     if (!character) {
         return '';
     }
     const attributeModifierLookup = buildAttributeModifierLookup(character);
-    const attackAttributeLabel = buildAttackAttributeLabel(t, ability.weaponAttackAttribute, attributeModifierLookup, character.bonuses?.level ?? 0, ability.weaponAttackBonusNumber);
+    const weapon = findWeaponByName(ability.weaponName, character.items.weapons);
+    const weaponProficiencyBonus = weapon?.weaponProficiencyBonusNumber ?? 0;
+    const attackAttributeLabel = buildAttackAttributeLabel(t, ability.weaponAttackAttribute, attributeModifierLookup, character.bonuses?.level ?? 0, ability.weaponAttackBonusNumber + weaponProficiencyBonus);
     const attackDefenseLabel = buildDefenseLabel(t, ability.weaponAttackDefense);
     if (!attackAttributeLabel || !attackDefenseLabel) {
         return '';
@@ -99,13 +108,8 @@ const buildDamageDiceLabel = (t: ReturnType<typeof useI18n>['t'], damageDiceType
             return '';
     }
 };
-const buildWeaponDamageLabel = (t: ReturnType<typeof useI18n>['t'], weaponName: string, weapons: CharacterAbilitiesPrintPageState['character'] extends infer T ? T extends {
-    items: {
-        weapons: Array<infer U>;
-    };
-} ? Array<U> : never : never): string => {
-    const normalizedWeaponName = weaponName.trim().toLowerCase();
-    const weapon = weapons.find((entry) => entry.name.trim().toLowerCase() === normalizedWeaponName);
+const buildWeaponDamageLabel = (t: ReturnType<typeof useI18n>['t'], weaponName: string, weapons: CharacterWeapon[]): string => {
+    const weapon = findWeaponByName(weaponName, weapons);
     if (!weapon) {
         return weaponName.trim();
     }

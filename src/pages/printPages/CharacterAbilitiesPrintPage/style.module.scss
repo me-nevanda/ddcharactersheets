@@ -267,8 +267,9 @@
   padding-top: 0.2rem;
   border-top: 1px solid rgba(255, 248, 235, 0.18);
   color: var(--text-strong);
-  font-size: 0.94rem;
-  line-height: 1.45;
+  font-family: var(--font-heading);
+  font-size: 0.84rem;
+  line-height: 1.1;
   white-space: pre-wrap;
 }
 
@@ -568,7 +569,7 @@
   .abilityDescription {
     padding-top: 0.25rem;
     border-top-color: #c8c8c8;
-    font-size: 0.84rem;
+    font-size: 0.78rem;
   }
 
   .detailList {
