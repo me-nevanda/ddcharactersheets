@@ -1,4 +1,4 @@
-import type { Character, CharacterAbility, CharacterItems } from '../../../types/character'
+import type { Character, CharacterAbility, CharacterItems } from '@appTypes/character'
 
 export type CharacterItemGroupKey = keyof CharacterItems
 

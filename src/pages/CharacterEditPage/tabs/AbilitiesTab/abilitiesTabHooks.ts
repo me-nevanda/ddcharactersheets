@@ -5,7 +5,7 @@ import { buildAttributeModifierMap, buildEffectiveAttributes, buildNormalizedAtt
 import { formatModifier, getLevelBonus } from '../../sections/GeneralSection/generalSectionHooks';
 import styles from '../../style.module.scss';
 import type { PendingAbilityRemoval, SelectOption, VisibleAbilityEntry, } from './types';
-import type { CharacterAttributes, CharacterDefenses, CharacterAbilityAreaType, CharacterWeaponDamageType, CharacterAbilityType, } from '../../../../types/character';
+import type { CharacterAttributes, CharacterDefenses, CharacterAbilityAreaType, CharacterWeaponDamageType, CharacterAbilityType, } from '@appTypes/character';
 export const useAbilitiesTab = () => {
     const { t } = useI18n();
     const { form, handleAbilityCreateEmpty, handleAbilityChange, handleAbilityRemove } = useCharacterEditPageContext();

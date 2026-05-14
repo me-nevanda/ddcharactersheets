@@ -1,4 +1,4 @@
-import type { Character } from '../../../types/character'
+import type { Character } from '@appTypes/character'
 
 export interface PrintItemRow {
   key: string

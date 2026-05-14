@@ -5,7 +5,7 @@ import { createCharacter, deleteCharacter, listCharacters } from '@lib/api';
 import { getErrorMessage } from '@lib/errors';
 import { useUnnamedCharacterImageFallback } from '@pages/characterPageHooks';
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
-import type { Character } from '../../types/character';
+import type { Character } from '@appTypes/character';
 import type { CharacterListCardViewModel } from './types';
 export const useCharacterListData = (t: (key: string) => string) => {
     const [characters, setCharacters] = useState<Character[]>([]);

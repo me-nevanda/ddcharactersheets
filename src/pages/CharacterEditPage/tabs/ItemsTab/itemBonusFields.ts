@@ -2,7 +2,7 @@ import type {
   CharacterArmorBonusFieldName,
   CharacterItemBonusFieldName,
   CharacterWeaponBonusFieldName,
-} from '../../../../types/character'
+} from '@appTypes/character'
 
 export interface ItemBonusFieldOption<TFieldName extends string> {
   fieldName: TFieldName

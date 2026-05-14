@@ -3,7 +3,7 @@ import { emptyArmor, emptyFeat, emptyOtherItem, emptyTraining, emptyWeapon, defa
 import { normalizeAlignmentValue, normalizeAbilityType, normalizeAbilityWeaponAttackAttribute, normalizeAbilityWeaponAttackBonusNumber, normalizeAbilityWeaponAttackDefense, normalizeGenderValue, } from '../characterEditPageLogic';
 import { clampAttributeValue } from '../sections/AttributesSection/attributesSectionHooks';
 import { buildRaceAttributeBonuses, clampLevelValue, normalizeClassValue, normalizeRaceValue } from '../sections/GeneralSection/generalSectionHooks';
-import { CharacterClass, type CharacterAbility, type CharacterAbilityType, type CharacterArmorBonusFieldName, type CharacterItemBonusFieldName, type CharacterWeaponDamageDiceType, type CharacterWeaponFieldName } from '../../../types/character';
+import { CharacterClass, type CharacterAbility, type CharacterAbilityType, type CharacterArmorBonusFieldName, type CharacterItemBonusFieldName, type CharacterWeaponDamageDiceType, type CharacterWeaponFieldName } from '@appTypes/character';
 import type { CharacterEditPageHandlers, CharacterEditPageSetForm, CharacterAbilityFieldName, CharacterAttributeFieldName, CharacterFeatFieldName, CharacterGeneralChangeEvent, CharacterGeneralFieldName, CharacterItemFieldName, CharacterItemGroupKey, CharacterSkillFieldName } from '../types';
 import type { CharacterFeatBonusFieldName } from '../featsLogic';
 

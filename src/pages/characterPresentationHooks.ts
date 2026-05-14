@@ -1,5 +1,5 @@
 import { useI18n } from '@i18n/index';
-import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace, } from '../types/character';
+import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace, } from '@appTypes/character';
 const raceKeyByCharacterRace: Record<CharacterRace, string> = {
     [CharacterRace.Human]: 'human',
     [CharacterRace.Tiefling]: 'thiefling',

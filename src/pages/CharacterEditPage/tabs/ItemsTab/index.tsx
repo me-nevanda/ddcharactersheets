@@ -5,7 +5,7 @@ import { useCharacterEditPageContext } from '@pages/CharacterEditPage/characterE
 import { ArmorItemCard } from './ArmorItemCard';
 import { OtherItemCard } from './OtherItemCard';
 import { WeaponItemCard } from './WeaponItemCard';
-import type { CharacterArmor, CharacterOtherItem, CharacterWeapon } from '../../../../types/character';
+import type { CharacterArmor, CharacterOtherItem, CharacterWeapon } from '@appTypes/character';
 import styles from '../../style.module.scss';
 const itemGroups = ['weapons', 'armors', 'others'] as const;
 export const ItemsTab = () => {

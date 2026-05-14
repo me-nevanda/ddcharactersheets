@@ -1,5 +1,5 @@
 import type { AttributeDefinition, SkillDefinition } from './types'
-import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace } from '../types/character'
+import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace } from '@appTypes/character'
 
 export const attributeDefinitions: AttributeDefinition[] = [
   { key: 'strength', translationKey: 'pages.characterEdit.fields.strength' },

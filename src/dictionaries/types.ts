@@ -1,4 +1,4 @@
-import type { CharacterAttributes, CharacterTraining } from '../types/character'
+import type { CharacterAttributes, CharacterTraining } from '@appTypes/character'
 
 export type CharacterAttributeFieldName = keyof CharacterAttributes
 export type CharacterTrainingFieldName = keyof CharacterTraining

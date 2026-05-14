@@ -16,7 +16,7 @@ import type {
   CharacterWeaponFieldName,
   CharacterWeaponDamageDiceType,
   CharacterTraining,
-} from '../../types/character'
+} from '@appTypes/character'
 import type { CharacterFeatBonusFieldName } from './featsLogic'
 import type { AttributeRow } from './sections/AttributesSection/types'
 import type { DefenseTooltipValues, DefenseValues } from './sections/DefensesSection/types'

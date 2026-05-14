@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },
@@ -21,8 +23,10 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
+    "eslint": "^9.39.4",
     "sass": "^1.99.0",
     "typescript": "^6.0.2",
+    "typescript-eslint": "^8.59.3",
     "vite": "^5.4.21"
   }
 }

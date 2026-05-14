@@ -117,6 +117,7 @@ export default defineConfig({
             '@i18n': '/src/i18n',
             '@dictionaries': '/src/dictionaries',
             '@components': '/src/components',
+            '@appTypes': '/src/types',
         },
     },
 });

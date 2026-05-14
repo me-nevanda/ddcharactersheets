@@ -6,7 +6,7 @@ import { emptyAbilities, emptyFeats, emptyForm, defaultAbilityAction, defaultAbi
 import { normalizeAbilityType, normalizeAbilityWeaponArea, normalizeAbilityWeaponAttackAttribute, normalizeAbilityWeaponAttackBonusNumber, normalizeAbilityWeaponAttackDefense, normalizeAbilityWeaponDamageDiceCount, normalizeAbilityWeaponDamageDiceType, normalizeAbilityWeaponDamageType, normalizeAbilityWeaponRange, normalizeAbilityWeaponRecurringDamageCount, normalizeFeats, normalizeItems, } from '../characterEditPageLogic';
 import { buildNormalizedAttributes } from '../sections/AttributesSection/attributesSectionHooks';
 import { buildRaceAttributeBonuses, buildCharacterSpeed, clampLevelValue } from '../sections/GeneralSection/generalSectionHooks';
-import type { Character, CharacterWeapon } from '../../../types/character';
+import type { Character, CharacterWeapon } from '@appTypes/character';
 import type { CharacterEditFormData, CharacterEditPageSetBoolean, CharacterEditPageSetForm, CharacterEditPageSetString } from '../types';
 
 const resolveAbilityWeaponId = (weaponReference: string, weapons: CharacterWeapon[]): string => {

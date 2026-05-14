@@ -1,7 +1,7 @@
 import type {
   CharacterItemBonusFieldName,
   CharacterOtherItem,
-} from '../../../../../types/character'
+} from '@appTypes/character'
 
 export interface OtherItemCardProps {
   item: CharacterOtherItem

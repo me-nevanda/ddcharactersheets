@@ -1,7 +1,7 @@
 import { useI18n } from '@i18n/index'
 import { alignmentOptions, classOptions, genderOptions, raceOptions } from '@dictionaries/characterEditDefinitions'
-import { CharacterClass, CharacterRace } from '../../../../types/character'
-import type { CharacterAttributeBonuses } from '../../../../types/character'
+import { CharacterClass, CharacterRace } from '@appTypes/character'
+import type { CharacterAttributeBonuses } from '@appTypes/character'
 import { useCharacterEditPageContext } from '../../characterEditPageContext'
 import type { GeneralSelectOption } from './types'
 

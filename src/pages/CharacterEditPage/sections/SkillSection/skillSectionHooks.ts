@@ -7,7 +7,7 @@ import {
   type CharacterItems,
   type CharacterSkillBonuses,
   type CharacterTraining,
-} from '../../../../types/character'
+} from '@appTypes/character'
 import { useCharacterEditPageContext } from '../../characterEditPageContext'
 import { buildFeatBonusSources, type CharacterFeatBonusFieldName } from '../../featsLogic'
 import type { CharacterAttributeFieldName, CharacterSkillFieldName } from '../../types'

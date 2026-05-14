@@ -1,4 +1,4 @@
-import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace } from '../../types/character'
+import { CharacterAlignment, CharacterClass, CharacterGender, CharacterRace } from '@appTypes/character'
 import { buildCharacterSpeed } from './sections/GeneralSection/generalSectionHooks'
 import type {
   CharacterArmor,
@@ -17,7 +17,7 @@ import type {
   CharacterSkillBonuses,
   CharacterTraining,
   CharacterWeaponDamageType,
-} from '../../types/character'
+} from '@appTypes/character'
 import type { CharacterEditFormData } from './types'
 
 export const zeroAttributeBonuses: CharacterAttributeBonuses = {

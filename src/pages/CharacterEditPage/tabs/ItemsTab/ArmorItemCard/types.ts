@@ -1,7 +1,7 @@
 import type {
   CharacterArmorBonusFieldName,
   CharacterArmor,
-} from '../../../../../types/character'
+} from '@appTypes/character'
 
 export interface ArmorItemCardProps {
   armor: CharacterArmor

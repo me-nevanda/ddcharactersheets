@@ -13,7 +13,7 @@ import {
   emptyItems,
 } from './characterEditPageUtils'
 import { formatModifier } from './sections/GeneralSection/generalSectionHooks'
-import { CharacterAlignment, CharacterGender, isCharacterWeaponDamageType } from '../../types/character'
+import { CharacterAlignment, CharacterGender, isCharacterWeaponDamageType } from '@appTypes/character'
 import type {
   CharacterAbility,
   CharacterAbilityAreaType,
@@ -27,7 +27,7 @@ import type {
   CharacterWeapon,
   CharacterWeaponDamageDiceType,
   CharacterWeaponDamageType,
-} from '../../types/character'
+} from '@appTypes/character'
 import type { CharacterItemGroupKey } from './types'
 
 type EquippedItemBonusSource = {

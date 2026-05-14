@@ -6,7 +6,7 @@ import { defaultAbilityWeaponAttackAttribute, defaultAbilityWeaponAttackBonusNum
 import { hasFeatContent, normalizeAlignmentValue, normalizeGenderValue } from '../characterEditPageLogic';
 import { normalizeDefenses } from '../sections/DefensesSection/defensesSectionHooks';
 import { buildCharacterSpeed, clampLevelValue } from '../sections/GeneralSection/generalSectionHooks';
-import type { CharacterBonuses } from '../../../types/character';
+import type { CharacterBonuses } from '@appTypes/character';
 import type { CharacterEditFormData, CharacterEditPageComputedState, CharacterEditPageSetBoolean, CharacterEditPageSetForm, CharacterEditPageSetString } from '../types';
 
 type UseCharacterEditPageSubmitHandlerParams = {

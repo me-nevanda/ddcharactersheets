@@ -1,5 +1,5 @@
 import type { KeyboardEventHandler, MouseEventHandler, SyntheticEvent } from 'react'
-import type { Character } from '../../types/character'
+import type { Character } from '@appTypes/character'
 
 export interface CharacterListCardViewModel {
   id: string

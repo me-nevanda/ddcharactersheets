@@ -1,4 +1,4 @@
-import type { CharacterFeat } from '../../types/character';
+import type { CharacterFeat } from '@appTypes/character';
 export type CharacterFeatBonusFieldName = Exclude<keyof CharacterFeat, 'id' | 'name' | 'description' | 'visible'>;
 export interface FeatBonusSource {
     name: string;

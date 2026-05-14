@@ -8,7 +8,7 @@ import { buildSkillBonuses } from '@pages/CharacterEditPage/sections/SkillSectio
 import { buildCharacterHp, buildCharacterSpeed, buildCharacterSurge, clampSpeedValue, getLevelBonus, } from '@pages/CharacterEditPage/sections/GeneralSection/generalSectionHooks';
 import { sumFeatBonus } from '@pages/CharacterEditPage/featsLogic';
 import { useCharacterById, useCharacterDocumentTitle } from '@pages/characterPageHooks';
-import type { CharacterItemBonusFieldName, CharacterItems, CharacterSkillBonuses, CharacterTraining } from '../../../types/character';
+import type { CharacterItemBonusFieldName, CharacterItems, CharacterSkillBonuses, CharacterTraining } from '@appTypes/character';
 import type { CharacterPrintPageState } from './types';
 const sumEquippedItemBonus = (items: CharacterItems, fieldName: CharacterItemBonusFieldName): number => {
     return [...items.armors, ...items.weapons, ...items.others]

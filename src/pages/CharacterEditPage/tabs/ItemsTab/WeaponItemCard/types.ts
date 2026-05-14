@@ -3,7 +3,7 @@ import type {
   CharacterWeaponBonusFieldName,
   CharacterWeaponFieldName,
   CharacterWeaponDamageDiceType,
-} from '../../../../../types/character'
+} from '@appTypes/character'
 
 export interface WeaponItemCardProps {
   weapon: CharacterWeapon

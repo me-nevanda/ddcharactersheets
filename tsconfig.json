@@ -18,7 +18,8 @@
       "@lib/*": ["src/lib/*"],
       "@i18n/*": ["src/i18n/*"],
       "@dictionaries/*": ["src/dictionaries/*"],
-      "@components/*": ["src/components/*"]
+      "@components/*": ["src/components/*"],
+      "@appTypes/*": ["src/types/*"]
     },
     "ignoreDeprecations": "6.0"
   },

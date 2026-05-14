@@ -6,7 +6,7 @@ import { buildSkillBonuses, buildSkillModifiers } from '../sections/SkillSection
 import { buildCharacterHp, buildCharacterSpeed, buildCharacterSurge, clampSpeedValue, formatModifier, getLevelBonus } from '../sections/GeneralSection/generalSectionHooks';
 import { buildFeatBonusSources, sumFeatBonus, type CharacterFeatBonusFieldName } from '../featsLogic';
 import { skillDefinitions } from '@dictionaries/characterEditDefinitions';
-import type { CharacterAttributeBonuses, CharacterSkillBonuses } from '../../../types/character';
+import type { CharacterAttributeBonuses, CharacterSkillBonuses } from '@appTypes/character';
 import type { CharacterEditFormData, CharacterEditPageComputedState } from '../types';
 
 export const useCharacterEditPageDerivedState = (

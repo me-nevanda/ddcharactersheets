@@ -6,7 +6,7 @@ import type {
   CharacterWeaponDamageType,
   CharacterAttributes,
   CharacterDefenses,
-} from '../../../../types/character'
+} from '@appTypes/character'
 
 export interface PendingAbilityRemoval {
   index: number

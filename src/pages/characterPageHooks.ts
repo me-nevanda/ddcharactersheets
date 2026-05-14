@@ -3,7 +3,7 @@ import type { SyntheticEvent } from 'react';
 import { getCharacter } from '@lib/api';
 import { getErrorMessage } from '@lib/errors';
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
-import type { Character } from '../types/character';
+import type { Character } from '@appTypes/character';
 export const useCharacterById = (characterId: string, t: (key: string) => string) => {
     const [character, setCharacter] = useState<Character | null>(null);
     const [loading, setLoading] = useState(true);

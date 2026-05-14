@@ -1,6 +1,6 @@
 import { useI18n } from '@i18n/index'
 import { attributeDefinitions } from '@dictionaries/characterEditDefinitions'
-import type { CharacterAttributeBonuses, CharacterAttributes } from '../../../../types/character'
+import type { CharacterAttributeBonuses, CharacterAttributes } from '@appTypes/character'
 import { useCharacterEditPageContext } from '../../characterEditPageContext'
 import type { AttributeCardViewModel, AttributeRow } from './types'
 

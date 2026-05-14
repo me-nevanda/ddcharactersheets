@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useI18n } from '@i18n/index';
 import { useCharacterById, useCharacterDocumentTitle } from '@pages/characterPageHooks';
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
-import { type Character, type CharacterAbility, type CharacterAttributeBonuses, type CharacterWeapon } from '../../../types/character';
+import { type Character, type CharacterAbility, type CharacterAttributeBonuses, type CharacterWeapon } from '@appTypes/character';
 import { buildAttributeModifierMap, buildEffectiveAttributes, buildNormalizedAttributes, } from '@pages/CharacterEditPage/sections/AttributesSection/attributesSectionHooks';
 import { formatModifier } from '@pages/CharacterEditPage/sections/GeneralSection/generalSectionHooks';
 import type { CharacterAbilitiesPrintPageState, PrintAbilityDetailRow, PrintAbilityRow, PrintFeatRow } from './types';

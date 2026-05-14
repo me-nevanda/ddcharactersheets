@@ -1,4 +1,4 @@
-import type { Character, CharacterData } from '../types/character';
+import type { Character, CharacterData } from '@appTypes/character';
 interface ApiEnvelope<T> {
     character?: T;
     characters?: T[];
