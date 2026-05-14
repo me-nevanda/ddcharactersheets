@@ -31,7 +31,7 @@ export interface AbilityCardProps {
   defenseOptions: SelectOption<keyof CharacterDefenses>[]
   weaponAreaOptions: SelectOption<CharacterAbilityAreaType>[]
   weaponDamageTypeOptions: SelectOption<CharacterWeaponDamageType>[]
-  weaponOptions: string[]
+  weaponOptions: SelectOption<string>[]
   getAbilityHeaderClass: (type: CharacterAbilityType) => string
   onAbilityChange: (index: number, fieldName: keyof CharacterAbility, value: string | number) => void
   onRemoveAbility: (index: number, abilityName: string) => void
@@ -53,7 +53,7 @@ export interface AbilityOffensiveFieldsProps {
   attackBonusOptions: number[]
   defenseOptions: SelectOption<keyof CharacterDefenses>[]
   weaponDamageTypeOptions: SelectOption<CharacterWeaponDamageType>[]
-  weaponOptions: string[]
+  weaponOptions: SelectOption<string>[]
   onAbilityChange: (index: number, fieldName: keyof CharacterAbility, value: string | number) => void
   t: (key: string, variables?: Record<string, string | number>) => string
 }

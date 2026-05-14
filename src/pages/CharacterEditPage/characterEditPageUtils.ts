@@ -113,6 +113,7 @@ export const emptyItems: CharacterItems = {
 }
 
 export const emptyArmor: CharacterArmor = {
+  id: '',
   name: '',
   description: '',
   equipped: false,
@@ -131,6 +132,7 @@ export const emptyArmor: CharacterArmor = {
 }
 
 export const emptyOtherItem: CharacterOtherItem = {
+  id: '',
   name: '',
   description: '',
   equipped: false,
@@ -148,6 +150,7 @@ export const emptyOtherItem: CharacterOtherItem = {
 }
 
 export const emptyWeapon: CharacterWeapon = {
+  id: '',
   name: '',
   description: '',
   damageDiceCount: 1,
@@ -208,6 +211,7 @@ export const emptyTraining: CharacterTraining = {
 
 export const emptyForm: CharacterEditFormData = {
   name: '',
+  description: '',
   level: 1,
   race: CharacterRace.Human,
   class: CharacterClass.Warlock,

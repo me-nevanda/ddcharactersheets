@@ -66,6 +66,7 @@ export interface TranslationDictionary {
         general: string
         attributes: string
         defenses: string
+        description: string
         skills: string
       }
       defenseTooltip: {
@@ -216,6 +217,7 @@ export interface TranslationDictionary {
       }
       fields: {
         name: string
+        description: string
         level: string
         speed: string
         hp: string
@@ -255,6 +257,7 @@ export interface TranslationDictionary {
       }
       placeholders: {
         name: string
+        description: string
         titleName: string
         race: string
         class: string

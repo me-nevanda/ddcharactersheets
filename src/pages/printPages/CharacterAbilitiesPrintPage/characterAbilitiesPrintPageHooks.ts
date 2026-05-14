@@ -41,19 +41,23 @@ const buildDefenseLabel = (t: ReturnType<typeof useI18n>['t'], defense: Characte
             return '';
     }
 };
-const findWeaponByName = (weaponName: string, weapons: CharacterWeapon[]): CharacterWeapon | undefined => {
-    const normalizedWeaponName = weaponName.trim().toLowerCase();
-    if (normalizedWeaponName.length === 0) {
+const findWeaponByReference = (weaponReference: string, weapons: CharacterWeapon[]): CharacterWeapon | undefined => {
+    if (weaponReference.trim().length === 0) {
         return undefined;
     }
-    return weapons.find((entry) => entry.name.trim().toLowerCase() === normalizedWeaponName);
+    const weaponById = weapons.find((entry) => entry.id === weaponReference);
+    if (weaponById) {
+        return weaponById;
+    }
+    const normalizedWeaponReference = weaponReference.trim().toLowerCase();
+    return weapons.find((entry) => entry.name.trim().toLowerCase() === normalizedWeaponReference);
 };
 const buildAttackDisplayLabel = (t: ReturnType<typeof useI18n>['t'], ability: CharacterAbility, character: CharacterAbilitiesPrintPageState['character']): string => {
     if (!character) {
         return '';
     }
     const attributeModifierLookup = buildAttributeModifierLookup(character);
-    const weapon = findWeaponByName(ability.weaponName, character.items.weapons);
+    const weapon = findWeaponByReference(ability.weaponId, character.items.weapons);
     const weaponProficiencyBonus = weapon?.weaponProficiencyBonusNumber ?? 0;
     const attackAttributeLabel = buildAttackAttributeLabel(t, ability.weaponAttackAttribute, attributeModifierLookup, character.bonuses?.level ?? 0, ability.weaponAttackBonusNumber + weaponProficiencyBonus);
     const attackDefenseLabel = buildDefenseLabel(t, ability.weaponAttackDefense);
@@ -108,10 +112,10 @@ const buildDamageDiceLabel = (t: ReturnType<typeof useI18n>['t'], damageDiceType
             return '';
     }
 };
-const buildWeaponDamageLabel = (t: ReturnType<typeof useI18n>['t'], weaponName: string, weapons: CharacterWeapon[]): string => {
-    const weapon = findWeaponByName(weaponName, weapons);
+const buildWeaponDamageLabel = (t: ReturnType<typeof useI18n>['t'], weaponReference: string, weapons: CharacterWeapon[]): string => {
+    const weapon = findWeaponByReference(weaponReference, weapons);
     if (!weapon) {
-        return weaponName.trim();
+        return '';
     }
     const damageParts = [
         weapon.damageDiceType ? buildDamageDiceLabel(t, weapon.damageDiceType) : '',
@@ -150,11 +154,12 @@ const buildAbilityDamage = (t: ReturnType<typeof useI18n>['t'], ability: Charact
             ? `${ability.weaponRecurringDamageCount} ${t('pages.characterAbilitiesPrint.damageParts.recurring')} ${t('pages.characterAbilitiesPrint.damageParts.type')} ${buildDamageTypeLabel(t, ability.weaponRecurringDamageType)}`
             : `${ability.weaponRecurringDamageCount} ${t('pages.characterAbilitiesPrint.damageParts.recurring')}`
         : '';
+    const weaponDamageLabel = buildWeaponDamageLabel(t, ability.weaponId, character.items.weapons);
     const damageParts = [
-        ability.weaponName.trim().length > 0
+        weaponDamageLabel.length > 0
             ? ability.weaponCount > 0
-                ? `(${ability.weaponCount} x ${buildWeaponDamageLabel(t, ability.weaponName, character.items.weapons)})`
-                : `(${buildWeaponDamageLabel(t, ability.weaponName, character.items.weapons)})`
+                ? `(${ability.weaponCount} x ${weaponDamageLabel})`
+                : `(${weaponDamageLabel})`
             : '',
         damageCoreParts.join(' + '),
     ].filter((part) => part.length > 0);

@@ -5,13 +5,14 @@ import { useCharacterById, useCharacterDocumentTitle } from '@pages/characterPag
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
 import type { CharacterItemsPrintPageState, PrintItemRow } from './types';
 const buildItemRows = (items: Array<{
+    id: string;
     name: string;
     description: string;
 }>, category: PrintItemRow['category']): PrintItemRow[] => {
     return items
         .filter((item) => item.name.trim().length > 0 || item.description.trim().length > 0)
         .map((item, index) => ({
-        key: `${item.name.trim() || 'item'}-${index}`,
+        key: item.id || `${item.name.trim() || 'item'}-${index}`,
         name: item.name,
         description: item.description,
         category,

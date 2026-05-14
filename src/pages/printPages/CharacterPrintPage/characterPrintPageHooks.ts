@@ -165,17 +165,17 @@ export const useCharacterPrintPage = (): CharacterPrintPageState => {
             abilityRows: character.abilities ?? [],
             itemRows: {
                 armors: character.items.armors.map((item, index) => ({
-                    key: `armor-${index}`,
+                    key: item.id || `armor-${index}`,
                     name: item.name,
                     description: item.description,
                 })),
                 weapons: character.items.weapons.map((item, index) => ({
-                    key: `weapon-${index}`,
+                    key: item.id || `weapon-${index}`,
                     name: item.name,
                     description: item.description,
                 })),
                 others: character.items.others.map((item, index) => ({
-                    key: `other-${index}`,
+                    key: item.id || `other-${index}`,
                     name: item.name,
                     description: item.description,
                 })),

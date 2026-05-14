@@ -158,7 +158,19 @@ const normalizeAbilityType = (value: unknown): CharacterAbilityType => {
     }
     return 'unlimited';
 };
-const normalizeAbilities = (data: unknown): CharacterAbility[] => {
+const resolveAbilityWeaponId = (weaponReference: string, weapons: CharacterWeapon[]): string => {
+    if (weaponReference.trim().length === 0) {
+        return '';
+    }
+    const weaponById = weapons.find((weapon) => weapon.id === weaponReference);
+    if (weaponById) {
+        return weaponById.id;
+    }
+    const normalizedWeaponReference = weaponReference.trim().toLowerCase();
+    const weaponByName = weapons.find((weapon) => weapon.name.trim().toLowerCase() === normalizedWeaponReference);
+    return weaponByName?.id ?? weaponReference;
+};
+const normalizeAbilities = (data: unknown, weapons: CharacterWeapon[] = []): CharacterAbility[] => {
     if (!Array.isArray(data)) {
         return [];
     }
@@ -174,7 +186,7 @@ const normalizeAbilities = (data: unknown): CharacterAbility[] => {
         weaponCount: typeof item.weaponCount === 'number' && Number.isFinite(item.weaponCount)
             ? Math.min(10, Math.max(1, Math.trunc(item.weaponCount)))
             : 1,
-        weaponName: typeof item.weaponName === 'string' ? item.weaponName : '',
+        weaponId: resolveAbilityWeaponId(typeof item.weaponId === 'string' ? item.weaponId : typeof item.weaponName === 'string' ? item.weaponName : '', weapons),
         weaponDamageDiceType: normalizeAbilityWeaponDamageDiceType(item.weaponDamageDiceType),
         weaponDamageDiceCount: typeof item.weaponDamageDiceCount === 'number' && Number.isFinite(item.weaponDamageDiceCount)
             ? Math.min(20, Math.max(0, Math.trunc(item.weaponDamageDiceCount)))
@@ -311,6 +323,7 @@ const normalizeItemGroup = <T extends CharacterArmor | CharacterWeapon | Charact
     const normalized = data
         .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
         .map((item) => ({
+        id: typeof item.id === 'string' && item.id.length > 0 ? item.id : randomUUID(),
         name: typeof item.name === 'string' ? item.name.trim() : '',
         description: typeof item.description === 'string' ? item.description.trim() : '',
         equipped: item.equipped === true,
@@ -392,6 +405,7 @@ const normalizeArmorGroup = (data: unknown): CharacterArmor[] => {
     return data
         .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
         .map((item) => ({
+        id: typeof item.id === 'string' && item.id.length > 0 ? item.id : randomUUID(),
         name: typeof item.name === 'string' ? item.name.trim() : '',
         description: typeof item.description === 'string' ? item.description.trim() : '',
         equipped: item.equipped === true,
@@ -429,6 +443,7 @@ const normalizeWeaponGroup = (data: unknown): CharacterWeapon[] => {
     return data
         .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
         .map((item) => ({
+        id: typeof item.id === 'string' && item.id.length > 0 ? item.id : randomUUID(),
         name: typeof item.name === 'string' ? item.name.trim() : '',
         description: typeof item.description === 'string' ? item.description.trim() : '',
         damageDiceCount: typeof item.damageDiceCount === 'number' && Number.isFinite(item.damageDiceCount)
@@ -657,9 +672,9 @@ const normalizeCharacter = (data: Partial<Record<keyof CharacterData, unknown>> 
     const training = typeof data.training === 'object' && data.training !== null
         ? normalizeTraining(data.training as Partial<Record<keyof CharacterTraining, unknown>>)
         : normalizeTraining();
-    const abilities = normalizeAbilities((data as Record<string, unknown>).abilities);
-    const feats = normalizeFeats((data as Record<string, unknown>).feats);
     const items = normalizeItems((data as Record<string, unknown>).items);
+    const abilities = normalizeAbilities((data as Record<string, unknown>).abilities, items.weapons);
+    const feats = normalizeFeats((data as Record<string, unknown>).feats);
     const attributeBonuses = buildAttributeBonuses(attributes);
     const race = typeof data.race === 'string'
         ? normalizeRaceValue(data.race)
@@ -685,6 +700,7 @@ const normalizeCharacter = (data: Partial<Record<keyof CharacterData, unknown>> 
     };
     return {
         name: typeof data.name === 'string' ? data.name : '',
+        description: typeof data.description === 'string' ? data.description.trim() : '',
         level,
         race,
         class: clazz,

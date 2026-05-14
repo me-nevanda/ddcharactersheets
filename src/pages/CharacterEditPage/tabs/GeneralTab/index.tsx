@@ -1,4 +1,5 @@
 import { AttributesSection } from '../../sections/AttributesSection';
+import { DescriptionSection } from '../../sections/DescriptionSection';
 import { DefensesSection } from '../../sections/DefensesSection';
 import { GeneralSection } from '../../sections/GeneralSection';
 import { SkillSection } from '../../sections/SkillSection';
@@ -8,6 +9,7 @@ export const GeneralTab = () => {
       <div className={styles.sectionColumn}>
         <GeneralSection />
         <DefensesSection />
+        <DescriptionSection />
       </div>
       <div className={styles.sectionColumn}>
         <AttributesSection />

@@ -1,8 +1,8 @@
 import styles from '../../style.module.scss';
 import type { AbilityOffensiveFieldsProps } from './types';
 export const AbilityOffensiveFields = ({ ability, index, attributeOptions, attackBonusOptions, defenseOptions, weaponDamageTypeOptions, weaponOptions, onAbilityChange, t, }: AbilityOffensiveFieldsProps) => {
-    const currentWeaponOptions = ability.weaponName.length > 0 && !weaponOptions.includes(ability.weaponName)
-        ? [...weaponOptions, ability.weaponName]
+    const currentWeaponOptions = ability.weaponId.length > 0 && !weaponOptions.some((option) => option.value === ability.weaponId)
+        ? [...weaponOptions, { value: ability.weaponId, label: ability.weaponId }]
         : weaponOptions;
     return (<div className={styles.abilityField}>
       <div className={styles.divider} data-label={t('pages.characterEdit.abilities.attackLabel')}/>
@@ -42,17 +42,17 @@ export const AbilityOffensiveFields = ({ ability, index, attributeOptions, attac
               </option>))}
           </select>
           <span className={styles.weaponDamageSeparator}>x</span>
-          <select className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponSelect}`} id={`ability-weapon-${index}`} value={ability.weaponName} onChange={(event) => {
-            const nextWeaponName = event.target.value;
-            onAbilityChange(index, 'weaponName', nextWeaponName);
-            if (nextWeaponName.length === 0) {
+          <select className={`${styles.input} ${styles.selectChevronInset} ${styles.abilityWeaponSelect}`} id={`ability-weapon-${index}`} value={ability.weaponId} onChange={(event) => {
+            const nextWeaponId = event.target.value;
+            onAbilityChange(index, 'weaponId', nextWeaponId);
+            if (nextWeaponId.length === 0) {
                 onAbilityChange(index, 'weaponDamageDiceType', '');
                 onAbilityChange(index, 'weaponDamageDiceCount', 0);
             }
         }}>
             <option value="">{t('pages.characterEdit.abilities.weaponOptions.none')}</option>
-            {currentWeaponOptions.map((weaponName) => (<option key={weaponName} value={weaponName}>
-                {weaponName}
+            {currentWeaponOptions.map((weapon) => (<option key={weapon.value} value={weapon.value}>
+                {weapon.label}
               </option>))}
           </select>
         </div>

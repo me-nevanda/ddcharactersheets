@@ -67,6 +67,7 @@ export const pl: TranslationDictionary = {
         general: 'Ogólne',
         attributes: 'Atrybuty',
         defenses: 'Obrony',
+        description: 'Opis',
         skills: 'Umiejętności (+ wyszkolenia)',
       },
       defenseTooltip: {
@@ -217,6 +218,7 @@ export const pl: TranslationDictionary = {
       },
       fields: {
         name: 'Imię',
+        description: 'Opis',
         level: 'Poziom',
         speed: 'Szybkość',
         hp: 'HP',
@@ -256,6 +258,7 @@ export const pl: TranslationDictionary = {
       },
       placeholders: {
         name: 'np. Seraphina',
+        description: 'Opis postaci',
         titleName: 'Bezimienny bohater',
         race: 'Wybierz rasę',
         class: 'Wybierz klasę',

@@ -130,7 +130,7 @@ export const useCharacterEditPageFormHandlers = (setForm: CharacterEditPageSetFo
             type: normalizeAbilityType(ability.type),
             kind: ability.kind,
             weaponCount: ability.weaponCount,
-            weaponName: ability.weaponName.trim(),
+            weaponId: ability.weaponId.trim(),
             weaponDamageDiceType: ability.weaponDamageDiceType,
             weaponDamageDiceCount: ability.weaponDamageDiceCount,
             weaponAttributeBonus: ability.weaponAttributeBonus,
@@ -168,7 +168,7 @@ export const useCharacterEditPageFormHandlers = (setForm: CharacterEditPageSetFo
                     type,
                     kind: defaultAbilityKind,
                     weaponCount: 1,
-                    weaponName: '',
+                    weaponId: '',
                     weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
                     weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
                     weaponAttributeBonus: '',
@@ -198,7 +198,7 @@ export const useCharacterEditPageFormHandlers = (setForm: CharacterEditPageSetFo
                     ...(fieldName === 'kind' && value === 'utility'
                         ? {
                             weaponCount: 1,
-                            weaponName: '',
+                            weaponId: '',
                             weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
                             weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
                             weaponAttributeBonus: '',
@@ -212,7 +212,7 @@ export const useCharacterEditPageFormHandlers = (setForm: CharacterEditPageSetFo
                             weaponMiss: defaultAbilityWeaponMiss,
                             weaponProvocation: defaultAbilityWeaponProvocation,
                         }
-                        : fieldName === 'weaponName' && value === ''
+                        : fieldName === 'weaponId' && value === ''
                             ? {
                                 weaponDamageDiceType: defaultAbilityWeaponDamageDiceType,
                                 weaponDamageDiceCount: defaultAbilityWeaponDamageDiceCount,
@@ -287,15 +287,16 @@ export const useCharacterEditPageFormHandlers = (setForm: CharacterEditPageSetFo
     };
 
     const handleItemCreateEmpty = (group: CharacterItemGroupKey) => {
+        const nextItemId = globalThis.crypto.randomUUID();
         setForm((currentForm) => ({
             ...currentForm,
             items: {
                 ...currentForm.items,
                 [group]: group === 'weapons'
-                    ? [...currentForm.items[group], { ...emptyWeapon }]
+                    ? [...currentForm.items[group], { ...emptyWeapon, id: nextItemId }]
                     : group === 'armors'
-                        ? [...currentForm.items[group], { ...emptyArmor }]
-                        : [...currentForm.items[group], { ...emptyOtherItem }],
+                        ? [...currentForm.items[group], { ...emptyArmor, id: nextItemId }]
+                        : [...currentForm.items[group], { ...emptyOtherItem, id: nextItemId }],
             },
         }));
     };

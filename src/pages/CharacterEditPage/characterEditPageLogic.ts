@@ -363,9 +363,10 @@ export const normalizeArmorGroup = (group: unknown): CharacterArmor[] => {
     return []
   }
 
-  return group
-    .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
-    .map((entry) => ({
+    return group
+      .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
+      .map((entry) => ({
+      id: typeof entry.id === 'string' && entry.id.length > 0 ? entry.id : globalThis.crypto.randomUUID(),
       name: typeof entry.name === 'string' ? entry.name : '',
       description: typeof entry.description === 'string' ? entry.description : '',
       equipped: entry.equipped === true,
@@ -430,6 +431,7 @@ export const normalizeItems = (items: unknown): CharacterItems => {
     return group
       .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
       .map((entry) => ({
+        id: typeof entry.id === 'string' && entry.id.length > 0 ? entry.id : globalThis.crypto.randomUUID(),
         name: typeof entry.name === 'string' ? entry.name : '',
         description: typeof entry.description === 'string' ? entry.description : '',
         equipped: entry.equipped === true,
@@ -486,6 +488,7 @@ export const normalizeItems = (items: unknown): CharacterItems => {
     return group
       .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
       .map((entry) => ({
+        id: typeof entry.id === 'string' && entry.id.length > 0 ? entry.id : globalThis.crypto.randomUUID(),
         name: typeof entry.name === 'string' ? entry.name : '',
         description: typeof entry.description === 'string' ? entry.description : '',
         damageDiceCount:

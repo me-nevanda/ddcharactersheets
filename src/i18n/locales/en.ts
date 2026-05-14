@@ -67,6 +67,7 @@ export const en: TranslationDictionary = {
         general: 'General',
         attributes: 'Attributes',
         defenses: 'Defenses',
+        description: 'Description',
         skills: 'Skills (+ training)',
       },
       defenseTooltip: {
@@ -217,6 +218,7 @@ export const en: TranslationDictionary = {
       },
       fields: {
         name: 'Name',
+        description: 'Description',
         level: 'Level',
         speed: 'Speed',
         hp: 'HP',
@@ -256,6 +258,7 @@ export const en: TranslationDictionary = {
       },
       placeholders: {
         name: 'e.g. Seraphina',
+        description: 'Character description',
         titleName: 'Nameless hero',
         race: 'Select race',
         class: 'Select class',

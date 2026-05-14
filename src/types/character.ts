@@ -66,7 +66,7 @@ export interface CharacterAbility {
   type: CharacterAbilityType
   kind: CharacterAbilityKind
   weaponCount: number
-  weaponName: string
+  weaponId: string
   weaponDamageDiceType: CharacterWeaponDamageDiceType | ''
   weaponDamageDiceCount: number
   weaponAttributeBonus: string
@@ -114,6 +114,7 @@ export interface CharacterFeat {
 }
 
 export interface CharacterItemBase {
+  id: string
   name: string
   description: string
 }
@@ -314,6 +315,7 @@ export interface CharacterTraining {
 
 export interface CharacterData {
   name: string
+  description: string
   level: number
   race: CharacterRace
   class: CharacterClass

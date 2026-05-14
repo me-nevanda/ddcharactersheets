@@ -15,9 +15,12 @@ export const useAbilitiesTab = () => {
     const effectiveAttributes = buildEffectiveAttributes(normalizedAttributes, form.attributesPlus);
     const attributeModifierMap = buildAttributeModifierMap(effectiveAttributes);
     const levelBonusValue = getLevelBonus(form.level);
-    const weaponOptions = form.items.weapons
-        .map((weapon) => weapon.name.trim())
-        .filter((weaponName, index, array) => weaponName.length > 0 && array.indexOf(weaponName) === index);
+    const weaponOptions: SelectOption<string>[] = form.items.weapons
+        .filter((weapon) => weapon.name.trim().length > 0)
+        .map((weapon) => ({
+        value: weapon.id,
+        label: weapon.name.trim(),
+    }));
     const attributeOptions: SelectOption<keyof CharacterAttributes>[] = [
         {
             value: 'strength',

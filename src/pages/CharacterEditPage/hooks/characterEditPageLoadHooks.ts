@@ -6,13 +6,28 @@ import { emptyAbilities, emptyFeats, emptyForm, defaultAbilityAction, defaultAbi
 import { normalizeAbilityType, normalizeAbilityWeaponArea, normalizeAbilityWeaponAttackAttribute, normalizeAbilityWeaponAttackBonusNumber, normalizeAbilityWeaponAttackDefense, normalizeAbilityWeaponDamageDiceCount, normalizeAbilityWeaponDamageDiceType, normalizeAbilityWeaponDamageType, normalizeAbilityWeaponRange, normalizeAbilityWeaponRecurringDamageCount, normalizeFeats, normalizeItems, } from '../characterEditPageLogic';
 import { buildNormalizedAttributes } from '../sections/AttributesSection/attributesSectionHooks';
 import { buildRaceAttributeBonuses, buildCharacterSpeed, clampLevelValue } from '../sections/GeneralSection/generalSectionHooks';
-import type { Character } from '../../../types/character';
+import type { Character, CharacterWeapon } from '../../../types/character';
 import type { CharacterEditFormData, CharacterEditPageSetBoolean, CharacterEditPageSetForm, CharacterEditPageSetString } from '../types';
+
+const resolveAbilityWeaponId = (weaponReference: string, weapons: CharacterWeapon[]): string => {
+    if (weaponReference.length === 0) {
+        return '';
+    }
+    const weaponById = weapons.find((weapon) => weapon.id === weaponReference);
+    if (weaponById) {
+        return weaponById.id;
+    }
+    const normalizedWeaponReference = weaponReference.trim().toLowerCase();
+    const weaponByName = weapons.find((weapon) => weapon.name.trim().toLowerCase() === normalizedWeaponReference);
+    return weaponByName?.id ?? weaponReference;
+};
 
 const buildCharacterEditFormData = (character: Character): CharacterEditFormData => {
     const { bonuses: characterBonuses, ...characterData } = character;
+    const items = normalizeItems(character.items);
     return {
         ...characterData,
+        description: character.description ?? '',
         level: clampLevelValue(character.level),
         speed: buildCharacterSpeed(character.race),
         hp: character.hp ?? 0,
@@ -26,7 +41,7 @@ const buildCharacterEditFormData = (character: Character): CharacterEditFormData
             type: normalizeAbilityType(ability.type),
             kind: ability.kind ?? defaultAbilityKind,
             weaponCount: ability.weaponCount ?? 1,
-            weaponName: ability.weaponName ?? '',
+            weaponId: resolveAbilityWeaponId(ability.weaponId ?? (ability as { weaponName?: string }).weaponName ?? '', items.weapons),
             weaponDamageDiceType: normalizeAbilityWeaponDamageDiceType(ability.weaponDamageDiceType, defaultAbilityWeaponDamageDiceType),
             weaponDamageDiceCount: normalizeAbilityWeaponDamageDiceCount(ability.weaponDamageDiceCount, defaultAbilityWeaponDamageDiceCount),
             weaponAttributeBonus: ability.weaponAttributeBonus ?? '',
@@ -43,7 +58,7 @@ const buildCharacterEditFormData = (character: Character): CharacterEditFormData
             weaponArea: normalizeAbilityWeaponArea(ability.weaponArea),
         })),
         feats: normalizeFeats(character.feats ?? emptyFeats),
-        items: normalizeItems(character.items),
+        items,
         defenses: character.defenses ?? zeroDefenses,
         training: {
             ...character.training,
