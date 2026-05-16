@@ -1,11 +1,5 @@
 @use '../../styles/mixins' as *;
 
-.pageShell {
-  width: min(100%, 1100px);
-  margin: 0 auto;
-  padding: 1rem;
-}
-
 .status {
   margin: 0 0 0.75rem;
   padding: 0.75rem 0.9rem;

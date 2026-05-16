@@ -36,9 +36,19 @@ export const en: TranslationDictionary = {
     },
   },
   pages: {
+    main: {
+      tabsLabel: 'Sheet list',
+      tabs: {
+        heroes: 'Heroes',
+        monsters: 'Monsters',
+      },
+    },
     characterList: {
       eyebrow: 'Character Archive',
       title: 'D&D Character Sheets',
+      actions: {
+        addMinion: 'Add minion',
+      },
       emptyState: 'There are no character sheets yet. Add one to start editing.',
       unnamedCharacter: 'Nameless hero',
       missingRace: 'No race',

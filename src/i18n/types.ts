@@ -35,9 +35,19 @@ export interface TranslationDictionary {
     }
   }
   pages: {
+    main: {
+      tabsLabel: string
+      tabs: {
+        heroes: string
+        monsters: string
+      }
+    }
     characterList: {
       eyebrow: string
       title: string
+      actions: {
+        addMinion: string
+      }
       emptyState: string
       unnamedCharacter: string
       missingRace: string

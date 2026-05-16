@@ -1,0 +1,52 @@
+@use '../../styles/mixins' as *;
+
+.pageShell {
+  width: min(100%, 1300px);
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.listBody {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.tabRail {
+  display: grid;
+  gap: 0.55rem;
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+  margin-top: 7rem;
+}
+
+.tabButton {
+  @include pill-button;
+  justify-content: flex-start;
+  width: 100%;
+  background: rgba(255, 248, 235, 0.03);
+  border-color: rgba(255, 248, 235, 0.08);
+  color: var(--text-strong);
+}
+
+.tabButtonActive {
+  background: linear-gradient(135deg, rgba(166, 74, 46, 0.25), rgba(217, 164, 65, 0.22));
+  border-color: rgba(240, 198, 111, 0.5);
+}
+
+.tabPanel {
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .listBody {
+    grid-template-columns: 1fr;
+  }
+
+  .tabRail {
+    position: static;
+    margin-top: 0;
+  }
+}

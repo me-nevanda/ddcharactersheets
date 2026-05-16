@@ -1,0 +1,30 @@
+import { useI18n } from '@i18n/index'
+import { CharacterListPage } from '@pages/CharacterListPage'
+import { MonstersListPage } from '@pages/MonstersListPage'
+import { useMainPage } from './mainPageHooks'
+import styles from './style.module.scss'
+
+export const MainPage = () => {
+  const { t } = useI18n()
+  const { activeTab, handleTabChange } = useMainPage()
+
+  return (
+    <main className={styles.pageShell}>
+      <div className={styles.listBody}>
+        <aside className={styles.tabRail} aria-label={t('pages.main.tabsLabel')}>
+          <button className={`${styles.tabButton} ${activeTab === 'heroes' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('heroes')}>
+            {t('pages.main.tabs.heroes')}
+          </button>
+          <button className={`${styles.tabButton} ${activeTab === 'monsters' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('monsters')}>
+            {t('pages.main.tabs.monsters')}
+          </button>
+        </aside>
+
+        <div className={styles.tabPanel}>
+          {activeTab === 'heroes' ? <CharacterListPage /> : null}
+          {activeTab === 'monsters' ? <MonstersListPage /> : null}
+        </div>
+      </div>
+    </main>
+  )
+}

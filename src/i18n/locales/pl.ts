@@ -36,9 +36,19 @@ export const pl: TranslationDictionary = {
     },
   },
   pages: {
+    main: {
+      tabsLabel: 'Lista kart',
+      tabs: {
+        heroes: 'Bohaterowie',
+        monsters: 'Potwory',
+      },
+    },
     characterList: {
       eyebrow: 'Archiwum Bohaterów',
       title: 'Karty postaci D&D',
+      actions: {
+        addMinion: 'Dodaj poplecznika',
+      },
       emptyState: 'Nie ma jeszcze żadnych kart. Dodaj pierwszą i przejdź do edycji.',
       unnamedCharacter: 'Bezimienny bohater',
       missingRace: 'Brak rasy',

@@ -1,4 +1,5 @@
 export interface CharacterListHeaderProps {
+  actionLabel: string
   creating: boolean
-  onCreateCharacter: () => void
+  onAction: () => void
 }
