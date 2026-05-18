@@ -78,6 +78,7 @@ export const useCharacterEditPageLoad = (
     setForm: CharacterEditPageSetForm,
     setInitialForm: CharacterEditPageSetForm,
     setError: CharacterEditPageSetString,
+    setImageUrl: CharacterEditPageSetString,
     setLoading: CharacterEditPageSetBoolean,
     t: (key: string, variables?: TranslationVariables) => string,
 ) => {
@@ -90,6 +91,7 @@ export const useCharacterEditPageLoad = (
                     const nextForm = buildCharacterEditFormData(character);
                     setForm(nextForm);
                     setInitialForm(nextForm);
+                    setImageUrl(character.imageUrl);
                     setError('');
                 }
             }
@@ -108,5 +110,5 @@ export const useCharacterEditPageLoad = (
         return () => {
             cancelled = true;
         };
-    }, [characterId, setError, setForm, setInitialForm, setLoading, t]);
+    }, [characterId, setError, setForm, setImageUrl, setInitialForm, setLoading, t]);
 };

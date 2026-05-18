@@ -13,7 +13,7 @@ import styles from './style.module.scss'
 export const MonsterEditPage = () => {
   const { t } = useI18n()
   const { handleTabChange } = useMainPageContext()
-  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleChange, handleDescriptionChange, handleImageChange, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, loading, saving, uploadingImage } = useMonsterEditPage()
+  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleChange, handleDescriptionChange, handleImageChange, handleImageRemove, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, loading, removingImage, saving, uploadingImage } = useMonsterEditPage()
   const [activeTab, setActiveTab] = useState<MonsterEditTabKey>('general')
   const bloodiedValue = Math.floor(form.hp / 2)
 
@@ -22,15 +22,28 @@ export const MonsterEditPage = () => {
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
           <div className={styles.headerBrand}>
-            <label className={`${styles.headerImagePicker} ${imageUrl ? styles.headerImagePickerWithImage : ''}`}>
-              <span className={styles.srOnly}>{t('pages.monsterEdit.fields.image')}</span>
-              <input className={styles.headerImageInput} type="file" accept="image/png,image/jpeg" onChange={(event) => void handleImageChange(event)} disabled={uploadingImage} />
+            <div className={`${styles.headerImagePicker} ${imageUrl ? styles.headerImagePickerWithImage : ''}`}>
+              <input id="monster-image-input" className={styles.headerImageInput} type="file" accept="image/png,image/jpeg" onChange={(event) => void handleImageChange(event)} disabled={uploadingImage || removingImage} />
               {imageUrl ? (
-                <img className={styles.headerImage} src={imageUrl} alt={t('pages.monsterEdit.fields.image')} />
+                <>
+                  <img className={styles.headerImage} src={imageUrl} alt={t('pages.monsterEdit.fields.image')} />
+                  <div className={styles.headerImageActions}>
+                    <label className={styles.headerImageAction} htmlFor="monster-image-input" aria-disabled={uploadingImage || removingImage}>
+                      <AppIcon name="edit" />
+                      <span>{t('pages.monsterEdit.imageActions.uploadNew')}</span>
+                    </label>
+                    <button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={() => void handleImageRemove()}>
+                      <AppIcon name="trash" />
+                      <span>{t('pages.monsterEdit.imageActions.remove')}</span>
+                    </button>
+                  </div>
+                </>
               ) : (
-                <span className={styles.headerImagePlaceholder}>{t('pages.monsterEdit.placeholders.image')}</span>
+                <label className={styles.headerImagePlaceholder} htmlFor="monster-image-input">
+                  {t('pages.monsterEdit.placeholders.image')}
+                </label>
               )}
-            </label>
+            </div>
             <div className={styles.headerCopy}>
               <p className={styles.eyebrow}>{t('pages.monsterEdit.eyebrow')}</p>
               <label className={styles.titleField} htmlFor="name">

@@ -497,3 +497,22 @@ export const updateMonsterImage = async (monsterId: string, contentType: string 
 
   return readMonster(monsterId)
 }
+
+export const deleteMonsterImage = async (monsterId: string): Promise<Monster> => {
+  await ensureMonstersDirectory()
+  await stat(getMonsterFilePath(monsterId))
+
+  await Promise.all(
+    monsterImageExtensions.map(async (extension) => {
+      try {
+        await unlink(getMonsterImageFilePath(monsterId, extension))
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+          throw error
+        }
+      }
+    }),
+  )
+
+  return readMonster(monsterId)
+}

@@ -61,6 +61,34 @@ export const deleteCharacter = async (characterId: string): Promise<void> => {
         method: 'DELETE',
     });
 };
+export const uploadCharacterImage = async (characterId: string, image: File): Promise<Character> => {
+    const response = await fetch(`/api/characters/${characterId}/image`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': image.type,
+        },
+        body: image,
+    });
+    const payload = (await response.json().catch(() => null)) as ApiEnvelope<Character> | null;
+    if (!response.ok) {
+        const error = new Error(payload?.errorCode ?? 'errors.api.generic') as ApiError;
+        error.code = payload?.errorCode ?? 'errors.api.generic';
+        throw error;
+    }
+    if (!payload?.character) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.character;
+};
+export const deleteCharacterImage = async (characterId: string): Promise<Character> => {
+    const payload = await requestJson<ApiEnvelope<Character>>(`/api/characters/${characterId}/image`, {
+        method: 'DELETE',
+    });
+    if (!payload?.character) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.character;
+};
 export const listMonsters = async (): Promise<Monster[]> => {
     const payload = await requestJson<ApiEnvelope<Monster>>('/api/monsters');
     return payload?.monsters ?? [];
@@ -110,6 +138,15 @@ export const uploadMonsterImage = async (monsterId: string, image: File): Promis
         error.code = payload?.errorCode ?? 'errors.api.generic';
         throw error;
     }
+    if (!payload?.monster) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.monster;
+};
+export const deleteMonsterImage = async (monsterId: string): Promise<Monster> => {
+    const payload = await requestJson<ApiEnvelope<Monster>>(`/api/monsters/${monsterId}/image`, {
+        method: 'DELETE',
+    });
     if (!payload?.monster) {
         throw new Error('errors.api.generic');
     }

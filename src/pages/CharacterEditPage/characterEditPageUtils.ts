@@ -211,6 +211,7 @@ export const emptyTraining: CharacterTraining = {
 
 export const emptyForm: CharacterEditFormData = {
   name: '',
+  imageUrl: '',
   description: '',
   level: 1,
   race: CharacterRace.Human,

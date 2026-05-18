@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { defineConfig, type Connect, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-import { createCharacter, deleteCharacter, isSafeCharacterId, listCharacters, readCharacter, updateCharacter, } from './server/characterStore';
-import { createMonster, deleteMonster, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
+import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacterId, listCharacters, readCharacter, readCharacterImage, updateCharacter, updateCharacterImage, } from './server/characterStore';
+import { createMonster, deleteMonster, deleteMonsterImage, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
 interface ApiError extends Error {
     code?: string;
     statusCode?: number;
@@ -62,6 +62,31 @@ const createCharactersApiPlugin = (): Plugin => {
                 sendJson(response, 201, { character: await createCharacter() });
                 return;
             }
+            const imageMatch = url.pathname.match(/^\/api\/characters\/([^/]+)\/image$/);
+            if (imageMatch) {
+                const characterId = imageMatch[1];
+                if (!isSafeCharacterId(characterId)) {
+                    sendError(response, 400, 'errors.api.invalidCharacterId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    const image = await readCharacterImage(characterId);
+                    response.statusCode = 200;
+                    response.setHeader('Content-Type', image.contentType);
+                    response.end(image.data);
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const character = await updateCharacterImage(characterId, request.headers['content-type'], await readRawBody(request));
+                    sendJson(response, 200, { character });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    const character = await deleteCharacterImage(characterId);
+                    sendJson(response, 200, { character });
+                    return;
+                }
+            }
             const match = url.pathname.match(/^\/api\/characters\/([^/]+)$/);
             if (match) {
                 const characterId = match[1];
@@ -101,6 +126,10 @@ const createCharactersApiPlugin = (): Plugin => {
             }
             if (apiError.code === 'API_INVALID_CHARACTER_ID') {
                 sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidCharacterId');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_CHARACTER_IMAGE') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidCharacterImage');
                 return;
             }
             sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');
@@ -148,6 +177,11 @@ const createMonstersApiPlugin = (): Plugin => {
                 }
                 if (request.method === 'PUT') {
                     const monster = await updateMonsterImage(monsterId, request.headers['content-type'], await readRawBody(request));
+                    sendJson(response, 200, { monster });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    const monster = await deleteMonsterImage(monsterId);
                     sendJson(response, 200, { monster });
                     return;
                 }

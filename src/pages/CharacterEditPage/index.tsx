@@ -21,7 +21,7 @@ const CharacterEditPageContent = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [isPrintMenuOpen, setPrintMenuOpen] = useState(false);
     const printMenuRef = useRef<HTMLDivElement>(null);
-    const { error, form, loading, saving, hasChanges, handleGeneralChange, handleSubmit } = useCharacterEditPageContext();
+    const { error, form, handleGeneralChange, handleImageChange, handleImageRemove, handleSubmit, hasChanges, imageUrl, loading, removingImage, saving, uploadingImage } = useCharacterEditPageContext();
     const activeTab = resolveActiveTab(searchParams.get('tab'));
     useEffect(() => {
         const handleDocumentPointerDown = (event: MouseEvent) => {
@@ -72,9 +72,22 @@ const CharacterEditPageContent = () => {
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
           <div className={styles.headerBrand}>
-            <div className={styles.headerPortraitStack}>
-              <img className={styles.headerPortrait} src={getCharacterPortraitSrc(form.race, form.gender)} alt="" aria-hidden="true" onError={handleImageError}/>
-              <img className={styles.headerClass} src={getCharacterClassSrc(form.class)} alt="" aria-hidden="true" onError={handleImageError}/>
+            <div className={`${styles.headerPortraitStack} ${imageUrl ? styles.headerPortraitStackCustomImage : styles.headerPortraitStackDefaultImage}`}>
+              <input id="character-image-input" className={styles.headerImageInput} type="file" accept="image/png,image/jpeg" onChange={(event) => void handleImageChange(event)} disabled={uploadingImage || removingImage}/>
+              {imageUrl ? (<img className={styles.headerCustomPortrait} src={imageUrl} alt={t('pages.characterEdit.fields.image')}/>) : (<label className={styles.headerImageUploadTarget} htmlFor="character-image-input" aria-label={t('pages.characterEdit.fields.image')}>
+                  <img className={styles.headerPortrait} src={getCharacterPortraitSrc(form.race, form.gender)} alt="" aria-hidden="true" onError={handleImageError}/>
+                  <img className={styles.headerClass} src={getCharacterClassSrc(form.class)} alt="" aria-hidden="true" onError={handleImageError}/>
+                </label>)}
+              <div className={styles.headerImageActions}>
+                <label className={styles.headerImageAction} htmlFor="character-image-input" aria-disabled={uploadingImage || removingImage}>
+                  <AppIcon name="edit"/>
+                  <span>{t('pages.characterEdit.imageActions.uploadNew')}</span>
+                </label>
+                {imageUrl ? (<button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={() => void handleImageRemove()}>
+                    <AppIcon name="trash"/>
+                    <span>{t('pages.characterEdit.imageActions.remove')}</span>
+                  </button>) : null}
+              </div>
             </div>
             <div className={styles.headerCopy}>
               <p className={styles.eyebrow}>{t('pages.characterEdit.eyebrow')}</p>

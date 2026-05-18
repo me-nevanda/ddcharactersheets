@@ -123,6 +123,7 @@ export const useCharacterListCards = (characters: Character[], deletingId: strin
         onOpen: () => {
             openCharacter(character.id);
         },
+        imageSrc: character.imageUrl,
         portraitSrc: getCharacterPortraitSrc(character.race, character.gender),
         raceLabel: getRaceLabel(character.race),
         classSrc: getCharacterClassSrc(character.class),

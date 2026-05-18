@@ -12,6 +12,7 @@ export interface CharacterListCardViewModel {
   onDeleteClick: MouseEventHandler<HTMLButtonElement>
   onKeyDown: KeyboardEventHandler<HTMLElement>
   onOpen: () => void
+  imageSrc: string
   portraitSrc: string
   raceLabel: string
   classSrc: string

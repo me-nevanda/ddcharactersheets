@@ -34,6 +34,7 @@ export interface MonsterEditPageState {
   handleChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void
   handleDescriptionChange: (value: string) => void
   handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
+  handleImageRemove: () => Promise<void>
   handlePrint: () => void
   handleResistancesChange: (value: string) => void
   handleSpecialChange: (value: string) => void
@@ -42,5 +43,6 @@ export interface MonsterEditPageState {
   imageUrl: string
   loading: boolean
   saving: boolean
+  removingImage: boolean
   uploadingImage: boolean
 }

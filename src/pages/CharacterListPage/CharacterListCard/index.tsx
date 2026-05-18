@@ -6,9 +6,11 @@ export const CharacterListCard = ({ card, onImageError, }: CharacterListCardProp
     const { t } = useI18n();
     return (<article className={styles.characterCard} role="link" tabIndex={0} onClick={card.onOpen} onKeyDown={card.onKeyDown}>
       <div className={styles.cardBody}>
-        <div className={styles.cardPortraitStack}>
-          <img className={styles.cardPortrait} src={card.portraitSrc} alt="" aria-hidden="true" onError={onImageError}/>
-          <img className={styles.cardClass} src={card.classSrc} alt="" aria-hidden="true" onError={onImageError}/>
+        <div className={`${styles.cardPortraitStack} ${card.imageSrc ? styles.cardPortraitStackCustomImage : styles.cardPortraitStackDefaultImage}`}>
+          {card.imageSrc ? (<img className={styles.cardCustomPortrait} src={card.imageSrc} alt="" aria-hidden="true" onError={onImageError}/>) : (<>
+              <img className={styles.cardPortrait} src={card.portraitSrc} alt="" aria-hidden="true" onError={onImageError}/>
+              <img className={styles.cardClass} src={card.classSrc} alt="" aria-hidden="true" onError={onImageError}/>
+            </>)}
         </div>
 
         <div className={styles.characterSummary}>

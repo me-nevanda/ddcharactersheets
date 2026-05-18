@@ -1,7 +1,7 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { getMonster, saveMonster, uploadMonsterImage } from '@lib/api'
+import { deleteMonsterImage, getMonster, saveMonster, uploadMonsterImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { normalizeItems } from '@pages/CharacterEditPage/characterEditPageLogic'
 import { emptyArmor, emptyItems, emptyOtherItem, emptyWeapon } from '@pages/CharacterEditPage/characterEditPageUtils'
@@ -185,6 +185,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
   const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [removingImage, setRemovingImage] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
 
   useEffect(() => {
@@ -282,6 +283,24 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
       setError(getErrorMessage(t, nextError))
     } finally {
       setUploadingImage(false)
+    }
+  }
+
+  const handleImageRemove = async () => {
+    if (!imageUrl || removingImage) {
+      return
+    }
+
+    setRemovingImage(true)
+    setError('')
+
+    try {
+      const monster = await deleteMonsterImage(monsterId)
+      setImageUrl(monster.imageUrl)
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+    } finally {
+      setRemovingImage(false)
     }
   }
 
@@ -533,6 +552,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     handleChange,
     handleDescriptionChange,
     handleImageChange,
+    handleImageRemove,
     handlePrint,
     handleResistancesChange,
     handleSpecialChange,
@@ -540,6 +560,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
     imageUrl,
     loading,
+    removingImage,
     saving,
     uploadingImage,
   }

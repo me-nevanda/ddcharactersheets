@@ -40,6 +40,7 @@ export const en: TranslationDictionary = {
       invalidCharacterId: 'The character ID is invalid.',
       invalidMonsterId: 'The monster ID is invalid.',
       invalidJsonBody: 'The request payload is invalid.',
+      invalidCharacterImage: 'The hero image must be a PNG or JPG file.',
       invalidMonsterImage: 'The monster image must be a PNG or JPG file.',
       characterNotFound: 'Character not found.',
       monsterNotFound: 'Monster not found.',
@@ -93,6 +94,10 @@ export const en: TranslationDictionary = {
         description: 'Description',
         resistances: 'Resistances',
         special: 'Special',
+      },
+      imageActions: {
+        uploadNew: 'New',
+        remove: 'Remove',
       },
       attacks: {
         title: 'Attacks',
@@ -158,6 +163,10 @@ export const en: TranslationDictionary = {
         characterSheet: 'Character sheet',
         abilitiesAndFeats: 'Abilities and feats',
         items: 'Items',
+      },
+      imageActions: {
+        uploadNew: 'New',
+        remove: 'Remove',
       },
       sections: {
         general: 'General',
@@ -314,6 +323,7 @@ export const en: TranslationDictionary = {
       },
       fields: {
         name: 'Name',
+        image: 'Hero image',
         description: 'Description',
         level: 'Level',
         speed: 'Speed',

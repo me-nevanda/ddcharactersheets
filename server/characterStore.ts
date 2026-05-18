@@ -8,11 +8,16 @@ interface ApiError extends Error {
     code?: string;
     statusCode?: number;
 }
+export interface CharacterImage {
+    contentType: 'image/jpeg' | 'image/png';
+    data: Buffer;
+}
 interface LegacyCharacterBonuses extends CharacterBonuses {
     attributesPlus?: unknown;
 }
 const charactersDirectory = path.resolve(process.cwd(), 'data', 'characters');
 const safeCharacterIdPattern = /^[a-z0-9-]+$/i;
+const characterImageExtensions = ['jpg', 'png'] as const;
 const normalizeAttributeValue = (value: unknown): number => {
     if (typeof value !== 'number' || !Number.isFinite(value)) {
         return 10;
@@ -736,6 +741,46 @@ const getCharacterFilePath = (characterId: string): string => {
     }
     return path.join(charactersDirectory, `${characterId}.json`);
 };
+const getCharacterImageFilePath = (characterId: string, extension: (typeof characterImageExtensions)[number]): string => {
+    if (!isSafeCharacterId(characterId)) {
+        const error = new Error('Invalid character id') as ApiError;
+        error.statusCode = 400;
+        error.code = 'API_INVALID_CHARACTER_ID';
+        throw error;
+    }
+    return path.join(charactersDirectory, `${characterId}.${extension}`);
+};
+const getCharacterImageInfo = async (characterId: string): Promise<{ contentType: CharacterImage['contentType']; filePath: string; imageUrl: string } | null> => {
+    for (const extension of characterImageExtensions) {
+        const filePath = getCharacterImageFilePath(characterId, extension);
+        try {
+            await stat(filePath);
+            return {
+                contentType: extension === 'png' ? 'image/png' : 'image/jpeg',
+                filePath,
+                imageUrl: `/api/characters/${characterId}/image`,
+            };
+        }
+        catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+                throw error;
+            }
+        }
+    }
+    return null;
+};
+const normalizeImageExtension = (contentType: string | undefined): (typeof characterImageExtensions)[number] => {
+    if (contentType === 'image/png') {
+        return 'png';
+    }
+    if (contentType === 'image/jpeg' || contentType === 'image/jpg') {
+        return 'jpg';
+    }
+    const error = new Error('Invalid character image') as ApiError;
+    error.statusCode = 400;
+    error.code = 'API_INVALID_CHARACTER_IMAGE';
+    throw error;
+};
 export const isSafeCharacterId = (characterId: string): boolean => {
     return safeCharacterIdPattern.test(characterId);
 };
@@ -746,12 +791,14 @@ export const listCharacters = async (): Promise<Character[]> => {
     const characters = await Promise.all(characterFiles.map(async (entry) => {
         const characterId = path.basename(entry.name, '.json');
         const filePath = getCharacterFilePath(characterId);
-        const [rawCharacter, fileInfo] = await Promise.all([
+        const [rawCharacter, fileInfo, imageInfo] = await Promise.all([
             readFile(filePath, 'utf8'),
             stat(filePath),
+            getCharacterImageInfo(characterId),
         ]);
         return {
             id: characterId,
+            imageUrl: imageInfo?.imageUrl ?? '',
             ...normalizeCharacter(parseCharacter(rawCharacter)),
             updatedAt: fileInfo.mtime.toISOString(),
         };
@@ -761,10 +808,14 @@ export const listCharacters = async (): Promise<Character[]> => {
 export const readCharacter = async (characterId: string): Promise<Character> => {
     await ensureCharactersDirectory();
     const filePath = getCharacterFilePath(characterId);
-    const rawCharacter = await readFile(filePath, 'utf8');
-    const fileInfo = await stat(filePath);
+    const [rawCharacter, fileInfo, imageInfo] = await Promise.all([
+        readFile(filePath, 'utf8'),
+        stat(filePath),
+        getCharacterImageInfo(characterId),
+    ]);
     return {
         id: characterId,
+        imageUrl: imageInfo?.imageUrl ?? '',
         ...normalizeCharacter(parseCharacter(rawCharacter)),
         updatedAt: fileInfo.mtime.toISOString(),
     };
@@ -794,4 +845,62 @@ export const deleteCharacter = async (characterId: string): Promise<void> => {
     await ensureCharactersDirectory();
     const filePath = getCharacterFilePath(characterId);
     await unlink(filePath);
+    await Promise.all(characterImageExtensions.map(async (extension) => {
+        try {
+            await unlink(getCharacterImageFilePath(characterId, extension));
+        }
+        catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+                throw error;
+            }
+        }
+    }));
+};
+export const readCharacterImage = async (characterId: string): Promise<CharacterImage> => {
+    await ensureCharactersDirectory();
+    const imageInfo = await getCharacterImageInfo(characterId);
+    if (!imageInfo) {
+        const error = new Error('Character image not found') as ApiError;
+        error.statusCode = 404;
+        error.code = 'ENOENT';
+        throw error;
+    }
+    return {
+        contentType: imageInfo.contentType,
+        data: await readFile(imageInfo.filePath),
+    };
+};
+export const updateCharacterImage = async (characterId: string, contentType: string | undefined, data: Buffer): Promise<Character> => {
+    await ensureCharactersDirectory();
+    await stat(getCharacterFilePath(characterId));
+    const extension = normalizeImageExtension(contentType);
+    const nextFilePath = getCharacterImageFilePath(characterId, extension);
+    const staleExtensions = characterImageExtensions.filter((imageExtension) => imageExtension !== extension);
+    await Promise.all(staleExtensions.map(async (staleExtension) => {
+        try {
+            await unlink(getCharacterImageFilePath(characterId, staleExtension));
+        }
+        catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+                throw error;
+            }
+        }
+    }));
+    await writeFile(nextFilePath, data);
+    return readCharacter(characterId);
+};
+export const deleteCharacterImage = async (characterId: string): Promise<Character> => {
+    await ensureCharactersDirectory();
+    await stat(getCharacterFilePath(characterId));
+    await Promise.all(characterImageExtensions.map(async (extension) => {
+        try {
+            await unlink(getCharacterImageFilePath(characterId, extension));
+        }
+        catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+                throw error;
+            }
+        }
+    }));
+    return readCharacter(characterId);
 };

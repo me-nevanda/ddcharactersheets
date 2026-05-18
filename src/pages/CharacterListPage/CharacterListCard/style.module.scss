@@ -30,8 +30,33 @@
 }
 
 .cardPortraitStack {
+  position: relative;
   display: grid;
   align-content: start;
+  height: 120px;
+  isolation: isolate;
+}
+
+.cardPortraitStackDefaultImage {
+  width: 160px;
+}
+
+.cardPortraitStackCustomImage {
+  width: 120px;
+}
+
+.cardPortraitStackCustomImage::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0.45rem;
+  width: 78%;
+  height: 80%;
+  border-radius: 999px;
+  background: rgba(255, 232, 180, 0.42);
+  filter: blur(14px);
+  transform: translateX(-50%);
+  z-index: 0;
 }
 
 .cardPortrait {
@@ -44,6 +69,20 @@
   grid-area: 1 / 1;
   display: block;
   height: 120px;
+}
+
+.cardCustomPortrait {
+  position: relative;
+  grid-area: 1 / 1;
+  display: block;
+  max-width: 120px;
+  max-height: 120px;
+  width: auto;
+  height: auto;
+  align-self: center;
+  justify-self: center;
+  object-fit: contain;
+  z-index: 1;
 }
 
 .characterSummary {
@@ -140,10 +179,26 @@
     align-content: start;
   }
 
+  .cardPortraitStackDefaultImage {
+    width: 126px;
+  }
+
+  .cardPortraitStackCustomImage {
+    width: 96px;
+  }
+
+  .cardPortraitStack {
+    height: 96px;
+  }
+
   .cardPortrait,
   .cardClass {
-    width: 96px;
     height: 96px;
+  }
+
+  .cardCustomPortrait {
+    max-width: 96px;
+    max-height: 96px;
   }
 
   .cardMeta {

@@ -336,5 +336,6 @@ export interface CharacterData {
 
 export interface Character extends CharacterData {
   id: string
+  imageUrl: string
   updatedAt: string
 }

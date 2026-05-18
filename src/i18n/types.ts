@@ -39,6 +39,7 @@ export interface TranslationDictionary {
       invalidCharacterId: string
       invalidMonsterId: string
       invalidJsonBody: string
+      invalidCharacterImage: string
       invalidMonsterImage: string
       characterNotFound: string
       monsterNotFound: string
@@ -92,6 +93,10 @@ export interface TranslationDictionary {
         description: string
         resistances: string
         special: string
+      }
+      imageActions: {
+        uploadNew: string
+        remove: string
       }
       attacks: {
         title: string
@@ -157,6 +162,10 @@ export interface TranslationDictionary {
         characterSheet: string
         abilitiesAndFeats: string
         items: string
+      }
+      imageActions: {
+        uploadNew: string
+        remove: string
       }
       sections: {
         general: string
@@ -313,6 +322,7 @@ export interface TranslationDictionary {
       }
       fields: {
         name: string
+        image: string
         description: string
         level: string
         speed: string

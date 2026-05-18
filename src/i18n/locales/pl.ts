@@ -40,6 +40,7 @@ export const pl: TranslationDictionary = {
       invalidCharacterId: 'Nieprawidłowy identyfikator karty.',
       invalidMonsterId: 'Nieprawidłowy identyfikator potwora.',
       invalidJsonBody: 'Nieprawidłowe dane żądania.',
+      invalidCharacterImage: 'Obraz bohatera musi być plikiem PNG albo JPG.',
       invalidMonsterImage: 'Obraz potwora musi być plikiem PNG albo JPG.',
       characterNotFound: 'Nie znaleziono karty.',
       monsterNotFound: 'Nie znaleziono potwora.',
@@ -93,6 +94,10 @@ export const pl: TranslationDictionary = {
         description: 'Opis',
         resistances: 'Odporności',
         special: 'Specjalne',
+      },
+      imageActions: {
+        uploadNew: 'Nowy',
+        remove: 'Usuń',
       },
       attacks: {
         title: 'Ataki',
@@ -158,6 +163,10 @@ export const pl: TranslationDictionary = {
         characterSheet: 'Karta postaci',
         abilitiesAndFeats: 'Zdolności i atuty',
         items: 'Przedmioty',
+      },
+      imageActions: {
+        uploadNew: 'Nowy',
+        remove: 'Usuń',
       },
       sections: {
         general: 'Ogólne',
@@ -314,6 +323,7 @@ export const pl: TranslationDictionary = {
       },
       fields: {
         name: 'Imię',
+        image: 'Obraz bohatera',
         description: 'Opis',
         level: 'Poziom',
         speed: 'Szybkość',

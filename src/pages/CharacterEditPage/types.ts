@@ -53,6 +53,8 @@ export interface CharacterEditPageState {
   attributeBonuses: CharacterAttributes
   attributeBonusTooltips: Record<CharacterAttributeFieldName, string>
   handleGeneralChange: (event: CharacterGeneralChangeEvent) => void
+  handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
+  handleImageRemove: () => Promise<void>
   handleGeneralFieldChange: (fieldName: CharacterGeneralFieldName, value: string) => void
   handleAttributeChange: (event: ChangeEvent<HTMLInputElement>) => void
   handleTrainingChange: (event: ChangeEvent<HTMLInputElement>) => void
@@ -102,7 +104,10 @@ export interface CharacterEditPageState {
   defenseValues: DefenseValues
   defenseTooltips: DefenseTooltipValues
   hpValue: number
+  imageUrl: string
+  removingImage: boolean
   surgeValue: number
+  uploadingImage: boolean
   hasChanges: boolean
 }
 
