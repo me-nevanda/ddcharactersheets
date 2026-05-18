@@ -19,7 +19,7 @@
   position: sticky;
   top: 1rem;
   align-self: start;
-  margin-top: 7rem;
+  margin-top: calc(clamp(3.1rem, 5vw, 10.25rem) + 3.1rem);
 }
 
 .tabButton {

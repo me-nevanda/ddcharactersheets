@@ -4,15 +4,15 @@ import type { OtherItemCardProps } from './types';
 import { ItemBonusEditor } from '../ItemBonusEditor';
 import { otherBonusFields } from '../itemBonusFields';
 import styles from '../../../style.module.scss';
-export const OtherItemCard = ({ item, index, onNameChange, onDescriptionChange, onRemove, onEquipChange, onBonusChange, onBonusFieldChange, }: OtherItemCardProps) => {
+export const OtherItemCard = ({ item, index, onNameChange, onDescriptionChange, onRemove, onEquipChange, showEquipButton = true, onBonusChange, onBonusFieldChange, }: OtherItemCardProps) => {
     const { t } = useI18n();
     return (<article className={styles.abilityCard}>
       <div className={`${styles.abilityCardHeader} ${styles.itemCardHeader}`}>
         <input className={styles.abilityCardTitleInput} id={`item-others-name-${index}`} value={item.name} placeholder={t('pages.characterEdit.items.namePlaceholder')} onChange={(event) => onNameChange(index, event.target.value)}/>
         <div className={styles.itemCardActions}>
-          <button className={`${styles.weaponEquipButton} ${item.equipped ? styles.weaponEquipButtonActive : styles.weaponEquipButtonInactive}`} type="button" aria-pressed={item.equipped} aria-label={item.equipped ? t('pages.characterEdit.items.equippedLabel') : t('pages.characterEdit.items.unequippedLabel')} title={item.equipped ? t('pages.characterEdit.items.equippedLabel') : t('pages.characterEdit.items.unequippedLabel')} onClick={() => onEquipChange(index, !item.equipped)}>
+          {showEquipButton ? <button className={`${styles.weaponEquipButton} ${item.equipped ? styles.weaponEquipButtonActive : styles.weaponEquipButtonInactive}`} type="button" aria-pressed={item.equipped} aria-label={item.equipped ? t('pages.characterEdit.items.equippedLabel') : t('pages.characterEdit.items.unequippedLabel')} title={item.equipped ? t('pages.characterEdit.items.equippedLabel') : t('pages.characterEdit.items.unequippedLabel')} onClick={() => onEquipChange(index, !item.equipped)}>
             <AppIcon name="clothes"/>
-          </button>
+          </button> : null}
           <button className={styles.abilityRemoveButton} type="button" aria-label={t('pages.characterEdit.items.removeButton')} title={t('pages.characterEdit.items.removeButton')} onClick={() => onRemove(index, item.name)}>
             <AppIcon name="delete"/>
           </button>

@@ -42,6 +42,7 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
         attributeBonuses: computedState.attributeBonuses,
         attributeBonusTooltips: computedState.attributeBonusTooltips,
         handleGeneralChange: handlers.handleGeneralChange,
+        handleGeneralFieldChange: handlers.handleGeneralFieldChange,
         handleAttributeChange: handlers.handleAttributeChange,
         handleTrainingChange: handlers.handleTrainingChange,
         handleAbilityCreateEmpty: handlers.handleAbilityCreateEmpty,

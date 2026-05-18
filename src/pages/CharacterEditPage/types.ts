@@ -53,6 +53,7 @@ export interface CharacterEditPageState {
   attributeBonuses: CharacterAttributes
   attributeBonusTooltips: Record<CharacterAttributeFieldName, string>
   handleGeneralChange: (event: CharacterGeneralChangeEvent) => void
+  handleGeneralFieldChange: (fieldName: CharacterGeneralFieldName, value: string) => void
   handleAttributeChange: (event: ChangeEvent<HTMLInputElement>) => void
   handleTrainingChange: (event: ChangeEvent<HTMLInputElement>) => void
   handleAbilityCreateEmpty: (type?: CharacterAbilityType) => void
@@ -113,6 +114,7 @@ export type CharacterEditPageSetString = Dispatch<SetStateAction<string>>
 
 export type CharacterEditPageHandlerKeys =
   | 'handleGeneralChange'
+  | 'handleGeneralFieldChange'
   | 'handleAttributeChange'
   | 'handleTrainingChange'
   | 'handleAbilityCreateEmpty'

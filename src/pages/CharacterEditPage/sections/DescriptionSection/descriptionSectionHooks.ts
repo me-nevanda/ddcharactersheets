@@ -3,11 +3,15 @@ import { useCharacterEditPageContext } from '../../characterEditPageContext'
 
 export const useDescriptionSection = () => {
   const { t } = useI18n()
-  const { form, handleGeneralChange } = useCharacterEditPageContext()
+  const { form, handleGeneralFieldChange } = useCharacterEditPageContext()
+
+  const handleDescriptionChange = (value: string) => {
+    handleGeneralFieldChange('description', value)
+  }
 
   return {
     form,
-    handleGeneralChange,
+    handleDescriptionChange,
     t,
   }
 }

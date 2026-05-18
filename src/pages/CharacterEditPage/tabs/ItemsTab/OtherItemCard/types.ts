@@ -10,6 +10,7 @@ export interface OtherItemCardProps {
   onDescriptionChange: (index: number, value: string) => void
   onRemove: (index: number, name: string) => void
   onEquipChange: (index: number, value: boolean) => void
+  showEquipButton?: boolean
   onBonusChange: (index: number, fieldName: CharacterItemBonusFieldName, value: number) => void
   onBonusFieldChange: (
     index: number,

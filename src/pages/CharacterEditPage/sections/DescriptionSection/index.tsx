@@ -1,8 +1,9 @@
+import { SimpleWysiwygEditor } from '@components/SimpleWysiwygEditor'
 import styles from '../../style.module.scss'
 import { useDescriptionSection } from './descriptionSectionHooks'
 
 export const DescriptionSection = () => {
-  const { t, form, handleGeneralChange } = useDescriptionSection()
+  const { t, form, handleDescriptionChange } = useDescriptionSection()
 
   return (
     <section className={styles.section}>
@@ -10,17 +11,9 @@ export const DescriptionSection = () => {
         <h2 className={styles.sectionTitle}>{t('pages.characterEdit.sections.description')}</h2>
       </div>
 
-      <label className={styles.descriptionField} htmlFor="description">
-        <textarea
-          className={`${styles.input} ${styles.characterDescriptionTextarea}`}
-          id="description"
-          name="description"
-          value={form.description}
-          aria-label={t('pages.characterEdit.fields.description')}
-          placeholder={t('pages.characterEdit.placeholders.description')}
-          onChange={handleGeneralChange}
-        />
-      </label>
+      <div className={styles.descriptionField}>
+        <SimpleWysiwygEditor ariaLabel={t('pages.characterEdit.fields.description')} minHeightClassName={styles.characterDescriptionTextarea} name="description" placeholder={t('pages.characterEdit.placeholders.description')} toolbar={false} value={form.description} onChange={handleDescriptionChange} />
+      </div>
     </section>
   )
 }

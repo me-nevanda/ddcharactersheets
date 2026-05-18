@@ -8,7 +8,7 @@ import { useCharacterListPage } from './characterListPageStateHooks';
 const CharacterListPageContent = ({ cards, creating, deletingId, deleteDialogCharacterName, error, handleCardImageError, loading, characterToDelete, handleCloseDeleteDialog, handleConfirmDeleteCharacter, handleCreateCharacter, showCharacterGrid, showEmptyState, }: CharacterListPageState) => {
     const { t } = useI18n();
     return (<>
-      <CharacterListHeader actionLabel={t('common.actions.addCard')} creating={creating} onAction={() => void handleCreateCharacter()}/>
+      <CharacterListHeader actionLabel={t('pages.characterList.actions.addHero')} creating={creating} onAction={() => void handleCreateCharacter()} subtitle={t('pages.main.subtitle')} title={t('pages.main.tabs.heroes')}/>
 
       {error ? <p className={styles.status}>{error}</p> : null}
 

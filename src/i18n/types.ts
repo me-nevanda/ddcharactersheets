@@ -16,11 +16,20 @@ export interface TranslationDictionary {
       save: string
       backToList: string
     }
+    editor: {
+      bold: string
+      italic: string
+      underline: string
+      bulletList: string
+      numberedList: string
+      clearFormatting: string
+    }
     states: {
       creating: string
       deleting: string
       loadingCards: string
       loadingCharacter: string
+      loadingMonsters: string
       saving: string
     }
   }
@@ -28,14 +37,18 @@ export interface TranslationDictionary {
     api: {
       generic: string
       invalidCharacterId: string
+      invalidMonsterId: string
       invalidJsonBody: string
+      invalidMonsterImage: string
       characterNotFound: string
+      monsterNotFound: string
       notFound: string
       unexpectedServerError: string
     }
   }
   pages: {
     main: {
+      subtitle: string
       tabsLabel: string
       tabs: {
         heroes: string
@@ -43,10 +56,9 @@ export interface TranslationDictionary {
       }
     }
     characterList: {
-      eyebrow: string
-      title: string
       actions: {
-        addMinion: string
+        addHero: string
+        addMonster: string
       }
       emptyState: string
       unnamedCharacter: string
@@ -56,6 +68,80 @@ export interface TranslationDictionary {
       deleteDialog: {
         title: string
         body: string
+      }
+    }
+    monsterList: {
+      emptyState: string
+      unnamedMonster: string
+      deleteDialog: {
+        title: string
+        body: string
+      }
+    }
+    monsterEdit: {
+      eyebrow: string
+      title: string
+      loading: string
+      tabs: {
+        general: string
+        attacks: string
+        loot: string
+      }
+      sections: {
+        defenses: string
+        description: string
+        resistances: string
+        special: string
+      }
+      attacks: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeButton: string
+        typeLabel: string
+        typeOptions: {
+          standard: string
+          unlimited: string
+          encounter: string
+          daily: string
+        }
+        attackLabel: string
+        namePlaceholder: string
+        descriptionPlaceholder: string
+      }
+      loot: {
+        title: string
+        emptyState: string
+        addButton: string
+        groups: {
+          armors: string
+          weapons: string
+          others: string
+        }
+        removeDialog: {
+          title: string
+          body: string
+        }
+      }
+      fields: {
+        name: string
+        image: string
+        description: string
+        kp: string
+        fortitude: string
+        reflex: string
+        will: string
+        speed: string
+        hp: string
+        level: string
+        bloodied: string
+      }
+      placeholders: {
+        titleName: string
+        image: string
+        description: string
+        resistances: string
+        special: string
       }
     }
     characterEdit: {
@@ -353,6 +439,18 @@ export interface TranslationDictionary {
         armors: string
         weapons: string
         others: string
+      }
+    }
+    monsterPrint: {
+      title: string
+      loading: string
+      error: string
+      printButtonLabel: string
+      emptyAttacks: string
+      unnamedAttack: string
+      sections: {
+        stats: string
+        attacks: string
       }
     }
   }

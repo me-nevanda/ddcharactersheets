@@ -1,7 +1,10 @@
 import type { Character, CharacterData } from '@appTypes/character';
+import type { Monster, MonsterData } from '@appTypes/monster';
 interface ApiEnvelope<T> {
     character?: T;
     characters?: T[];
+    monster?: T;
+    monsters?: T[];
     errorCode?: string;
 }
 export interface ApiError extends Error {
@@ -57,4 +60,58 @@ export const deleteCharacter = async (characterId: string): Promise<void> => {
     await requestJson<null>(`/api/characters/${characterId}`, {
         method: 'DELETE',
     });
+};
+export const listMonsters = async (): Promise<Monster[]> => {
+    const payload = await requestJson<ApiEnvelope<Monster>>('/api/monsters');
+    return payload?.monsters ?? [];
+};
+export const createMonster = async (): Promise<Monster> => {
+    const payload = await requestJson<ApiEnvelope<Monster>>('/api/monsters', {
+        method: 'POST',
+    });
+    if (!payload?.monster) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.monster;
+};
+export const getMonster = async (monsterId: string): Promise<Monster> => {
+    const payload = await requestJson<ApiEnvelope<Monster>>(`/api/monsters/${monsterId}`);
+    if (!payload?.monster) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.monster;
+};
+export const saveMonster = async (monsterId: string, monster: MonsterData): Promise<Monster> => {
+    const payload = await requestJson<ApiEnvelope<Monster>>(`/api/monsters/${monsterId}`, {
+        method: 'PUT',
+        body: JSON.stringify(monster),
+    });
+    if (!payload?.monster) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.monster;
+};
+export const deleteMonster = async (monsterId: string): Promise<void> => {
+    await requestJson<null>(`/api/monsters/${monsterId}`, {
+        method: 'DELETE',
+    });
+};
+export const uploadMonsterImage = async (monsterId: string, image: File): Promise<Monster> => {
+    const response = await fetch(`/api/monsters/${monsterId}/image`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': image.type,
+        },
+        body: image,
+    });
+    const payload = (await response.json().catch(() => null)) as ApiEnvelope<Monster> | null;
+    if (!response.ok) {
+        const error = new Error(payload?.errorCode ?? 'errors.api.generic') as ApiError;
+        error.code = payload?.errorCode ?? 'errors.api.generic';
+        throw error;
+    }
+    if (!payload?.monster) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.monster;
 };

@@ -1,7 +1,7 @@
 import { useI18n } from '@i18n/index';
 import type { DeleteCharacterDialogProps } from './types';
 import styles from './style.module.scss';
-export const DeleteCharacterDialog = ({ characterName, deleting, open, onCancel, onConfirm, }: DeleteCharacterDialogProps) => {
+export const DeleteCharacterDialog = ({ bodyKey = 'pages.characterList.deleteDialog.body', characterName, deleting, open, titleKey = 'pages.characterList.deleteDialog.title', onCancel, onConfirm, }: DeleteCharacterDialogProps) => {
     const { t } = useI18n();
     if (!open) {
         return null;
@@ -9,10 +9,10 @@ export const DeleteCharacterDialog = ({ characterName, deleting, open, onCancel,
     return (<div className={styles.backdrop} role="presentation">
       <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="delete-character-title">
         <h2 className={styles.title} id="delete-character-title">
-          {t('pages.characterList.deleteDialog.title')}
+          {t(titleKey)}
         </h2>
         <p className={styles.text}>
-          {t('pages.characterList.deleteDialog.body', {
+          {t(bodyKey, {
             name: characterName,
         })}
         </p>

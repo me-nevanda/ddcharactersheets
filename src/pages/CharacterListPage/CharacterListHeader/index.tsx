@@ -2,13 +2,13 @@ import { AppIcon } from '@components/AppIcon';
 import { useI18n } from '@i18n/index';
 import type { CharacterListHeaderProps } from './types';
 import styles from './style.module.scss';
-export const CharacterListHeader = ({ actionLabel, creating, onAction, }: CharacterListHeaderProps) => {
+export const CharacterListHeader = ({ actionLabel, creating, onAction, subtitle, title, }: CharacterListHeaderProps) => {
     const { t } = useI18n();
     return (<header className={styles.hero}>
       <div><img className={styles.headerLogo} src="/favicon.png" alt="" aria-hidden="true"/></div>
       <div className={styles.heroCopy}>
-        <p className={styles.eyebrow}>{t('pages.characterList.eyebrow')}</p>
-        <h1 className={styles.title}>{t('pages.characterList.title')}</h1>
+        <p className={styles.eyebrow}>{subtitle}</p>
+        <h1 className={styles.title}>{title}</h1>
       </div>
       <button className={styles.primaryButton} type="button" onClick={onAction} disabled={creating}>
         <span className={styles.buttonContent}>

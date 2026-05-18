@@ -10,6 +10,7 @@ export interface ArmorItemCardProps {
   onDescriptionChange: (index: number, value: string) => void
   onRemove: (index: number, name: string) => void
   onEquipChange: (index: number, value: boolean) => void
+  showEquipButton?: boolean
   onBonusChange: (index: number, fieldName: CharacterArmorBonusFieldName, value: number) => void
   onBonusFieldChange: (
     index: number,

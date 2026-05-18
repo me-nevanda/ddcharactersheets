@@ -5,6 +5,7 @@ import { useUnnamedCharacterImageFallback } from '@pages/characterPageHooks';
 import { useI18n } from '@i18n/index';
 import { CharacterEditPageProvider, useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext';
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
+import { useMainPageContext } from '@pages/main/mainPageContext';
 import styles from './style.module.scss';
 import type { CharacterEditTabKey } from '@pages/CharacterEditPage/types';
 import { AbilitiesTab } from '@pages/CharacterEditPage/tabs/AbilitiesTab';
@@ -16,6 +17,7 @@ const CharacterEditPageContent = () => {
     const { getCharacterClassSrc, getCharacterPortraitSrc } = useCharacterPresentation();
     const handleImageError = useUnnamedCharacterImageFallback();
     const { characterId = '' } = useParams();
+    const { handleTabChange: handleMainTabChange } = useMainPageContext();
     const [searchParams, setSearchParams] = useSearchParams();
     const [isPrintMenuOpen, setPrintMenuOpen] = useState(false);
     const printMenuRef = useRef<HTMLDivElement>(null);
@@ -83,7 +85,7 @@ const CharacterEditPageContent = () => {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/">
+            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={() => handleMainTabChange('heroes')}>
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.printAction} ref={printMenuRef}>

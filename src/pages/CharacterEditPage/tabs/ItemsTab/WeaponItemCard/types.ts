@@ -11,6 +11,7 @@ export interface WeaponItemCardProps {
   onNameChange: (index: number, value: string) => void
   onDescriptionChange: (index: number, value: string) => void
   onRemove: (index: number, name: string) => void
+  showEquipButton?: boolean
   onDamageChange: (
     index: number,
     fieldName: CharacterWeaponFieldName,

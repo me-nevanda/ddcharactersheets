@@ -49,6 +49,13 @@ export const useCharacterEditPageClassTrainingRules = (characterClass: Character
 };
 
 export const useCharacterEditPageFormHandlers = (setForm: CharacterEditPageSetForm): CharacterEditPageHandlers => {
+    const handleGeneralFieldChange = (fieldName: CharacterGeneralFieldName, value: string) => {
+        setForm((currentForm) => ({
+            ...currentForm,
+            [fieldName]: value,
+        }));
+    };
+
     const handleGeneralChange = (event: CharacterGeneralChangeEvent) => {
         const { name, value } = event.target;
         const fieldName = name as CharacterGeneralFieldName;
@@ -378,6 +385,7 @@ export const useCharacterEditPageFormHandlers = (setForm: CharacterEditPageSetFo
 
     return {
         handleGeneralChange,
+        handleGeneralFieldChange,
         handleAttributeChange,
         handleTrainingChange,
         handleAbilityCreateEmpty,
