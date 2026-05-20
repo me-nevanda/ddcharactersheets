@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { LanguageSwitcher } from '@components/LanguageSwitcher';
+import { AdventureEditPage } from '@pages/AdventureEditPage';
 import { CharacterEditPage } from '@pages/CharacterEditPage';
 import { MainPage } from '@pages/main';
 import { MainPageProvider } from '@pages/main/mainPageContext';
@@ -15,6 +16,7 @@ const App = () => {
       <MainPageProvider>
         <Routes>
           <Route path="/" element={<MainPage />}/>
+          <Route path="/adventures/:adventureId/edit" element={<AdventureEditPage />}/>
           <Route path="/characters/:characterId/edit" element={<CharacterEditPage />}/>
           <Route path="/monsters/:monsterId/edit" element={<MonsterEditPage />}/>
           <Route path="/monster-groups/:groupId/edit" element={<MonsterGroupEditPage />}/>

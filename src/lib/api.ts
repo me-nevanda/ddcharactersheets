@@ -1,13 +1,38 @@
+import type { Adventure, AdventureData } from '@appTypes/adventure';
 import type { Character, CharacterData } from '@appTypes/character';
 import type { Monster, MonsterData, MonsterGroup } from '@appTypes/monster';
 interface ApiEnvelope<T> {
+    adventure?: T;
+    adventures?: T[];
     character?: T;
     characters?: T[];
     monster?: T;
     monsters?: T[];
     monsterGroup?: T;
     monsterGroups?: T[];
+    response?: T;
+    tokenCount?: T;
     errorCode?: string;
+}
+export interface GeminiResponse {
+    id: string;
+    model: string;
+    text: string;
+    usage: GeminiUsage;
+}
+export interface CreateGeminiResponseRequest {
+    instructions?: string;
+    model?: string;
+    prompt: string;
+}
+export interface GeminiTokenCount {
+    model: string;
+    totalTokens: number;
+}
+export interface GeminiUsage {
+    inputTokens: number;
+    outputTokens: number;
+    totalTokens: number;
 }
 export interface ApiError extends Error {
     code: string;
@@ -31,6 +56,36 @@ const requestJson = async <T>(url: string, options: RequestInit = {}): Promise<T
 export const listCharacters = async (): Promise<Character[]> => {
     const payload = await requestJson<ApiEnvelope<Character>>('/api/characters');
     return payload?.characters ?? [];
+};
+export const listAdventures = async (): Promise<Adventure[]> => {
+    const payload = await requestJson<ApiEnvelope<Adventure>>('/api/adventures');
+    return payload?.adventures ?? [];
+};
+export const createAdventure = async (): Promise<Adventure> => {
+    const payload = await requestJson<ApiEnvelope<Adventure>>('/api/adventures', {
+        method: 'POST',
+    });
+    if (!payload?.adventure) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.adventure;
+};
+export const getAdventure = async (adventureId: string): Promise<Adventure> => {
+    const payload = await requestJson<ApiEnvelope<Adventure>>(`/api/adventures/${adventureId}`);
+    if (!payload?.adventure) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.adventure;
+};
+export const saveAdventure = async (adventureId: string, adventure: AdventureData): Promise<Adventure> => {
+    const payload = await requestJson<ApiEnvelope<Adventure>>(`/api/adventures/${adventureId}`, {
+        method: 'PUT',
+        body: JSON.stringify(adventure),
+    });
+    if (!payload?.adventure) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.adventure;
 };
 export const createCharacter = async (): Promise<Character> => {
     const payload = await requestJson<ApiEnvelope<Character>>('/api/characters', {
@@ -188,4 +243,24 @@ export const deleteMonsterImage = async (monsterId: string): Promise<Monster> =>
         throw new Error('errors.api.generic');
     }
     return payload.monster;
+};
+export const createGeminiResponse = async (request: CreateGeminiResponseRequest): Promise<GeminiResponse> => {
+    const payload = await requestJson<ApiEnvelope<GeminiResponse>>('/api/gemini/responses', {
+        method: 'POST',
+        body: JSON.stringify(request),
+    });
+    if (!payload?.response) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.response;
+};
+export const countGeminiTokens = async (request: CreateGeminiResponseRequest): Promise<GeminiTokenCount> => {
+    const payload = await requestJson<ApiEnvelope<GeminiTokenCount>>('/api/gemini/tokens', {
+        method: 'POST',
+        body: JSON.stringify(request),
+    });
+    if (!payload?.tokenCount) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.tokenCount;
 };

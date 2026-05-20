@@ -43,12 +43,21 @@ export interface TranslationDictionary {
       invalidCharacterId: string
       invalidMonsterId: string
       invalidMonsterGroupId: string
+      invalidAdventureId: string
       invalidJsonBody: string
       invalidCharacterImage: string
       invalidMonsterImage: string
       invalidMonsterGroupName: string
+      geminiPromptRequired: string
+      geminiConfigMissing: string
+      geminiConfigInvalid: string
+      geminiApiKeyMissing: string
+      geminiUnauthorized: string
+      geminiRateLimited: string
+      geminiRequestFailed: string
       characterNotFound: string
       monsterNotFound: string
+      adventureNotFound: string
       notFound: string
       unexpectedServerError: string
     }
@@ -60,6 +69,43 @@ export interface TranslationDictionary {
       tabs: {
         heroes: string
         monsters: string
+        adventures: string
+      }
+    }
+    adventureList: {
+      actions: {
+        addAdventure: string
+      }
+      emptyState: string
+      loading: string
+      unnamedAdventure: string
+      updatedAt: string
+    }
+    adventureEdit: {
+      eyebrow: string
+      loading: string
+      actions: {
+        send: string
+        sending: string
+      }
+      fields: {
+        name: string
+        output: string
+        prompt: string
+      }
+      placeholders: {
+        output: string
+        titleName: string
+        prompt: string
+      }
+      tokens: {
+        lastUsage: string
+        noLastUsage: string
+        promptCount: string
+        promptUnavailable: string
+        quotaReset: string
+        summaryLabel: string
+        todayRequests: string
       }
     }
     characterList: {

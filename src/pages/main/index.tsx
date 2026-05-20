@@ -1,4 +1,5 @@
 import { useI18n } from '@i18n/index'
+import { AdventureListPage } from '@pages/AdventureListPage'
 import { CharacterListPage } from '@pages/CharacterListPage'
 import { MonstersListPage } from '@pages/MonstersListPage'
 import { useMainPage } from './mainPageHooks'
@@ -18,11 +19,15 @@ export const MainPage = () => {
           <button className={`${styles.tabButton} ${activeTab === 'monsters' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('monsters')}>
             {t('pages.main.tabs.monsters')}
           </button>
+          <button className={`${styles.tabButton} ${activeTab === 'adventures' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('adventures')}>
+            {t('pages.main.tabs.adventures')}
+          </button>
         </aside>
 
         <div className={styles.tabPanel}>
           {activeTab === 'heroes' ? <CharacterListPage /> : null}
           {activeTab === 'monsters' ? <MonstersListPage /> : null}
+          {activeTab === 'adventures' ? <AdventureListPage /> : null}
         </div>
       </div>
     </main>

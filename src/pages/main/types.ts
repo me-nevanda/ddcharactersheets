@@ -1,4 +1,4 @@
-export type MainTabKey = 'heroes' | 'monsters'
+export type MainTabKey = 'heroes' | 'monsters' | 'adventures'
 
 export interface MainPageState {
   activeTab: MainTabKey

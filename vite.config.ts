@@ -1,7 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { defineConfig, type Connect, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+import { createAdventure, isSafeAdventureId, listAdventures, readAdventure, updateAdventure } from './server/adventureStore';
 import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacterId, listCharacters, readCharacter, readCharacterImage, updateCharacter, updateCharacterImage, } from './server/characterStore';
+import { countGeminiTokens, createGeminiResponse } from './server/geminiService';
 import { createMonsterGroup, isSafeMonsterGroupId, listMonsterGroups, readMonsterGroup, updateMonsterGroup } from './server/monsterGroupStore';
 import { createMonster, deleteMonster, deleteMonsterImage, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
 interface ApiError extends Error {
@@ -146,6 +148,70 @@ const createCharactersApiPlugin = (): Plugin => {
         },
     };
 };
+const createAdventuresApiPlugin = (): Plugin => {
+    const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
+        const url = new URL(request.url ?? '/', 'http://localhost');
+        if (!url.pathname.startsWith('/api/adventures')) {
+            next();
+            return;
+        }
+        try {
+            if (request.method === 'GET' && url.pathname === '/api/adventures') {
+                sendJson(response, 200, { adventures: await listAdventures() });
+                return;
+            }
+            if (request.method === 'POST' && url.pathname === '/api/adventures') {
+                sendJson(response, 201, { adventure: await createAdventure() });
+                return;
+            }
+            const match = url.pathname.match(/^\/api\/adventures\/([^/]+)$/);
+            if (match) {
+                const adventureId = match[1];
+                if (!isSafeAdventureId(adventureId)) {
+                    sendError(response, 400, 'errors.api.invalidAdventureId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    sendJson(response, 200, { adventure: await readAdventure(adventureId) });
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const payload = await readJsonBody(request);
+                    sendJson(response, 200, {
+                        adventure: await updateAdventure(adventureId, payload),
+                    });
+                    return;
+                }
+            }
+            sendError(response, 404, 'errors.api.notFound');
+        }
+        catch (error) {
+            const apiError = error as ApiError;
+            if (apiError.code === 'ENOENT') {
+                sendError(response, 404, 'errors.api.adventureNotFound');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_JSON_BODY') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidJsonBody');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_ADVENTURE_ID') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidAdventureId');
+                return;
+            }
+            sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');
+        }
+    };
+    return {
+        name: 'adventures-api',
+        configureServer(server) {
+            server.middlewares.use(handler);
+        },
+        configurePreviewServer(server) {
+            server.middlewares.use(handler);
+        },
+    };
+};
 const createMonstersApiPlugin = (): Plugin => {
     const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
         const url = new URL(request.url ?? '/', 'http://localhost');
@@ -279,8 +345,71 @@ const createMonstersApiPlugin = (): Plugin => {
         },
     };
 };
+const createGeminiApiPlugin = (): Plugin => {
+    const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
+        const url = new URL(request.url ?? '/', 'http://localhost');
+        if (!url.pathname.startsWith('/api/gemini')) {
+            next();
+            return;
+        }
+        try {
+            if (request.method === 'POST' && url.pathname === '/api/gemini/responses') {
+                const payload = await readJsonBody(request);
+                sendJson(response, 200, await createGeminiResponse(payload));
+                return;
+            }
+            if (request.method === 'POST' && url.pathname === '/api/gemini/tokens') {
+                const payload = await readJsonBody(request);
+                sendJson(response, 200, await countGeminiTokens(payload));
+                return;
+            }
+            sendError(response, 404, 'errors.api.notFound');
+        }
+        catch (error) {
+            const apiError = error as ApiError;
+            if (apiError.code === 'API_INVALID_JSON_BODY') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidJsonBody');
+                return;
+            }
+            if (apiError.code === 'API_GEMINI_PROMPT_REQUIRED') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.geminiPromptRequired');
+                return;
+            }
+            if (apiError.code === 'API_GEMINI_CONFIG_MISSING') {
+                sendError(response, apiError.statusCode ?? 500, 'errors.api.geminiConfigMissing');
+                return;
+            }
+            if (apiError.code === 'API_GEMINI_CONFIG_INVALID') {
+                sendError(response, apiError.statusCode ?? 500, 'errors.api.geminiConfigInvalid');
+                return;
+            }
+            if (apiError.code === 'API_GEMINI_API_KEY_MISSING') {
+                sendError(response, apiError.statusCode ?? 500, 'errors.api.geminiApiKeyMissing');
+                return;
+            }
+            if (apiError.code === 'API_GEMINI_UNAUTHORIZED') {
+                sendError(response, apiError.statusCode ?? 401, 'errors.api.geminiUnauthorized');
+                return;
+            }
+            if (apiError.code === 'API_GEMINI_RATE_LIMITED') {
+                sendError(response, apiError.statusCode ?? 429, 'errors.api.geminiRateLimited');
+                return;
+            }
+            sendError(response, apiError.statusCode ?? 500, 'errors.api.geminiRequestFailed');
+        }
+    };
+    return {
+        name: 'gemini-api',
+        configureServer(server) {
+            server.middlewares.use(handler);
+        },
+        configurePreviewServer(server) {
+            server.middlewares.use(handler);
+        },
+    };
+};
 export default defineConfig({
-    plugins: [react(), createCharactersApiPlugin(), createMonstersApiPlugin()],
+    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createGeminiApiPlugin()],
     resolve: {
         alias: {
             '@pages': '/src/pages',
