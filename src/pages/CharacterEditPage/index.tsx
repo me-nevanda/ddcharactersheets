@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AppIcon } from '@components/AppIcon';
+import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog';
 import { useUnnamedCharacterImageFallback } from '@pages/characterPageHooks';
 import { useI18n } from '@i18n/index';
 import { CharacterEditPageProvider, useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext';
@@ -17,8 +18,10 @@ const CharacterEditPageContent = () => {
     const { getCharacterClassSrc, getCharacterPortraitSrc } = useCharacterPresentation();
     const handleImageError = useUnnamedCharacterImageFallback();
     const { characterId = '' } = useParams();
+    const navigate = useNavigate();
     const { handleTabChange: handleMainTabChange } = useMainPageContext();
     const [searchParams, setSearchParams] = useSearchParams();
+    const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false);
     const [isPrintMenuOpen, setPrintMenuOpen] = useState(false);
     const printMenuRef = useRef<HTMLDivElement>(null);
     const { error, form, handleGeneralChange, handleImageChange, handleImageRemove, handleSubmit, hasChanges, imageUrl, loading, removingImage, saving, uploadingImage } = useCharacterEditPageContext();
@@ -68,6 +71,19 @@ const CharacterEditPageContent = () => {
         }
         window.open(`/characters/${characterId}/print/items`, '_blank');
     };
+    const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+        if (hasChanges) {
+            event.preventDefault();
+            setUnsavedChangesDialogOpen(true);
+            return;
+        }
+        handleMainTabChange('heroes');
+    };
+    const handleConfirmBackToList = () => {
+        setUnsavedChangesDialogOpen(false);
+        handleMainTabChange('heroes');
+        navigate('/');
+    };
     return (<main className={styles.editorLayout}>
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
@@ -98,7 +114,7 @@ const CharacterEditPageContent = () => {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={() => handleMainTabChange('heroes')}>
+            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.printAction} ref={printMenuRef}>
@@ -158,6 +174,7 @@ const CharacterEditPageContent = () => {
               </div>
             </div>
           </form>)}
+        <UnsavedChangesDialog open={isUnsavedChangesDialogOpen} onCancel={() => setUnsavedChangesDialogOpen(false)} onConfirm={handleConfirmBackToList}/>
       </section>
     </main>);
 };

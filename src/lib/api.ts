@@ -1,10 +1,12 @@
 import type { Character, CharacterData } from '@appTypes/character';
-import type { Monster, MonsterData } from '@appTypes/monster';
+import type { Monster, MonsterData, MonsterGroup } from '@appTypes/monster';
 interface ApiEnvelope<T> {
     character?: T;
     characters?: T[];
     monster?: T;
     monsters?: T[];
+    monsterGroup?: T;
+    monsterGroups?: T[];
     errorCode?: string;
 }
 export interface ApiError extends Error {
@@ -92,6 +94,41 @@ export const deleteCharacterImage = async (characterId: string): Promise<Charact
 export const listMonsters = async (): Promise<Monster[]> => {
     const payload = await requestJson<ApiEnvelope<Monster>>('/api/monsters');
     return payload?.monsters ?? [];
+};
+export const listMonsterGroups = async (): Promise<MonsterGroup[]> => {
+    const payload = await requestJson<ApiEnvelope<MonsterGroup>>('/api/monster-groups');
+    return payload?.monsterGroups ?? [];
+};
+export const createMonsterGroup = async (name: string): Promise<MonsterGroup> => {
+    const payload = await requestJson<ApiEnvelope<MonsterGroup>>('/api/monster-groups', {
+        method: 'POST',
+        body: JSON.stringify({ name }),
+    });
+    if (!payload?.monsterGroup) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.monsterGroup;
+};
+export const getMonsterGroup = async (groupId: string): Promise<MonsterGroup> => {
+    const payload = await requestJson<ApiEnvelope<MonsterGroup>>(`/api/monster-groups/${groupId}`);
+    if (!payload?.monsterGroup) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.monsterGroup;
+};
+export const saveMonsterGroup = async (groupId: string, monsterGroup: MonsterGroup): Promise<MonsterGroup> => {
+    const payload = await requestJson<ApiEnvelope<MonsterGroup>>(`/api/monster-groups/${groupId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            uniqueId: monsterGroup.uniqueId,
+            name: monsterGroup.name,
+            monsterFileNames: monsterGroup.monsterFileNames,
+        }),
+    });
+    if (!payload?.monsterGroup) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.monsterGroup;
 };
 export const createMonster = async (): Promise<Monster> => {
     const payload = await requestJson<ApiEnvelope<Monster>>('/api/monsters', {

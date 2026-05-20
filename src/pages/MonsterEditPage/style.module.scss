@@ -671,6 +671,12 @@
   gap: 0.75rem;
 }
 
+.statPair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
 .statCard {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
@@ -680,6 +686,31 @@
   border-radius: 0.95rem;
   background: rgba(255, 248, 235, 0.03);
   border: 1px solid rgba(255, 248, 235, 0.06);
+}
+
+.levelTypeCard {
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+}
+
+.generateAttributesButton {
+  @include pill-button;
+  justify-content: center;
+  min-width: 2.7rem;
+  min-height: 2.7rem;
+  padding: 0.45rem 0.65rem;
+  background: rgba(255, 248, 235, 0.04);
+  border-color: rgba(240, 198, 111, 0.26);
+  color: var(--accent-strong);
+}
+
+.generateAttributesButton:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.generateAttributesButton svg {
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 .defenseLabel {
@@ -816,6 +847,14 @@
   text-align: center;
 }
 
+.typeInput {
+  width: 8.5rem;
+}
+
+.roleInput {
+  width: 10rem;
+}
+
 @media (max-width: 720px) {
   .editorHeader,
   .headerBrand {
@@ -837,6 +876,10 @@
   }
 
   .defenseGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statPair {
     grid-template-columns: 1fr;
   }
 

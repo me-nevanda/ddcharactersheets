@@ -48,6 +48,9 @@ const normalizeReadOnlyValue = (value: unknown): number => {
     }
     return Math.max(0, Math.trunc(value));
 };
+const normalizeUniqueId = (value: unknown): string => {
+    return typeof value === 'string' && value.trim().length > 0 ? value : randomUUID();
+};
 const normalizeAttributes = (data: Partial<Record<keyof CharacterAttributes, unknown>> = {}): CharacterAttributes => {
     return {
         strength: normalizeAttributeValue(data.strength),
@@ -704,6 +707,7 @@ const normalizeCharacter = (data: Partial<Record<keyof CharacterData, unknown>> 
         defenses: normalizeDefenseBonuses(bonusData?.defenses as Partial<Record<keyof CharacterDefenseBonuses, unknown>> | undefined, computedDefenseBonuses),
     };
     return {
+        uniqueId: normalizeUniqueId(data.uniqueId),
         name: typeof data.name === 'string' ? data.name : '',
         description: typeof data.description === 'string' ? data.description.trim() : '',
         level,
@@ -727,7 +731,7 @@ const normalizeCharacter = (data: Partial<Record<keyof CharacterData, unknown>> 
     };
 };
 const parseCharacter = (rawCharacter: string): Partial<Record<keyof CharacterData, unknown>> => {
-    return JSON.parse(rawCharacter || '{}') as Partial<Record<keyof CharacterData, unknown>>;
+    return JSON.parse(rawCharacter.replace(/^\uFEFF/, '') || '{}') as Partial<Record<keyof CharacterData, unknown>>;
 };
 const ensureCharactersDirectory = async (): Promise<void> => {
     await mkdir(charactersDirectory, { recursive: true });
@@ -824,7 +828,7 @@ export const createCharacter = async (): Promise<Character> => {
     await ensureCharactersDirectory();
     const characterId = `${Date.now()}-${randomUUID().slice(0, 8)}`;
     const filePath = getCharacterFilePath(characterId);
-    await writeFile(filePath, '{}\n', 'utf8');
+    await writeFile(filePath, `${JSON.stringify({ uniqueId: randomUUID() }, null, 2)}\n`, 'utf8');
     return readCharacter(characterId);
 };
 export const updateCharacter = async (characterId: string, data: unknown): Promise<Character> => {
@@ -833,10 +837,12 @@ export const updateCharacter = async (characterId: string, data: unknown): Promi
     const rawCharacter = await readFile(filePath, 'utf8');
     const existingCharacter = parseCharacter(rawCharacter);
     const nextCharacter = {
-        ...existingCharacter,
-        ...normalizeCharacter(typeof data === 'object' && data !== null
+        ...normalizeCharacter({
+            ...existingCharacter,
+            ...(typeof data === 'object' && data !== null
             ? (data as Partial<Record<keyof CharacterData, unknown>>)
             : {}),
+        }),
     };
     await writeFile(filePath, `${JSON.stringify(nextCharacter, null, 2)}\n`, 'utf8');
     return readCharacter(characterId);

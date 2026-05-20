@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, type MouseEvent as ReactMouseEvent } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { SimpleWysiwygEditor } from '@components/SimpleWysiwygEditor'
+import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
 import { useMainPageContext } from '@pages/main/mainPageContext'
 import { useMonsterEditPage } from './monsterEditPageHooks'
@@ -12,10 +13,25 @@ import styles from './style.module.scss'
 
 export const MonsterEditPage = () => {
   const { t } = useI18n()
+  const navigate = useNavigate()
   const { handleTabChange } = useMainPageContext()
-  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleChange, handleDescriptionChange, handleImageChange, handleImageRemove, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, loading, removingImage, saving, uploadingImage } = useMonsterEditPage()
+  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleChange, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, loading, removingImage, saving, uploadingImage } = useMonsterEditPage()
   const [activeTab, setActiveTab] = useState<MonsterEditTabKey>('general')
+  const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
   const bloodiedValue = Math.floor(form.hp / 2)
+  const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+    if (hasChanges) {
+      event.preventDefault()
+      setUnsavedChangesDialogOpen(true)
+      return
+    }
+    handleTabChange('monsters')
+  }
+  const handleConfirmBackToList = () => {
+    setUnsavedChangesDialogOpen(false)
+    handleTabChange('monsters')
+    navigate('/')
+  }
 
   return (
     <main className={styles.editorLayout}>
@@ -53,7 +69,7 @@ export const MonsterEditPage = () => {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={() => handleTabChange('monsters')}>
+            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.printAction}>
@@ -124,8 +140,8 @@ export const MonsterEditPage = () => {
 
                     <section className={styles.section}>
                       <div className={styles.statsGrid}>
-                        <label className={styles.statCard} htmlFor="level">
-                          <span className={styles.defenseLabel}>{t('pages.monsterEdit.fields.level')}</span>
+                        <label className={`${styles.statCard} ${styles.levelTypeCard}`} htmlFor="level">
+                          <span className={styles.srOnly}>{t('pages.monsterEdit.fields.level')}</span>
                           <select className={`${styles.input} ${styles.selectChevronInset} ${styles.statInput}`} id="level" name="level" value={form.level} onChange={handleChange}>
                             {Array.from({ length: 30 }, (_, levelIndex) => levelIndex + 1).map((level) => (
                               <option key={level} value={level}>
@@ -133,6 +149,23 @@ export const MonsterEditPage = () => {
                               </option>
                             ))}
                           </select>
+                          <select className={`${styles.input} ${styles.selectChevronInset} ${styles.roleInput}`} id="role" name="role" value={form.role} onChange={handleChange} aria-label={t('pages.monsterEdit.fields.role')}>
+                            <option value="skirmisher">{t('pages.monsterEdit.roleOptions.skirmisher')}</option>
+                            <option value="brute">{t('pages.monsterEdit.roleOptions.brute')}</option>
+                            <option value="soldier">{t('pages.monsterEdit.roleOptions.soldier')}</option>
+                            <option value="lurker">{t('pages.monsterEdit.roleOptions.lurker')}</option>
+                            <option value="controller">{t('pages.monsterEdit.roleOptions.controller')}</option>
+                            <option value="artillery">{t('pages.monsterEdit.roleOptions.artillery')}</option>
+                          </select>
+                          <select className={`${styles.input} ${styles.selectChevronInset} ${styles.typeInput}`} id="type" name="type" value={form.type} onChange={handleChange}>
+                            <option value="minion">{t('pages.monsterEdit.typeOptions.minion')}</option>
+                            <option value="normal">{t('pages.monsterEdit.typeOptions.normal')}</option>
+                            <option value="solo">{t('pages.monsterEdit.typeOptions.solo')}</option>
+                            <option value="elite">{t('pages.monsterEdit.typeOptions.elite')}</option>
+                          </select>
+                          <button className={styles.generateAttributesButton} type="button" aria-label={t('pages.monsterEdit.actions.generateAttributes')} title={t('pages.monsterEdit.actions.generateAttributes')} onClick={handleGenerateAttributes}>
+                            <AppIcon name="magic" />
+                          </button>
                         </label>
                         <label className={styles.statCard} htmlFor="speed">
                           <span className={styles.defenseLabel}>{t('pages.monsterEdit.fields.speed')}</span>
@@ -188,6 +221,7 @@ export const MonsterEditPage = () => {
             </div>
           </form>
         )}
+        <UnsavedChangesDialog open={isUnsavedChangesDialogOpen} onCancel={() => setUnsavedChangesDialogOpen(false)} onConfirm={handleConfirmBackToList} />
       </section>
     </main>
   )

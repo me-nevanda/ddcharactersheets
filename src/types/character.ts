@@ -314,6 +314,7 @@ export interface CharacterTraining {
 }
 
 export interface CharacterData {
+  uniqueId: string
   name: string
   description: string
   level: number

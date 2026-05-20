@@ -6,12 +6,15 @@ import { getErrorMessage } from '@lib/errors'
 import { normalizeItems } from '@pages/CharacterEditPage/characterEditPageLogic'
 import { emptyArmor, emptyItems, emptyOtherItem, emptyWeapon } from '@pages/CharacterEditPage/characterEditPageUtils'
 import type { CharacterArmorBonusFieldName, CharacterItemBonusFieldName, CharacterWeaponDamageDiceType, CharacterWeaponFieldName } from '@appTypes/character'
-import type { MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses } from '@appTypes/monster'
+import type { MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterType } from '@appTypes/monster'
 import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/CharacterEditPage/types'
 import type { MonsterEditPageState } from './types'
 
 const emptyMonsterForm: MonsterData = {
+  uniqueId: '',
   name: '',
+  role: 'skirmisher',
+  type: 'normal',
   description: '',
   resistances: '',
   special: '',
@@ -30,6 +33,8 @@ const emptyMonsterForm: MonsterData = {
 
 const defenseFields = ['kp', 'fortitude', 'reflex', 'will'] as const satisfies readonly (keyof MonsterDefenses)[]
 const numericFields = ['hp', 'level', 'speed'] as const satisfies readonly (keyof Pick<MonsterData, 'hp' | 'level' | 'speed'>)[]
+const monsterRoles = ['skirmisher', 'brute', 'soldier', 'lurker', 'controller', 'artillery'] as const satisfies readonly MonsterRole[]
+const monsterTypes = ['minion', 'normal', 'solo', 'elite'] as const satisfies readonly MonsterType[]
 const monsterAttackTypes = ['standard', 'unlimited', 'encounter', 'daily'] as const satisfies readonly MonsterAttackType[]
 const monsterAttackActions = ['action', 'noAction'] as const satisfies readonly MonsterAttackAction[]
 const monsterAttackAreas = [
@@ -64,6 +69,14 @@ const isNumericField = (name: string): name is (typeof numericFields)[number] =>
   return numericFields.includes(name as (typeof numericFields)[number])
 }
 
+const normalizeMonsterType = (value: string): MonsterType => {
+  return monsterTypes.includes(value as MonsterType) ? (value as MonsterType) : 'normal'
+}
+
+const normalizeMonsterRole = (value: string): MonsterRole => {
+  return monsterRoles.includes(value as MonsterRole) ? (value as MonsterRole) : 'skirmisher'
+}
+
 const createMonsterAttackId = (): string => {
   return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
@@ -96,6 +109,22 @@ const normalizeLevelInputValue = (value: string): number => {
   }
 
   return Math.min(30, Math.max(1, Math.trunc(parsedValue)))
+}
+
+const buildGeneratedMonsterAttributes = (level: number, type: MonsterType): Pick<MonsterData, 'defenses' | 'hp'> => {
+  const normalizedLevel = Math.min(30, Math.max(1, Math.trunc(level)))
+  const baseHp = 24 + normalizedLevel * 8
+  const hp = type === 'minion' ? 1 : type === 'solo' ? baseHp * 4 : type === 'elite' ? baseHp * 2 : baseHp
+
+  return {
+    defenses: {
+      kp: Math.min(50, 14 + normalizedLevel),
+      fortitude: Math.min(50, 12 + normalizedLevel),
+      reflex: Math.min(50, 12 + normalizedLevel),
+      will: Math.min(50, 12 + normalizedLevel),
+    },
+    hp,
+  }
 }
 
 const normalizeAttackRangeValue = (value: string | number): number => {
@@ -195,7 +224,10 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
       try {
         const monster = await getMonster(monsterId)
         const nextForm = {
+          uniqueId: monster.uniqueId,
           name: monster.name,
+          role: normalizeMonsterRole(monster.role),
+          type: normalizeMonsterType(monster.type),
           description: monster.description,
           resistances: monster.resistances ?? '',
           special: monster.special ?? '',
@@ -252,6 +284,22 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
       return
     }
 
+    if (name === 'type') {
+      setForm((current) => ({
+        ...current,
+        type: normalizeMonsterType(value),
+      }))
+      return
+    }
+
+    if (name === 'role') {
+      setForm((current) => ({
+        ...current,
+        role: normalizeMonsterRole(value),
+      }))
+      return
+    }
+
     setForm((current) => ({
       ...current,
       [name]: value,
@@ -262,6 +310,13 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     setForm((current) => ({
       ...current,
       description: value,
+    }))
+  }
+
+  const handleGenerateAttributes = () => {
+    setForm((current) => ({
+      ...current,
+      ...buildGeneratedMonsterAttributes(current.level, current.type),
     }))
   }
 
@@ -512,7 +567,10 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     setError('')
     try {
       const nextForm = {
+        uniqueId: form.uniqueId,
         name: form.name.trim(),
+        role: form.role,
+        type: form.type,
         description: form.description.trim(),
         resistances: form.resistances.trim(),
         special: form.special.trim(),
@@ -551,6 +609,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     handleItemRemove,
     handleChange,
     handleDescriptionChange,
+    handleGenerateAttributes,
     handleImageChange,
     handleImageRemove,
     handlePrint,

@@ -33,6 +33,7 @@ export interface MonsterEditPageState {
   handleItemRemove: (group: CharacterItemGroupKey, index: number) => void
   handleChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void
   handleDescriptionChange: (value: string) => void
+  handleGenerateAttributes: () => void
   handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
   handleImageRemove: () => Promise<void>
   handlePrint: () => void

@@ -25,6 +25,10 @@ export const en: TranslationDictionary = {
       numberedList: 'Numbered list',
       clearFormatting: 'Clear formatting',
     },
+    confirmations: {
+      unsavedChangesTitle: 'Unsaved changes',
+      unsavedChangesBody: 'You have unsaved changes. Are you sure you want to return to the list?',
+    },
     states: {
       creating: 'Creating...',
       deleting: 'Deleting...',
@@ -39,9 +43,11 @@ export const en: TranslationDictionary = {
       generic: 'The request could not be completed.',
       invalidCharacterId: 'The character ID is invalid.',
       invalidMonsterId: 'The monster ID is invalid.',
+      invalidMonsterGroupId: 'The monster group ID is invalid.',
       invalidJsonBody: 'The request payload is invalid.',
       invalidCharacterImage: 'The hero image must be a PNG or JPG file.',
       invalidMonsterImage: 'The monster image must be a PNG or JPG file.',
+      invalidMonsterGroupName: 'The monster group name is required.',
       characterNotFound: 'Character not found.',
       monsterNotFound: 'Monster not found.',
       notFound: 'Resource not found.',
@@ -73,6 +79,33 @@ export const en: TranslationDictionary = {
       },
     },
     monsterList: {
+      actions: {
+        addGroup: 'Add group',
+      },
+      tabs: {
+        groups: 'Groups',
+        list: 'List',
+      },
+      groups: {
+        addMonster: 'Add monster to group',
+        loading: 'Loading monster groups...',
+        emptyState: 'There are no monster groups yet.',
+        emptyMonsters: 'No monsters',
+        monsterCount: 'Monsters: {count}',
+        moreMonsters: 'More monsters',
+        uniqueId: 'ID:',
+        createDialog: {
+          title: 'Add group',
+          nameLabel: 'Group name',
+          namePlaceholder: 'e.g. Ruin guards',
+        },
+        addMonsterDialog: {
+          title: 'Add monster to "{name}"',
+          searchLabel: 'Search monster',
+          searchPlaceholder: 'Type at least 3 characters',
+          emptyState: 'There are no monsters to add.',
+        },
+      },
       emptyState: 'There are no monsters yet.',
       unnamedMonster: 'Nameless monster',
       deleteDialog: {
@@ -98,6 +131,9 @@ export const en: TranslationDictionary = {
       imageActions: {
         uploadNew: 'New',
         remove: 'Remove',
+      },
+      actions: {
+        generateAttributes: 'Generate attributes',
       },
       attacks: {
         title: 'Attacks',
@@ -129,6 +165,20 @@ export const en: TranslationDictionary = {
           body: 'The loot "{name}" will be deleted permanently.',
         },
       },
+      typeOptions: {
+        minion: 'Minion',
+        normal: 'Normal',
+        solo: 'Solo',
+        elite: 'Elite',
+      },
+      roleOptions: {
+        skirmisher: 'Skirmisher',
+        brute: 'Brute',
+        soldier: 'Soldier',
+        lurker: 'Lurker',
+        controller: 'Controller',
+        artillery: 'Artillery',
+      },
       fields: {
         name: 'Name',
         image: 'Monster image',
@@ -138,6 +188,8 @@ export const en: TranslationDictionary = {
         reflex: 'Reflex',
         will: 'Will',
         speed: 'Speed',
+        role: 'Role',
+        type: 'Type',
         hp: 'HP',
         level: 'Level',
         bloodied: 'Bloodied',
@@ -148,6 +200,31 @@ export const en: TranslationDictionary = {
         description: 'Monster description',
         resistances: 'Resistances, immunities, and vulnerabilities',
         special: 'Special monster traits',
+      },
+    },
+    monsterGroupEdit: {
+      eyebrow: 'MONSTER GROUP',
+      loading: 'Loading monster group...',
+      emptyState: 'No monsters have been added to this group yet.',
+      actions: {
+        addMonster: 'Add monster',
+        removeMonster: 'Remove from group',
+      },
+      fields: {
+        name: 'Group name',
+      },
+      placeholders: {
+        name: 'Group name',
+      },
+      sections: {
+        availableMonsters: 'Available monsters',
+        monsters: 'Monsters in group',
+      },
+      addMonsterDialog: {
+        title: 'Add monster to group',
+        searchLabel: 'Search monster',
+        searchPlaceholder: 'Type at least 3 characters',
+        emptyState: 'There are no monsters to add.',
       },
     },
     characterEdit: {

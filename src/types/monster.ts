@@ -7,6 +7,8 @@ export interface MonsterDefenses {
   will: number
 }
 
+export type MonsterType = 'minion' | 'normal' | 'solo' | 'elite'
+export type MonsterRole = 'skirmisher' | 'brute' | 'soldier' | 'lurker' | 'controller' | 'artillery'
 export type MonsterAttackAction = 'action' | 'noAction'
 export type MonsterAttackType = 'standard' | 'unlimited' | 'encounter' | 'daily'
 export type MonsterAttackAreaType =
@@ -45,7 +47,10 @@ export interface MonsterAttack {
 }
 
 export interface MonsterData {
+  uniqueId: string
   name: string
+  role: MonsterRole
+  type: MonsterType
   description: string
   resistances: string
   special: string
@@ -60,5 +65,16 @@ export interface MonsterData {
 export interface Monster extends MonsterData {
   id: string
   imageUrl: string
+  updatedAt: string
+}
+
+export interface MonsterGroupData {
+  uniqueId: string
+  name: string
+  monsterFileNames: string[]
+}
+
+export interface MonsterGroup extends MonsterGroupData {
+  id: string
   updatedAt: string
 }

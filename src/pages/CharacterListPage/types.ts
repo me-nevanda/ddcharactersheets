@@ -6,6 +6,7 @@ export interface CharacterListCardViewModel {
   alignmentLabel: string
   classLabel: string
   deleting: boolean
+  description: string
   genderLabel: string
   label: string
   level: number

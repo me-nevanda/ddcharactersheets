@@ -24,6 +24,10 @@ export interface TranslationDictionary {
       numberedList: string
       clearFormatting: string
     }
+    confirmations: {
+      unsavedChangesTitle: string
+      unsavedChangesBody: string
+    }
     states: {
       creating: string
       deleting: string
@@ -38,9 +42,11 @@ export interface TranslationDictionary {
       generic: string
       invalidCharacterId: string
       invalidMonsterId: string
+      invalidMonsterGroupId: string
       invalidJsonBody: string
       invalidCharacterImage: string
       invalidMonsterImage: string
+      invalidMonsterGroupName: string
       characterNotFound: string
       monsterNotFound: string
       notFound: string
@@ -72,6 +78,33 @@ export interface TranslationDictionary {
       }
     }
     monsterList: {
+      actions: {
+        addGroup: string
+      }
+      tabs: {
+        groups: string
+        list: string
+      }
+      groups: {
+        addMonster: string
+        loading: string
+        emptyState: string
+        emptyMonsters: string
+        monsterCount: string
+        moreMonsters: string
+        uniqueId: string
+        createDialog: {
+          title: string
+          nameLabel: string
+          namePlaceholder: string
+        }
+        addMonsterDialog: {
+          title: string
+          searchLabel: string
+          searchPlaceholder: string
+          emptyState: string
+        }
+      }
       emptyState: string
       unnamedMonster: string
       deleteDialog: {
@@ -97,6 +130,9 @@ export interface TranslationDictionary {
       imageActions: {
         uploadNew: string
         remove: string
+      }
+      actions: {
+        generateAttributes: string
       }
       attacks: {
         title: string
@@ -128,6 +164,20 @@ export interface TranslationDictionary {
           body: string
         }
       }
+      typeOptions: {
+        minion: string
+        normal: string
+        solo: string
+        elite: string
+      }
+      roleOptions: {
+        skirmisher: string
+        brute: string
+        soldier: string
+        lurker: string
+        controller: string
+        artillery: string
+      }
       fields: {
         name: string
         image: string
@@ -137,6 +187,8 @@ export interface TranslationDictionary {
         reflex: string
         will: string
         speed: string
+        role: string
+        type: string
         hp: string
         level: string
         bloodied: string
@@ -147,6 +199,31 @@ export interface TranslationDictionary {
         description: string
         resistances: string
         special: string
+      }
+    }
+    monsterGroupEdit: {
+      eyebrow: string
+      loading: string
+      emptyState: string
+      actions: {
+        addMonster: string
+        removeMonster: string
+      }
+      fields: {
+        name: string
+      }
+      placeholders: {
+        name: string
+      }
+      sections: {
+        availableMonsters: string
+        monsters: string
+      }
+      addMonsterDialog: {
+        title: string
+        searchLabel: string
+        searchPlaceholder: string
+        emptyState: string
       }
     }
     characterEdit: {

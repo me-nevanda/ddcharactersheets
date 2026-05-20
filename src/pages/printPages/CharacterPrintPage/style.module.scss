@@ -168,6 +168,43 @@
   align-content: start;
 }
 
+.characterImageFrame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 13rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 1.15rem;
+  background: rgba(255, 248, 235, 0.025);
+  isolation: isolate;
+}
+
+.characterImageFrame::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 1.4rem;
+  width: 70%;
+  height: 70%;
+  border-radius: 999px;
+  background: rgba(255, 232, 180, 0.42);
+  filter: blur(16px);
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.characterImage {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  max-height: 13rem;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  z-index: 1;
+}
+
 .rightColumn {
   align-content: stretch;
 }
@@ -298,6 +335,7 @@
   }
 
   .section,
+  .characterImageFrame,
   .metaCard,
   .statCard,
   .attributeCard,
@@ -393,6 +431,18 @@
   .rightColumn {
     height: 100%;
     gap: 0.5rem;
+  }
+
+  .characterImageFrame {
+    min-height: 46mm;
+  }
+
+  .characterImageFrame::before {
+    display: none;
+  }
+
+  .characterImage {
+    max-height: 46mm;
   }
 
   .rightColumn {

@@ -37,8 +37,20 @@
   line-height: 0.9;
 }
 
-.primaryButton {
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  justify-self: end;
+}
+
+.primaryButton,
+.secondaryButton {
   @include pill-button;
+}
+
+.primaryButton {
   justify-self: end;
   background: linear-gradient(135deg, #a64a2e 0%, #d9a441 100%);
   color: #1d120e;
@@ -46,12 +58,21 @@
   box-shadow: 0 12px 30px rgba(166, 74, 46, 0.3);
 }
 
-.primaryButton:hover {
+.secondaryButton {
+  background: rgba(255, 248, 235, 0.04);
+  border-color: var(--border-soft);
+  color: var(--text-strong);
+  font-weight: 700;
+}
+
+.primaryButton:hover,
+.secondaryButton:hover {
   transform: translateY(-1px);
   border-color: var(--border-strong);
 }
 
-.primaryButton:disabled {
+.primaryButton:disabled,
+.secondaryButton:disabled {
   cursor: wait;
   opacity: 0.72;
   transform: none;
@@ -69,7 +90,13 @@
     align-items: stretch;
   }
 
-  .primaryButton {
+  .actions,
+  .primaryButton,
+  .secondaryButton {
     justify-self: stretch;
+  }
+
+  .actions {
+    display: grid;
   }
 }

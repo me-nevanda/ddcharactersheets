@@ -210,6 +210,7 @@ export const emptyTraining: CharacterTraining = {
 }
 
 export const emptyForm: CharacterEditFormData = {
+  uniqueId: '',
   name: '',
   imageUrl: '',
   description: '',

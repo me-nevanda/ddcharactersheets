@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
-import type { Monster, MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses } from '../src/types/monster'
+import type { Monster, MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterType } from '../src/types/monster'
 
 interface ApiError extends Error {
   code?: string
@@ -18,6 +18,8 @@ const monstersDirectory = path.resolve(process.cwd(), 'data', 'monsters')
 const safeMonsterIdPattern = /^[a-z0-9-]+$/i
 const monsterImageExtensions = ['jpg', 'png'] as const
 const monsterAttackTypes = ['standard', 'unlimited', 'encounter', 'daily'] as const satisfies readonly MonsterAttackType[]
+const monsterRoles = ['skirmisher', 'brute', 'soldier', 'lurker', 'controller', 'artillery'] as const satisfies readonly MonsterRole[]
+const monsterTypes = ['minion', 'normal', 'solo', 'elite'] as const satisfies readonly MonsterType[]
 const monsterAttackActions = ['action', 'noAction'] as const satisfies readonly MonsterAttackAction[]
 const monsterAttackAreas = [
   'point',
@@ -63,6 +65,10 @@ const normalizeStatValue = (value: unknown, fallback: number): number => {
   }
 
   return Math.min(999, Math.max(0, Math.trunc(value)))
+}
+
+const normalizeUniqueId = (value: unknown): string => {
+  return typeof value === 'string' && value.trim().length > 0 ? value : randomUUID()
 }
 
 const normalizeLevelValue = (value: unknown): number => {
@@ -133,6 +139,14 @@ const normalizeAttackAction = (value: unknown): MonsterAttackAction => {
 
 const normalizeAttackType = (value: unknown): MonsterAttackType => {
   return monsterAttackTypes.includes(value as MonsterAttackType) ? (value as MonsterAttackType) : 'unlimited'
+}
+
+const normalizeMonsterType = (value: unknown): MonsterType => {
+  return monsterTypes.includes(value as MonsterType) ? (value as MonsterType) : 'normal'
+}
+
+const normalizeMonsterRole = (value: unknown): MonsterRole => {
+  return monsterRoles.includes(value as MonsterRole) ? (value as MonsterRole) : 'skirmisher'
 }
 
 const normalizeAttackArea = (value: unknown): MonsterAttackAreaType => {
@@ -285,7 +299,10 @@ const normalizeItems = (items: unknown): CharacterItems => {
 
 const normalizeMonster = (data: Partial<Record<keyof MonsterData, unknown>> = {}): MonsterData => {
   return {
+    uniqueId: normalizeUniqueId(data.uniqueId),
     name: typeof data.name === 'string' ? data.name : '',
+    role: normalizeMonsterRole(data.role),
+    type: normalizeMonsterType(data.type),
     description: typeof data.description === 'string' ? data.description.trim() : '',
     resistances: typeof data.resistances === 'string' ? data.resistances.trim() : '',
     special: typeof data.special === 'string' ? data.special.trim() : '',
@@ -302,7 +319,7 @@ const normalizeMonster = (data: Partial<Record<keyof MonsterData, unknown>> = {}
 }
 
 const parseMonster = (rawMonster: string): Partial<Record<keyof MonsterData, unknown>> => {
-  return JSON.parse(rawMonster || '{}') as Partial<Record<keyof MonsterData, unknown>>
+  return JSON.parse(rawMonster.replace(/^\uFEFF/, '') || '{}') as Partial<Record<keyof MonsterData, unknown>>
 }
 
 const ensureMonstersDirectory = async (): Promise<void> => {
@@ -418,7 +435,7 @@ export const createMonster = async (): Promise<Monster> => {
   await ensureMonstersDirectory()
   const monsterId = `${Date.now()}-${randomUUID().slice(0, 8)}`
   const filePath = getMonsterFilePath(monsterId)
-  await writeFile(filePath, '{}\n', 'utf8')
+  await writeFile(filePath, `${JSON.stringify({ uniqueId: randomUUID() }, null, 2)}\n`, 'utf8')
 
   return readMonster(monsterId)
 }
@@ -429,8 +446,10 @@ export const updateMonster = async (monsterId: string, data: unknown): Promise<M
   const rawMonster = await readFile(filePath, 'utf8')
   const existingMonster = parseMonster(rawMonster)
   const nextMonster = {
-    ...existingMonster,
-    ...normalizeMonster(typeof data === 'object' && data !== null ? (data as Partial<Record<keyof MonsterData, unknown>>) : {}),
+    ...normalizeMonster({
+      ...existingMonster,
+      ...(typeof data === 'object' && data !== null ? (data as Partial<Record<keyof MonsterData, unknown>>) : {}),
+    }),
   }
 
   await writeFile(filePath, `${JSON.stringify(nextMonster, null, 2)}\n`, 'utf8')

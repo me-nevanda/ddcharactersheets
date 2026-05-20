@@ -56,6 +56,11 @@ export const CharacterPrintPage = () => {
 
         <div className={styles.contentGrid}>
           <section className={styles.leftColumn}>
+            {character.imageUrl ? (
+              <div className={styles.characterImageFrame}>
+                <img className={styles.characterImage} src={character.imageUrl} alt={t('pages.characterEdit.fields.image')} />
+              </div>
+            ) : null}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Umiejętności (K20+)</h2>
               <div className={styles.skillGrid}>
@@ -93,9 +98,7 @@ export const CharacterPrintPage = () => {
               <div className={styles.attributeGrid}>
                 {attributeRows.map((row) => (<div key={row.key} className={styles.attributeCard}>
                     <span className={styles.statLabel}>{row.label}</span>
-                    <span className={styles.attributeValue}>
-                      {row.value} ({row.modifier > 0 ? `+${row.modifier}` : row.modifier})
-                    </span>
+                    <span className={styles.attributeValue}>{row.value}</span>
                   </div>))}
               </div>
             </section>

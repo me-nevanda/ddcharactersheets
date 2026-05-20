@@ -7,6 +7,19 @@ import { useUnnamedCharacterImageFallback } from '@pages/characterPageHooks';
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
 import type { Character } from '@appTypes/character';
 import type { CharacterListCardViewModel } from './types';
+
+const getPlainTextDescription = (description: string): string => {
+    if (!description) {
+        return '';
+    }
+    if (typeof document === 'undefined') {
+        return description;
+    }
+    const template = document.createElement('template');
+    template.innerHTML = description;
+    return (template.content.textContent ?? '').trim();
+};
+
 export const useCharacterListData = (t: (key: string) => string) => {
     const [characters, setCharacters] = useState<Character[]>([]);
     const [loading, setLoading] = useState(true);
@@ -107,6 +120,7 @@ export const useCharacterListCards = (characters: Character[], deletingId: strin
         alignmentLabel: getAlignmentLabel(character.alignment),
         classLabel: getClassLabel(character.class),
         deleting: deletingId === character.id,
+        description: getPlainTextDescription(character.description),
         genderLabel: getGenderLabel(character.gender),
         label: getCharacterLabel(character.name),
         level: character.level,

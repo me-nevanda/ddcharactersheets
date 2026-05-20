@@ -31,6 +31,7 @@ export const CharacterListCard = ({ card, onImageError, }: CharacterListCardProp
               </span>
             </div>
           </div>
+          {card.description ? <p className={styles.characterDescription}>{card.description}</p> : null}
         </div>
       </div>
 

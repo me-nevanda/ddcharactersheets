@@ -103,6 +103,19 @@
   line-height: 1.05;
 }
 
+.characterDescription {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0.35rem 0 0;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  font-style: italic;
+  line-height: 1.28;
+  text-overflow: ellipsis;
+}
+
 .cardMeta {
   display: flex;
   flex-wrap: wrap;

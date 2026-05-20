@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { defineConfig, type Connect, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacterId, listCharacters, readCharacter, readCharacterImage, updateCharacter, updateCharacterImage, } from './server/characterStore';
+import { createMonsterGroup, isSafeMonsterGroupId, listMonsterGroups, readMonsterGroup, updateMonsterGroup } from './server/monsterGroupStore';
 import { createMonster, deleteMonster, deleteMonsterImage, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
 interface ApiError extends Error {
     code?: string;
@@ -148,11 +149,37 @@ const createCharactersApiPlugin = (): Plugin => {
 const createMonstersApiPlugin = (): Plugin => {
     const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
         const url = new URL(request.url ?? '/', 'http://localhost');
-        if (!url.pathname.startsWith('/api/monsters')) {
+        if (!url.pathname.startsWith('/api/monsters') && !url.pathname.startsWith('/api/monster-groups')) {
             next();
             return;
         }
         try {
+            if (request.method === 'GET' && url.pathname === '/api/monster-groups') {
+                sendJson(response, 200, { monsterGroups: await listMonsterGroups() });
+                return;
+            }
+            if (request.method === 'POST' && url.pathname === '/api/monster-groups') {
+                const payload = await readJsonBody(request);
+                sendJson(response, 201, { monsterGroup: await createMonsterGroup(payload) });
+                return;
+            }
+            const groupMatch = url.pathname.match(/^\/api\/monster-groups\/([^/]+)$/);
+            if (groupMatch) {
+                const groupId = groupMatch[1];
+                if (!isSafeMonsterGroupId(groupId)) {
+                    sendError(response, 400, 'errors.api.invalidMonsterGroupId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    sendJson(response, 200, { monsterGroup: await readMonsterGroup(groupId) });
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const payload = await readJsonBody(request);
+                    sendJson(response, 200, { monsterGroup: await updateMonsterGroup(groupId, payload) });
+                    return;
+                }
+            }
             if (request.method === 'GET' && url.pathname === '/api/monsters') {
                 sendJson(response, 200, { monsters: await listMonsters() });
                 return;
@@ -225,6 +252,14 @@ const createMonstersApiPlugin = (): Plugin => {
             }
             if (apiError.code === 'API_INVALID_MONSTER_ID') {
                 sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidMonsterId');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_MONSTER_GROUP_ID') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidMonsterGroupId');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_MONSTER_GROUP_NAME') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidMonsterGroupName');
                 return;
             }
             if (apiError.code === 'API_INVALID_MONSTER_IMAGE') {

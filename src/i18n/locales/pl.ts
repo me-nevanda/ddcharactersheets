@@ -25,6 +25,10 @@ export const pl: TranslationDictionary = {
       numberedList: 'Lista numerowana',
       clearFormatting: 'Wyczyść formatowanie',
     },
+    confirmations: {
+      unsavedChangesTitle: 'Niezapisane zmiany',
+      unsavedChangesBody: 'Masz niezapisane zmiany. Czy na pewno chcesz wrócić do listy?',
+    },
     states: {
       creating: 'Tworzenie...',
       deleting: 'Usuwanie...',
@@ -39,9 +43,11 @@ export const pl: TranslationDictionary = {
       generic: 'Nie udało się wykonać zadania.',
       invalidCharacterId: 'Nieprawidłowy identyfikator karty.',
       invalidMonsterId: 'Nieprawidłowy identyfikator potwora.',
+      invalidMonsterGroupId: 'Nieprawidłowy identyfikator grupy potworów.',
       invalidJsonBody: 'Nieprawidłowe dane żądania.',
       invalidCharacterImage: 'Obraz bohatera musi być plikiem PNG albo JPG.',
       invalidMonsterImage: 'Obraz potwora musi być plikiem PNG albo JPG.',
+      invalidMonsterGroupName: 'Nazwa grupy potworów jest wymagana.',
       characterNotFound: 'Nie znaleziono karty.',
       monsterNotFound: 'Nie znaleziono potwora.',
       notFound: 'Nie znaleziono zasobu.',
@@ -73,6 +79,33 @@ export const pl: TranslationDictionary = {
       },
     },
     monsterList: {
+      actions: {
+        addGroup: 'Dodaj grupę',
+      },
+      tabs: {
+        groups: 'Grupy',
+        list: 'Lista',
+      },
+      groups: {
+        addMonster: 'Dodaj potwora do grupy',
+        loading: 'Wczytywanie grup potworów...',
+        emptyState: 'Nie ma jeszcze żadnych grup potworów.',
+        emptyMonsters: 'Brak potworów',
+        monsterCount: 'Potwory: {count}',
+        moreMonsters: 'Więcej potworów',
+        uniqueId: 'ID:',
+        createDialog: {
+          title: 'Dodaj grupę',
+          nameLabel: 'Nazwa grupy',
+          namePlaceholder: 'Np. Strażnicy ruin',
+        },
+        addMonsterDialog: {
+          title: 'Dodaj potwora do grupy „{name}”',
+          searchLabel: 'Szukaj potwora',
+          searchPlaceholder: 'Wpisz min. 3 znaki',
+          emptyState: 'Nie ma potworów do dodania.',
+        },
+      },
       emptyState: 'Nie ma jeszcze żadnych potworów.',
       unnamedMonster: 'Bezimienny potwór',
       deleteDialog: {
@@ -98,6 +131,9 @@ export const pl: TranslationDictionary = {
       imageActions: {
         uploadNew: 'Nowy',
         remove: 'Usuń',
+      },
+      actions: {
+        generateAttributes: 'Wygeneruj atrybuty',
       },
       attacks: {
         title: 'Ataki',
@@ -129,6 +165,20 @@ export const pl: TranslationDictionary = {
           body: 'Łup „{name}” zostanie usunięty na stałe.',
         },
       },
+      typeOptions: {
+        minion: 'Minion',
+        normal: 'Zwykły',
+        solo: 'Samotnik',
+        elite: 'Elita',
+      },
+      roleOptions: {
+        skirmisher: 'Harcownik',
+        brute: 'Osiłek',
+        soldier: 'Żołnierz',
+        lurker: 'Czatownik',
+        controller: 'Manipulator',
+        artillery: 'Strzelec',
+      },
       fields: {
         name: 'Nazwa',
         image: 'Obraz potwora',
@@ -138,6 +188,8 @@ export const pl: TranslationDictionary = {
         reflex: 'Refleks',
         will: 'Wola',
         speed: 'Szybkość',
+        role: 'Rola',
+        type: 'Typ',
         hp: 'HP',
         level: 'Poziom',
         bloodied: 'Krwawi',
@@ -148,6 +200,31 @@ export const pl: TranslationDictionary = {
         description: 'Opis potwora',
         resistances: 'Odporności, niewrażliwości i podatności',
         special: 'Cechy specjalne potwora',
+      },
+    },
+    monsterGroupEdit: {
+      eyebrow: 'GRUPA POTWORÓW',
+      loading: 'Wczytywanie grupy potworów...',
+      emptyState: 'Nie dodano jeszcze żadnych potworów do tej grupy.',
+      actions: {
+        addMonster: 'Dodaj potwora',
+        removeMonster: 'Usuń z grupy',
+      },
+      fields: {
+        name: 'Nazwa grupy',
+      },
+      placeholders: {
+        name: 'Nazwa grupy',
+      },
+      sections: {
+        availableMonsters: 'Dostępne potwory',
+        monsters: 'Potwory w grupie',
+      },
+      addMonsterDialog: {
+        title: 'Dodaj potwora do grupy',
+        searchLabel: 'Szukaj potwora',
+        searchPlaceholder: 'Wpisz min. 3 znaki',
+        emptyState: 'Nie ma potworów do dodania.',
       },
     },
     characterEdit: {
