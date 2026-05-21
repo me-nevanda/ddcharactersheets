@@ -1,0 +1,342 @@
+@use '../../styles/mixins' as *;
+
+.editorLayout {
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.editorCard {
+  @include surface-card;
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.editorHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.headerBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.headerIconFrame {
+  display: grid;
+  place-items: center;
+  width: 5.25rem;
+  height: 5.25rem;
+  border: 1px solid rgba(240, 198, 111, 0.24);
+  border-radius: 0.95rem;
+  background: rgba(255, 248, 235, 0.04);
+  color: var(--accent);
+  flex: 0 0 auto;
+}
+
+.headerIcon {
+  width: 2.35rem;
+  height: 2.35rem;
+}
+
+.headerCopy {
+  display: grid;
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.titleField {
+  display: block;
+}
+
+.titleInput {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-strong);
+  font: inherit;
+  font-size: clamp(1.9rem, 3vw, 4.4rem);
+  line-height: 0.95;
+  outline: none;
+}
+
+.titleInput::placeholder {
+  color: var(--text-soft);
+  opacity: 1;
+}
+
+.titleInput:focus {
+  box-shadow: none;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.floatingBackAction {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 30;
+}
+
+.floatingSaveAction {
+  position: fixed;
+  top: calc(4.15rem + 16px);
+  right: 1rem;
+  z-index: 19;
+}
+
+.ghostButton,
+.primaryButton {
+  @include pill-button;
+}
+
+.ghostButton {
+  background: rgba(255, 248, 235, 0.03);
+  border-color: rgba(255, 248, 235, 0.08);
+  color: var(--text-strong);
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, #a64a2e 0%, #d9a441 100%);
+  color: #1d120e;
+  font-weight: 700;
+  box-shadow: 0 12px 30px rgba(166, 74, 46, 0.3);
+}
+
+.ghostButton:hover,
+.primaryButton:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.primaryButton:disabled {
+  cursor: default;
+  opacity: 0.72;
+  transform: none;
+}
+
+.buttonContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.buttonContent svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex-shrink: 0;
+}
+
+.status {
+  margin: 0 0 0.85rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(243, 165, 165, 0.25);
+  background: rgba(122, 32, 32, 0.16);
+  color: #ffe1e1;
+  font-size: 0.92rem;
+}
+
+.loadingText {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.editorForm {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.section {
+  @include surface-card;
+  display: grid;
+  gap: 0.9rem;
+  padding: 0.95rem;
+  min-width: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 0.95rem;
+}
+
+.sectionFooter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.fieldLabel {
+  color: var(--text-strong);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
+
+.descriptionField {
+  display: block;
+}
+
+.descriptionEditor {
+  min-height: 14rem;
+}
+
+.placeItemsList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.placeItemCard {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.95rem;
+  border-radius: 1rem;
+  background: rgba(255, 248, 235, 0.03);
+  border: 1px solid rgba(255, 248, 235, 0.06);
+}
+
+.placeItemHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(240, 198, 111, 0.18);
+  background: linear-gradient(135deg, rgba(166, 74, 46, 0.18), rgba(217, 164, 65, 0.08));
+}
+
+.placeItemTitleInput {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-strong);
+  font: inherit;
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  line-height: 1;
+  outline: none;
+}
+
+.placeItemTitleInput::placeholder {
+  color: var(--text-soft);
+  opacity: 1;
+}
+
+.placeItemTitleInput:focus {
+  box-shadow: none;
+}
+
+.placeItemRemoveButton {
+  @include pill-button;
+  padding-inline: 0.75rem;
+  background: rgba(122, 32, 32, 0.18);
+  border-color: rgba(243, 165, 165, 0.28);
+  color: #ffe1e1;
+}
+
+.placeItemRemoveButton:hover {
+  transform: translateY(-1px);
+  border-color: rgba(243, 165, 165, 0.42);
+  background: rgba(122, 32, 32, 0.24);
+}
+
+.placeItemRemoveButton svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+}
+
+.placeItemDescriptionEditor {
+  min-height: 8rem;
+}
+
+.addPlaceItemButton {
+  @include pill-button;
+  background: linear-gradient(135deg, #a64a2e 0%, #d9a441 100%);
+  color: #1d120e;
+  font-weight: 700;
+  box-shadow: 0 12px 30px rgba(166, 74, 46, 0.3);
+}
+
+.addPlaceItemButton:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.addPlaceItemButton svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 720px) {
+  .editorHeader,
+  .headerBrand {
+    align-items: start;
+  }
+
+  .editorHeader {
+    flex-direction: column;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .headerActions > * {
+    flex: 1 1 auto;
+  }
+
+  .placeItemsList {
+    grid-template-columns: 1fr;
+  }
+}

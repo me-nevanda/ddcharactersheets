@@ -1,5 +1,5 @@
 import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
-import type { Monster } from '@appTypes/monster'
+import type { Monster, MonsterGroup } from '@appTypes/monster'
 
 export type MonsterListTabKey = 'groups' | 'list'
 
@@ -22,11 +22,13 @@ export interface MonsterListCardViewModel {
 }
 
 export interface MonsterGroupCardViewModel {
+  deleting: boolean
   id: string
   monsterCount: number
   hasMoreMonsters: boolean
   monsterThumbnails: MonsterGroupThumbnailViewModel[]
   name: string
+  onDeleteClick: MouseEventHandler<HTMLButtonElement>
   onKeyDown: KeyboardEventHandler<HTMLElement>
   onOpen: () => void
 }
@@ -49,7 +51,10 @@ export interface MonstersListPageState {
   creating: boolean
   creatingGroup: boolean
   deletingId: string
+  groupDeletingId: string
+  groupToDelete: MonsterGroup | null
   deleteDialogMonsterName: string
+  deleteDialogGroupName: string
   error: string
   groupName: string
   groups: MonsterGroupCardViewModel[]
@@ -57,6 +62,8 @@ export interface MonstersListPageState {
   handleChangeGroupName: (value: string) => void
   handleCloseDeleteDialog: () => void
   handleConfirmDeleteMonster: () => Promise<void>
+  handleCloseDeleteGroupDialog: () => void
+  handleConfirmDeleteMonsterGroup: () => Promise<void>
   handleCreateGroupSubmit: FormEventHandler<HTMLFormElement>
   handleCreateMonster: () => Promise<void>
   handleOpenCreateGroupDialog: () => void

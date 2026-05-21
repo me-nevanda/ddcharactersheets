@@ -4,8 +4,9 @@ import react from '@vitejs/plugin-react';
 import { createAdventure, isSafeAdventureId, listAdventures, readAdventure, updateAdventure } from './server/adventureStore';
 import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacterId, listCharacters, readCharacter, readCharacterImage, updateCharacter, updateCharacterImage, } from './server/characterStore';
 import { countGeminiTokens, createGeminiResponse } from './server/geminiService';
-import { createMonsterGroup, isSafeMonsterGroupId, listMonsterGroups, readMonsterGroup, updateMonsterGroup } from './server/monsterGroupStore';
+import { createMonsterGroup, deleteMonsterGroup, isSafeMonsterGroupId, listMonsterGroups, readMonsterGroup, updateMonsterGroup } from './server/monsterGroupStore';
 import { createMonster, deleteMonster, deleteMonsterImage, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
+import { createPlace, isSafePlaceId, listPlaces, readPlace, updatePlace } from './server/placeStore';
 interface ApiError extends Error {
     code?: string;
     statusCode?: number;
@@ -245,6 +246,12 @@ const createMonstersApiPlugin = (): Plugin => {
                     sendJson(response, 200, { monsterGroup: await updateMonsterGroup(groupId, payload) });
                     return;
                 }
+                if (request.method === 'DELETE') {
+                    await deleteMonsterGroup(groupId);
+                    response.statusCode = 204;
+                    response.end();
+                    return;
+                }
             }
             if (request.method === 'GET' && url.pathname === '/api/monsters') {
                 sendJson(response, 200, { monsters: await listMonsters() });
@@ -345,6 +352,70 @@ const createMonstersApiPlugin = (): Plugin => {
         },
     };
 };
+const createPlacesApiPlugin = (): Plugin => {
+    const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
+        const url = new URL(request.url ?? '/', 'http://localhost');
+        if (!url.pathname.startsWith('/api/places')) {
+            next();
+            return;
+        }
+        try {
+            if (request.method === 'GET' && url.pathname === '/api/places') {
+                sendJson(response, 200, { places: await listPlaces() });
+                return;
+            }
+            if (request.method === 'POST' && url.pathname === '/api/places') {
+                sendJson(response, 201, { place: await createPlace() });
+                return;
+            }
+            const match = url.pathname.match(/^\/api\/places\/([^/]+)$/);
+            if (match) {
+                const placeId = match[1];
+                if (!isSafePlaceId(placeId)) {
+                    sendError(response, 400, 'errors.api.invalidPlaceId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    sendJson(response, 200, { place: await readPlace(placeId) });
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const payload = await readJsonBody(request);
+                    sendJson(response, 200, {
+                        place: await updatePlace(placeId, payload),
+                    });
+                    return;
+                }
+            }
+            sendError(response, 404, 'errors.api.notFound');
+        }
+        catch (error) {
+            const apiError = error as ApiError;
+            if (apiError.code === 'ENOENT') {
+                sendError(response, 404, 'errors.api.placeNotFound');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_JSON_BODY') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidJsonBody');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_PLACE_ID') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidPlaceId');
+                return;
+            }
+            sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');
+        }
+    };
+    return {
+        name: 'places-api',
+        configureServer(server) {
+            server.middlewares.use(handler);
+        },
+        configurePreviewServer(server) {
+            server.middlewares.use(handler);
+        },
+    };
+};
 const createGeminiApiPlugin = (): Plugin => {
     const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
         const url = new URL(request.url ?? '/', 'http://localhost');
@@ -409,7 +480,7 @@ const createGeminiApiPlugin = (): Plugin => {
     };
 };
 export default defineConfig({
-    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createGeminiApiPlugin()],
+    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createPlacesApiPlugin(), createGeminiApiPlugin()],
     resolve: {
         alias: {
             '@pages': '/src/pages',

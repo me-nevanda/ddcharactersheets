@@ -45,6 +45,7 @@ export const pl: TranslationDictionary = {
       invalidMonsterId: 'Nieprawidłowy identyfikator potwora.',
       invalidMonsterGroupId: 'Nieprawidłowy identyfikator grupy potworów.',
       invalidAdventureId: 'Nieprawidłowy identyfikator przygody.',
+      invalidPlaceId: 'Nieprawidłowy identyfikator obszaru.',
       invalidJsonBody: 'Nieprawidłowe dane żądania.',
       invalidCharacterImage: 'Obraz bohatera musi być plikiem PNG albo JPG.',
       invalidMonsterImage: 'Obraz potwora musi być plikiem PNG albo JPG.',
@@ -59,6 +60,7 @@ export const pl: TranslationDictionary = {
       characterNotFound: 'Nie znaleziono karty.',
       monsterNotFound: 'Nie znaleziono potwora.',
       adventureNotFound: 'Nie znaleziono przygody.',
+      placeNotFound: 'Nie znaleziono obszaru.',
       notFound: 'Nie znaleziono zasobu.',
       unexpectedServerError: 'Wystąpił nieoczekiwany błąd serwera.',
     },
@@ -71,6 +73,43 @@ export const pl: TranslationDictionary = {
         heroes: 'Bohaterowie',
         monsters: 'Potwory',
         adventures: 'Przygody',
+        places: 'Miejsca',
+      },
+    },
+    placeList: {
+      actions: {
+        addPlace: 'Nowy obszar',
+      },
+      emptyState: 'Nie ma jeszcze żadnych obszarów. Dodaj pierwszy i przejdź do edycji.',
+      loading: 'Wczytywanie obszarów...',
+      unnamedPlace: 'Nienazwany obszar',
+      updatedAt: 'Ostatnia zmiana:',
+    },
+    placeEdit: {
+      eyebrow: 'OBSZAR',
+      loading: 'Wczytywanie obszaru...',
+      fields: {
+        name: 'Nazwa',
+        description: 'Opis',
+      },
+      placeholders: {
+        titleName: 'Nienazwany obszar',
+        description: 'Opis obszaru',
+      },
+      places: {
+        title: 'Miejsca',
+        emptyState: 'Nie dodano jeszcze żadnego miejsca.',
+        addButton: 'Dodaj miejsce',
+        removeButton: 'Usuń',
+        nameLabel: 'Nazwa miejsca',
+        namePlaceholder: 'Np. Karczma „Pod złotym smokiem”',
+        descriptionLabel: 'Opis miejsca',
+        descriptionPlaceholder: 'Krótki opis miejsca',
+        unnamedItem: 'Bezimienne miejsce',
+        removeDialog: {
+          title: 'Usunąć miejsce?',
+          body: 'Miejsce „{name}” zostanie usunięte na stałe.',
+        },
       },
     },
     adventureList: {
@@ -139,7 +178,12 @@ export const pl: TranslationDictionary = {
         emptyMonsters: 'Brak potworów',
         monsterCount: 'Potwory: {count}',
         moreMonsters: 'Więcej potworów',
+        unnamedGroup: 'Nienazwana grupa',
         uniqueId: 'ID:',
+        deleteDialog: {
+          title: 'Usunąć grupę potworów?',
+          body: 'Grupa „{name}” zostanie usunięta na stałe.',
+        },
         createDialog: {
           title: 'Dodaj grupę',
           nameLabel: 'Nazwa grupy',

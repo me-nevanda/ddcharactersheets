@@ -6,6 +6,7 @@ import { MainPage } from '@pages/main';
 import { MainPageProvider } from '@pages/main/mainPageContext';
 import { MonsterEditPage } from '@pages/MonsterEditPage';
 import { MonsterGroupEditPage } from '@pages/MonsterGroupEditPage';
+import { PlaceEditPage } from '@pages/PlaceEditPage';
 import { CharacterAbilitiesPrintPage } from '@pages/printPages/CharacterAbilitiesPrintPage';
 import { CharacterItemsPrintPage } from '@pages/printPages/CharacterItemsPrintPage';
 import { CharacterPrintPage } from '@pages/printPages/CharacterPrintPage';
@@ -20,6 +21,7 @@ const App = () => {
           <Route path="/characters/:characterId/edit" element={<CharacterEditPage />}/>
           <Route path="/monsters/:monsterId/edit" element={<MonsterEditPage />}/>
           <Route path="/monster-groups/:groupId/edit" element={<MonsterGroupEditPage />}/>
+          <Route path="/places/:placeId/edit" element={<PlaceEditPage />}/>
           <Route path="/characters/:characterId/print/abilities" element={<CharacterAbilitiesPrintPage />}/>
           <Route path="/characters/:characterId/print/items" element={<CharacterItemsPrintPage />}/>
           <Route path="/characters/:characterId/print" element={<CharacterPrintPage />}/>

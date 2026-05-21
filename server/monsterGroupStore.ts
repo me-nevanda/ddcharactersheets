@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { MonsterGroup, MonsterGroupData } from '../src/types/monster'
 
@@ -150,4 +150,9 @@ export const updateMonsterGroup = async (groupId: string, data: unknown): Promis
     ...nextGroup,
     updatedAt: fileInfo.mtime.toISOString(),
   }
+}
+
+export const deleteMonsterGroup = async (groupId: string): Promise<void> => {
+  await ensureMonsterGroupsDirectory()
+  await unlink(getMonsterGroupFilePath(groupId))
 }

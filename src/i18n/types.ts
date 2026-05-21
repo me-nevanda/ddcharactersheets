@@ -44,6 +44,7 @@ export interface TranslationDictionary {
       invalidMonsterId: string
       invalidMonsterGroupId: string
       invalidAdventureId: string
+      invalidPlaceId: string
       invalidJsonBody: string
       invalidCharacterImage: string
       invalidMonsterImage: string
@@ -58,6 +59,7 @@ export interface TranslationDictionary {
       characterNotFound: string
       monsterNotFound: string
       adventureNotFound: string
+      placeNotFound: string
       notFound: string
       unexpectedServerError: string
     }
@@ -70,6 +72,43 @@ export interface TranslationDictionary {
         heroes: string
         monsters: string
         adventures: string
+        places: string
+      }
+    }
+    placeList: {
+      actions: {
+        addPlace: string
+      }
+      emptyState: string
+      loading: string
+      unnamedPlace: string
+      updatedAt: string
+    }
+    placeEdit: {
+      eyebrow: string
+      loading: string
+      fields: {
+        name: string
+        description: string
+      }
+      placeholders: {
+        titleName: string
+        description: string
+      }
+      places: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeButton: string
+        nameLabel: string
+        namePlaceholder: string
+        descriptionLabel: string
+        descriptionPlaceholder: string
+        unnamedItem: string
+        removeDialog: {
+          title: string
+          body: string
+        }
       }
     }
     adventureList: {
@@ -138,7 +177,12 @@ export interface TranslationDictionary {
         emptyMonsters: string
         monsterCount: string
         moreMonsters: string
+        unnamedGroup: string
         uniqueId: string
+        deleteDialog: {
+          title: string
+          body: string
+        }
         createDialog: {
           title: string
           nameLabel: string

@@ -75,6 +75,11 @@ const MonsterGroupCard = ({ group }: { group: MonsterGroupCardViewModel }) => {
           </div>
         ) : <p className={styles.groupEmptyText}>{t('pages.monsterList.groups.emptyMonsters')}</p>}
       </div>
+      <div className={styles.cardActions}>
+        <button aria-label={t('common.actions.delete')} className={styles.dangerButton} type="button" title={t('common.actions.delete')} onClick={group.onDeleteClick} disabled={group.deleting}>
+          <AppIcon name="trash" />
+        </button>
+      </div>
     </article>
   )
 }
@@ -113,64 +118,67 @@ const CreateMonsterGroupDialog = ({
 
 export const MonstersListPage = () => {
   const { t } = useI18n()
-  const { activeTab, cards, creating, creatingGroup, deletingId, deleteDialogMonsterName, error, groupName, groups, handleCancelCreateGroup, handleChangeGroupName, handleCloseDeleteDialog, handleConfirmDeleteMonster, handleCreateGroupSubmit, handleCreateMonster, handleOpenCreateGroupDialog, loading, loadingGroups, monsterToDelete, setActiveTab, showCreateGroupDialog, showEmptyGroupsState, showEmptyState, showGroupList, showMonsterGrid } = useMonstersListPage()
+  const { activeTab, cards, creating, creatingGroup, deleteDialogGroupName, deletingId, deleteDialogMonsterName, error, groupDeletingId, groupName, groups, groupToDelete, handleCancelCreateGroup, handleChangeGroupName, handleCloseDeleteDialog, handleCloseDeleteGroupDialog, handleConfirmDeleteMonster, handleConfirmDeleteMonsterGroup, handleCreateGroupSubmit, handleCreateMonster, handleOpenCreateGroupDialog, loading, loadingGroups, monsterToDelete, setActiveTab, showCreateGroupDialog, showEmptyGroupsState, showEmptyState, showGroupList, showMonsterGrid } = useMonstersListPage()
 
   return (
     <>
       <CharacterListHeader actionLabel={t('pages.characterList.actions.addMonster')} creating={creating} secondaryActionLabel={t('pages.monsterList.actions.addGroup')} secondaryCreating={creatingGroup} onAction={() => void handleCreateMonster()} onSecondaryAction={handleOpenCreateGroupDialog} subtitle={t('pages.main.subtitle')} title={t('pages.main.tabs.monsters')} />
-      <div className={styles.monsterTabs} role="tablist" aria-label={t('pages.main.tabs.monsters')}>
-        <button className={`${styles.monsterTabButton} ${activeTab === 'groups' ? styles.monsterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'groups'} onClick={() => setActiveTab('groups')}>
-          {t('pages.monsterList.tabs.groups')}
-        </button>
-        <button className={`${styles.monsterTabButton} ${activeTab === 'list' ? styles.monsterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'list'} onClick={() => setActiveTab('list')}>
-          {t('pages.monsterList.tabs.list')}
-        </button>
-      </div>
       {error ? <p className={styles.status}>{error}</p> : null}
-      {activeTab === 'groups' ? (
-        <>
-          {loadingGroups ? (
-            <section className={styles.emptyPanel}>
-              <p className={styles.emptyText}>{t('pages.monsterList.groups.loading')}</p>
-            </section>
-          ) : null}
-          {showEmptyGroupsState ? (
-            <section className={styles.emptyPanel}>
-              <p className={styles.emptyText}>{t('pages.monsterList.groups.emptyState')}</p>
-            </section>
-          ) : null}
-          {showGroupList ? (
-            <section className={styles.groupList} aria-label={t('pages.monsterList.tabs.groups')}>
-              {groups.map((group) => (
-                <MonsterGroupCard key={group.id} group={group} />
-              ))}
-            </section>
-          ) : null}
-        </>
-      ) : null}
-      {activeTab === 'list' ? (
-        <>
-          {loading ? (
-            <section className={styles.emptyPanel}>
-              <p className={styles.emptyText}>{t('common.states.loadingMonsters')}</p>
-            </section>
-          ) : null}
-          {showEmptyState ? (
-            <section className={styles.emptyPanel}>
-              <p className={styles.emptyText}>{t('pages.monsterList.emptyState')}</p>
-            </section>
-          ) : null}
-          {showMonsterGrid ? (
-            <section className={styles.monsterGrid} aria-label={t('pages.main.tabs.monsters')}>
-              {cards.map((card) => (
-                <MonsterListCard key={card.id} card={card} />
-              ))}
-            </section>
-          ) : null}
-        </>
-      ) : null}
+      <div className={styles.tabsContainer}>
+        <div className={styles.monsterTabs} role="tablist" aria-label={t('pages.main.tabs.monsters')}>
+          <button className={`${styles.monsterTabButton} ${activeTab === 'groups' ? styles.monsterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'groups'} onClick={() => setActiveTab('groups')}>
+            {t('pages.monsterList.tabs.groups')}
+          </button>
+          <button className={`${styles.monsterTabButton} ${activeTab === 'list' ? styles.monsterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'list'} onClick={() => setActiveTab('list')}>
+            {t('pages.monsterList.tabs.list')}
+          </button>
+        </div>
+        {activeTab === 'groups' ? (
+          <>
+            {loadingGroups ? (
+              <section className={styles.emptyPanel}>
+                <p className={styles.emptyText}>{t('pages.monsterList.groups.loading')}</p>
+              </section>
+            ) : null}
+            {showEmptyGroupsState ? (
+              <section className={styles.emptyPanel}>
+                <p className={styles.emptyText}>{t('pages.monsterList.groups.emptyState')}</p>
+              </section>
+            ) : null}
+            {showGroupList ? (
+              <section className={styles.groupList} aria-label={t('pages.monsterList.tabs.groups')}>
+                {groups.map((group) => (
+                  <MonsterGroupCard key={group.id} group={group} />
+                ))}
+              </section>
+            ) : null}
+          </>
+        ) : null}
+        {activeTab === 'list' ? (
+          <>
+            {loading ? (
+              <section className={styles.emptyPanel}>
+                <p className={styles.emptyText}>{t('common.states.loadingMonsters')}</p>
+              </section>
+            ) : null}
+            {showEmptyState ? (
+              <section className={styles.emptyPanel}>
+                <p className={styles.emptyText}>{t('pages.monsterList.emptyState')}</p>
+              </section>
+            ) : null}
+            {showMonsterGrid ? (
+              <section className={styles.monsterGrid} aria-label={t('pages.main.tabs.monsters')}>
+                {cards.map((card) => (
+                  <MonsterListCard key={card.id} card={card} />
+                ))}
+              </section>
+            ) : null}
+          </>
+        ) : null}
+      </div>
       {showCreateGroupDialog ? <CreateMonsterGroupDialog creatingGroup={creatingGroup} groupName={groupName} onCancel={handleCancelCreateGroup} onChangeGroupName={handleChangeGroupName} onSubmit={handleCreateGroupSubmit} /> : null}
       <DeleteCharacterDialog bodyKey="pages.monsterList.deleteDialog.body" characterName={deleteDialogMonsterName} deleting={deletingId === monsterToDelete?.id} open={Boolean(monsterToDelete)} titleKey="pages.monsterList.deleteDialog.title" onCancel={handleCloseDeleteDialog} onConfirm={() => void handleConfirmDeleteMonster()} />
+      <DeleteCharacterDialog bodyKey="pages.monsterList.groups.deleteDialog.body" characterName={deleteDialogGroupName} deleting={groupDeletingId === groupToDelete?.id} open={Boolean(groupToDelete)} titleKey="pages.monsterList.groups.deleteDialog.title" onCancel={handleCloseDeleteGroupDialog} onConfirm={() => void handleConfirmDeleteMonsterGroup()} />
     </>
   )
 }

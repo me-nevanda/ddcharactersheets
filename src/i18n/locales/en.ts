@@ -45,6 +45,7 @@ export const en: TranslationDictionary = {
       invalidMonsterId: 'The monster ID is invalid.',
       invalidMonsterGroupId: 'The monster group ID is invalid.',
       invalidAdventureId: 'The adventure ID is invalid.',
+      invalidPlaceId: 'The place ID is invalid.',
       invalidJsonBody: 'The request payload is invalid.',
       invalidCharacterImage: 'The hero image must be a PNG or JPG file.',
       invalidMonsterImage: 'The monster image must be a PNG or JPG file.',
@@ -59,6 +60,7 @@ export const en: TranslationDictionary = {
       characterNotFound: 'Character not found.',
       monsterNotFound: 'Monster not found.',
       adventureNotFound: 'Adventure not found.',
+      placeNotFound: 'Place not found.',
       notFound: 'Resource not found.',
       unexpectedServerError: 'An unexpected server error occurred.',
     },
@@ -71,6 +73,43 @@ export const en: TranslationDictionary = {
         heroes: 'Heroes',
         monsters: 'Monsters',
         adventures: 'Adventures',
+        places: 'Places',
+      },
+    },
+    placeList: {
+      actions: {
+        addPlace: 'New place',
+      },
+      emptyState: 'There are no places yet. Add one to start editing.',
+      loading: 'Loading places...',
+      unnamedPlace: 'Unnamed place',
+      updatedAt: 'Last updated:',
+    },
+    placeEdit: {
+      eyebrow: 'PLACE',
+      loading: 'Loading place...',
+      fields: {
+        name: 'Name',
+        description: 'Description',
+      },
+      placeholders: {
+        titleName: 'Unnamed place',
+        description: 'Place description',
+      },
+      places: {
+        title: 'Places',
+        emptyState: 'No places have been added yet.',
+        addButton: 'Add place',
+        removeButton: 'Remove',
+        nameLabel: 'Place name',
+        namePlaceholder: 'e.g. The Golden Dragon Inn',
+        descriptionLabel: 'Place description',
+        descriptionPlaceholder: 'Short place description',
+        unnamedItem: 'Unnamed place',
+        removeDialog: {
+          title: 'Delete this place?',
+          body: 'The place "{name}" will be deleted permanently.',
+        },
       },
     },
     adventureList: {
@@ -139,7 +178,12 @@ export const en: TranslationDictionary = {
         emptyMonsters: 'No monsters',
         monsterCount: 'Monsters: {count}',
         moreMonsters: 'More monsters',
+        unnamedGroup: 'Unnamed group',
         uniqueId: 'ID:',
+        deleteDialog: {
+          title: 'Delete this monster group?',
+          body: 'The group "{name}" will be deleted permanently.',
+        },
         createDialog: {
           title: 'Add group',
           nameLabel: 'Group name',

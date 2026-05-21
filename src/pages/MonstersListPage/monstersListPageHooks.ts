@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { createMonster, createMonsterGroup, deleteMonster, listMonsterGroups, listMonsters } from '@lib/api'
+import { createMonster, createMonsterGroup, deleteMonster, deleteMonsterGroup, listMonsterGroups, listMonsters } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
 import type { MonsterGroupCardViewModel, MonsterListCardViewModel, MonsterListTabKey, MonstersListPageState } from './types'
@@ -28,7 +28,9 @@ export const useMonstersListPage = (): MonstersListPageState => {
   const [creating, setCreating] = useState(false)
   const [creatingGroup, setCreatingGroup] = useState(false)
   const [deletingId, setDeletingId] = useState('')
+  const [groupDeletingId, setGroupDeletingId] = useState('')
   const [monsterToDelete, setMonsterToDelete] = useState<Monster | null>(null)
+  const [groupToDelete, setGroupToDelete] = useState<MonsterGroup | null>(null)
   const [activeTab, setActiveTab] = useState<MonsterListTabKey>('groups')
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false)
   const [groupName, setGroupName] = useState('')
@@ -153,6 +155,33 @@ export const useMonstersListPage = (): MonstersListPageState => {
     }
   }
 
+  const handleOpenDeleteGroupDialog = (group: MonsterGroup) => {
+    setGroupToDelete(group)
+  }
+
+  const handleCloseDeleteGroupDialog = () => {
+    setGroupToDelete(null)
+  }
+
+  const handleConfirmDeleteMonsterGroup = async () => {
+    if (!groupToDelete) {
+      return
+    }
+
+    setGroupDeletingId(groupToDelete.id)
+    setError('')
+
+    try {
+      await deleteMonsterGroup(groupToDelete.id)
+      setGroups((currentGroups) => currentGroups.filter((group) => group.id !== groupToDelete.id))
+      setGroupToDelete(null)
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+    } finally {
+      setGroupDeletingId('')
+    }
+  }
+
   const cards: MonsterListCardViewModel[] = monsters.map((monster) => ({
     deleting: deletingId === monster.id,
     descriptionPreview: buildTextPreview(monster.description),
@@ -182,6 +211,7 @@ export const useMonstersListPage = (): MonstersListPageState => {
   }))
 
   const groupCards: MonsterGroupCardViewModel[] = groups.map((group) => ({
+    deleting: groupDeletingId === group.id,
     hasMoreMonsters: group.monsterFileNames.length > 4,
     id: group.id,
     monsterCount: group.monsterFileNames.length,
@@ -194,6 +224,10 @@ export const useMonstersListPage = (): MonstersListPageState => {
         label: monster.name.trim() || t('pages.monsterList.unnamedMonster'),
       })),
     name: group.name,
+    onDeleteClick: (event) => {
+      event.stopPropagation()
+      handleOpenDeleteGroupDialog(group)
+    },
     onKeyDown: (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
@@ -212,13 +246,18 @@ export const useMonstersListPage = (): MonstersListPageState => {
     creatingGroup,
     deletingId,
     deleteDialogMonsterName: monsterToDelete?.name.trim() || t('pages.monsterList.unnamedMonster'),
+    deleteDialogGroupName: groupToDelete?.name.trim() || t('pages.monsterList.groups.unnamedGroup'),
     error,
+    groupDeletingId,
     groupName,
+    groupToDelete,
     groups: groupCards,
     handleCancelCreateGroup,
     handleChangeGroupName,
     handleCloseDeleteDialog,
+    handleCloseDeleteGroupDialog,
     handleConfirmDeleteMonster,
+    handleConfirmDeleteMonsterGroup,
     handleCreateGroupSubmit,
     handleCreateMonster,
     handleOpenCreateGroupDialog,

@@ -1,0 +1,109 @@
+@use '../../styles/mixins' as *;
+
+.status {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(243, 165, 165, 0.25);
+  background: rgba(122, 32, 32, 0.16);
+  color: #ffe1e1;
+  font-size: 0.92rem;
+}
+
+.emptyState {
+  @include surface-card;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.emptyText {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.placeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 2.25rem;
+}
+
+.placeCard {
+  @include surface-card;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.95rem;
+  cursor: pointer;
+}
+
+.placeCard:hover {
+  border-color: var(--border-strong);
+}
+
+.placeCard:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+}
+
+.cardIconFrame {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border: 1px solid rgba(240, 198, 111, 0.24);
+  border-radius: 0.85rem;
+  background: rgba(255, 248, 235, 0.04);
+  color: var(--accent);
+}
+
+.cardIcon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.placeSummary {
+  display: grid;
+  gap: 0.24rem;
+  min-width: 0;
+}
+
+.placeName {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-strong);
+  font-size: 1.35rem;
+  line-height: 1.08;
+}
+
+.cardMeta {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.84rem;
+  line-height: 1.2;
+}
+
+.descriptionPreview {
+  display: -webkit-box;
+  margin: 0.35rem 0 0;
+  overflow: hidden;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  font-style: italic;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+@media (max-width: 720px) {
+  .placeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .placeCard {
+    align-items: start;
+  }
+}

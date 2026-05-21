@@ -10,6 +10,7 @@ export type AppIconName =
   | 'magic'
   | 'minion'
   | 'monster'
+  | 'place'
   | 'plus'
   | 'print'
   | 'save'

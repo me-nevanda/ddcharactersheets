@@ -1,6 +1,7 @@
 import type { Adventure, AdventureData } from '@appTypes/adventure';
 import type { Character, CharacterData } from '@appTypes/character';
 import type { Monster, MonsterData, MonsterGroup } from '@appTypes/monster';
+import type { Place, PlaceData } from '@appTypes/place';
 interface ApiEnvelope<T> {
     adventure?: T;
     adventures?: T[];
@@ -10,6 +11,8 @@ interface ApiEnvelope<T> {
     monsters?: T[];
     monsterGroup?: T;
     monsterGroups?: T[];
+    place?: T;
+    places?: T[];
     response?: T;
     tokenCount?: T;
     errorCode?: string;
@@ -185,6 +188,11 @@ export const saveMonsterGroup = async (groupId: string, monsterGroup: MonsterGro
     }
     return payload.monsterGroup;
 };
+export const deleteMonsterGroup = async (groupId: string): Promise<void> => {
+    await requestJson<null>(`/api/monster-groups/${groupId}`, {
+        method: 'DELETE',
+    });
+};
 export const createMonster = async (): Promise<Monster> => {
     const payload = await requestJson<ApiEnvelope<Monster>>('/api/monsters', {
         method: 'POST',
@@ -243,6 +251,36 @@ export const deleteMonsterImage = async (monsterId: string): Promise<Monster> =>
         throw new Error('errors.api.generic');
     }
     return payload.monster;
+};
+export const listPlaces = async (): Promise<Place[]> => {
+    const payload = await requestJson<ApiEnvelope<Place>>('/api/places');
+    return payload?.places ?? [];
+};
+export const createPlace = async (): Promise<Place> => {
+    const payload = await requestJson<ApiEnvelope<Place>>('/api/places', {
+        method: 'POST',
+    });
+    if (!payload?.place) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.place;
+};
+export const getPlace = async (placeId: string): Promise<Place> => {
+    const payload = await requestJson<ApiEnvelope<Place>>(`/api/places/${placeId}`);
+    if (!payload?.place) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.place;
+};
+export const savePlace = async (placeId: string, place: PlaceData): Promise<Place> => {
+    const payload = await requestJson<ApiEnvelope<Place>>(`/api/places/${placeId}`, {
+        method: 'PUT',
+        body: JSON.stringify(place),
+    });
+    if (!payload?.place) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.place;
 };
 export const createGeminiResponse = async (request: CreateGeminiResponseRequest): Promise<GeminiResponse> => {
     const payload = await requestJson<ApiEnvelope<GeminiResponse>>('/api/gemini/responses', {

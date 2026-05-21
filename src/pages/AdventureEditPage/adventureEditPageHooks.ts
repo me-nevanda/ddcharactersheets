@@ -185,6 +185,7 @@ export const useAdventureEditPage = (): AdventureEditPageState => {
         const nextTodayRequestCount = todayRequestCount + 1
         const nextAdventure: AdventureData = {
           ...form,
+          prompt: '',
           output: result.text,
         }
         const adventure = await saveAdventure(adventureId, nextAdventure)
