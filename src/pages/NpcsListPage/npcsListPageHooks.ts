@@ -190,6 +190,7 @@ export const useNpcsListPage = (): NpcsListPageState => {
       descriptionPreview: buildTextPreview(npc.description),
       id: npc.id,
       imageSrc: npc.imageUrl || '/favicon.png',
+      isDead: npc.isDead === true,
       isElite: !isStory && npc.type === 'elite',
       isMinion: !isStory && npc.type === 'minion',
       isNormal: !isStory && npc.type === 'normal',
@@ -226,8 +227,21 @@ export const useNpcsListPage = (): NpcsListPageState => {
       .filter((npc): npc is Npc => Boolean(npc))
       .slice(0, 4)
       .map((npc) => ({
+        id: npc.id,
         imageSrc: npc.imageUrl || '/favicon.png',
+        isDead: npc.isDead === true,
         label: npc.name.trim() || t('pages.npcList.unnamedNpc'),
+        onKeyDown: (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            event.stopPropagation()
+            openNpc(npc.id)
+          }
+        },
+        onOpen: (event) => {
+          event.stopPropagation()
+          openNpc(npc.id)
+        },
       })),
     name: group.name,
     onDeleteClick: (event) => {

@@ -15,7 +15,7 @@ export const NpcEditPage = () => {
   const { t } = useI18n()
   const navigate = useNavigate()
   const { handleTabChange } = useMainPageContext()
-  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleIsStoryToggle, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useNpcEditPage()
+  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleIsDeadToggle, handleIsStoryToggle, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useNpcEditPage()
   const [activeTab, setActiveTab] = useState<NpcEditTabKey>('general')
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
   const bloodiedValue = Math.floor(form.hp / 2)
@@ -226,10 +226,16 @@ export const NpcEditPage = () => {
                   </div> : null}
 
                   <div className={styles.rightColumn}>
-                    <label className={styles.storyToggleRow} htmlFor="isStory">
-                      <input className={styles.storyToggleInput} id="isStory" name="isStory" type="checkbox" checked={form.isStory} onChange={handleIsStoryToggle} />
-                      <span className={styles.storyToggleLabel}>{t('pages.npcEdit.fields.isStory')}</span>
-                    </label>
+                    <div className={styles.storyToggleGroup}>
+                      <label className={styles.storyToggleRow} htmlFor="isStory">
+                        <input className={styles.storyToggleInput} id="isStory" name="isStory" type="checkbox" checked={form.isStory} onChange={handleIsStoryToggle} />
+                        <span className={styles.storyToggleLabel}>{t('pages.npcEdit.fields.isStory')}</span>
+                      </label>
+                      <label className={styles.storyToggleRow} htmlFor="isDead">
+                        <input className={styles.storyToggleInput} id="isDead" name="isDead" type="checkbox" checked={form.isDead} onChange={handleIsDeadToggle} />
+                        <span className={styles.storyToggleLabel}>{t('pages.npcEdit.fields.isDead')}</span>
+                      </label>
+                    </div>
 
                     {!form.isStory ? (
                       <section className={styles.section}>

@@ -48,6 +48,7 @@ export const pl: TranslationDictionary = {
       invalidNpcGroupId: 'Nieprawidłowy identyfikator grupy NPC.',
       invalidAdventureId: 'Nieprawidłowy identyfikator przygody.',
       invalidPlaceId: 'Nieprawidłowy identyfikator obszaru.',
+      invalidEventId: 'Nieprawidłowy identyfikator wydarzenia.',
       invalidJsonBody: 'Nieprawidłowe dane żądania.',
       invalidCharacterImage: 'Obraz bohatera musi być plikiem PNG albo JPG.',
       invalidMonsterImage: 'Obraz potwora musi być plikiem PNG albo JPG.',
@@ -66,6 +67,7 @@ export const pl: TranslationDictionary = {
       npcNotFound: 'Nie znaleziono NPC.',
       adventureNotFound: 'Nie znaleziono przygody.',
       placeNotFound: 'Nie znaleziono obszaru.',
+      eventNotFound: 'Nie znaleziono wydarzenia.',
       notFound: 'Nie znaleziono zasobu.',
       unexpectedServerError: 'Wystąpił nieoczekiwany błąd serwera.',
     },
@@ -80,6 +82,7 @@ export const pl: TranslationDictionary = {
         npcs: 'NPC',
         adventures: 'Przygody',
         places: 'Miejsca',
+        events: 'Wydarzenia',
       },
     },
     placeList: {
@@ -90,6 +93,31 @@ export const pl: TranslationDictionary = {
       loading: 'Wczytywanie obszarów...',
       unnamedPlace: 'Nienazwany obszar',
       updatedAt: 'Ostatnia zmiana:',
+    },
+    eventList: {
+      actions: {
+        addEvent: 'Dodaj wydarzenie',
+      },
+      emptyState: 'Nie ma jeszcze żadnych wydarzeń. Dodaj pierwsze i przejdź do edycji.',
+      loading: 'Wczytywanie wydarzeń...',
+      unnamedEvent: 'Bezimienne wydarzenie',
+      updatedAt: 'Ostatnia zmiana:',
+      deleteDialog: {
+        title: 'Usunąć wydarzenie?',
+        body: 'Wydarzenie „{name}” zostanie usunięte na stałe.',
+      },
+    },
+    eventEdit: {
+      eyebrow: 'WYDARZENIE',
+      loading: 'Wczytywanie wydarzenia...',
+      fields: {
+        name: 'Tytuł',
+        description: 'Opis',
+      },
+      placeholders: {
+        titleName: 'Bezimienne wydarzenie',
+        description: 'Opis wydarzenia',
+      },
     },
     placeEdit: {
       eyebrow: 'OBSZAR',
@@ -462,6 +490,7 @@ export const pl: TranslationDictionary = {
         mediumDamage: 'Obrażenia średnie',
         highDamage: 'Obrażenia wysokie',
         isStory: 'NPC fabularny',
+        isDead: 'Martwy',
       },
       placeholders: {
         titleName: 'Bezimienny NPC',
@@ -472,7 +501,7 @@ export const pl: TranslationDictionary = {
       },
     },
     monsterGroupEdit: {
-      eyebrow: 'GRUPA NPC',
+      eyebrow: 'GRUPA POTWORÓW',
       loading: 'Wczytywanie grupy potworów...',
       emptyState: 'Nie dodano jeszcze żadnych potworów do tej grupy.',
       actions: {
@@ -837,6 +866,10 @@ export const pl: TranslationDictionary = {
       sections: {
         stats: 'Poziom, szybkość i HP',
         attacks: 'Ataki',
+        items: 'Przedmioty',
+        weapons: 'Bronie',
+        armors: 'Zbroje',
+        others: 'Pozostałe',
       },
     },
     npcPrint: {
@@ -849,6 +882,10 @@ export const pl: TranslationDictionary = {
       sections: {
         stats: 'Poziom, szybkość i HP',
         attacks: 'Ataki',
+        items: 'Przedmioty',
+        weapons: 'Bronie',
+        armors: 'Zbroje',
+        others: 'Pozostałe',
       },
     },
   },

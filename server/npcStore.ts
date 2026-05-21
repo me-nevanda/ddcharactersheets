@@ -335,6 +335,7 @@ const normalizeNpc = (data: Partial<Record<keyof NpcData, unknown>> = {}): NpcDa
     level: normalizeLevelValue(data.level),
     speed: normalizeStatValue(data.speed, 6),
     isStory: data.isStory === true,
+    isDead: data.isDead === true,
   }
 }
 

@@ -1,4 +1,4 @@
-import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
+import type { FormEventHandler, KeyboardEventHandler, MouseEvent, MouseEventHandler } from 'react'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
 import type { MainMonsterListTabKey } from '@pages/main/types'
 
@@ -35,8 +35,11 @@ export interface MonsterGroupCardViewModel {
 }
 
 export interface MonsterGroupThumbnailViewModel {
+  id: string
   imageSrc: string
   label: string
+  onKeyDown: KeyboardEventHandler<HTMLElement>
+  onOpen: (event: MouseEvent<HTMLElement>) => void
 }
 
 export interface CreateMonsterGroupDialogProps {

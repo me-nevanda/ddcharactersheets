@@ -1,5 +1,6 @@
 ﻿import type { Adventure, AdventureData } from '@appTypes/adventure';
 import type { Character, CharacterData } from '@appTypes/character';
+import type { Event, EventData } from '@appTypes/event';
 import type { Monster, MonsterData, MonsterGroup } from '@appTypes/monster';
 import type { Npc, NpcData, NpcGroup } from '@appTypes/npc';
 import type { Place, PlaceData } from '@appTypes/place';
@@ -8,6 +9,8 @@ interface ApiEnvelope<T> {
     adventures?: T[];
     character?: T;
     characters?: T[];
+    event?: T;
+    events?: T[];
     monster?: T;
     monsters?: T[];
     monsterGroup?: T;
@@ -359,6 +362,41 @@ export const deleteNpcImage = async (npcId: string): Promise<Npc> => {
         throw new Error('errors.api.generic');
     }
     return payload.npc;
+};
+export const listEvents = async (): Promise<Event[]> => {
+    const payload = await requestJson<ApiEnvelope<Event>>('/api/events');
+    return payload?.events ?? [];
+};
+export const createEvent = async (): Promise<Event> => {
+    const payload = await requestJson<ApiEnvelope<Event>>('/api/events', {
+        method: 'POST',
+    });
+    if (!payload?.event) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.event;
+};
+export const getEvent = async (eventId: string): Promise<Event> => {
+    const payload = await requestJson<ApiEnvelope<Event>>(`/api/events/${eventId}`);
+    if (!payload?.event) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.event;
+};
+export const saveEvent = async (eventId: string, event: EventData): Promise<Event> => {
+    const payload = await requestJson<ApiEnvelope<Event>>(`/api/events/${eventId}`, {
+        method: 'PUT',
+        body: JSON.stringify(event),
+    });
+    if (!payload?.event) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.event;
+};
+export const deleteEvent = async (eventId: string): Promise<void> => {
+    await requestJson<null>(`/api/events/${eventId}`, {
+        method: 'DELETE',
+    });
 };
 export const listPlaces = async (): Promise<Place[]> => {
     const payload = await requestJson<ApiEnvelope<Place>>('/api/places');

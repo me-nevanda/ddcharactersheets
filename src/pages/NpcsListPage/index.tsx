@@ -17,7 +17,7 @@ const NpcListCard = ({ card }: { card: NpcListCardViewModel }) => {
   ].filter(Boolean).join(' ')
 
   return (
-    <article className={styles.npcCard} role="link" tabIndex={0} onClick={card.onOpen} onKeyDown={card.onKeyDown}>
+    <article className={`${styles.npcCard} ${card.isDead ? styles.npcCardDead : ''}`} role="link" tabIndex={0} onClick={card.onOpen} onKeyDown={card.onKeyDown}>
       <div className={styles.cardBody}>
         <div className={styles.npcImageFrame}>
           <img className={styles.npcImage} src={card.imageSrc} alt="" aria-hidden="true" />
@@ -72,7 +72,7 @@ const NpcGroupCard = ({ group }: { group: NpcGroupCardViewModel }) => {
         {group.npcThumbnails.length > 0 ? (
           <div className={styles.groupThumbnails}>
             {group.npcThumbnails.map((npc) => (
-              <div className={styles.groupThumbnailItem} key={`${group.id}-${npc.label}-${npc.imageSrc}`}>
+              <div className={`${styles.groupThumbnailItem} ${npc.isDead ? styles.groupThumbnailItemDead : ''}`} key={`${group.id}-${npc.id}`} role="link" tabIndex={0} onClick={npc.onOpen} onKeyDown={npc.onKeyDown}>
                 <span className={styles.groupThumbnailName} title={npc.label}>{npc.label}</span>
                 <img className={styles.groupThumbnail} src={npc.imageSrc} alt={npc.label} title={npc.label} />
               </div>

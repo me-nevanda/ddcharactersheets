@@ -135,7 +135,27 @@
   padding: 0.35rem;
   border: 1px solid var(--border-soft);
   border-radius: 0.55rem;
-  background: rgba(255, 248, 235, 0.03);
+  background: rgba(255, 248, 235, 0.16);
+  cursor: pointer;
+}
+
+.groupThumbnailItem:hover {
+  border-color: var(--border-strong);
+}
+
+.groupThumbnailItem:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+}
+
+.groupThumbnailItemDead {
+  background: rgba(220, 38, 38, 0.55);
+  border-color: rgba(220, 38, 38, 0.85);
+}
+
+.groupThumbnailItemDead:hover {
+  border-color: rgba(220, 38, 38, 0.9);
 }
 
 .groupThumbnailName {
@@ -347,6 +367,15 @@
   outline: 0;
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+}
+
+.npcCardDead {
+  background: rgba(220, 38, 38, 0.22);
+  border-color: rgba(220, 38, 38, 0.65);
+}
+
+.npcCardDead:hover {
+  border-color: rgba(220, 38, 38, 0.9);
 }
 
 .cardBody {

@@ -3,6 +3,7 @@ import { defineConfig, type Connect, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { createAdventure, isSafeAdventureId, listAdventures, readAdventure, updateAdventure } from './server/adventureStore';
 import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacterId, listCharacters, readCharacter, readCharacterImage, updateCharacter, updateCharacterImage, } from './server/characterStore';
+import { createEvent, deleteEvent, isSafeEventId, listEvents, readEvent, updateEvent } from './server/eventStore';
 import { countGeminiTokens, createGeminiResponse } from './server/geminiService';
 import { createMonsterGroup, deleteMonsterGroup, isSafeMonsterGroupId, listMonsterGroups, readMonsterGroup, updateMonsterGroup } from './server/monsterGroupStore';
 import { createMonster, deleteMonster, deleteMonsterImage, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
@@ -557,6 +558,76 @@ const createPlacesApiPlugin = (): Plugin => {
         },
     };
 };
+const createEventsApiPlugin = (): Plugin => {
+    const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
+        const url = new URL(request.url ?? '/', 'http://localhost');
+        if (!url.pathname.startsWith('/api/events')) {
+            next();
+            return;
+        }
+        try {
+            if (request.method === 'GET' && url.pathname === '/api/events') {
+                sendJson(response, 200, { events: await listEvents() });
+                return;
+            }
+            if (request.method === 'POST' && url.pathname === '/api/events') {
+                sendJson(response, 201, { event: await createEvent() });
+                return;
+            }
+            const match = url.pathname.match(/^\/api\/events\/([^/]+)$/);
+            if (match) {
+                const eventId = match[1];
+                if (!isSafeEventId(eventId)) {
+                    sendError(response, 400, 'errors.api.invalidEventId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    sendJson(response, 200, { event: await readEvent(eventId) });
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const payload = await readJsonBody(request);
+                    sendJson(response, 200, {
+                        event: await updateEvent(eventId, payload),
+                    });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    await deleteEvent(eventId);
+                    response.statusCode = 204;
+                    response.end();
+                    return;
+                }
+            }
+            sendError(response, 404, 'errors.api.notFound');
+        }
+        catch (error) {
+            const apiError = error as ApiError;
+            if (apiError.code === 'ENOENT') {
+                sendError(response, 404, 'errors.api.eventNotFound');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_JSON_BODY') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidJsonBody');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_EVENT_ID') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidEventId');
+                return;
+            }
+            sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');
+        }
+    };
+    return {
+        name: 'events-api',
+        configureServer(server) {
+            server.middlewares.use(handler);
+        },
+        configurePreviewServer(server) {
+            server.middlewares.use(handler);
+        },
+    };
+};
 const createGeminiApiPlugin = (): Plugin => {
     const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
         const url = new URL(request.url ?? '/', 'http://localhost');
@@ -621,7 +692,7 @@ const createGeminiApiPlugin = (): Plugin => {
     };
 };
 export default defineConfig({
-    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createNpcsApiPlugin(), createPlacesApiPlugin(), createGeminiApiPlugin()],
+    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createNpcsApiPlugin(), createPlacesApiPlugin(), createEventsApiPlugin(), createGeminiApiPlugin()],
     resolve: {
         alias: {
             '@pages': '/src/pages',

@@ -66,7 +66,7 @@ const MonsterGroupCard = ({ group }: { group: MonsterGroupCardViewModel }) => {
         {group.monsterThumbnails.length > 0 ? (
           <div className={styles.groupThumbnails}>
             {group.monsterThumbnails.map((monster) => (
-              <div className={styles.groupThumbnailItem} key={`${group.id}-${monster.label}-${monster.imageSrc}`}>
+              <div className={styles.groupThumbnailItem} key={`${group.id}-${monster.id}`} role="link" tabIndex={0} onClick={monster.onOpen} onKeyDown={monster.onKeyDown}>
                 <span className={styles.groupThumbnailName} title={monster.label}>{monster.label}</span>
                 <img className={styles.groupThumbnail} src={monster.imageSrc} alt={monster.label} title={monster.label} />
               </div>

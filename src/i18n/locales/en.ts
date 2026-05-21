@@ -48,6 +48,7 @@ export const en: TranslationDictionary = {
       invalidNpcGroupId: 'The NPC group ID is invalid.',
       invalidAdventureId: 'The adventure ID is invalid.',
       invalidPlaceId: 'The place ID is invalid.',
+      invalidEventId: 'The event ID is invalid.',
       invalidJsonBody: 'The request payload is invalid.',
       invalidCharacterImage: 'The hero image must be a PNG or JPG file.',
       invalidMonsterImage: 'The monster image must be a PNG or JPG file.',
@@ -66,6 +67,7 @@ export const en: TranslationDictionary = {
       npcNotFound: 'NPC not found.',
       adventureNotFound: 'Adventure not found.',
       placeNotFound: 'Place not found.',
+      eventNotFound: 'Event not found.',
       notFound: 'Resource not found.',
       unexpectedServerError: 'An unexpected server error occurred.',
     },
@@ -80,6 +82,7 @@ export const en: TranslationDictionary = {
         npcs: 'NPC',
         adventures: 'Adventures',
         places: 'Places',
+        events: 'Events',
       },
     },
     placeList: {
@@ -90,6 +93,31 @@ export const en: TranslationDictionary = {
       loading: 'Loading places...',
       unnamedPlace: 'Unnamed place',
       updatedAt: 'Last updated:',
+    },
+    eventList: {
+      actions: {
+        addEvent: 'Add event',
+      },
+      emptyState: 'There are no events yet. Add one to start editing.',
+      loading: 'Loading events...',
+      unnamedEvent: 'Unnamed event',
+      updatedAt: 'Last updated:',
+      deleteDialog: {
+        title: 'Delete this event?',
+        body: 'The event "{name}" will be deleted permanently.',
+      },
+    },
+    eventEdit: {
+      eyebrow: 'EVENT',
+      loading: 'Loading event...',
+      fields: {
+        name: 'Title',
+        description: 'Description',
+      },
+      placeholders: {
+        titleName: 'Unnamed event',
+        description: 'Event description',
+      },
     },
     placeEdit: {
       eyebrow: 'PLACE',
@@ -462,6 +490,7 @@ export const en: TranslationDictionary = {
         mediumDamage: 'Medium damage',
         highDamage: 'High damage',
         isStory: 'Story NPC',
+        isDead: 'Dead',
       },
       placeholders: {
         titleName: 'Nameless NPC',
@@ -837,6 +866,10 @@ export const en: TranslationDictionary = {
       sections: {
         stats: 'Level, speed, and HP',
         attacks: 'Attacks',
+        items: 'Items',
+        weapons: 'Weapons',
+        armors: 'Armors',
+        others: 'Others',
       },
     },
     npcPrint: {
@@ -849,6 +882,10 @@ export const en: TranslationDictionary = {
       sections: {
         stats: 'Level, speed, and HP',
         attacks: 'Attacks',
+        items: 'Items',
+        weapons: 'Weapons',
+        armors: 'Armors',
+        others: 'Others',
       },
     },
   },

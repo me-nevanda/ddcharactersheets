@@ -4,7 +4,21 @@ import { useI18n } from '@i18n/index'
 import { getMonster } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import type { Monster, MonsterAttackAreaType, MonsterDefenses } from '@appTypes/monster'
-import type { MonsterPrintAreaOption, MonsterPrintAttackRow, MonsterPrintPageState } from './types'
+import type { MonsterPrintAreaOption, MonsterPrintAttackRow, MonsterPrintItemRow, MonsterPrintPageState, PrintMonsterItemCategory } from './types'
+
+const buildItemRows = (
+  items: Array<{ id: string; name: string; description: string }>,
+  category: PrintMonsterItemCategory,
+): MonsterPrintItemRow[] => {
+  return items
+    .filter((item) => item.name.trim().length > 0 || item.description.trim().length > 0)
+    .map((item, index) => ({
+      key: item.id || `${item.name.trim() || 'item'}-${index}`,
+      name: item.name,
+      description: item.description,
+      category,
+    }))
+}
 
 const buildAreaOptions = (t: ReturnType<typeof useI18n>['t']): MonsterPrintAreaOption[] => {
   return [
@@ -97,6 +111,10 @@ export const useMonsterPrintPage = (): MonsterPrintPageState => {
         statRows: [],
         defenseRows: [],
         attackRows: [],
+        weapons: [],
+        armors: [],
+        others: [],
+        hasItems: false,
       }
     }
 
@@ -112,6 +130,10 @@ export const useMonsterPrintPage = (): MonsterPrintPageState => {
       value: String(monster.defenses[fieldName]),
     }))
 
+    const weapons = buildItemRows(monster.items.weapons, 'weapon')
+    const armors = buildItemRows(monster.items.armors, 'armor')
+    const others = buildItemRows(monster.items.others, 'other')
+
     return {
       monster,
       loading,
@@ -122,6 +144,10 @@ export const useMonsterPrintPage = (): MonsterPrintPageState => {
       statRows,
       defenseRows,
       attackRows: buildAttackRows(t, monster),
+      weapons,
+      armors,
+      others,
+      hasItems: weapons.length > 0 || armors.length > 0 || others.length > 0,
     }
   }, [error, loading, monster, t])
 }

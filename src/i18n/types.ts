@@ -47,6 +47,7 @@ export interface TranslationDictionary {
       invalidNpcGroupId: string
       invalidAdventureId: string
       invalidPlaceId: string
+      invalidEventId: string
       invalidJsonBody: string
       invalidCharacterImage: string
       invalidMonsterImage: string
@@ -65,6 +66,7 @@ export interface TranslationDictionary {
       npcNotFound: string
       adventureNotFound: string
       placeNotFound: string
+      eventNotFound: string
       notFound: string
       unexpectedServerError: string
     }
@@ -79,6 +81,7 @@ export interface TranslationDictionary {
         npcs: string
         adventures: string
         places: string
+        events: string
       }
     }
     placeList: {
@@ -89,6 +92,31 @@ export interface TranslationDictionary {
       loading: string
       unnamedPlace: string
       updatedAt: string
+    }
+    eventList: {
+      actions: {
+        addEvent: string
+      }
+      emptyState: string
+      loading: string
+      unnamedEvent: string
+      updatedAt: string
+      deleteDialog: {
+        title: string
+        body: string
+      }
+    }
+    eventEdit: {
+      eyebrow: string
+      loading: string
+      fields: {
+        name: string
+        description: string
+      }
+      placeholders: {
+        titleName: string
+        description: string
+      }
     }
     placeEdit: {
       eyebrow: string
@@ -463,6 +491,7 @@ export interface TranslationDictionary {
         mediumDamage: string
         highDamage: string
         isStory: string
+        isDead: string
       }
       placeholders: {
         titleName: string
@@ -839,6 +868,10 @@ export interface TranslationDictionary {
       sections: {
         stats: string
         attacks: string
+        items: string
+        weapons: string
+        armors: string
+        others: string
       }
     }
 
@@ -852,6 +885,10 @@ export interface TranslationDictionary {
       sections: {
         stats: string
         attacks: string
+        items: string
+        weapons: string
+        armors: string
+        others: string
       }
     }
   }

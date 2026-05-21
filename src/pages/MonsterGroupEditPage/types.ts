@@ -1,4 +1,4 @@
-import type { FormEventHandler, MouseEventHandler } from 'react'
+import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
 
 export interface MonsterGroupMonsterViewModel {
   descriptionPreview: string
@@ -11,6 +11,8 @@ export interface MonsterGroupMonsterViewModel {
   isSolo: boolean
   label: string
   level: number
+  onKeyDown: KeyboardEventHandler<HTMLElement>
+  onOpen: () => void
   roleLabel: string
   typeLabel: string
 }

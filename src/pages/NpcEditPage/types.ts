@@ -42,6 +42,7 @@ export interface NpcEditPageState {
   handleResistancesChange: (value: string) => void
   handleSpecialChange: (value: string) => void
   handleIsStoryToggle: (event: ChangeEvent<HTMLInputElement>) => void
+  handleIsDeadToggle: (event: ChangeEvent<HTMLInputElement>) => void
   handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
   imageUrl: string

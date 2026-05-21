@@ -10,7 +10,19 @@ const hasRichText = (value: string): boolean => {
 
 export const NpcPrintPage = () => {
   const { t } = useI18n()
-  const { npc, loading, error, title, npcName, statRows, defenseRows, attackRows } = useNpcPrintPage()
+  const { npc, loading, error, title, npcName, statRows, defenseRows, attackRows, weapons, armors, others, hasItems } = useNpcPrintPage()
+
+  const getItemIconName = (category: 'weapon' | 'armor' | 'other') => {
+    if (category === 'weapon') {
+      return 'sword'
+    }
+
+    if (category === 'armor') {
+      return 'shield'
+    }
+
+    return 'shirt'
+  }
 
   const getAttackTypeClass = (type: PrintNpcAttackType) => {
     if (type === 'standard') {
@@ -190,6 +202,7 @@ export const NpcPrintPage = () => {
                 ))}
               </div>
             </section>
+
           </div>
 
           <section className={`${styles.section} ${styles.attacksSection}`}>
@@ -197,6 +210,64 @@ export const NpcPrintPage = () => {
             {sortedAttacks.length > 0 ? <div className={styles.attackGrid}>{sortedAttacks.map(renderAttackCard)}</div> : <p className={styles.emptyState}>{t('pages.npcPrint.emptyAttacks')}</p>}
           </section>
         </div>
+
+        {hasItems ? (
+          <section className={`${styles.section} ${styles.itemsSection}`}>
+            <h2 className={styles.sectionTitle}>{t('pages.npcPrint.sections.items')}</h2>
+            <div className={styles.itemSectionStack}>
+              {weapons.length > 0 ? (
+                <div className={styles.itemSectionGroup}>
+                  <h3 className={styles.itemGroupTitle}>{t('pages.npcPrint.sections.weapons')}</h3>
+                  <div className={styles.itemGrid}>
+                    {weapons.map((item) => (
+                      <article key={item.key} className={styles.itemCard}>
+                        <h4 className={styles.itemName}>
+                          <AppIcon className={styles.itemIcon} name={getItemIconName(item.category)} />
+                          <span>{item.name}</span>
+                        </h4>
+                        {item.description ? <p className={styles.itemDescription}>{item.description}</p> : null}
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {armors.length > 0 ? (
+                <div className={styles.itemSectionGroup}>
+                  <h3 className={styles.itemGroupTitle}>{t('pages.npcPrint.sections.armors')}</h3>
+                  <div className={styles.itemGrid}>
+                    {armors.map((item) => (
+                      <article key={item.key} className={styles.itemCard}>
+                        <h4 className={styles.itemName}>
+                          <AppIcon className={styles.itemIcon} name={getItemIconName(item.category)} />
+                          <span>{item.name}</span>
+                        </h4>
+                        {item.description ? <p className={styles.itemDescription}>{item.description}</p> : null}
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {others.length > 0 ? (
+                <div className={styles.itemSectionGroup}>
+                  <h3 className={styles.itemGroupTitle}>{t('pages.npcPrint.sections.others')}</h3>
+                  <div className={styles.itemGrid}>
+                    {others.map((item) => (
+                      <article key={item.key} className={styles.itemCard}>
+                        <h4 className={styles.itemName}>
+                          <AppIcon className={styles.itemIcon} name={getItemIconName(item.category)} />
+                          <span>{item.name}</span>
+                        </h4>
+                        {item.description ? <p className={styles.itemDescription}>{item.description}</p> : null}
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
       </article>
     </main>
   )

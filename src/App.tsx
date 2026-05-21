@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { LanguageSwitcher } from '@components/LanguageSwitcher';
 import { AdventureEditPage } from '@pages/AdventureEditPage';
 import { CharacterEditPage } from '@pages/CharacterEditPage';
+import { EventEditPage } from '@pages/EventEditPage';
 import { MainPage } from '@pages/main';
 import { MainPageProvider } from '@pages/main/mainPageContext';
 import { MonsterEditPage } from '@pages/MonsterEditPage';
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/npcs/:npcId/edit" element={<NpcEditPage />}/>
           <Route path="/npc-groups/:groupId/edit" element={<NpcGroupEditPage />}/>
           <Route path="/places/:placeId/edit" element={<PlaceEditPage />}/>
+          <Route path="/events/:eventId/edit" element={<EventEditPage />}/>
           <Route path="/characters/:characterId/print/abilities" element={<CharacterAbilitiesPrintPage />}/>
           <Route path="/characters/:characterId/print/items" element={<CharacterItemsPrintPage />}/>
           <Route path="/characters/:characterId/print" element={<CharacterPrintPage />}/>

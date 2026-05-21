@@ -4,7 +4,21 @@ import { useI18n } from '@i18n/index'
 import { getNpc } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import type { Npc, NpcAttackAreaType, NpcDefenses } from '@appTypes/npc'
-import type { NpcPrintAreaOption, NpcPrintAttackRow, NpcPrintPageState } from './types'
+import type { NpcPrintAreaOption, NpcPrintAttackRow, NpcPrintItemRow, NpcPrintPageState, PrintNpcItemCategory } from './types'
+
+const buildItemRows = (
+  items: Array<{ id: string; name: string; description: string }>,
+  category: PrintNpcItemCategory,
+): NpcPrintItemRow[] => {
+  return items
+    .filter((item) => item.name.trim().length > 0 || item.description.trim().length > 0)
+    .map((item, index) => ({
+      key: item.id || `${item.name.trim() || 'item'}-${index}`,
+      name: item.name,
+      description: item.description,
+      category,
+    }))
+}
 
 const buildAreaOptions = (t: ReturnType<typeof useI18n>['t']): NpcPrintAreaOption[] => {
   return [
@@ -97,6 +111,10 @@ export const useNpcPrintPage = (): NpcPrintPageState => {
         statRows: [],
         defenseRows: [],
         attackRows: [],
+        weapons: [],
+        armors: [],
+        others: [],
+        hasItems: false,
       }
     }
 
@@ -112,6 +130,10 @@ export const useNpcPrintPage = (): NpcPrintPageState => {
       value: String(npc.defenses[fieldName]),
     }))
 
+    const weapons = buildItemRows(npc.items.weapons, 'weapon')
+    const armors = buildItemRows(npc.items.armors, 'armor')
+    const others = buildItemRows(npc.items.others, 'other')
+
     return {
       npc,
       loading,
@@ -122,6 +144,10 @@ export const useNpcPrintPage = (): NpcPrintPageState => {
       statRows,
       defenseRows,
       attackRows: buildAttackRows(t, npc),
+      weapons,
+      armors,
+      others,
+      hasItems: weapons.length > 0 || armors.length > 0 || others.length > 0,
     }
   }, [error, loading, npc, t])
 }

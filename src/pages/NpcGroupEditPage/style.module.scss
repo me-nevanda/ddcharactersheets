@@ -242,7 +242,27 @@
   padding: 0.75rem;
   border: 1px solid var(--border-soft);
   border-radius: 0.75rem;
-  background: rgba(255, 248, 235, 0.03);
+  background: rgba(255, 248, 235, 0.16);
+  cursor: pointer;
+}
+
+.npcPickerItem:hover {
+  border-color: var(--border-strong);
+}
+
+.npcPickerItem:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+}
+
+.npcPickerItemDead {
+  background: rgba(220, 38, 38, 0.22);
+  border-color: rgba(220, 38, 38, 0.65);
+}
+
+.npcPickerItemDead:hover {
+  border-color: rgba(220, 38, 38, 0.9);
 }
 
 .npcPickerImage {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getMonsterGroup, listMonsters, saveMonsterGroup } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
@@ -29,6 +29,7 @@ const buildTextPreview = (value: string): string => {
 const buildMonsterViewModel = (
   monster: Monster,
   t: ReturnType<typeof useI18n>['t'],
+  openMonster: (monsterId: string) => void,
 ): MonsterGroupMonsterViewModel => {
   return {
     descriptionPreview: buildTextPreview(monster.description),
@@ -41,6 +42,15 @@ const buildMonsterViewModel = (
     isSolo: monster.type === 'solo',
     label: monster.name.trim() || t('pages.monsterList.unnamedMonster'),
     level: monster.level,
+    onKeyDown: (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        openMonster(monster.id)
+      }
+    },
+    onOpen: () => {
+      openMonster(monster.id)
+    },
     roleLabel: t(`pages.monsterEdit.roleOptions.${monster.role}`),
     typeLabel: t(`pages.monsterEdit.typeOptions.${monster.type}`),
   }
@@ -48,6 +58,7 @@ const buildMonsterViewModel = (
 
 export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
   const { t } = useI18n()
+  const navigate = useNavigate()
   const { groupId = '' } = useParams()
   const [form, setForm] = useState<MonsterGroup>(emptyGroup)
   const [initialForm, setInitialForm] = useState<MonsterGroup>(emptyGroup)
@@ -148,13 +159,17 @@ export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
     }
   }
 
+  const openMonster = (monsterId: string) => {
+    navigate(`/monsters/${monsterId}/edit`)
+  }
+
   const assignedMonsterFileNames = new Set(form.monsterFileNames)
   const normalizedAssignedMonsterSearch = assignedMonsterSearch.trim().toLocaleLowerCase()
   const allAssignedMonsters: AssignedMonsterGroupMonsterViewModel[] = form.monsterFileNames
     .map((fileName) => monsters.find((monster) => getMonsterFileName(monster.id) === fileName))
     .filter((monster): monster is Monster => Boolean(monster))
     .map((monster) => ({
-      ...buildMonsterViewModel(monster, t),
+      ...buildMonsterViewModel(monster, t, openMonster),
       onRemoveClick: (event) => {
         event.stopPropagation()
         handleRemoveMonster(monster.id)
@@ -170,7 +185,7 @@ export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
     ? availableMonsters.filter((monster) => (monster.name.trim() || t('pages.monsterList.unnamedMonster')).toLocaleLowerCase().includes(normalizedMonsterSearch))
     : availableMonsters.slice(0, 8)
   const monsterOptions: MonsterGroupMonsterOptionViewModel[] = filteredMonsters.map((monster) => ({
-    ...buildMonsterViewModel(monster, t),
+    ...buildMonsterViewModel(monster, t, openMonster),
     onAddClick: (event) => {
       event.stopPropagation()
       handleAddMonster(monster.id)

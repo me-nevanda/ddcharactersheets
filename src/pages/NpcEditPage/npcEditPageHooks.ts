@@ -38,6 +38,7 @@ const emptyNpcForm: NpcData = {
   level: 1,
   speed: 6,
   isStory: false,
+  isDead: false,
 }
 
 const defenseFields = ['kp', 'fortitude', 'reflex', 'will'] as const satisfies readonly (keyof NpcDefenses)[]
@@ -255,6 +256,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
           level: npc.level,
           speed: npc.speed,
           isStory: npc.isStory === true,
+          isDead: npc.isDead === true,
         }
         if (!cancelled) {
           setForm(nextForm)
@@ -424,6 +426,14 @@ export const useNpcEditPage = (): NpcEditPageState => {
     setForm((current) => ({
       ...current,
       isStory: nextIsStory,
+    }))
+  }
+
+  const handleIsDeadToggle = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextIsDead = event.target.checked
+    setForm((current) => ({
+      ...current,
+      isDead: nextIsDead,
     }))
   }
 
@@ -649,6 +659,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
         level: form.level,
         speed: form.speed,
         isStory: form.isStory,
+        isDead: form.isDead,
       }
       await saveNpc(npcId, nextForm)
       setForm(nextForm)
@@ -683,6 +694,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
     handleResistancesChange,
     handleSpecialChange,
     handleIsStoryToggle,
+    handleIsDeadToggle,
     handleSubmit,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
     imageUrl,

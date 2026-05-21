@@ -71,6 +71,7 @@ export interface NpcData {
   level: number
   speed: number
   isStory: boolean
+  isDead: boolean
 }
 
 export interface Npc extends NpcData {

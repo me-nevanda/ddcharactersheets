@@ -27,7 +27,7 @@ const NpcRow = ({
   ].filter(Boolean).join(' ')
 
   return (
-    <article className={styles.npcPickerItem}>
+    <article className={`${styles.npcPickerItem} ${npc.isDead ? styles.npcPickerItemDead : ''}`} role="link" tabIndex={0} onClick={npc.onOpen} onKeyDown={npc.onKeyDown}>
       <img className={styles.npcPickerImage} src={npc.imageSrc} alt="" aria-hidden="true" />
       <div className={styles.npcPickerSummary}>
         <h3 className={nameClassName}>

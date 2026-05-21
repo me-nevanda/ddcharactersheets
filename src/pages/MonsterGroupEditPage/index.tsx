@@ -27,7 +27,7 @@ const MonsterRow = ({
   ].filter(Boolean).join(' ')
 
   return (
-    <article className={styles.monsterPickerItem}>
+    <article className={styles.monsterPickerItem} role="link" tabIndex={0} onClick={monster.onOpen} onKeyDown={monster.onKeyDown}>
       <img className={styles.monsterPickerImage} src={monster.imageSrc} alt="" aria-hidden="true" />
       <div className={styles.monsterPickerSummary}>
         <h3 className={nameClassName}>

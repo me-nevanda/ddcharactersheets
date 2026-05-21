@@ -2,6 +2,8 @@
 
 export type PrintNpcAttackType = NpcAttackType
 
+export type PrintNpcItemCategory = 'weapon' | 'armor' | 'other'
+
 export interface NpcPrintDetailRow {
   label: string
   value: string
@@ -14,6 +16,13 @@ export interface NpcPrintAttackRow extends NpcAttack {
   attackDisplay: string
 }
 
+export interface NpcPrintItemRow {
+  key: string
+  name: string
+  description: string
+  category: PrintNpcItemCategory
+}
+
 export interface NpcPrintPageState {
   npc: Npc | null
   loading: boolean
@@ -24,6 +33,10 @@ export interface NpcPrintPageState {
   statRows: NpcPrintDetailRow[]
   defenseRows: NpcPrintDetailRow[]
   attackRows: NpcPrintAttackRow[]
+  weapons: NpcPrintItemRow[]
+  armors: NpcPrintItemRow[]
+  others: NpcPrintItemRow[]
+  hasItems: boolean
 }
 
 export interface NpcPrintAreaOption {

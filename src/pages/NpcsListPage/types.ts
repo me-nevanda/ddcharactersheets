@@ -1,4 +1,4 @@
-﻿import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
+﻿import type { FormEventHandler, KeyboardEventHandler, MouseEvent, MouseEventHandler } from 'react'
 import type { Npc, NpcGroup } from '@appTypes/npc'
 import type { MainNpcListTabKey } from '@pages/main/types'
 
@@ -9,6 +9,7 @@ export interface NpcListCardViewModel {
   deleting: boolean
   id: string
   imageSrc: string
+  isDead: boolean
   isElite: boolean
   isMinion: boolean
   isNormal: boolean
@@ -37,8 +38,12 @@ export interface NpcGroupCardViewModel {
 }
 
 export interface NpcGroupThumbnailViewModel {
+  id: string
   imageSrc: string
+  isDead: boolean
   label: string
+  onKeyDown: KeyboardEventHandler<HTMLElement>
+  onOpen: (event: MouseEvent<HTMLElement>) => void
 }
 
 export interface CreateNpcGroupDialogProps {

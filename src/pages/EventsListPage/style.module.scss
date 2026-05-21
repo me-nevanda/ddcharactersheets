@@ -1,0 +1,126 @@
+@use '../../styles/mixins' as *;
+
+.status {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(243, 165, 165, 0.25);
+  background: rgba(122, 32, 32, 0.16);
+  color: #ffe1e1;
+  font-size: 0.92rem;
+}
+
+.emptyState {
+  @include surface-card;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.emptyText {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.eventGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 2.25rem;
+}
+
+.eventCard {
+  @include surface-card;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.95rem;
+  cursor: pointer;
+}
+
+.eventCard:hover {
+  border-color: var(--border-strong);
+}
+
+.eventCard:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+}
+
+.eventSummary {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.eventName {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 1.3rem;
+  line-height: 1.05;
+}
+
+.eventDescription {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0.35rem 0 0;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  font-style: italic;
+  line-height: 1.28;
+  text-overflow: ellipsis;
+}
+
+.cardActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.dangerButton {
+  @include pill-button;
+  min-height: 2.1rem;
+  min-width: 2.6rem;
+  padding: 0.45rem 0.65rem;
+  background: rgba(122, 32, 32, 0.18);
+  border-color: rgba(243, 165, 165, 0.3);
+  color: #ffe1e1;
+  font-size: 0.9rem;
+}
+
+.dangerButton:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.dangerButton:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  .eventGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cardActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dangerButton {
+    width: 100%;
+  }
+
+  .eventCard {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+}

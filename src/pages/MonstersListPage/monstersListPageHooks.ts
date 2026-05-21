@@ -221,8 +221,20 @@ export const useMonstersListPage = (): MonstersListPageState => {
       .filter((monster): monster is Monster => Boolean(monster))
       .slice(0, 4)
       .map((monster) => ({
+        id: monster.id,
         imageSrc: monster.imageUrl || '/favicon.png',
         label: monster.name.trim() || t('pages.monsterList.unnamedMonster'),
+        onKeyDown: (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            event.stopPropagation()
+            openMonster(monster.id)
+          }
+        },
+        onOpen: (event) => {
+          event.stopPropagation()
+          openMonster(monster.id)
+        },
       })),
     name: group.name,
     onDeleteClick: (event) => {

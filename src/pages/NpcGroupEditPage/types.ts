@@ -1,16 +1,19 @@
-﻿import type { FormEventHandler, MouseEventHandler } from 'react'
+﻿import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
 
 export interface NpcGroupNpcViewModel {
   descriptionPreview: string
   fileName: string
   id: string
   imageSrc: string
+  isDead: boolean
   isElite: boolean
   isMinion: boolean
   isNormal: boolean
   isSolo: boolean
   label: string
   level: number
+  onKeyDown: KeyboardEventHandler<HTMLElement>
+  onOpen: () => void
   roleLabel: string
   typeLabel: string
 }

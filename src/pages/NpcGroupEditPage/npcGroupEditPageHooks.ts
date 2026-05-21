@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getNpcGroup, listNpcs, saveNpcGroup } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
@@ -29,18 +29,29 @@ const buildTextPreview = (value: string): string => {
 const buildNpcViewModel = (
   npc: Npc,
   t: ReturnType<typeof useI18n>['t'],
+  openNpc: (npcId: string) => void,
 ): NpcGroupNpcViewModel => {
   return {
     descriptionPreview: buildTextPreview(npc.description),
     fileName: getNpcFileName(npc.id),
     id: npc.id,
     imageSrc: npc.imageUrl || '/favicon.png',
+    isDead: npc.isDead === true,
     isElite: npc.type === 'elite',
     isMinion: npc.type === 'minion',
     isNormal: npc.type === 'normal',
     isSolo: npc.type === 'solo',
     label: npc.name.trim() || t('pages.npcList.unnamedNpc'),
     level: npc.level,
+    onKeyDown: (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        openNpc(npc.id)
+      }
+    },
+    onOpen: () => {
+      openNpc(npc.id)
+    },
     roleLabel: t(`pages.npcEdit.roleOptions.${npc.role}`),
     typeLabel: t(`pages.npcEdit.typeOptions.${npc.type}`),
   }
@@ -48,6 +59,7 @@ const buildNpcViewModel = (
 
 export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
   const { t } = useI18n()
+  const navigate = useNavigate()
   const { groupId = '' } = useParams()
   const [form, setForm] = useState<NpcGroup>(emptyGroup)
   const [initialForm, setInitialForm] = useState<NpcGroup>(emptyGroup)
@@ -148,13 +160,17 @@ export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
     }
   }
 
+  const openNpc = (npcId: string) => {
+    navigate(`/npcs/${npcId}/edit`)
+  }
+
   const assignedNpcFileNames = new Set(form.npcFileNames)
   const normalizedAssignedNpcSearch = assignedNpcSearch.trim().toLocaleLowerCase()
   const allAssignedNpcs: AssignedNpcGroupNpcViewModel[] = form.npcFileNames
     .map((fileName) => npcs.find((npc) => getNpcFileName(npc.id) === fileName))
     .filter((npc): npc is Npc => Boolean(npc))
     .map((npc) => ({
-      ...buildNpcViewModel(npc, t),
+      ...buildNpcViewModel(npc, t, openNpc),
       onRemoveClick: (event) => {
         event.stopPropagation()
         handleRemoveNpc(npc.id)
@@ -170,7 +186,7 @@ export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
     ? availableNpcs.filter((npc) => (npc.name.trim() || t('pages.npcList.unnamedNpc')).toLocaleLowerCase().includes(normalizedNpcSearch))
     : availableNpcs.slice(0, 8)
   const npcOptions: NpcGroupNpcOptionViewModel[] = filteredNpcs.map((npc) => ({
-    ...buildNpcViewModel(npc, t),
+    ...buildNpcViewModel(npc, t, openNpc),
     onAddClick: (event) => {
       event.stopPropagation()
       handleAddNpc(npc.id)

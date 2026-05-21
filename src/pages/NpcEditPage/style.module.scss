@@ -372,6 +372,13 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
+.storyToggleGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .storyToggleRow {
   display: inline-flex;
   align-items: center;
