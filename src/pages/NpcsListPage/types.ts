@@ -1,7 +1,8 @@
 ﻿import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
 import type { Npc, NpcGroup } from '@appTypes/npc'
+import type { MainNpcListTabKey } from '@pages/main/types'
 
-export type NpcListTabKey = 'groups' | 'list'
+export type NpcListTabKey = MainNpcListTabKey
 
 export interface NpcListCardViewModel {
   descriptionPreview: string

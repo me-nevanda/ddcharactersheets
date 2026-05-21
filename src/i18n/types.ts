@@ -273,6 +273,11 @@ export interface TranslationDictionary {
       actions: {
         generateAttributes: string
       }
+      generateAttributesDialog: {
+        title: string
+        body: string
+        confirm: string
+      }
       attacks: {
         title: string
         emptyState: string
@@ -286,6 +291,8 @@ export interface TranslationDictionary {
           daily: string
         }
         attackLabel: string
+        attackSuggestion: string
+        damageSuggestion: string
         namePlaceholder: string
         descriptionPlaceholder: string
       }
@@ -364,6 +371,7 @@ export interface TranslationDictionary {
       }
       sections: {
         defenses: string
+        suggested: string
         description: string
         resistances: string
         special: string
@@ -374,6 +382,11 @@ export interface TranslationDictionary {
       }
       actions: {
         generateAttributes: string
+      }
+      generateAttributesDialog: {
+        title: string
+        body: string
+        confirm: string
       }
       attacks: {
         title: string
@@ -388,6 +401,8 @@ export interface TranslationDictionary {
           daily: string
         }
         attackLabel: string
+        attackSuggestion: string
+        damageSuggestion: string
         namePlaceholder: string
         descriptionPlaceholder: string
       }
@@ -433,6 +448,18 @@ export interface TranslationDictionary {
         hp: string
         level: string
         bloodied: string
+        attack: string
+        damage: string
+        vsKp: string
+        vsOtherDefenses: string
+        low: string
+        medium: string
+        high: string
+        attackVsKp: string
+        attackVsOtherDefenses: string
+        lowDamage: string
+        mediumDamage: string
+        highDamage: string
       }
       placeholders: {
         titleName: string

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { createMonster, createMonsterGroup, deleteMonster, deleteMonsterGroup, listMonsterGroups, listMonsters } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
+import { useMainPageContext } from '@pages/main/mainPageContext'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
 import type { MonsterGroupCardViewModel, MonsterListCardViewModel, MonsterListTabKey, MonstersListPageState } from './types'
 
@@ -20,6 +21,7 @@ const getMonsterFileName = (monsterId: string): string => {
 
 export const useMonstersListPage = (): MonstersListPageState => {
   const { t } = useI18n()
+  const { activeMonsterListTab, handleMonsterListTabChange } = useMainPageContext()
   const navigate = useNavigate()
   const [monsters, setMonsters] = useState<Monster[]>([])
   const [groups, setGroups] = useState<MonsterGroup[]>([])
@@ -31,7 +33,6 @@ export const useMonstersListPage = (): MonstersListPageState => {
   const [groupDeletingId, setGroupDeletingId] = useState('')
   const [monsterToDelete, setMonsterToDelete] = useState<Monster | null>(null)
   const [groupToDelete, setGroupToDelete] = useState<MonsterGroup | null>(null)
-  const [activeTab, setActiveTab] = useState<MonsterListTabKey>('groups')
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false)
   const [groupName, setGroupName] = useState('')
   const [error, setError] = useState('')
@@ -240,7 +241,7 @@ export const useMonstersListPage = (): MonstersListPageState => {
   }))
 
   return {
-    activeTab,
+    activeTab: activeMonsterListTab,
     cards,
     creating,
     creatingGroup,
@@ -264,7 +265,7 @@ export const useMonstersListPage = (): MonstersListPageState => {
     loading,
     loadingGroups,
     monsterToDelete,
-    setActiveTab,
+    setActiveTab: handleMonsterListTabChange as (tab: MonsterListTabKey) => void,
     showCreateGroupDialog,
     showEmptyState: !loading && cards.length === 0,
     showEmptyGroupsState: !loadingGroups && groupCards.length === 0,

@@ -6,8 +6,9 @@ import { getErrorMessage } from '@lib/errors'
 import { normalizeItems } from '@pages/CharacterEditPage/characterEditPageLogic'
 import { emptyArmor, emptyItems, emptyOtherItem, emptyWeapon } from '@pages/CharacterEditPage/characterEditPageUtils'
 import type { CharacterArmorBonusFieldName, CharacterItemBonusFieldName, CharacterWeaponDamageDiceType, CharacterWeaponFieldName } from '@appTypes/character'
-import type { NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcRole, NpcType } from '@appTypes/npc'
+import type { NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcRole, NpcSuggestedStats, NpcType } from '@appTypes/npc'
 import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/CharacterEditPage/types'
+import { useNpcAttributeGeneration } from './npcAttributeGenerationHooks'
 import type { NpcEditPageState } from './types'
 
 const emptyNpcForm: NpcData = {
@@ -26,12 +27,20 @@ const emptyNpcForm: NpcData = {
     reflex: 10,
     will: 10,
   },
+  suggested: {
+    attackVsKp: '',
+    attackVsOtherDefenses: '',
+    lowDamage: '',
+    mediumDamage: '',
+    highDamage: '',
+  },
   hp: 0,
   level: 1,
   speed: 6,
 }
 
 const defenseFields = ['kp', 'fortitude', 'reflex', 'will'] as const satisfies readonly (keyof NpcDefenses)[]
+const suggestedFields = ['attackVsKp', 'attackVsOtherDefenses', 'lowDamage', 'mediumDamage', 'highDamage'] as const satisfies readonly (keyof NpcSuggestedStats)[]
 const numericFields = ['hp', 'level', 'speed'] as const satisfies readonly (keyof Pick<NpcData, 'hp' | 'level' | 'speed'>)[]
 const npcRoles = ['skirmisher', 'brute', 'soldier', 'lurker', 'controller', 'artillery'] as const satisfies readonly NpcRole[]
 const npcTypes = ['minion', 'normal', 'solo', 'elite'] as const satisfies readonly NpcType[]
@@ -63,6 +72,10 @@ const npcAttackAreas = [
 
 const isDefenseField = (name: string): name is keyof NpcDefenses => {
   return defenseFields.includes(name as keyof NpcDefenses)
+}
+
+const isSuggestedField = (name: string): name is keyof NpcSuggestedStats => {
+  return suggestedFields.includes(name as keyof NpcSuggestedStats)
 }
 
 const isNumericField = (name: string): name is (typeof numericFields)[number] => {
@@ -101,6 +114,20 @@ const normalizeStatInputValue = (value: string): number => {
   return Math.min(999, Math.max(0, Math.trunc(parsedValue)))
 }
 
+const normalizeSuggestedInputValue = (value: string): string => {
+  return value
+}
+
+const normalizeSuggestedStats = (suggested: Partial<Record<keyof NpcSuggestedStats, unknown>> | undefined): NpcSuggestedStats => {
+  return {
+    attackVsKp: typeof suggested?.attackVsKp === 'string' ? normalizeSuggestedInputValue(suggested.attackVsKp) : '',
+    attackVsOtherDefenses: typeof suggested?.attackVsOtherDefenses === 'string' ? normalizeSuggestedInputValue(suggested.attackVsOtherDefenses) : '',
+    lowDamage: typeof suggested?.lowDamage === 'string' ? normalizeSuggestedInputValue(suggested.lowDamage) : '',
+    mediumDamage: typeof suggested?.mediumDamage === 'string' ? normalizeSuggestedInputValue(suggested.mediumDamage) : '',
+    highDamage: typeof suggested?.highDamage === 'string' ? normalizeSuggestedInputValue(suggested.highDamage) : '',
+  }
+}
+
 const normalizeLevelInputValue = (value: string): number => {
   const parsedValue = Number.parseInt(value, 10)
 
@@ -109,22 +136,6 @@ const normalizeLevelInputValue = (value: string): number => {
   }
 
   return Math.min(30, Math.max(1, Math.trunc(parsedValue)))
-}
-
-const buildGeneratedNpcAttributes = (level: number, type: NpcType): Pick<NpcData, 'defenses' | 'hp'> => {
-  const normalizedLevel = Math.min(30, Math.max(1, Math.trunc(level)))
-  const baseHp = 24 + normalizedLevel * 8
-  const hp = type === 'minion' ? 1 : type === 'solo' ? baseHp * 4 : type === 'elite' ? baseHp * 2 : baseHp
-
-  return {
-    defenses: {
-      kp: Math.min(50, 14 + normalizedLevel),
-      fortitude: Math.min(50, 12 + normalizedLevel),
-      reflex: Math.min(50, 12 + normalizedLevel),
-      will: Math.min(50, 12 + normalizedLevel),
-    },
-    hp,
-  }
 }
 
 const normalizeAttackRangeValue = (value: string | number): number => {
@@ -207,6 +218,7 @@ const normalizeNpcAttacks = (attacks: unknown): NpcAttack[] => {
 
 export const useNpcEditPage = (): NpcEditPageState => {
   const { t } = useI18n()
+  const { generateNpcAttributes } = useNpcAttributeGeneration()
   const { npcId = '' } = useParams()
   const [form, setForm] = useState<NpcData>(emptyNpcForm)
   const [initialForm, setInitialForm] = useState<NpcData>(emptyNpcForm)
@@ -216,6 +228,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
   const [saving, setSaving] = useState(false)
   const [removingImage, setRemovingImage] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [isGenerateAttributesDialogOpen, setGenerateAttributesDialogOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -234,6 +247,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
           attacks: normalizeNpcAttacks(npc.attacks),
           items: normalizeItems(npc.items),
           defenses: npc.defenses,
+          suggested: normalizeSuggestedStats(npc.suggested),
           hp: npc.hp,
           level: npc.level,
           speed: npc.speed,
@@ -271,6 +285,17 @@ export const useNpcEditPage = (): NpcEditPageState => {
         defenses: {
           ...current.defenses,
           [name]: normalizeDefenseInputValue(value),
+        },
+      }))
+      return
+    }
+
+    if (isSuggestedField(name)) {
+      setForm((current) => ({
+        ...current,
+        suggested: {
+          ...current.suggested,
+          [name]: normalizeSuggestedInputValue(value),
         },
       }))
       return
@@ -314,10 +339,19 @@ export const useNpcEditPage = (): NpcEditPageState => {
   }
 
   const handleGenerateAttributes = () => {
+    setGenerateAttributesDialogOpen(true)
+  }
+
+  const handleCancelGenerateAttributes = () => {
+    setGenerateAttributesDialogOpen(false)
+  }
+
+  const handleConfirmGenerateAttributes = () => {
     setForm((current) => ({
       ...current,
-      ...buildGeneratedNpcAttributes(current.level, current.type),
+      ...generateNpcAttributes(current.level, current.role, current.type),
     }))
+    setGenerateAttributesDialogOpen(false)
   }
 
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -581,6 +615,13 @@ export const useNpcEditPage = (): NpcEditPageState => {
         })),
         items: form.items,
         defenses: form.defenses,
+        suggested: {
+          attackVsKp: form.suggested.attackVsKp.trim(),
+          attackVsOtherDefenses: form.suggested.attackVsOtherDefenses.trim(),
+          lowDamage: form.suggested.lowDamage.trim(),
+          mediumDamage: form.suggested.mediumDamage.trim(),
+          highDamage: form.suggested.highDamage.trim(),
+        },
         hp: form.hp,
         level: form.level,
         speed: form.speed,
@@ -601,6 +642,8 @@ export const useNpcEditPage = (): NpcEditPageState => {
     handleAttackAdd,
     handleAttackChange,
     handleAttackRemove,
+    handleCancelGenerateAttributes,
+    handleConfirmGenerateAttributes,
     handleItemCreateEmpty,
     handleItemChange,
     handleItemBonusFieldChange,
@@ -618,6 +661,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
     handleSubmit,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
     imageUrl,
+    isGenerateAttributesDialogOpen,
     loading,
     removingImage,
     saving,

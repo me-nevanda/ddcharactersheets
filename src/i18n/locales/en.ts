@@ -273,6 +273,11 @@ export const en: TranslationDictionary = {
       actions: {
         generateAttributes: 'Generate attributes',
       },
+      generateAttributesDialog: {
+        title: 'Generate attributes?',
+        body: 'This will replace HP, defenses, and suggested attack and damage values for the current monster level, role, and type.',
+        confirm: 'Generate',
+      },
       attacks: {
         title: 'Attacks',
         emptyState: 'No attacks have been added yet.',
@@ -286,6 +291,8 @@ export const en: TranslationDictionary = {
           daily: 'Daily',
         },
         attackLabel: 'Attack',
+        attackSuggestion: 'Attack: vs AC: {attackVsKp}, vs other defenses {attackVsOtherDefenses}',
+        damageSuggestion: 'Low damage: {lowDamage}, medium: {mediumDamage}, high {highDamage}',
         namePlaceholder: 'e.g. Claws',
         descriptionPlaceholder: 'Attack effect description',
       },
@@ -363,6 +370,7 @@ export const en: TranslationDictionary = {
       },
       sections: {
         defenses: 'Defenses',
+        suggested: 'Suggested',
         description: 'Description',
         resistances: 'Resistances',
         special: 'Special',
@@ -373,6 +381,11 @@ export const en: TranslationDictionary = {
       },
       actions: {
         generateAttributes: 'Generate attributes',
+      },
+      generateAttributesDialog: {
+        title: 'Generate attributes?',
+        body: 'This will replace HP, defenses, and suggested attack and damage values for the current NPC level, role, and type.',
+        confirm: 'Generate',
       },
       attacks: {
         title: 'Attacks',
@@ -387,6 +400,8 @@ export const en: TranslationDictionary = {
           daily: 'Daily',
         },
         attackLabel: 'Attack',
+        attackSuggestion: 'Attack: vs AC: {attackVsKp}, vs other defenses {attackVsOtherDefenses}',
+        damageSuggestion: 'Low damage: {lowDamage}, medium: {mediumDamage}, high {highDamage}',
         namePlaceholder: 'e.g. Claws',
         descriptionPlaceholder: 'Attack effect description',
       },
@@ -432,6 +447,18 @@ export const en: TranslationDictionary = {
         hp: 'HP',
         level: 'Level',
         bloodied: 'Bloodied',
+        attack: 'Attack:',
+        damage: 'Dmg:',
+        vsKp: 'vs AC',
+        vsOtherDefenses: 'vs other defenses',
+        low: 'low',
+        medium: 'medium',
+        high: 'high',
+        attackVsKp: 'Attack vs AC',
+        attackVsOtherDefenses: 'Attack vs other defenses',
+        lowDamage: 'Low damage',
+        mediumDamage: 'Medium damage',
+        highDamage: 'High damage',
       },
       placeholders: {
         titleName: 'Nameless NPC',

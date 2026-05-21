@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { createNpc, createNpcGroup, deleteNpc, deleteNpcGroup, listNpcGroups, listNpcs } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
+import { useMainPageContext } from '@pages/main/mainPageContext'
 import type { Npc, NpcGroup } from '@appTypes/npc'
 import type { NpcGroupCardViewModel, NpcListCardViewModel, NpcListTabKey, NpcsListPageState } from './types'
 
@@ -20,6 +21,7 @@ const getNpcFileName = (npcId: string): string => {
 
 export const useNpcsListPage = (): NpcsListPageState => {
   const { t } = useI18n()
+  const { activeNpcListTab, handleNpcListTabChange } = useMainPageContext()
   const navigate = useNavigate()
   const [npcs, setNpcs] = useState<Npc[]>([])
   const [groups, setGroups] = useState<NpcGroup[]>([])
@@ -31,7 +33,6 @@ export const useNpcsListPage = (): NpcsListPageState => {
   const [groupDeletingId, setGroupDeletingId] = useState('')
   const [npcToDelete, setNpcToDelete] = useState<Npc | null>(null)
   const [groupToDelete, setGroupToDelete] = useState<NpcGroup | null>(null)
-  const [activeTab, setActiveTab] = useState<NpcListTabKey>('groups')
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false)
   const [groupName, setGroupName] = useState('')
   const [error, setError] = useState('')
@@ -240,7 +241,7 @@ export const useNpcsListPage = (): NpcsListPageState => {
   }))
 
   return {
-    activeTab,
+    activeTab: activeNpcListTab,
     cards,
     creating,
     creatingGroup,
@@ -264,7 +265,7 @@ export const useNpcsListPage = (): NpcsListPageState => {
     loading,
     loadingGroups,
     npcToDelete,
-    setActiveTab,
+    setActiveTab: handleNpcListTabChange as (tab: NpcListTabKey) => void,
     showCreateGroupDialog,
     showEmptyState: !loading && cards.length === 0,
     showEmptyGroupsState: !loadingGroups && groupCards.length === 0,

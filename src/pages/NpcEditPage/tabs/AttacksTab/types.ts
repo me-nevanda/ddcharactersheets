@@ -1,4 +1,4 @@
-﻿import type { NpcAttack, NpcAttackAreaType, NpcAttackType, NpcDefenses } from '@appTypes/npc'
+import type { NpcAttack, NpcAttackAreaType, NpcAttackType, NpcDefenses, NpcSuggestedStats } from '@appTypes/npc'
 
 export interface SelectOption<TValue extends string | number> {
   value: TValue
@@ -12,6 +12,7 @@ export interface VisibleNpcAttackEntry {
 
 export interface AttacksTabProps {
   attacks: NpcAttack[]
+  suggested: NpcSuggestedStats
   onAttackAdd: (type: NpcAttackType) => void
   onAttackChange: (index: number, fieldName: keyof NpcAttack, value: string | number) => void
   onAttackRemove: (index: number) => void
@@ -24,6 +25,7 @@ export interface AttackCardProps {
   defenseOptions: SelectOption<keyof NpcDefenses>[]
   getAttackHeaderClass: (type: NpcAttackType) => string
   index: number
+  suggested: NpcSuggestedStats
   onAttackChange: (index: number, fieldName: keyof NpcAttack, value: string | number) => void
   onAttackRemove: (index: number) => void
   t: (key: string, variables?: Record<string, string | number>) => string

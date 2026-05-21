@@ -1,7 +1,8 @@
 import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
+import type { MainMonsterListTabKey } from '@pages/main/types'
 
-export type MonsterListTabKey = 'groups' | 'list'
+export type MonsterListTabKey = MainMonsterListTabKey
 
 export interface MonsterListCardViewModel {
   descriptionPreview: string

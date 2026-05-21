@@ -8,6 +8,7 @@ import { emptyArmor, emptyItems, emptyOtherItem, emptyWeapon } from '@pages/Char
 import type { CharacterArmorBonusFieldName, CharacterItemBonusFieldName, CharacterWeaponDamageDiceType, CharacterWeaponFieldName } from '@appTypes/character'
 import type { MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '@appTypes/monster'
 import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/CharacterEditPage/types'
+import { useMonsterAttributeGeneration } from './monsterAttributeGenerationHooks'
 import type { MonsterEditPageState } from './types'
 
 const emptyMonsterForm: MonsterData = {
@@ -137,22 +138,6 @@ const normalizeLevelInputValue = (value: string): number => {
   return Math.min(30, Math.max(1, Math.trunc(parsedValue)))
 }
 
-const buildGeneratedMonsterAttributes = (level: number, type: MonsterType): Pick<MonsterData, 'defenses' | 'hp'> => {
-  const normalizedLevel = Math.min(30, Math.max(1, Math.trunc(level)))
-  const baseHp = 24 + normalizedLevel * 8
-  const hp = type === 'minion' ? 1 : type === 'solo' ? baseHp * 4 : type === 'elite' ? baseHp * 2 : baseHp
-
-  return {
-    defenses: {
-      kp: Math.min(50, 14 + normalizedLevel),
-      fortitude: Math.min(50, 12 + normalizedLevel),
-      reflex: Math.min(50, 12 + normalizedLevel),
-      will: Math.min(50, 12 + normalizedLevel),
-    },
-    hp,
-  }
-}
-
 const normalizeAttackRangeValue = (value: string | number): number => {
   const parsedValue = typeof value === 'number' ? value : Number.parseInt(value, 10)
 
@@ -233,6 +218,7 @@ const normalizeMonsterAttacks = (attacks: unknown): MonsterAttack[] => {
 
 export const useMonsterEditPage = (): MonsterEditPageState => {
   const { t } = useI18n()
+  const { generateMonsterAttributes } = useMonsterAttributeGeneration()
   const { monsterId = '' } = useParams()
   const [form, setForm] = useState<MonsterData>(emptyMonsterForm)
   const [initialForm, setInitialForm] = useState<MonsterData>(emptyMonsterForm)
@@ -242,6 +228,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
   const [saving, setSaving] = useState(false)
   const [removingImage, setRemovingImage] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [isGenerateAttributesDialogOpen, setGenerateAttributesDialogOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -352,10 +339,19 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
   }
 
   const handleGenerateAttributes = () => {
+    setGenerateAttributesDialogOpen(true)
+  }
+
+  const handleCancelGenerateAttributes = () => {
+    setGenerateAttributesDialogOpen(false)
+  }
+
+  const handleConfirmGenerateAttributes = () => {
     setForm((current) => ({
       ...current,
-      ...buildGeneratedMonsterAttributes(current.level, current.type),
+      ...generateMonsterAttributes(current.level, current.role, current.type),
     }))
+    setGenerateAttributesDialogOpen(false)
   }
 
   const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -646,6 +642,8 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     handleAttackAdd,
     handleAttackChange,
     handleAttackRemove,
+    handleCancelGenerateAttributes,
+    handleConfirmGenerateAttributes,
     handleItemCreateEmpty,
     handleItemChange,
     handleItemBonusFieldChange,
@@ -663,6 +661,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     handleSubmit,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
     imageUrl,
+    isGenerateAttributesDialogOpen,
     loading,
     removingImage,
     saving,

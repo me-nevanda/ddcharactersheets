@@ -11,6 +11,8 @@ export interface NpcEditPageState {
   handleAttackAdd: (type: NpcAttackType) => void
   handleAttackChange: (index: number, fieldName: keyof NpcAttack, value: string | number) => void
   handleAttackRemove: (index: number) => void
+  handleCancelGenerateAttributes: () => void
+  handleConfirmGenerateAttributes: () => void
   handleItemCreateEmpty: (group: CharacterItemGroupKey) => void
   handleItemChange: (
     group: CharacterItemGroupKey,
@@ -42,6 +44,7 @@ export interface NpcEditPageState {
   handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
   imageUrl: string
+  isGenerateAttributesDialogOpen: boolean
   loading: boolean
   saving: boolean
   removingImage: boolean

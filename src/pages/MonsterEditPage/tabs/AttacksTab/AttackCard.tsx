@@ -3,7 +3,19 @@ import { SimpleWysiwygEditor } from '@components/SimpleWysiwygEditor'
 import styles from '../../style.module.scss'
 import type { AttackCardProps } from './types'
 
-export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOptions, getAttackHeaderClass, index, onAttackChange, onAttackRemove, t }: AttackCardProps) => {
+const formatSuggestedValue = (value: string): string => {
+  return value.trim()
+}
+
+export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOptions, getAttackHeaderClass, index, suggested, onAttackChange, onAttackRemove, t }: AttackCardProps) => {
+  const attackVsKp = formatSuggestedValue(suggested.attackVsKp)
+  const attackVsOtherDefenses = formatSuggestedValue(suggested.attackVsOtherDefenses)
+  const lowDamage = formatSuggestedValue(suggested.lowDamage)
+  const mediumDamage = formatSuggestedValue(suggested.mediumDamage)
+  const highDamage = formatSuggestedValue(suggested.highDamage)
+  const showAttackSuggestion = attackVsKp || attackVsOtherDefenses
+  const showDamageSuggestion = lowDamage || mediumDamage || highDamage
+
   return (
     <article className={styles.attackCard}>
       <div className={`${styles.attackCardHeader} ${getAttackHeaderClass(attack.type)}`}>
@@ -52,6 +64,18 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
 
       <div className={styles.attackField}>
         <div className={styles.divider} data-label={t('pages.monsterEdit.attacks.attackLabel')} />
+        {showAttackSuggestion ? (
+          <p className={styles.attackSuggestion}>
+            <span className={styles.attackSuggestionLabel}>{t('pages.monsterEdit.fields.attack')}</span>
+            {attackVsKp ? (
+              <span>{t('pages.monsterEdit.fields.vsKp')}: {attackVsKp}</span>
+            ) : null}
+            {attackVsKp && attackVsOtherDefenses ? <span>,</span> : null}
+            {attackVsOtherDefenses ? (
+              <span>{t('pages.monsterEdit.fields.vsOtherDefenses')}: {attackVsOtherDefenses}</span>
+            ) : null}
+          </p>
+        ) : null}
         <div className={styles.attackTargetRow}>
           <label className={styles.attackInlineField} htmlFor={`monster-attack-bonus-${index}`}>
             <span className={styles.srOnly}>{t('pages.characterEdit.abilities.weaponAttackBonusLabel')}</span>
@@ -81,6 +105,22 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
 
       <div className={styles.attackField}>
         <div className={styles.divider} data-label={t('pages.characterEdit.abilities.descriptionLabel')} />
+        {showDamageSuggestion ? (
+          <p className={styles.attackSuggestion}>
+            <span className={styles.attackSuggestionLabel}>{t('pages.monsterEdit.fields.damage')}</span>
+            {lowDamage ? (
+              <span>{t('pages.monsterEdit.fields.low')}: {lowDamage}</span>
+            ) : null}
+            {lowDamage && (mediumDamage || highDamage) ? <span>,</span> : null}
+            {mediumDamage ? (
+              <span>{t('pages.monsterEdit.fields.medium')}: {mediumDamage}</span>
+            ) : null}
+            {mediumDamage && highDamage ? <span>,</span> : null}
+            {highDamage ? (
+              <span>{t('pages.monsterEdit.fields.high')} {highDamage}</span>
+            ) : null}
+          </p>
+        ) : null}
         <SimpleWysiwygEditor ariaLabel={t('pages.characterEdit.abilities.descriptionLabel')} minHeightClassName={styles.attackTextarea} name={`monster-attack-description-${index}`} placeholder={t('pages.monsterEdit.attacks.descriptionPlaceholder')} toolbar={false} value={attack.description} onChange={(value) => onAttackChange(index, 'description', value)} />
       </div>
     </article>

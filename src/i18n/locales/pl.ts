@@ -273,6 +273,11 @@ export const pl: TranslationDictionary = {
       actions: {
         generateAttributes: 'Wygeneruj atrybuty',
       },
+      generateAttributesDialog: {
+        title: 'Wygenerować atrybuty?',
+        body: 'Ta akcja nadpisze HP, obrony i sugerowane wartości ataku oraz obrażeń dla aktualnego poziomu, roli i typu potwora.',
+        confirm: 'Wygeneruj',
+      },
       attacks: {
         title: 'Ataki',
         emptyState: 'Nie dodano jeszcze żadnego ataku.',
@@ -286,6 +291,8 @@ export const pl: TranslationDictionary = {
           daily: 'Dzienny',
         },
         attackLabel: 'Atak',
+        attackSuggestion: 'Atak: vs KP: {attackVsKp}, vs inne obrony {attackVsOtherDefenses}',
+        damageSuggestion: 'Obrażenia niskie: {lowDamage}, średnie: {mediumDamage}, wysokie {highDamage}',
         namePlaceholder: 'Np. Pazury',
         descriptionPlaceholder: 'Opis działania ataku',
       },
@@ -363,6 +370,7 @@ export const pl: TranslationDictionary = {
       },
       sections: {
         defenses: 'Obrony',
+        suggested: 'Sugerowane',
         description: 'Opis',
         resistances: 'Odporności',
         special: 'Specjalne',
@@ -373,6 +381,11 @@ export const pl: TranslationDictionary = {
       },
       actions: {
         generateAttributes: 'Wygeneruj atrybuty',
+      },
+      generateAttributesDialog: {
+        title: 'Wygenerować atrybuty?',
+        body: 'Ta akcja nadpisze HP, obrony i sugerowane wartości ataku oraz obrażeń dla aktualnego poziomu, roli i typu NPC.',
+        confirm: 'Wygeneruj',
       },
       attacks: {
         title: 'Ataki',
@@ -387,6 +400,8 @@ export const pl: TranslationDictionary = {
           daily: 'Dzienny',
         },
         attackLabel: 'Atak',
+        attackSuggestion: 'Atak: vs KP: {attackVsKp}, vs inne obrony {attackVsOtherDefenses}',
+        damageSuggestion: 'Obrażenia niskie: {lowDamage}, średnie: {mediumDamage}, wysokie {highDamage}',
         namePlaceholder: 'Np. Pazury',
         descriptionPlaceholder: 'Opis działania ataku',
       },
@@ -432,6 +447,18 @@ export const pl: TranslationDictionary = {
         hp: 'HP',
         level: 'Poziom',
         bloodied: 'Krwawi',
+        attack: 'Atak:',
+        damage: 'Obr.:',
+        vsKp: 'vs KP',
+        vsOtherDefenses: 'vs inne obrony',
+        low: 'niskie',
+        medium: 'średnie',
+        high: 'wysokie',
+        attackVsKp: 'Atak vs KP',
+        attackVsOtherDefenses: 'Atak vs inne obrony',
+        lowDamage: 'Obrażenia niskie',
+        mediumDamage: 'Obrażenia średnie',
+        highDamage: 'Obrażenia wysokie',
       },
       placeholders: {
         titleName: 'Bezimienny NPC',

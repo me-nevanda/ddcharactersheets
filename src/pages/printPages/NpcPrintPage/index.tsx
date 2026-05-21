@@ -144,11 +144,11 @@ export const NpcPrintPage = () => {
         <div className={styles.contentGrid}>
           <div className={styles.leftColumn}>
             <section className={`${styles.section} ${styles.descriptionSection}`}>
+              <h2 className={styles.sectionTitle}>{t('pages.npcEdit.sections.description')}</h2>
               <div className={styles.descriptionCopy}>
-                <h2 className={styles.sectionTitle}>{t('pages.npcEdit.sections.description')}</h2>
+                {npc.imageUrl ? <img className={styles.npcImage} src={npc.imageUrl} alt={t('pages.npcEdit.fields.image')} /> : null}
                 {hasRichText(npc.description) ? <div className={styles.richText} dangerouslySetInnerHTML={{ __html: npc.description }} /> : null}
               </div>
-              {npc.imageUrl ? <img className={styles.npcImage} src={npc.imageUrl} alt={t('pages.npcEdit.fields.image')} /> : null}
             </section>
 
             {hasResistances ? (

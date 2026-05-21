@@ -7,6 +7,14 @@ export interface NpcDefenses {
   will: number
 }
 
+export interface NpcSuggestedStats {
+  attackVsKp: string
+  attackVsOtherDefenses: string
+  lowDamage: string
+  mediumDamage: string
+  highDamage: string
+}
+
 export type NpcType = 'minion' | 'normal' | 'solo' | 'elite'
 export type NpcRole = 'skirmisher' | 'brute' | 'soldier' | 'lurker' | 'controller' | 'artillery'
 export type NpcAttackAction = 'action' | 'noAction'
@@ -57,6 +65,7 @@ export interface NpcData {
   attacks: NpcAttack[]
   items: CharacterItems
   defenses: NpcDefenses
+  suggested: NpcSuggestedStats
   hp: number
   level: number
   speed: number

@@ -2,7 +2,7 @@
 import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
-import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcRole, NpcType } from '../src/types/npc'
+import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcRole, NpcSuggestedStats, NpcType } from '../src/types/npc'
 
 interface ApiError extends Error {
   code?: string
@@ -65,6 +65,10 @@ const normalizeStatValue = (value: unknown, fallback: number): number => {
   }
 
   return Math.min(999, Math.max(0, Math.trunc(value)))
+}
+
+const normalizeSuggestedStatValue = (value: unknown): string => {
+  return typeof value === 'string' ? value.trim() : ''
 }
 
 const normalizeUniqueId = (value: unknown): string => {
@@ -163,6 +167,16 @@ const normalizeDefenses = (data: Partial<Record<keyof NpcDefenses, unknown>> = {
     fortitude: normalizeDefenseValue(data.fortitude),
     reflex: normalizeDefenseValue(data.reflex),
     will: normalizeDefenseValue(data.will),
+  }
+}
+
+const normalizeSuggestedStats = (data: Partial<Record<keyof NpcSuggestedStats, unknown>> = {}): NpcSuggestedStats => {
+  return {
+    attackVsKp: normalizeSuggestedStatValue(data.attackVsKp),
+    attackVsOtherDefenses: normalizeSuggestedStatValue(data.attackVsOtherDefenses),
+    lowDamage: normalizeSuggestedStatValue(data.lowDamage),
+    mediumDamage: normalizeSuggestedStatValue(data.mediumDamage),
+    highDamage: normalizeSuggestedStatValue(data.highDamage),
   }
 }
 
@@ -312,6 +326,10 @@ const normalizeNpc = (data: Partial<Record<keyof NpcData, unknown>> = {}): NpcDa
       typeof data.defenses === 'object' && data.defenses !== null
         ? normalizeDefenses(data.defenses as Partial<Record<keyof NpcDefenses, unknown>>)
         : normalizeDefenses(),
+    suggested:
+      typeof data.suggested === 'object' && data.suggested !== null
+        ? normalizeSuggestedStats(data.suggested as Partial<Record<keyof NpcSuggestedStats, unknown>>)
+        : normalizeSuggestedStats(),
     hp: normalizeStatValue(data.hp, 0),
     level: normalizeLevelValue(data.level),
     speed: normalizeStatValue(data.speed, 6),

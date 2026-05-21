@@ -1,4 +1,4 @@
-import type { MonsterAttack, MonsterAttackAreaType, MonsterAttackType, MonsterDefenses } from '@appTypes/monster'
+import type { MonsterAttack, MonsterAttackAreaType, MonsterAttackType, MonsterDefenses, MonsterSuggestedStats } from '@appTypes/monster'
 
 export interface SelectOption<TValue extends string | number> {
   value: TValue
@@ -12,6 +12,7 @@ export interface VisibleMonsterAttackEntry {
 
 export interface AttacksTabProps {
   attacks: MonsterAttack[]
+  suggested: MonsterSuggestedStats
   onAttackAdd: (type: MonsterAttackType) => void
   onAttackChange: (index: number, fieldName: keyof MonsterAttack, value: string | number) => void
   onAttackRemove: (index: number) => void
@@ -24,6 +25,7 @@ export interface AttackCardProps {
   defenseOptions: SelectOption<keyof MonsterDefenses>[]
   getAttackHeaderClass: (type: MonsterAttackType) => string
   index: number
+  suggested: MonsterSuggestedStats
   onAttackChange: (index: number, fieldName: keyof MonsterAttack, value: string | number) => void
   onAttackRemove: (index: number) => void
   t: (key: string, variables?: Record<string, string | number>) => string

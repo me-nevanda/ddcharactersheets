@@ -15,7 +15,7 @@ export const NpcEditPage = () => {
   const { t } = useI18n()
   const navigate = useNavigate()
   const { handleTabChange } = useMainPageContext()
-  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleChange, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, loading, removingImage, saving, uploadingImage } = useNpcEditPage()
+  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useNpcEditPage()
   const [activeTab, setActiveTab] = useState<NpcEditTabKey>('general')
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
   const bloodiedValue = Math.floor(form.hp / 2)
@@ -181,6 +181,41 @@ export const NpcEditPage = () => {
                         </label>
                       </div>
                     </section>
+
+                    <section className={styles.section}>
+                      <div className={styles.sectionHeader}>
+                        <h2 className={styles.sectionTitle}>{t('pages.npcEdit.sections.suggested')}</h2>
+                      </div>
+
+                      <div className={styles.suggestedGrid}>
+                        <div className={styles.suggestedRow}>
+                          <span className={styles.suggestedRowLabel}>{t('pages.npcEdit.fields.attack')}</span>
+                          <label className={styles.suggestedInlineField} htmlFor="attackVsKp">
+                            <span className={styles.defenseLabel}>{t('pages.npcEdit.fields.vsKp')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="attackVsKp" name="attackVsKp" type="text" value={form.suggested.attackVsKp} onChange={handleChange} />
+                          </label>
+                          <label className={styles.suggestedInlineField} htmlFor="attackVsOtherDefenses">
+                            <span className={styles.defenseLabel}>{t('pages.npcEdit.fields.vsOtherDefenses')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="attackVsOtherDefenses" name="attackVsOtherDefenses" type="text" value={form.suggested.attackVsOtherDefenses} onChange={handleChange} />
+                          </label>
+                        </div>
+                        <div className={styles.suggestedRow}>
+                          <span className={styles.suggestedRowLabel}>{t('pages.npcEdit.fields.damage')}</span>
+                          <label className={styles.suggestedInlineField} htmlFor="lowDamage">
+                            <span className={styles.defenseLabel}>{t('pages.npcEdit.fields.low')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="lowDamage" name="lowDamage" type="text" value={form.suggested.lowDamage} onChange={handleChange} />
+                          </label>
+                          <label className={styles.suggestedInlineField} htmlFor="mediumDamage">
+                            <span className={styles.defenseLabel}>{t('pages.npcEdit.fields.medium')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="mediumDamage" name="mediumDamage" type="text" value={form.suggested.mediumDamage} onChange={handleChange} />
+                          </label>
+                          <label className={styles.suggestedInlineField} htmlFor="highDamage">
+                            <span className={styles.defenseLabel}>{t('pages.npcEdit.fields.high')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="highDamage" name="highDamage" type="text" value={form.suggested.highDamage} onChange={handleChange} />
+                          </label>
+                        </div>
+                      </div>
+                    </section>
                   </div>
 
                   <div className={styles.rightColumn}>
@@ -215,12 +250,32 @@ export const NpcEditPage = () => {
                     </section>
                   </div>
                 </div> : null}
-                {activeTab === 'attacks' ? <AttacksTab attacks={form.attacks} onAttackAdd={handleAttackAdd} onAttackChange={handleAttackChange} onAttackRemove={handleAttackRemove} /> : null}
+                {activeTab === 'attacks' ? <AttacksTab attacks={form.attacks} suggested={form.suggested} onAttackAdd={handleAttackAdd} onAttackChange={handleAttackChange} onAttackRemove={handleAttackRemove} /> : null}
                 {activeTab === 'loot' ? <LootTab items={form.items} onArmorBonusChange={handleArmorBonusChange} onItemBonusFieldChange={handleItemBonusFieldChange} onItemChange={handleItemChange} onItemCreateEmpty={handleItemCreateEmpty} onItemRemove={handleItemRemove} onWeaponDamageChange={handleWeaponDamageChange} /> : null}
               </div>
             </div>
           </form>
         )}
+        {isGenerateAttributesDialogOpen ? (
+          <div className={styles.deleteBackdrop} role="presentation">
+            <div className={styles.deleteDialog} role="dialog" aria-modal="true" aria-labelledby="generate-attributes-title">
+              <h2 className={styles.deleteDialogTitle} id="generate-attributes-title">
+                {t('pages.npcEdit.generateAttributesDialog.title')}
+              </h2>
+              <p className={styles.deleteDialogText}>
+                {t('pages.npcEdit.generateAttributesDialog.body')}
+              </p>
+              <div className={styles.deleteDialogActions}>
+                <button className={styles.deleteDialogSecondaryButton} type="button" onClick={handleCancelGenerateAttributes}>
+                  {t('common.actions.cancel')}
+                </button>
+                <button className={styles.deleteDialogDangerButton} type="button" onClick={handleConfirmGenerateAttributes}>
+                  {t('pages.npcEdit.generateAttributesDialog.confirm')}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
         <UnsavedChangesDialog open={isUnsavedChangesDialogOpen} onCancel={() => setUnsavedChangesDialogOpen(false)} onConfirm={handleConfirmBackToList} />
       </section>
     </main>

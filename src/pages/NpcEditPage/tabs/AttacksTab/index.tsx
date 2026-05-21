@@ -36,7 +36,7 @@ export const AttacksTab = (props: AttacksTabProps) => {
         {visibleAttacks.length > 0 ? (
           <div className={styles.attackGrid}>
             {visibleAttacks.map(({ attack, index }) => (
-              <AttackCard key={attack.id} attack={attack} attackBonusOptions={attackBonusOptions} areaOptions={areaOptions} defenseOptions={defenseOptions} getAttackHeaderClass={getAttackHeaderClass} index={index} onAttackChange={onAttackChange} onAttackRemove={onAttackRemove} t={t} />
+              <AttackCard key={attack.id} attack={attack} attackBonusOptions={attackBonusOptions} areaOptions={areaOptions} defenseOptions={defenseOptions} getAttackHeaderClass={getAttackHeaderClass} index={index} suggested={props.suggested} onAttackChange={onAttackChange} onAttackRemove={onAttackRemove} t={t} />
             ))}
           </div>
         ) : null}
