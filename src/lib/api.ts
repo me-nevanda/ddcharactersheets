@@ -1,6 +1,7 @@
-import type { Adventure, AdventureData } from '@appTypes/adventure';
+﻿import type { Adventure, AdventureData } from '@appTypes/adventure';
 import type { Character, CharacterData } from '@appTypes/character';
 import type { Monster, MonsterData, MonsterGroup } from '@appTypes/monster';
+import type { Npc, NpcData, NpcGroup } from '@appTypes/npc';
 import type { Place, PlaceData } from '@appTypes/place';
 interface ApiEnvelope<T> {
     adventure?: T;
@@ -11,6 +12,10 @@ interface ApiEnvelope<T> {
     monsters?: T[];
     monsterGroup?: T;
     monsterGroups?: T[];
+    npc?: T;
+    npcs?: T[];
+    npcGroup?: T;
+    npcGroups?: T[];
     place?: T;
     places?: T[];
     response?: T;
@@ -251,6 +256,109 @@ export const deleteMonsterImage = async (monsterId: string): Promise<Monster> =>
         throw new Error('errors.api.generic');
     }
     return payload.monster;
+};
+export const listNpcs = async (): Promise<Npc[]> => {
+    const payload = await requestJson<ApiEnvelope<Npc>>('/api/npcs');
+    return payload?.npcs ?? [];
+};
+export const listNpcGroups = async (): Promise<NpcGroup[]> => {
+    const payload = await requestJson<ApiEnvelope<NpcGroup>>('/api/npc-groups');
+    return payload?.npcGroups ?? [];
+};
+export const createNpcGroup = async (name: string): Promise<NpcGroup> => {
+    const payload = await requestJson<ApiEnvelope<NpcGroup>>('/api/npc-groups', {
+        method: 'POST',
+        body: JSON.stringify({ name }),
+    });
+    if (!payload?.npcGroup) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.npcGroup;
+};
+export const getNpcGroup = async (groupId: string): Promise<NpcGroup> => {
+    const payload = await requestJson<ApiEnvelope<NpcGroup>>(`/api/npc-groups/${groupId}`);
+    if (!payload?.npcGroup) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.npcGroup;
+};
+export const saveNpcGroup = async (groupId: string, npcGroup: NpcGroup): Promise<NpcGroup> => {
+    const payload = await requestJson<ApiEnvelope<NpcGroup>>(`/api/npc-groups/${groupId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            uniqueId: npcGroup.uniqueId,
+            name: npcGroup.name,
+            npcFileNames: npcGroup.npcFileNames,
+        }),
+    });
+    if (!payload?.npcGroup) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.npcGroup;
+};
+export const deleteNpcGroup = async (groupId: string): Promise<void> => {
+    await requestJson<null>(`/api/npc-groups/${groupId}`, {
+        method: 'DELETE',
+    });
+};
+export const createNpc = async (): Promise<Npc> => {
+    const payload = await requestJson<ApiEnvelope<Npc>>('/api/npcs', {
+        method: 'POST',
+    });
+    if (!payload?.npc) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.npc;
+};
+export const getNpc = async (npcId: string): Promise<Npc> => {
+    const payload = await requestJson<ApiEnvelope<Npc>>(`/api/npcs/${npcId}`);
+    if (!payload?.npc) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.npc;
+};
+export const saveNpc = async (npcId: string, npc: NpcData): Promise<Npc> => {
+    const payload = await requestJson<ApiEnvelope<Npc>>(`/api/npcs/${npcId}`, {
+        method: 'PUT',
+        body: JSON.stringify(npc),
+    });
+    if (!payload?.npc) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.npc;
+};
+export const deleteNpc = async (npcId: string): Promise<void> => {
+    await requestJson<null>(`/api/npcs/${npcId}`, {
+        method: 'DELETE',
+    });
+};
+export const uploadNpcImage = async (npcId: string, image: File): Promise<Npc> => {
+    const response = await fetch(`/api/npcs/${npcId}/image`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': image.type,
+        },
+        body: image,
+    });
+    const payload = (await response.json().catch(() => null)) as ApiEnvelope<Npc> | null;
+    if (!response.ok) {
+        const error = new Error(payload?.errorCode ?? 'errors.api.generic') as ApiError;
+        error.code = payload?.errorCode ?? 'errors.api.generic';
+        throw error;
+    }
+    if (!payload?.npc) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.npc;
+};
+export const deleteNpcImage = async (npcId: string): Promise<Npc> => {
+    const payload = await requestJson<ApiEnvelope<Npc>>(`/api/npcs/${npcId}/image`, {
+        method: 'DELETE',
+    });
+    if (!payload?.npc) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.npc;
 };
 export const listPlaces = async (): Promise<Place[]> => {
     const payload = await requestJson<ApiEnvelope<Place>>('/api/places');

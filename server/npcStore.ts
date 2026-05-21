@@ -1,27 +1,27 @@
-import { randomUUID } from 'node:crypto'
+﻿import { randomUUID } from 'node:crypto'
 import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
-import type { Monster, MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '../src/types/monster'
+import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcRole, NpcType } from '../src/types/npc'
 
 interface ApiError extends Error {
   code?: string
   statusCode?: number
 }
 
-export interface MonsterImage {
+export interface NpcImage {
   contentType: 'image/jpeg' | 'image/png'
   data: Buffer
 }
 
-const monstersDirectory = path.resolve(process.cwd(), 'data', 'monsters')
-const safeMonsterIdPattern = /^[a-z0-9-]+$/i
-const monsterImageExtensions = ['jpg', 'png'] as const
-const monsterAttackTypes = ['standard', 'unlimited', 'encounter', 'daily'] as const satisfies readonly MonsterAttackType[]
-const monsterRoles = ['skirmisher', 'brute', 'soldier', 'lurker', 'controller', 'artillery'] as const satisfies readonly MonsterRole[]
-const monsterTypes = ['minion', 'normal', 'solo', 'elite'] as const satisfies readonly MonsterType[]
-const monsterAttackActions = ['action', 'noAction'] as const satisfies readonly MonsterAttackAction[]
-const monsterAttackAreas = [
+const npcsDirectory = path.resolve(process.cwd(), 'data', 'npcs')
+const safeNpcIdPattern = /^[a-z0-9-]+$/i
+const npcImageExtensions = ['jpg', 'png'] as const
+const npcAttackTypes = ['standard', 'unlimited', 'encounter', 'daily'] as const satisfies readonly NpcAttackType[]
+const npcRoles = ['skirmisher', 'brute', 'soldier', 'lurker', 'controller', 'artillery'] as const satisfies readonly NpcRole[]
+const npcTypes = ['minion', 'normal', 'solo', 'elite'] as const satisfies readonly NpcType[]
+const npcAttackActions = ['action', 'noAction'] as const satisfies readonly NpcAttackAction[]
+const npcAttackAreas = [
   'point',
   'burst1',
   'burst2',
@@ -43,7 +43,7 @@ const monsterAttackAreas = [
   'blast8',
   'blast9',
   'blast10',
-] as const satisfies readonly MonsterAttackAreaType[]
+] as const satisfies readonly NpcAttackAreaType[]
 
 const emptyItems: CharacterItems = {
   armors: [],
@@ -65,10 +65,6 @@ const normalizeStatValue = (value: unknown, fallback: number): number => {
   }
 
   return Math.min(999, Math.max(0, Math.trunc(value)))
-}
-
-const normalizeSuggestedStatValue = (value: unknown): string => {
-  return typeof value === 'string' ? value.trim() : ''
 }
 
 const normalizeUniqueId = (value: unknown): string => {
@@ -137,31 +133,31 @@ const normalizeWeaponDamageDiceType = (value: unknown): CharacterWeaponDamageDic
     : 'd4'
 }
 
-const normalizeAttackAction = (value: unknown): MonsterAttackAction => {
-  return monsterAttackActions.includes(value as MonsterAttackAction) ? (value as MonsterAttackAction) : 'action'
+const normalizeAttackAction = (value: unknown): NpcAttackAction => {
+  return npcAttackActions.includes(value as NpcAttackAction) ? (value as NpcAttackAction) : 'action'
 }
 
-const normalizeAttackType = (value: unknown): MonsterAttackType => {
-  return monsterAttackTypes.includes(value as MonsterAttackType) ? (value as MonsterAttackType) : 'unlimited'
+const normalizeAttackType = (value: unknown): NpcAttackType => {
+  return npcAttackTypes.includes(value as NpcAttackType) ? (value as NpcAttackType) : 'unlimited'
 }
 
-const normalizeMonsterType = (value: unknown): MonsterType => {
-  return monsterTypes.includes(value as MonsterType) ? (value as MonsterType) : 'normal'
+const normalizeNpcType = (value: unknown): NpcType => {
+  return npcTypes.includes(value as NpcType) ? (value as NpcType) : 'normal'
 }
 
-const normalizeMonsterRole = (value: unknown): MonsterRole => {
-  return monsterRoles.includes(value as MonsterRole) ? (value as MonsterRole) : 'skirmisher'
+const normalizeNpcRole = (value: unknown): NpcRole => {
+  return npcRoles.includes(value as NpcRole) ? (value as NpcRole) : 'skirmisher'
 }
 
-const normalizeAttackArea = (value: unknown): MonsterAttackAreaType => {
-  return monsterAttackAreas.includes(value as MonsterAttackAreaType) ? (value as MonsterAttackAreaType) : 'point'
+const normalizeAttackArea = (value: unknown): NpcAttackAreaType => {
+  return npcAttackAreas.includes(value as NpcAttackAreaType) ? (value as NpcAttackAreaType) : 'point'
 }
 
-const normalizeAttackDefense = (value: unknown): keyof MonsterDefenses => {
-  return typeof value === 'string' && ['kp', 'fortitude', 'reflex', 'will'].includes(value) ? (value as keyof MonsterDefenses) : 'kp'
+const normalizeAttackDefense = (value: unknown): keyof NpcDefenses => {
+  return typeof value === 'string' && ['kp', 'fortitude', 'reflex', 'will'].includes(value) ? (value as keyof NpcDefenses) : 'kp'
 }
 
-const normalizeDefenses = (data: Partial<Record<keyof MonsterDefenses, unknown>> = {}): MonsterDefenses => {
+const normalizeDefenses = (data: Partial<Record<keyof NpcDefenses, unknown>> = {}): NpcDefenses => {
   return {
     kp: normalizeDefenseValue(data.kp),
     fortitude: normalizeDefenseValue(data.fortitude),
@@ -170,17 +166,7 @@ const normalizeDefenses = (data: Partial<Record<keyof MonsterDefenses, unknown>>
   }
 }
 
-const normalizeSuggestedStats = (data: Partial<Record<keyof MonsterSuggestedStats, unknown>> = {}): MonsterSuggestedStats => {
-  return {
-    attackVsKp: normalizeSuggestedStatValue(data.attackVsKp),
-    attackVsOtherDefenses: normalizeSuggestedStatValue(data.attackVsOtherDefenses),
-    lowDamage: normalizeSuggestedStatValue(data.lowDamage),
-    mediumDamage: normalizeSuggestedStatValue(data.mediumDamage),
-    highDamage: normalizeSuggestedStatValue(data.highDamage),
-  }
-}
-
-const normalizeAttack = (data: Partial<Record<keyof MonsterAttack, unknown>> = {}): MonsterAttack => {
+const normalizeAttack = (data: Partial<Record<keyof NpcAttack, unknown>> = {}): NpcAttack => {
   return {
     id: typeof data.id === 'string' && data.id.trim().length > 0 ? data.id : randomUUID(),
     name: typeof data.name === 'string' ? data.name.trim() : '',
@@ -194,13 +180,13 @@ const normalizeAttack = (data: Partial<Record<keyof MonsterAttack, unknown>> = {
   }
 }
 
-const normalizeAttacks = (attacks: unknown): MonsterAttack[] => {
+const normalizeAttacks = (attacks: unknown): NpcAttack[] => {
   if (!Array.isArray(attacks)) {
     return []
   }
 
   return attacks
-    .filter((attack): attack is Partial<Record<keyof MonsterAttack, unknown>> => typeof attack === 'object' && attack !== null)
+    .filter((attack): attack is Partial<Record<keyof NpcAttack, unknown>> => typeof attack === 'object' && attack !== null)
     .map((attack) => normalizeAttack(attack))
 }
 
@@ -311,12 +297,12 @@ const normalizeItems = (items: unknown): CharacterItems => {
   }
 }
 
-const normalizeMonster = (data: Partial<Record<keyof MonsterData, unknown>> = {}): MonsterData => {
+const normalizeNpc = (data: Partial<Record<keyof NpcData, unknown>> = {}): NpcData => {
   return {
     uniqueId: normalizeUniqueId(data.uniqueId),
     name: typeof data.name === 'string' ? data.name : '',
-    role: normalizeMonsterRole(data.role),
-    type: normalizeMonsterType(data.type),
+    role: normalizeNpcRole(data.role),
+    type: normalizeNpcType(data.type),
     description: typeof data.description === 'string' ? data.description.trim() : '',
     resistances: typeof data.resistances === 'string' ? data.resistances.trim() : '',
     special: typeof data.special === 'string' ? data.special.trim() : '',
@@ -324,58 +310,54 @@ const normalizeMonster = (data: Partial<Record<keyof MonsterData, unknown>> = {}
     items: normalizeItems(data.items),
     defenses:
       typeof data.defenses === 'object' && data.defenses !== null
-        ? normalizeDefenses(data.defenses as Partial<Record<keyof MonsterDefenses, unknown>>)
+        ? normalizeDefenses(data.defenses as Partial<Record<keyof NpcDefenses, unknown>>)
         : normalizeDefenses(),
-    suggested:
-      typeof data.suggested === 'object' && data.suggested !== null
-        ? normalizeSuggestedStats(data.suggested as Partial<Record<keyof MonsterSuggestedStats, unknown>>)
-        : normalizeSuggestedStats(),
     hp: normalizeStatValue(data.hp, 0),
     level: normalizeLevelValue(data.level),
     speed: normalizeStatValue(data.speed, 6),
   }
 }
 
-const parseMonster = (rawMonster: string): Partial<Record<keyof MonsterData, unknown>> => {
-  return JSON.parse(rawMonster.replace(/^\uFEFF/, '') || '{}') as Partial<Record<keyof MonsterData, unknown>>
+const parseNpc = (rawNpc: string): Partial<Record<keyof NpcData, unknown>> => {
+  return JSON.parse(rawNpc.replace(/^\uFEFF/, '') || '{}') as Partial<Record<keyof NpcData, unknown>>
 }
 
-const ensureMonstersDirectory = async (): Promise<void> => {
-  await mkdir(monstersDirectory, { recursive: true })
+const ensureNpcsDirectory = async (): Promise<void> => {
+  await mkdir(npcsDirectory, { recursive: true })
 }
 
-const getMonsterFilePath = (monsterId: string): string => {
-  if (!isSafeMonsterId(monsterId)) {
-    const error = new Error('Invalid monster id') as ApiError
+const getNpcFilePath = (npcId: string): string => {
+  if (!isSafeNpcId(npcId)) {
+    const error = new Error('Invalid npc id') as ApiError
     error.statusCode = 400
-    error.code = 'API_INVALID_MONSTER_ID'
+    error.code = 'API_INVALID_NPC_ID'
     throw error
   }
 
-  return path.join(monstersDirectory, `${monsterId}.json`)
+  return path.join(npcsDirectory, `${npcId}.json`)
 }
 
-const getMonsterImageFilePath = (monsterId: string, extension: (typeof monsterImageExtensions)[number]): string => {
-  if (!isSafeMonsterId(monsterId)) {
-    const error = new Error('Invalid monster id') as ApiError
+const getNpcImageFilePath = (npcId: string, extension: (typeof npcImageExtensions)[number]): string => {
+  if (!isSafeNpcId(npcId)) {
+    const error = new Error('Invalid npc id') as ApiError
     error.statusCode = 400
-    error.code = 'API_INVALID_MONSTER_ID'
+    error.code = 'API_INVALID_NPC_ID'
     throw error
   }
 
-  return path.join(monstersDirectory, `${monsterId}.${extension}`)
+  return path.join(npcsDirectory, `${npcId}.${extension}`)
 }
 
-const getMonsterImageInfo = async (monsterId: string): Promise<{ contentType: MonsterImage['contentType']; filePath: string; imageUrl: string } | null> => {
-  for (const extension of monsterImageExtensions) {
-    const filePath = getMonsterImageFilePath(monsterId, extension)
+const getNpcImageInfo = async (npcId: string): Promise<{ contentType: NpcImage['contentType']; filePath: string; imageUrl: string } | null> => {
+  for (const extension of npcImageExtensions) {
+    const filePath = getNpcImageFilePath(npcId, extension)
 
     try {
       await stat(filePath)
       return {
         contentType: extension === 'png' ? 'image/png' : 'image/jpeg',
         filePath,
-        imageUrl: `/api/monsters/${monsterId}/image`,
+        imageUrl: `/api/npcs/${npcId}/image`,
       }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
@@ -387,7 +369,7 @@ const getMonsterImageInfo = async (monsterId: string): Promise<{ contentType: Mo
   return null
 }
 
-const normalizeImageExtension = (contentType: string | undefined): (typeof monsterImageExtensions)[number] => {
+const normalizeImageExtension = (contentType: string | undefined): (typeof npcImageExtensions)[number] => {
   if (contentType === 'image/png') {
     return 'png'
   }
@@ -396,94 +378,94 @@ const normalizeImageExtension = (contentType: string | undefined): (typeof monst
     return 'jpg'
   }
 
-  const error = new Error('Invalid monster image') as ApiError
+  const error = new Error('Invalid npc image') as ApiError
   error.statusCode = 400
-  error.code = 'API_INVALID_MONSTER_IMAGE'
+  error.code = 'API_INVALID_NPC_IMAGE'
   throw error
 }
 
-export const isSafeMonsterId = (monsterId: string): boolean => {
-  return safeMonsterIdPattern.test(monsterId)
+export const isSafeNpcId = (npcId: string): boolean => {
+  return safeNpcIdPattern.test(npcId)
 }
 
-export const listMonsters = async (): Promise<Monster[]> => {
-  await ensureMonstersDirectory()
-  const entries = await readdir(monstersDirectory, { withFileTypes: true })
-  const monsterFiles = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const monsters = await Promise.all(
-    monsterFiles.map(async (entry) => {
-      const monsterId = path.basename(entry.name, '.json')
-      const filePath = getMonsterFilePath(monsterId)
-      const [rawMonster, fileInfo, imageInfo] = await Promise.all([
+export const listNpcs = async (): Promise<Npc[]> => {
+  await ensureNpcsDirectory()
+  const entries = await readdir(npcsDirectory, { withFileTypes: true })
+  const npcFiles = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
+  const npcs = await Promise.all(
+    npcFiles.map(async (entry) => {
+      const npcId = path.basename(entry.name, '.json')
+      const filePath = getNpcFilePath(npcId)
+      const [rawNpc, fileInfo, imageInfo] = await Promise.all([
         readFile(filePath, 'utf8'),
         stat(filePath),
-        getMonsterImageInfo(monsterId),
+        getNpcImageInfo(npcId),
       ])
 
       return {
-        id: monsterId,
+        id: npcId,
         imageUrl: imageInfo?.imageUrl ?? '',
-        ...normalizeMonster(parseMonster(rawMonster)),
+        ...normalizeNpc(parseNpc(rawNpc)),
         updatedAt: fileInfo.mtime.toISOString(),
       }
     }),
   )
 
-  return monsters.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+  return npcs.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
 }
 
-export const readMonster = async (monsterId: string): Promise<Monster> => {
-  await ensureMonstersDirectory()
-  const filePath = getMonsterFilePath(monsterId)
-  const [rawMonster, fileInfo, imageInfo] = await Promise.all([
+export const readNpc = async (npcId: string): Promise<Npc> => {
+  await ensureNpcsDirectory()
+  const filePath = getNpcFilePath(npcId)
+  const [rawNpc, fileInfo, imageInfo] = await Promise.all([
     readFile(filePath, 'utf8'),
     stat(filePath),
-    getMonsterImageInfo(monsterId),
+    getNpcImageInfo(npcId),
   ])
 
   return {
-    id: monsterId,
+    id: npcId,
     imageUrl: imageInfo?.imageUrl ?? '',
-    ...normalizeMonster(parseMonster(rawMonster)),
+    ...normalizeNpc(parseNpc(rawNpc)),
     updatedAt: fileInfo.mtime.toISOString(),
   }
 }
 
-export const createMonster = async (): Promise<Monster> => {
-  await ensureMonstersDirectory()
-  const monsterId = `${Date.now()}-${randomUUID().slice(0, 8)}`
-  const filePath = getMonsterFilePath(monsterId)
+export const createNpc = async (): Promise<Npc> => {
+  await ensureNpcsDirectory()
+  const npcId = `${Date.now()}-${randomUUID().slice(0, 8)}`
+  const filePath = getNpcFilePath(npcId)
   await writeFile(filePath, `${JSON.stringify({ uniqueId: randomUUID() }, null, 2)}\n`, 'utf8')
 
-  return readMonster(monsterId)
+  return readNpc(npcId)
 }
 
-export const updateMonster = async (monsterId: string, data: unknown): Promise<Monster> => {
-  await ensureMonstersDirectory()
-  const filePath = getMonsterFilePath(monsterId)
-  const rawMonster = await readFile(filePath, 'utf8')
-  const existingMonster = parseMonster(rawMonster)
-  const nextMonster = {
-    ...normalizeMonster({
-      ...existingMonster,
-      ...(typeof data === 'object' && data !== null ? (data as Partial<Record<keyof MonsterData, unknown>>) : {}),
+export const updateNpc = async (npcId: string, data: unknown): Promise<Npc> => {
+  await ensureNpcsDirectory()
+  const filePath = getNpcFilePath(npcId)
+  const rawNpc = await readFile(filePath, 'utf8')
+  const existingNpc = parseNpc(rawNpc)
+  const nextNpc = {
+    ...normalizeNpc({
+      ...existingNpc,
+      ...(typeof data === 'object' && data !== null ? (data as Partial<Record<keyof NpcData, unknown>>) : {}),
     }),
   }
 
-  await writeFile(filePath, `${JSON.stringify(nextMonster, null, 2)}\n`, 'utf8')
+  await writeFile(filePath, `${JSON.stringify(nextNpc, null, 2)}\n`, 'utf8')
 
-  return readMonster(monsterId)
+  return readNpc(npcId)
 }
 
-export const deleteMonster = async (monsterId: string): Promise<void> => {
-  await ensureMonstersDirectory()
-  const filePath = getMonsterFilePath(monsterId)
+export const deleteNpc = async (npcId: string): Promise<void> => {
+  await ensureNpcsDirectory()
+  const filePath = getNpcFilePath(npcId)
   await unlink(filePath)
 
   await Promise.all(
-    monsterImageExtensions.map(async (extension) => {
+    npcImageExtensions.map(async (extension) => {
       try {
-        await unlink(getMonsterImageFilePath(monsterId, extension))
+        await unlink(getNpcImageFilePath(npcId, extension))
       } catch (error) {
         if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
           throw error
@@ -493,12 +475,12 @@ export const deleteMonster = async (monsterId: string): Promise<void> => {
   )
 }
 
-export const readMonsterImage = async (monsterId: string): Promise<MonsterImage> => {
-  await ensureMonstersDirectory()
-  const imageInfo = await getMonsterImageInfo(monsterId)
+export const readNpcImage = async (npcId: string): Promise<NpcImage> => {
+  await ensureNpcsDirectory()
+  const imageInfo = await getNpcImageInfo(npcId)
 
   if (!imageInfo) {
-    const error = new Error('Monster image not found') as ApiError
+    const error = new Error('Npc image not found') as ApiError
     error.statusCode = 404
     error.code = 'ENOENT'
     throw error
@@ -510,18 +492,18 @@ export const readMonsterImage = async (monsterId: string): Promise<MonsterImage>
   }
 }
 
-export const updateMonsterImage = async (monsterId: string, contentType: string | undefined, data: Buffer): Promise<Monster> => {
-  await ensureMonstersDirectory()
-  await stat(getMonsterFilePath(monsterId))
+export const updateNpcImage = async (npcId: string, contentType: string | undefined, data: Buffer): Promise<Npc> => {
+  await ensureNpcsDirectory()
+  await stat(getNpcFilePath(npcId))
 
   const extension = normalizeImageExtension(contentType)
-  const nextFilePath = getMonsterImageFilePath(monsterId, extension)
-  const staleExtensions = monsterImageExtensions.filter((imageExtension) => imageExtension !== extension)
+  const nextFilePath = getNpcImageFilePath(npcId, extension)
+  const staleExtensions = npcImageExtensions.filter((imageExtension) => imageExtension !== extension)
 
   await Promise.all(
     staleExtensions.map(async (staleExtension) => {
       try {
-        await unlink(getMonsterImageFilePath(monsterId, staleExtension))
+        await unlink(getNpcImageFilePath(npcId, staleExtension))
       } catch (error) {
         if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
           throw error
@@ -532,17 +514,17 @@ export const updateMonsterImage = async (monsterId: string, contentType: string 
 
   await writeFile(nextFilePath, data)
 
-  return readMonster(monsterId)
+  return readNpc(npcId)
 }
 
-export const deleteMonsterImage = async (monsterId: string): Promise<Monster> => {
-  await ensureMonstersDirectory()
-  await stat(getMonsterFilePath(monsterId))
+export const deleteNpcImage = async (npcId: string): Promise<Npc> => {
+  await ensureNpcsDirectory()
+  await stat(getNpcFilePath(npcId))
 
   await Promise.all(
-    monsterImageExtensions.map(async (extension) => {
+    npcImageExtensions.map(async (extension) => {
       try {
-        await unlink(getMonsterImageFilePath(monsterId, extension))
+        await unlink(getNpcImageFilePath(npcId, extension))
       } catch (error) {
         if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
           throw error
@@ -551,5 +533,5 @@ export const deleteMonsterImage = async (monsterId: string): Promise<Monster> =>
     }),
   )
 
-  return readMonster(monsterId)
+  return readNpc(npcId)
 }

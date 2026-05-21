@@ -4,7 +4,7 @@ import type { MainPageState, MainTabKey } from './types'
 const mainTabStorageKey = 'did.main.activeTab'
 
 const isMainTabKey = (value: string | null): value is MainTabKey => {
-  return value === 'heroes' || value === 'monsters' || value === 'adventures' || value === 'places'
+  return value === 'heroes' || value === 'monsters' || value === 'npcs' || value === 'adventures' || value === 'places'
 }
 
 const getInitialTab = (): MainTabKey => {

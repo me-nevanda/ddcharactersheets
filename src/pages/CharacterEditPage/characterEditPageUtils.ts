@@ -213,6 +213,7 @@ export const emptyForm: CharacterEditFormData = {
   uniqueId: '',
   name: '',
   imageUrl: '',
+  shortDescription: '',
   description: '',
   level: 1,
   race: CharacterRace.Human,

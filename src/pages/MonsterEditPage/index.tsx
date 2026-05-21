@@ -139,6 +139,41 @@ export const MonsterEditPage = () => {
                     </section>
 
                     <section className={styles.section}>
+                      <div className={styles.sectionHeader}>
+                        <h2 className={styles.sectionTitle}>{t('pages.monsterEdit.sections.suggested')}</h2>
+                      </div>
+
+                      <div className={styles.suggestedGrid}>
+                        <div className={styles.suggestedRow}>
+                          <span className={styles.suggestedRowLabel}>{t('pages.monsterEdit.fields.attack')}</span>
+                          <label className={styles.suggestedInlineField} htmlFor="attackVsKp">
+                            <span className={styles.defenseLabel}>{t('pages.monsterEdit.fields.vsKp')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="attackVsKp" name="attackVsKp" type="text" value={form.suggested.attackVsKp} onChange={handleChange} />
+                          </label>
+                          <label className={styles.suggestedInlineField} htmlFor="attackVsOtherDefenses">
+                            <span className={styles.defenseLabel}>{t('pages.monsterEdit.fields.vsOtherDefenses')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="attackVsOtherDefenses" name="attackVsOtherDefenses" type="text" value={form.suggested.attackVsOtherDefenses} onChange={handleChange} />
+                          </label>
+                        </div>
+                        <div className={styles.suggestedRow}>
+                          <span className={styles.suggestedRowLabel}>{t('pages.monsterEdit.fields.damage')}</span>
+                          <label className={styles.suggestedInlineField} htmlFor="lowDamage">
+                            <span className={styles.defenseLabel}>{t('pages.monsterEdit.fields.low')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="lowDamage" name="lowDamage" type="text" value={form.suggested.lowDamage} onChange={handleChange} />
+                          </label>
+                          <label className={styles.suggestedInlineField} htmlFor="mediumDamage">
+                            <span className={styles.defenseLabel}>{t('pages.monsterEdit.fields.medium')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="mediumDamage" name="mediumDamage" type="text" value={form.suggested.mediumDamage} onChange={handleChange} />
+                          </label>
+                          <label className={styles.suggestedInlineField} htmlFor="highDamage">
+                            <span className={styles.defenseLabel}>{t('pages.monsterEdit.fields.high')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="highDamage" name="highDamage" type="text" value={form.suggested.highDamage} onChange={handleChange} />
+                          </label>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section className={styles.section}>
                       <div className={styles.statsGrid}>
                         <label className={`${styles.statCard} ${styles.levelTypeCard}`} htmlFor="level">
                           <span className={styles.srOnly}>{t('pages.monsterEdit.fields.level')}</span>

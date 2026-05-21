@@ -5,6 +5,10 @@ export const useDescriptionSection = () => {
   const { t } = useI18n()
   const { form, handleGeneralFieldChange } = useCharacterEditPageContext()
 
+  const handleShortDescriptionChange = (value: string) => {
+    handleGeneralFieldChange('shortDescription', value)
+  }
+
   const handleDescriptionChange = (value: string) => {
     handleGeneralFieldChange('description', value)
   }
@@ -12,6 +16,7 @@ export const useDescriptionSection = () => {
   return {
     form,
     handleDescriptionChange,
+    handleShortDescriptionChange,
     t,
   }
 }

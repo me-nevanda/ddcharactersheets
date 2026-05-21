@@ -1,16 +1,16 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+﻿import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { deleteMonsterImage, getMonster, saveMonster, uploadMonsterImage } from '@lib/api'
+import { deleteNpcImage, getNpc, saveNpc, uploadNpcImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { normalizeItems } from '@pages/CharacterEditPage/characterEditPageLogic'
 import { emptyArmor, emptyItems, emptyOtherItem, emptyWeapon } from '@pages/CharacterEditPage/characterEditPageUtils'
 import type { CharacterArmorBonusFieldName, CharacterItemBonusFieldName, CharacterWeaponDamageDiceType, CharacterWeaponFieldName } from '@appTypes/character'
-import type { MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '@appTypes/monster'
+import type { NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcRole, NpcType } from '@appTypes/npc'
 import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/CharacterEditPage/types'
-import type { MonsterEditPageState } from './types'
+import type { NpcEditPageState } from './types'
 
-const emptyMonsterForm: MonsterData = {
+const emptyNpcForm: NpcData = {
   uniqueId: '',
   name: '',
   role: 'skirmisher',
@@ -26,26 +26,18 @@ const emptyMonsterForm: MonsterData = {
     reflex: 10,
     will: 10,
   },
-  suggested: {
-    attackVsKp: '',
-    attackVsOtherDefenses: '',
-    lowDamage: '',
-    mediumDamage: '',
-    highDamage: '',
-  },
   hp: 0,
   level: 1,
   speed: 6,
 }
 
-const defenseFields = ['kp', 'fortitude', 'reflex', 'will'] as const satisfies readonly (keyof MonsterDefenses)[]
-const suggestedFields = ['attackVsKp', 'attackVsOtherDefenses', 'lowDamage', 'mediumDamage', 'highDamage'] as const satisfies readonly (keyof MonsterSuggestedStats)[]
-const numericFields = ['hp', 'level', 'speed'] as const satisfies readonly (keyof Pick<MonsterData, 'hp' | 'level' | 'speed'>)[]
-const monsterRoles = ['skirmisher', 'brute', 'soldier', 'lurker', 'controller', 'artillery'] as const satisfies readonly MonsterRole[]
-const monsterTypes = ['minion', 'normal', 'solo', 'elite'] as const satisfies readonly MonsterType[]
-const monsterAttackTypes = ['standard', 'unlimited', 'encounter', 'daily'] as const satisfies readonly MonsterAttackType[]
-const monsterAttackActions = ['action', 'noAction'] as const satisfies readonly MonsterAttackAction[]
-const monsterAttackAreas = [
+const defenseFields = ['kp', 'fortitude', 'reflex', 'will'] as const satisfies readonly (keyof NpcDefenses)[]
+const numericFields = ['hp', 'level', 'speed'] as const satisfies readonly (keyof Pick<NpcData, 'hp' | 'level' | 'speed'>)[]
+const npcRoles = ['skirmisher', 'brute', 'soldier', 'lurker', 'controller', 'artillery'] as const satisfies readonly NpcRole[]
+const npcTypes = ['minion', 'normal', 'solo', 'elite'] as const satisfies readonly NpcType[]
+const npcAttackTypes = ['standard', 'unlimited', 'encounter', 'daily'] as const satisfies readonly NpcAttackType[]
+const npcAttackActions = ['action', 'noAction'] as const satisfies readonly NpcAttackAction[]
+const npcAttackAreas = [
   'point',
   'burst1',
   'burst2',
@@ -67,29 +59,25 @@ const monsterAttackAreas = [
   'blast8',
   'blast9',
   'blast10',
-] as const satisfies readonly MonsterAttackAreaType[]
+] as const satisfies readonly NpcAttackAreaType[]
 
-const isDefenseField = (name: string): name is keyof MonsterDefenses => {
-  return defenseFields.includes(name as keyof MonsterDefenses)
-}
-
-const isSuggestedField = (name: string): name is keyof MonsterSuggestedStats => {
-  return suggestedFields.includes(name as keyof MonsterSuggestedStats)
+const isDefenseField = (name: string): name is keyof NpcDefenses => {
+  return defenseFields.includes(name as keyof NpcDefenses)
 }
 
 const isNumericField = (name: string): name is (typeof numericFields)[number] => {
   return numericFields.includes(name as (typeof numericFields)[number])
 }
 
-const normalizeMonsterType = (value: string): MonsterType => {
-  return monsterTypes.includes(value as MonsterType) ? (value as MonsterType) : 'normal'
+const normalizeNpcType = (value: string): NpcType => {
+  return npcTypes.includes(value as NpcType) ? (value as NpcType) : 'normal'
 }
 
-const normalizeMonsterRole = (value: string): MonsterRole => {
-  return monsterRoles.includes(value as MonsterRole) ? (value as MonsterRole) : 'skirmisher'
+const normalizeNpcRole = (value: string): NpcRole => {
+  return npcRoles.includes(value as NpcRole) ? (value as NpcRole) : 'skirmisher'
 }
 
-const createMonsterAttackId = (): string => {
+const createNpcAttackId = (): string => {
   return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
@@ -113,20 +101,6 @@ const normalizeStatInputValue = (value: string): number => {
   return Math.min(999, Math.max(0, Math.trunc(parsedValue)))
 }
 
-const normalizeSuggestedInputValue = (value: string): string => {
-  return value
-}
-
-const normalizeSuggestedStats = (suggested: Partial<Record<keyof MonsterSuggestedStats, unknown>> | undefined): MonsterSuggestedStats => {
-  return {
-    attackVsKp: typeof suggested?.attackVsKp === 'string' ? normalizeSuggestedInputValue(suggested.attackVsKp) : '',
-    attackVsOtherDefenses: typeof suggested?.attackVsOtherDefenses === 'string' ? normalizeSuggestedInputValue(suggested.attackVsOtherDefenses) : '',
-    lowDamage: typeof suggested?.lowDamage === 'string' ? normalizeSuggestedInputValue(suggested.lowDamage) : '',
-    mediumDamage: typeof suggested?.mediumDamage === 'string' ? normalizeSuggestedInputValue(suggested.mediumDamage) : '',
-    highDamage: typeof suggested?.highDamage === 'string' ? normalizeSuggestedInputValue(suggested.highDamage) : '',
-  }
-}
-
 const normalizeLevelInputValue = (value: string): number => {
   const parsedValue = Number.parseInt(value, 10)
 
@@ -137,7 +111,7 @@ const normalizeLevelInputValue = (value: string): number => {
   return Math.min(30, Math.max(1, Math.trunc(parsedValue)))
 }
 
-const buildGeneratedMonsterAttributes = (level: number, type: MonsterType): Pick<MonsterData, 'defenses' | 'hp'> => {
+const buildGeneratedNpcAttributes = (level: number, type: NpcType): Pick<NpcData, 'defenses' | 'hp'> => {
   const normalizedLevel = Math.min(30, Math.max(1, Math.trunc(level)))
   const baseHp = 24 + normalizedLevel * 8
   const hp = type === 'minion' ? 1 : type === 'solo' ? baseHp * 4 : type === 'elite' ? baseHp * 2 : baseHp
@@ -173,19 +147,19 @@ const normalizeAttackBonusValue = (value: string | number): number => {
   return Math.min(20, Math.max(0, Math.trunc(parsedValue)))
 }
 
-const normalizeAttackAction = (value: unknown): MonsterAttackAction => {
-  return monsterAttackActions.includes(value as MonsterAttackAction) ? (value as MonsterAttackAction) : 'action'
+const normalizeAttackAction = (value: unknown): NpcAttackAction => {
+  return npcAttackActions.includes(value as NpcAttackAction) ? (value as NpcAttackAction) : 'action'
 }
 
-const normalizeAttackType = (value: unknown): MonsterAttackType => {
-  return monsterAttackTypes.includes(value as MonsterAttackType) ? (value as MonsterAttackType) : 'unlimited'
+const normalizeAttackType = (value: unknown): NpcAttackType => {
+  return npcAttackTypes.includes(value as NpcAttackType) ? (value as NpcAttackType) : 'unlimited'
 }
 
-const normalizeAttackArea = (value: unknown): MonsterAttackAreaType => {
-  return monsterAttackAreas.includes(value as MonsterAttackAreaType) ? (value as MonsterAttackAreaType) : 'point'
+const normalizeAttackArea = (value: unknown): NpcAttackAreaType => {
+  return npcAttackAreas.includes(value as NpcAttackAreaType) ? (value as NpcAttackAreaType) : 'point'
 }
 
-const normalizeAttackDefense = (value: unknown): keyof MonsterDefenses => {
+const normalizeAttackDefense = (value: unknown): keyof NpcDefenses => {
   if (typeof value !== 'string') {
     return 'kp'
   }
@@ -193,9 +167,9 @@ const normalizeAttackDefense = (value: unknown): keyof MonsterDefenses => {
   return isDefenseField(value) ? value : 'kp'
 }
 
-const createEmptyMonsterAttack = (type: MonsterAttackType): MonsterAttack => {
+const createEmptyNpcAttack = (type: NpcAttackType): NpcAttack => {
   return {
-    id: createMonsterAttackId(),
+    id: createNpcAttackId(),
     name: '',
     action: 'action',
     type,
@@ -207,9 +181,9 @@ const createEmptyMonsterAttack = (type: MonsterAttackType): MonsterAttack => {
   }
 }
 
-const normalizeMonsterAttack = (attack: Partial<Record<keyof MonsterAttack, unknown>>, fallbackType: MonsterAttackType = 'unlimited'): MonsterAttack => {
+const normalizeNpcAttack = (attack: Partial<Record<keyof NpcAttack, unknown>>, fallbackType: NpcAttackType = 'unlimited'): NpcAttack => {
   return {
-    id: typeof attack.id === 'string' && attack.id.trim().length > 0 ? attack.id : createMonsterAttackId(),
+    id: typeof attack.id === 'string' && attack.id.trim().length > 0 ? attack.id : createNpcAttackId(),
     name: typeof attack.name === 'string' ? attack.name : '',
     action: normalizeAttackAction(attack.action),
     type: attack.type === undefined ? fallbackType : normalizeAttackType(attack.type),
@@ -221,21 +195,21 @@ const normalizeMonsterAttack = (attack: Partial<Record<keyof MonsterAttack, unkn
   }
 }
 
-const normalizeMonsterAttacks = (attacks: unknown): MonsterAttack[] => {
+const normalizeNpcAttacks = (attacks: unknown): NpcAttack[] => {
   if (!Array.isArray(attacks)) {
     return []
   }
 
   return attacks
-    .filter((attack): attack is Partial<Record<keyof MonsterAttack, unknown>> => typeof attack === 'object' && attack !== null)
-    .map((attack) => normalizeMonsterAttack(attack))
+    .filter((attack): attack is Partial<Record<keyof NpcAttack, unknown>> => typeof attack === 'object' && attack !== null)
+    .map((attack) => normalizeNpcAttack(attack))
 }
 
-export const useMonsterEditPage = (): MonsterEditPageState => {
+export const useNpcEditPage = (): NpcEditPageState => {
   const { t } = useI18n()
-  const { monsterId = '' } = useParams()
-  const [form, setForm] = useState<MonsterData>(emptyMonsterForm)
-  const [initialForm, setInitialForm] = useState<MonsterData>(emptyMonsterForm)
+  const { npcId = '' } = useParams()
+  const [form, setForm] = useState<NpcData>(emptyNpcForm)
+  const [initialForm, setInitialForm] = useState<NpcData>(emptyNpcForm)
   const [error, setError] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(true)
@@ -246,29 +220,28 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
   useEffect(() => {
     let cancelled = false
 
-    const loadMonster = async () => {
+    const loadNpc = async () => {
       try {
-        const monster = await getMonster(monsterId)
+        const npc = await getNpc(npcId)
         const nextForm = {
-          uniqueId: monster.uniqueId,
-          name: monster.name,
-          role: normalizeMonsterRole(monster.role),
-          type: normalizeMonsterType(monster.type),
-          description: monster.description,
-          resistances: monster.resistances ?? '',
-          special: monster.special ?? '',
-          attacks: normalizeMonsterAttacks(monster.attacks),
-          items: normalizeItems(monster.items),
-          defenses: monster.defenses,
-          suggested: normalizeSuggestedStats(monster.suggested),
-          hp: monster.hp,
-          level: monster.level,
-          speed: monster.speed,
+          uniqueId: npc.uniqueId,
+          name: npc.name,
+          role: normalizeNpcRole(npc.role),
+          type: normalizeNpcType(npc.type),
+          description: npc.description,
+          resistances: npc.resistances ?? '',
+          special: npc.special ?? '',
+          attacks: normalizeNpcAttacks(npc.attacks),
+          items: normalizeItems(npc.items),
+          defenses: npc.defenses,
+          hp: npc.hp,
+          level: npc.level,
+          speed: npc.speed,
         }
         if (!cancelled) {
           setForm(nextForm)
           setInitialForm(nextForm)
-          setImageUrl(monster.imageUrl)
+          setImageUrl(npc.imageUrl)
           setError('')
         }
       } catch (nextError) {
@@ -282,12 +255,12 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
       }
     }
 
-    void loadMonster()
+    void loadNpc()
 
     return () => {
       cancelled = true
     }
-  }, [monsterId, t])
+  }, [npcId, t])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target
@@ -298,17 +271,6 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
         defenses: {
           ...current.defenses,
           [name]: normalizeDefenseInputValue(value),
-        },
-      }))
-      return
-    }
-
-    if (isSuggestedField(name)) {
-      setForm((current) => ({
-        ...current,
-        suggested: {
-          ...current.suggested,
-          [name]: normalizeSuggestedInputValue(value),
         },
       }))
       return
@@ -325,7 +287,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     if (name === 'type') {
       setForm((current) => ({
         ...current,
-        type: normalizeMonsterType(value),
+        type: normalizeNpcType(value),
       }))
       return
     }
@@ -333,7 +295,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     if (name === 'role') {
       setForm((current) => ({
         ...current,
-        role: normalizeMonsterRole(value),
+        role: normalizeNpcRole(value),
       }))
       return
     }
@@ -354,7 +316,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
   const handleGenerateAttributes = () => {
     setForm((current) => ({
       ...current,
-      ...buildGeneratedMonsterAttributes(current.level, current.type),
+      ...buildGeneratedNpcAttributes(current.level, current.type),
     }))
   }
 
@@ -370,8 +332,8 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     setError('')
 
     try {
-      const monster = await uploadMonsterImage(monsterId, image)
-      setImageUrl(monster.imageUrl ? `${monster.imageUrl}?v=${Date.now()}` : '')
+      const npc = await uploadNpcImage(npcId, image)
+      setImageUrl(npc.imageUrl ? `${npc.imageUrl}?v=${Date.now()}` : '')
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
     } finally {
@@ -388,8 +350,8 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     setError('')
 
     try {
-      const monster = await deleteMonsterImage(monsterId)
-      setImageUrl(monster.imageUrl)
+      const npc = await deleteNpcImage(npcId)
+      setImageUrl(npc.imageUrl)
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
     } finally {
@@ -405,11 +367,11 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
   }
 
   const handlePrint = () => {
-    if (!monsterId) {
+    if (!npcId) {
       return
     }
 
-    window.open(`/monsters/${monsterId}/print`, '_blank')
+    window.open(`/npcs/${npcId}/print`, '_blank')
   }
 
   const handleSpecialChange = (value: string) => {
@@ -419,14 +381,14 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     }))
   }
 
-  const handleAttackAdd = (type: MonsterAttackType) => {
+  const handleAttackAdd = (type: NpcAttackType) => {
     setForm((current) => ({
       ...current,
-      attacks: [...current.attacks, createEmptyMonsterAttack(type)],
+      attacks: [...current.attacks, createEmptyNpcAttack(type)],
     }))
   }
 
-  const handleAttackChange = (index: number, fieldName: keyof MonsterAttack, value: string | number) => {
+  const handleAttackChange = (index: number, fieldName: keyof NpcAttack, value: string | number) => {
     setForm((current) => ({
       ...current,
       attacks: current.attacks.map((attack, attackIndex) => {
@@ -619,18 +581,11 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
         })),
         items: form.items,
         defenses: form.defenses,
-        suggested: {
-          attackVsKp: form.suggested.attackVsKp.trim(),
-          attackVsOtherDefenses: form.suggested.attackVsOtherDefenses.trim(),
-          lowDamage: form.suggested.lowDamage.trim(),
-          mediumDamage: form.suggested.mediumDamage.trim(),
-          highDamage: form.suggested.highDamage.trim(),
-        },
         hp: form.hp,
         level: form.level,
         speed: form.speed,
       }
-      await saveMonster(monsterId, nextForm)
+      await saveNpc(npcId, nextForm)
       setForm(nextForm)
       setInitialForm(nextForm)
       setSaving(false)

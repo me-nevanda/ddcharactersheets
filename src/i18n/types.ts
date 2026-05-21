@@ -1,4 +1,4 @@
-export type Locale = 'pl' | 'en'
+﻿export type Locale = 'pl' | 'en'
 
 export type TranslationVariables = Record<string, string | number>
 
@@ -43,12 +43,16 @@ export interface TranslationDictionary {
       invalidCharacterId: string
       invalidMonsterId: string
       invalidMonsterGroupId: string
+      invalidNpcId: string
+      invalidNpcGroupId: string
       invalidAdventureId: string
       invalidPlaceId: string
       invalidJsonBody: string
       invalidCharacterImage: string
       invalidMonsterImage: string
+      invalidNpcImage: string
       invalidMonsterGroupName: string
+      invalidNpcGroupName: string
       geminiPromptRequired: string
       geminiConfigMissing: string
       geminiConfigInvalid: string
@@ -58,6 +62,7 @@ export interface TranslationDictionary {
       geminiRequestFailed: string
       characterNotFound: string
       monsterNotFound: string
+      npcNotFound: string
       adventureNotFound: string
       placeNotFound: string
       notFound: string
@@ -71,6 +76,7 @@ export interface TranslationDictionary {
       tabs: {
         heroes: string
         monsters: string
+        npcs: string
         adventures: string
         places: string
       }
@@ -202,7 +208,152 @@ export interface TranslationDictionary {
         body: string
       }
     }
+
+    npcList: {
+      actions: {
+        addNpc: string
+        addGroup: string
+      }
+      tabs: {
+        groups: string
+        list: string
+      }
+      groups: {
+        addNpc: string
+        loading: string
+        emptyState: string
+        emptyNpcs: string
+        npcCount: string
+        moreNpcs: string
+        unnamedGroup: string
+        uniqueId: string
+        deleteDialog: {
+          title: string
+          body: string
+        }
+        createDialog: {
+          title: string
+          nameLabel: string
+          namePlaceholder: string
+        }
+        addNpcDialog: {
+          title: string
+          searchLabel: string
+          searchPlaceholder: string
+          emptyState: string
+        }
+      }
+      emptyState: string
+      unnamedNpc: string
+      deleteDialog: {
+        title: string
+        body: string
+      }
+    }
     monsterEdit: {
+      eyebrow: string
+      title: string
+      loading: string
+      tabs: {
+        general: string
+        attacks: string
+        loot: string
+      }
+      sections: {
+        defenses: string
+        suggested: string
+        description: string
+        resistances: string
+        special: string
+      }
+      imageActions: {
+        uploadNew: string
+        remove: string
+      }
+      actions: {
+        generateAttributes: string
+      }
+      attacks: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeButton: string
+        typeLabel: string
+        typeOptions: {
+          standard: string
+          unlimited: string
+          encounter: string
+          daily: string
+        }
+        attackLabel: string
+        namePlaceholder: string
+        descriptionPlaceholder: string
+      }
+      loot: {
+        title: string
+        emptyState: string
+        addButton: string
+        groups: {
+          armors: string
+          weapons: string
+          others: string
+        }
+        removeDialog: {
+          title: string
+          body: string
+        }
+      }
+      typeOptions: {
+        minion: string
+        normal: string
+        solo: string
+        elite: string
+      }
+      roleOptions: {
+        skirmisher: string
+        brute: string
+        soldier: string
+        lurker: string
+        controller: string
+        artillery: string
+      }
+      fields: {
+        name: string
+        image: string
+        description: string
+        kp: string
+        fortitude: string
+        reflex: string
+        will: string
+        speed: string
+        role: string
+        type: string
+        hp: string
+        level: string
+        bloodied: string
+        attack: string
+        damage: string
+        vsKp: string
+        vsOtherDefenses: string
+        low: string
+        medium: string
+        high: string
+        attackVsKp: string
+        attackVsOtherDefenses: string
+        lowDamage: string
+        mediumDamage: string
+        highDamage: string
+      }
+      placeholders: {
+        titleName: string
+        image: string
+        description: string
+        resistances: string
+        special: string
+      }
+    }
+
+    npcEdit: {
       eyebrow: string
       title: string
       loading: string
@@ -310,6 +461,32 @@ export interface TranslationDictionary {
         monsters: string
       }
       addMonsterDialog: {
+        title: string
+        searchLabel: string
+        searchPlaceholder: string
+        emptyState: string
+      }
+    }
+
+    npcGroupEdit: {
+      eyebrow: string
+      loading: string
+      emptyState: string
+      actions: {
+        addNpc: string
+        removeNpc: string
+      }
+      fields: {
+        name: string
+      }
+      placeholders: {
+        name: string
+      }
+      sections: {
+        availableNpcs: string
+        npcs: string
+      }
+      addNpcDialog: {
         title: string
         searchLabel: string
         searchPlaceholder: string
@@ -491,6 +668,8 @@ export interface TranslationDictionary {
         name: string
         image: string
         description: string
+        shortDescription: string
+        longDescription: string
         level: string
         speed: string
         hp: string
@@ -531,6 +710,8 @@ export interface TranslationDictionary {
       placeholders: {
         name: string
         description: string
+        shortDescription: string
+        longDescription: string
         titleName: string
         race: string
         class: string
@@ -619,6 +800,19 @@ export interface TranslationDictionary {
       }
     }
     monsterPrint: {
+      title: string
+      loading: string
+      error: string
+      printButtonLabel: string
+      emptyAttacks: string
+      unnamedAttack: string
+      sections: {
+        stats: string
+        attacks: string
+      }
+    }
+
+    npcPrint: {
       title: string
       loading: string
       error: string

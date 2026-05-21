@@ -1,4 +1,4 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
+﻿import type { IncomingMessage, ServerResponse } from 'node:http';
 import { defineConfig, type Connect, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { createAdventure, isSafeAdventureId, listAdventures, readAdventure, updateAdventure } from './server/adventureStore';
@@ -6,6 +6,8 @@ import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacter
 import { countGeminiTokens, createGeminiResponse } from './server/geminiService';
 import { createMonsterGroup, deleteMonsterGroup, isSafeMonsterGroupId, listMonsterGroups, readMonsterGroup, updateMonsterGroup } from './server/monsterGroupStore';
 import { createMonster, deleteMonster, deleteMonsterImage, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
+import { createNpcGroup, deleteNpcGroup, isSafeNpcGroupId, listNpcGroups, readNpcGroup, updateNpcGroup } from './server/npcGroupStore';
+import { createNpc, deleteNpc, deleteNpcImage, isSafeNpcId, listNpcs, readNpc, readNpcImage, updateNpc, updateNpcImage } from './server/npcStore';
 import { createPlace, isSafePlaceId, listPlaces, readPlace, updatePlace } from './server/placeStore';
 interface ApiError extends Error {
     code?: string;
@@ -352,6 +354,145 @@ const createMonstersApiPlugin = (): Plugin => {
         },
     };
 };
+const createNpcsApiPlugin = (): Plugin => {
+    const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
+        const url = new URL(request.url ?? '/', 'http://localhost');
+        if (!url.pathname.startsWith('/api/npcs') && !url.pathname.startsWith('/api/npc-groups')) {
+            next();
+            return;
+        }
+        try {
+            if (request.method === 'GET' && url.pathname === '/api/npc-groups') {
+                sendJson(response, 200, { npcGroups: await listNpcGroups() });
+                return;
+            }
+            if (request.method === 'POST' && url.pathname === '/api/npc-groups') {
+                const payload = await readJsonBody(request);
+                sendJson(response, 201, { npcGroup: await createNpcGroup(payload) });
+                return;
+            }
+            const groupMatch = url.pathname.match(/^\/api\/npc-groups\/([^/]+)$/);
+            if (groupMatch) {
+                const groupId = groupMatch[1];
+                if (!isSafeNpcGroupId(groupId)) {
+                    sendError(response, 400, 'errors.api.invalidNpcGroupId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    sendJson(response, 200, { npcGroup: await readNpcGroup(groupId) });
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const payload = await readJsonBody(request);
+                    sendJson(response, 200, { npcGroup: await updateNpcGroup(groupId, payload) });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    await deleteNpcGroup(groupId);
+                    response.statusCode = 204;
+                    response.end();
+                    return;
+                }
+            }
+            if (request.method === 'GET' && url.pathname === '/api/npcs') {
+                sendJson(response, 200, { npcs: await listNpcs() });
+                return;
+            }
+            if (request.method === 'POST' && url.pathname === '/api/npcs') {
+                sendJson(response, 201, { npc: await createNpc() });
+                return;
+            }
+            const imageMatch = url.pathname.match(/^\/api\/npcs\/([^/]+)\/image$/);
+            if (imageMatch) {
+                const npcId = imageMatch[1];
+                if (!isSafeNpcId(npcId)) {
+                    sendError(response, 400, 'errors.api.invalidNpcId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    const image = await readNpcImage(npcId);
+                    response.statusCode = 200;
+                    response.setHeader('Content-Type', image.contentType);
+                    response.end(image.data);
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const npc = await updateNpcImage(npcId, request.headers['content-type'], await readRawBody(request));
+                    sendJson(response, 200, { npc });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    const npc = await deleteNpcImage(npcId);
+                    sendJson(response, 200, { npc });
+                    return;
+                }
+            }
+            const match = url.pathname.match(/^\/api\/npcs\/([^/]+)$/);
+            if (match) {
+                const npcId = match[1];
+                if (!isSafeNpcId(npcId)) {
+                    sendError(response, 400, 'errors.api.invalidNpcId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    sendJson(response, 200, { npc: await readNpc(npcId) });
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const payload = await readJsonBody(request);
+                    sendJson(response, 200, {
+                        npc: await updateNpc(npcId, payload),
+                    });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    await deleteNpc(npcId);
+                    response.statusCode = 204;
+                    response.end();
+                    return;
+                }
+            }
+            sendError(response, 404, 'errors.api.notFound');
+        }
+        catch (error) {
+            const apiError = error as ApiError;
+            if (apiError.code === 'ENOENT') {
+                sendError(response, 404, 'errors.api.npcNotFound');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_JSON_BODY') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidJsonBody');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_MONSTER_ID') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidNpcId');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_MONSTER_GROUP_ID') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidNpcGroupId');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_MONSTER_GROUP_NAME') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidNpcGroupName');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_MONSTER_IMAGE') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidNpcImage');
+                return;
+            }
+            sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');
+        }
+    };
+    return {
+        name: 'npcs-api',
+        configureServer(server) {
+            server.middlewares.use(handler);
+        },
+        configurePreviewServer(server) {
+            server.middlewares.use(handler);
+        },
+    };
+};
 const createPlacesApiPlugin = (): Plugin => {
     const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
         const url = new URL(request.url ?? '/', 'http://localhost');
@@ -480,7 +621,7 @@ const createGeminiApiPlugin = (): Plugin => {
     };
 };
 export default defineConfig({
-    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createPlacesApiPlugin(), createGeminiApiPlugin()],
+    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createNpcsApiPlugin(), createPlacesApiPlugin(), createGeminiApiPlugin()],
     resolve: {
         alias: {
             '@pages': '/src/pages',

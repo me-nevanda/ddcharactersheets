@@ -27,6 +27,7 @@ const buildCharacterEditFormData = (character: Character): CharacterEditFormData
     const items = normalizeItems(character.items);
     return {
         ...characterData,
+        shortDescription: character.shortDescription ?? '',
         description: character.description ?? '',
         level: clampLevelValue(character.level),
         speed: buildCharacterSpeed(character.race),

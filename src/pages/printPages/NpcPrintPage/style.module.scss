@@ -1,0 +1,562 @@
+﻿@use '../../../styles/mixins' as *;
+
+@page {
+  size: A4 portrait;
+  margin: 6mm;
+}
+
+.pageShell {
+  min-height: 100vh;
+  padding: 1.25rem;
+}
+
+.printButton {
+  position: fixed;
+  top: calc(4rem + 20px);
+  right: 1rem;
+  z-index: 25;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 7.2rem;
+  height: 3rem;
+  padding: 0 0.95rem;
+  border: 1px solid rgba(240, 198, 111, 0.3);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #714232 0%, #a27748 100%);
+  color: #f8ead7;
+  box-shadow: 0 12px 26px rgba(84, 49, 37, 0.3);
+}
+
+.printButton:hover {
+  transform: translateY(-1px);
+}
+
+.printButtonContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.printButtonContent svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex-shrink: 0;
+}
+
+.sheet {
+  display: grid;
+  gap: 1rem;
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  padding: 1rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 1.35rem;
+  background: rgba(24, 17, 13, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.headerCopy {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.printHeader {
+  display: none;
+  margin: 0;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.95;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.8fr) minmax(0, 1.2fr);
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.leftColumn {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.section {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 1.15rem;
+  background: rgba(255, 248, 235, 0.025);
+  break-inside: avoid;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.descriptionSection {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.descriptionCopy {
+  display: grid;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.npcImage {
+  display: block;
+  max-width: 120px;
+  max-height: 120px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.richText,
+.attackDescription {
+  color: var(--text-strong);
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.richText :global(p),
+.attackDescription :global(p),
+.richText :global(ul),
+.attackDescription :global(ul),
+.richText :global(ol),
+.attackDescription :global(ol) {
+  margin-top: 0;
+  margin-bottom: 0.45rem;
+}
+
+.richText :global(:last-child),
+.attackDescription :global(:last-child) {
+  margin-bottom: 0;
+}
+
+.compactGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.valueCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid rgba(255, 248, 235, 0.08);
+  border-radius: 0.7rem;
+  background: rgba(255, 248, 235, 0.03);
+}
+
+.valueLabel {
+  color: var(--text-soft);
+  font-size: 0.8rem;
+}
+
+.valueNumber {
+  color: var(--text-strong);
+  font-size: 0.95rem;
+}
+
+.attacksSection {
+  align-self: start;
+}
+
+.attackGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.attackCard {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 1rem;
+  background: rgba(255, 248, 235, 0.03);
+  break-inside: avoid;
+}
+
+.attackCardUnlimited {
+  border-top: 0.32rem solid #3d8b4a;
+}
+
+.attackCardStandard {
+  border-top: 0.32rem solid #9aa0a6;
+}
+
+.attackCardEncounter {
+  border-top: 0.32rem solid #b03a34;
+}
+
+.attackCardDaily {
+  border-top: 0.32rem solid #7a7f86;
+}
+
+.attackHeader {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.attackHeaderRow {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.attackBadges {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.attackName {
+  margin: 0;
+  color: var(--text-strong);
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  line-height: 1.05;
+}
+
+.typeBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.typeBadgeUnlimited {
+  background: #3d8b4a;
+}
+
+.typeBadgeStandard {
+  background: #9aa0a6;
+}
+
+.typeBadgeEncounter {
+  background: #b03a34;
+}
+
+.typeBadgeDaily {
+  background: #7a7f86;
+}
+
+.metaTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--text-soft);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.actionTagAction {
+  background: rgba(61, 139, 74, 0.25);
+  color: #dff7e3;
+}
+
+.actionTagNoAction {
+  background: rgba(122, 127, 134, 0.25);
+  color: #eceff2;
+}
+
+.detailListInline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+.detailRow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.detailLabel,
+.detailValue,
+.damageLabel,
+.damageValue {
+  color: var(--text-strong);
+  font-family: var(--font-heading);
+  font-size: 0.84rem;
+  line-height: 1.1;
+}
+
+.detailLabel,
+.damageLabel {
+  white-space: nowrap;
+}
+
+.detailValue,
+.damageValue {
+  font-weight: 700;
+}
+
+.attackSection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: baseline;
+}
+
+.attackDescription {
+  margin: 0;
+  padding-top: 0.2rem;
+  border-top: 1px solid rgba(255, 248, 235, 0.18);
+  font-family: var(--font-heading);
+  font-size: 0.84rem;
+  line-height: 1.1;
+}
+
+.emptyState,
+.status {
+  margin: 0;
+  color: var(--text-strong);
+}
+
+@media (max-width: 820px) {
+  .contentGrid,
+  .descriptionSection {
+    grid-template-columns: 1fr;
+  }
+
+  .npcImage {
+    justify-self: start;
+  }
+}
+
+@media print {
+  :global(.language-switcher) {
+    display: none !important;
+  }
+
+  .sheet {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .sheet * {
+    font-family: inherit;
+  }
+
+  .title,
+  .sectionTitle,
+  .attackName {
+    font-family: var(--font-heading);
+  }
+
+  .printButton {
+    display: none;
+  }
+
+  :global(body) {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  :global(body)::before {
+    display: none !important;
+  }
+
+  .pageShell {
+    padding: 0;
+    min-height: auto;
+  }
+
+  .sheet {
+    box-sizing: border-box;
+    width: 100%;
+    gap: 0.45rem;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    box-shadow: none;
+    align-content: start;
+  }
+
+  .header {
+    display: none;
+  }
+
+  .printHeader {
+    display: block;
+    color: #111;
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+  }
+
+  .contentGrid {
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    gap: 0.45rem;
+  }
+
+  .leftColumn {
+    gap: 0.35rem;
+  }
+
+  .section,
+  .attackCard {
+    gap: 0.25rem;
+    padding: 0.4rem 0.45rem;
+    border-color: #bbb;
+    background: #fff;
+  }
+
+  .attackCardUnlimited {
+    border-top-color: #3d8b4a;
+  }
+
+  .attackCardStandard {
+    border-top-color: #777;
+  }
+
+  .attackCardEncounter {
+    border-top-color: #b03a34;
+  }
+
+  .attackCardDaily {
+    border-top-color: #111;
+  }
+
+  .sectionTitle {
+    font-size: 0.72rem;
+  }
+
+  .descriptionSection {
+    grid-template-columns: minmax(0, 1fr) 120px;
+    gap: 0.35rem;
+  }
+
+  .npcImage {
+    max-width: 120px;
+    max-height: 120px;
+  }
+
+  .compactGrid {
+    gap: 0.25rem;
+  }
+
+  .valueCard {
+    padding: 0.25rem 0.35rem;
+    border-color: #c8c8c8;
+    background: #fff;
+  }
+
+  .eyebrow,
+  .attackName,
+  .typeBadge,
+  .metaTag,
+  .damageLabel,
+  .damageValue,
+  .detailLabel,
+  .detailValue,
+  .richText,
+  .attackDescription,
+  .valueLabel,
+  .valueNumber,
+  .emptyState,
+  .status {
+    color: #111;
+  }
+
+  .attackName {
+    font-size: 1rem;
+  }
+
+  .typeBadge {
+    font-size: 0.58rem;
+    border: 1px solid #777;
+  }
+
+  .typeBadgeUnlimited {
+    border-color: #3d8b4a;
+    color: #1f6f2f;
+  }
+
+  .typeBadgeStandard {
+    border-color: #777;
+    color: #555;
+  }
+
+  .typeBadgeEncounter {
+    border-color: #b03a34;
+    color: #8f251f;
+  }
+
+  .typeBadgeDaily {
+    border-color: #111;
+    color: #111;
+  }
+
+  .actionTagAction {
+    background: rgba(61, 139, 74, 0.18);
+  }
+
+  .actionTagNoAction {
+    background: rgba(122, 127, 134, 0.18);
+  }
+
+  .richText,
+  .attackDescription,
+  .detailLabel,
+  .detailValue,
+  .damageLabel,
+  .damageValue {
+    font-size: 0.78rem;
+  }
+
+  .attackDescription {
+    border-top-color: #c8c8c8;
+  }
+
+  .attackGrid {
+    gap: 0.35rem;
+  }
+}

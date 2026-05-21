@@ -709,6 +709,7 @@ const normalizeCharacter = (data: Partial<Record<keyof CharacterData, unknown>> 
     return {
         uniqueId: normalizeUniqueId(data.uniqueId),
         name: typeof data.name === 'string' ? data.name : '',
+        shortDescription: typeof data.shortDescription === 'string' ? data.shortDescription.trim() : '',
         description: typeof data.description === 'string' ? data.description.trim() : '',
         level,
         race,

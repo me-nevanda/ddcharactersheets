@@ -42,6 +42,7 @@ export const useCharacterEditPageSubmitHandler = ({
             await saveCharacter(characterId, {
                 ...form,
                 name: form.name.trim(),
+                shortDescription: form.shortDescription.trim(),
                 description: form.description.trim(),
                 level: clampLevelValue(form.level),
                 gender: normalizeGenderValue(form.gender),

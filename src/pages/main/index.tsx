@@ -2,6 +2,7 @@ import { useI18n } from '@i18n/index'
 import { AdventureListPage } from '@pages/AdventureListPage'
 import { CharacterListPage } from '@pages/CharacterListPage'
 import { MonstersListPage } from '@pages/MonstersListPage'
+import { NpcsListPage } from '@pages/NpcsListPage'
 import { PlaceListPage } from '@pages/PlaceListPage'
 import { useMainPage } from './mainPageHooks'
 import styles from './style.module.scss'
@@ -20,6 +21,9 @@ export const MainPage = () => {
           <button className={`${styles.tabButton} ${activeTab === 'monsters' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('monsters')}>
             {t('pages.main.tabs.monsters')}
           </button>
+          <button className={`${styles.tabButton} ${activeTab === 'npcs' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('npcs')}>
+            {t('pages.main.tabs.npcs')}
+          </button>
           <button className={`${styles.tabButton} ${activeTab === 'adventures' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('adventures')}>
             {t('pages.main.tabs.adventures')}
           </button>
@@ -31,6 +35,7 @@ export const MainPage = () => {
         <div className={styles.tabPanel}>
           {activeTab === 'heroes' ? <CharacterListPage /> : null}
           {activeTab === 'monsters' ? <MonstersListPage /> : null}
+          {activeTab === 'npcs' ? <NpcsListPage /> : null}
           {activeTab === 'adventures' ? <AdventureListPage /> : null}
           {activeTab === 'places' ? <PlaceListPage /> : null}
         </div>

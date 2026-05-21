@@ -7,6 +7,14 @@ export interface MonsterDefenses {
   will: number
 }
 
+export interface MonsterSuggestedStats {
+  attackVsKp: string
+  attackVsOtherDefenses: string
+  lowDamage: string
+  mediumDamage: string
+  highDamage: string
+}
+
 export type MonsterType = 'minion' | 'normal' | 'solo' | 'elite'
 export type MonsterRole = 'skirmisher' | 'brute' | 'soldier' | 'lurker' | 'controller' | 'artillery'
 export type MonsterAttackAction = 'action' | 'noAction'
@@ -57,6 +65,7 @@ export interface MonsterData {
   attacks: MonsterAttack[]
   items: CharacterItems
   defenses: MonsterDefenses
+  suggested: MonsterSuggestedStats
   hp: number
   level: number
   speed: number

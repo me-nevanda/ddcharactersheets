@@ -316,6 +316,7 @@ export interface CharacterTraining {
 export interface CharacterData {
   uniqueId: string
   name: string
+  shortDescription: string
   description: string
   level: number
   race: CharacterRace

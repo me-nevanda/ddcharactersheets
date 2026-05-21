@@ -1,4 +1,4 @@
-@use '../../styles/mixins' as *;
+﻿@use '../../styles/mixins' as *;
 
 .editorLayout {
   min-height: 100vh;
@@ -445,34 +445,6 @@
   gap: 0.75rem;
 }
 
-.suggestedGrid {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.suggestedRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: 0.95rem;
-  background: rgba(255, 248, 235, 0.03);
-  border: 1px solid rgba(255, 248, 235, 0.06);
-}
-
-.suggestedRowLabel {
-  color: var(--text-strong);
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.suggestedInlineField {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
 .attackGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -870,11 +842,6 @@
   text-align: center;
 }
 
-.suggestedInput {
-  width: 5rem;
-  text-align: center;
-}
-
 .statInput {
   width: 5rem;
   text-align: center;
@@ -910,14 +877,6 @@
 
   .defenseGrid {
     grid-template-columns: 1fr;
-  }
-
-  .suggestedRow {
-    align-items: stretch;
-  }
-
-  .suggestedRowLabel {
-    width: 100%;
   }
 
   .statPair {

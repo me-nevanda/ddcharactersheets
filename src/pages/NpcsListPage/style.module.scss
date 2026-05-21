@@ -1,0 +1,556 @@
+﻿@use '../../styles/mixins' as *;
+
+.status {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(243, 165, 165, 0.25);
+  background: rgba(122, 32, 32, 0.16);
+  color: #ffe1e1;
+  font-size: 0.92rem;
+}
+
+.emptyPanel {
+  @include surface-card;
+  min-height: 10rem;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.emptyText {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.tabsContainer {
+  position: relative;
+  margin-top: 2.25rem;
+}
+
+.npcTabs {
+  position: absolute;
+  top: -2.9rem;
+  right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.npcTabButton {
+  @include pill-button;
+  min-height: 2rem;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  background: rgba(255, 248, 235, 0.03);
+  border-color: rgba(255, 248, 235, 0.08);
+  color: var(--text-strong);
+}
+
+.npcTabButtonActive {
+  background: linear-gradient(135deg, rgba(166, 74, 46, 0.25), rgba(217, 164, 65, 0.22));
+  border-color: rgba(240, 198, 111, 0.5);
+}
+
+.npcGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.groupList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.groupCard {
+  @include surface-card;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.8rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.95rem;
+  cursor: pointer;
+}
+
+.groupCard:hover {
+  border-color: var(--border-strong);
+}
+
+.groupCard:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+}
+
+.groupSummary {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.groupName {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-strong);
+  font-size: 1.12rem;
+  line-height: 1.15;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.groupId {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.groupThumbnails {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.45rem;
+  align-items: stretch;
+  margin-top: 0.35rem;
+  overflow: hidden;
+}
+
+.groupThumbnailItem {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  width: 100px;
+  min-height: 104px;
+  min-width: 0;
+  padding: 0.35rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.55rem;
+  background: rgba(255, 248, 235, 0.03);
+}
+
+.groupThumbnailName {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  color: var(--text-strong);
+  font-size: 0.82rem;
+  line-height: 1.15;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.groupThumbnail {
+  display: block;
+  max-width: 80px;
+  max-height: 80px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.groupThumbnailMore {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  min-height: 104px;
+  flex: 0 0 1.4rem;
+  color: var(--text-soft);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.groupEmptyText {
+  margin: 0.35rem 0 0;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.25;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(6, 4, 4, 0.72);
+  backdrop-filter: blur(6px);
+  z-index: 20;
+}
+
+.dialog {
+  width: min(100%, 420px);
+  max-height: calc(100vh - 2.5rem);
+  overflow: auto;
+  padding: 1.35rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent),
+    var(--bg-panel-strong);
+  box-shadow: var(--shadow);
+}
+
+.wideDialog {
+  width: min(100%, 620px);
+}
+
+.dialogTitle {
+  margin: 0 0 1rem;
+  color: var(--text-strong);
+  font-size: 1.35rem;
+}
+
+.npcPickerList {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.npcPickerItem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.75rem;
+  background: rgba(255, 248, 235, 0.03);
+}
+
+.npcPickerSummary {
+  display: grid;
+  gap: 0.16rem;
+  min-width: 0;
+}
+
+.npcPickerName {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-strong);
+  font-size: 1rem;
+  line-height: 1.15;
+}
+
+.npcPickerMeta,
+.npcPickerFile {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.fieldLabel {
+  color: var(--text-soft);
+  font-size: 0.82rem;
+}
+
+.input {
+  min-height: 2.6rem;
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.75rem;
+  background: rgba(255, 248, 235, 0.04);
+  color: var(--text-strong);
+  font: inherit;
+}
+
+.input:focus {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1.1rem;
+}
+
+.primaryButton,
+.secondaryButton,
+.iconButton {
+  @include pill-button;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, #a64a2e 0%, #d9a441 100%);
+  color: #1d120e;
+  font-weight: 700;
+}
+
+.secondaryButton {
+  background: rgba(255, 248, 235, 0.04);
+  border-color: var(--border-soft);
+  color: var(--text-strong);
+}
+
+.iconButton {
+  min-width: 2.35rem;
+  min-height: 2.35rem;
+  padding: 0.45rem;
+  background: rgba(217, 164, 65, 0.14);
+  border-color: rgba(240, 198, 111, 0.32);
+  color: var(--accent);
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.iconButton:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.iconButton:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
+.npcCard {
+  @include surface-card;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.95rem;
+  cursor: pointer;
+}
+
+.npcCard:hover {
+  border-color: var(--border-strong);
+}
+
+.npcCard:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+}
+
+.cardBody {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.npcImageFrame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 120px;
+  height: 120px;
+  isolation: isolate;
+}
+
+.npcImageFrame::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0.45rem;
+  width: 78%;
+  height: 80%;
+  border-radius: 999px;
+  background: rgba(255, 232, 180, 0.42);
+  filter: blur(14px);
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.npcImage {
+  position: relative;
+  display: block;
+  max-width: 120px;
+  max-height: 120px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.npcSummary {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.npcName {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 1.4rem;
+  line-height: 1.05;
+}
+
+.npcNameElite {
+  color: var(--accent-strong);
+}
+
+.npcNameMinion {
+  color: var(--text-soft);
+}
+
+.npcNameNormal {
+  color: var(--text-strong);
+}
+
+.npcNameSolo {
+  color: var(--accent);
+}
+
+.eliteIcon {
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--accent-strong);
+}
+
+.minionIcon {
+  width: 1.08rem;
+  height: 1.08rem;
+  color: var(--text-soft);
+}
+
+.normalIcon {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--text-strong);
+}
+
+.soloIcon {
+  width: 1.14rem;
+  height: 1.14rem;
+  color: var(--accent);
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.45rem;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+
+.cardMetaItem {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.cardMetaSeparator {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255, 248, 235, 0.34);
+}
+
+.npcDescription {
+  display: -webkit-box;
+  margin: 0.35rem 0 0;
+  overflow: hidden;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  font-style: italic;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.cardActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  align-items: center;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.dangerButton {
+  @include pill-button;
+  min-height: 2.1rem;
+  min-width: 2.6rem;
+  padding: 0.45rem 0.65rem;
+  background: rgba(122, 32, 32, 0.18);
+  border-color: rgba(243, 165, 165, 0.3);
+  color: #ffe1e1;
+  font-size: 0.9rem;
+}
+
+.dangerButton:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.dangerButton:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  .npcGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .groupList {
+    grid-template-columns: 1fr;
+  }
+
+  .groupCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .npcImage {
+    max-width: 96px;
+    max-height: 96px;
+  }
+
+  .npcImageFrame {
+    width: 96px;
+    height: 96px;
+  }
+
+  .npcCard {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .cardActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dangerButton {
+    width: 100%;
+  }
+
+  .dialogActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
