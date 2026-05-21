@@ -295,6 +295,7 @@ export const en: TranslationDictionary = {
         damageSuggestion: 'Low damage: {lowDamage}, medium: {mediumDamage}, high {highDamage}',
         namePlaceholder: 'e.g. Claws',
         descriptionPlaceholder: 'Attack effect description',
+        notApplicable: 'not applicable',
       },
       loot: {
         title: 'Loot',
@@ -404,6 +405,7 @@ export const en: TranslationDictionary = {
         damageSuggestion: 'Low damage: {lowDamage}, medium: {mediumDamage}, high {highDamage}',
         namePlaceholder: 'e.g. Claws',
         descriptionPlaceholder: 'Attack effect description',
+        notApplicable: 'not applicable',
       },
       loot: {
         title: 'Loot',
@@ -459,6 +461,7 @@ export const en: TranslationDictionary = {
         lowDamage: 'Low damage',
         mediumDamage: 'Medium damage',
         highDamage: 'High damage',
+        isStory: 'Story NPC',
       },
       placeholders: {
         titleName: 'Nameless NPC',

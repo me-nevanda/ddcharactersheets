@@ -37,6 +37,7 @@ const emptyNpcForm: NpcData = {
   hp: 0,
   level: 1,
   speed: 6,
+  isStory: false,
 }
 
 const defenseFields = ['kp', 'fortitude', 'reflex', 'will'] as const satisfies readonly (keyof NpcDefenses)[]
@@ -188,6 +189,7 @@ const createEmptyNpcAttack = (type: NpcAttackType): NpcAttack => {
     area: 'point',
     attackBonusNumber: 0,
     attackDefense: 'kp',
+    attackNotApplicable: false,
     description: '',
   }
 }
@@ -202,6 +204,7 @@ const normalizeNpcAttack = (attack: Partial<Record<keyof NpcAttack, unknown>>, f
     area: normalizeAttackArea(attack.area),
     attackBonusNumber: normalizeAttackBonusValue(typeof attack.attackBonusNumber === 'number' || typeof attack.attackBonusNumber === 'string' ? attack.attackBonusNumber : 0),
     attackDefense: normalizeAttackDefense(attack.attackDefense),
+    attackNotApplicable: attack.attackNotApplicable === true,
     description: typeof attack.description === 'string' ? attack.description : '',
   }
 }
@@ -251,6 +254,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
           hp: npc.hp,
           level: npc.level,
           speed: npc.speed,
+          isStory: npc.isStory === true,
         }
         if (!cancelled) {
           setForm(nextForm)
@@ -415,6 +419,14 @@ export const useNpcEditPage = (): NpcEditPageState => {
     }))
   }
 
+  const handleIsStoryToggle = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextIsStory = event.target.checked
+    setForm((current) => ({
+      ...current,
+      isStory: nextIsStory,
+    }))
+  }
+
   const handleAttackAdd = (type: NpcAttackType) => {
     setForm((current) => ({
       ...current,
@@ -422,11 +434,22 @@ export const useNpcEditPage = (): NpcEditPageState => {
     }))
   }
 
-  const handleAttackChange = (index: number, fieldName: keyof NpcAttack, value: string | number) => {
+  const handleAttackChange = (index: number, fieldName: keyof NpcAttack, value: string | number | boolean) => {
     setForm((current) => ({
       ...current,
       attacks: current.attacks.map((attack, attackIndex) => {
         if (attackIndex !== index) {
+          return attack
+        }
+
+        if (fieldName === 'attackNotApplicable') {
+          return {
+            ...attack,
+            attackNotApplicable: value === true,
+          }
+        }
+
+        if (typeof value === 'boolean') {
           return attack
         }
 
@@ -625,6 +648,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
         hp: form.hp,
         level: form.level,
         speed: form.speed,
+        isStory: form.isStory,
       }
       await saveNpc(npcId, nextForm)
       setForm(nextForm)
@@ -658,6 +682,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
     handlePrint,
     handleResistancesChange,
     handleSpecialChange,
+    handleIsStoryToggle,
     handleSubmit,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
     imageUrl,

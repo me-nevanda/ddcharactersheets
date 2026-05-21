@@ -100,6 +100,11 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
               ))}
             </select>
           </label>
+
+          <label className={styles.attackNotApplicableField} htmlFor={`npc-attack-not-applicable-${index}`}>
+            <input className={styles.attackNotApplicableInput} id={`npc-attack-not-applicable-${index}`} type="checkbox" checked={attack.attackNotApplicable} onChange={(event) => onAttackChange(index, 'attackNotApplicable', event.target.checked)} />
+            <span className={styles.attackNotApplicableLabel}>{t('pages.npcEdit.attacks.notApplicable')}</span>
+          </label>
         </div>
       </div>
 

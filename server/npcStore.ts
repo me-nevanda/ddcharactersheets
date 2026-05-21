@@ -190,6 +190,7 @@ const normalizeAttack = (data: Partial<Record<keyof NpcAttack, unknown>> = {}): 
     area: normalizeAttackArea(data.area),
     attackBonusNumber: normalizeAttackBonusValue(data.attackBonusNumber),
     attackDefense: normalizeAttackDefense(data.attackDefense),
+    attackNotApplicable: data.attackNotApplicable === true,
     description: typeof data.description === 'string' ? data.description.trim() : '',
   }
 }
@@ -333,6 +334,7 @@ const normalizeNpc = (data: Partial<Record<keyof NpcData, unknown>> = {}): NpcDa
     hp: normalizeStatValue(data.hp, 0),
     level: normalizeLevelValue(data.level),
     speed: normalizeStatValue(data.speed, 6),
+    isStory: data.isStory === true,
   }
 }
 

@@ -183,33 +183,38 @@ export const useNpcsListPage = (): NpcsListPageState => {
     }
   }
 
-  const cards: NpcListCardViewModel[] = npcs.map((npc) => ({
-    deleting: deletingId === npc.id,
-    descriptionPreview: buildTextPreview(npc.description),
-    id: npc.id,
-    imageSrc: npc.imageUrl || '/favicon.png',
-    isElite: npc.type === 'elite',
-    isMinion: npc.type === 'minion',
-    isNormal: npc.type === 'normal',
-    isSolo: npc.type === 'solo',
-    label: npc.name.trim() || t('pages.npcList.unnamedNpc'),
-    level: npc.level,
-    onDeleteClick: (event) => {
-      event.stopPropagation()
-      handleOpenDeleteDialog(npc)
-    },
-    onKeyDown: (event) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault()
+  const cards: NpcListCardViewModel[] = npcs.map((npc) => {
+    const isStory = npc.isStory === true
+    return {
+      deleting: deletingId === npc.id,
+      descriptionPreview: buildTextPreview(npc.description),
+      id: npc.id,
+      imageSrc: npc.imageUrl || '/favicon.png',
+      isElite: !isStory && npc.type === 'elite',
+      isMinion: !isStory && npc.type === 'minion',
+      isNormal: !isStory && npc.type === 'normal',
+      isSolo: !isStory && npc.type === 'solo',
+      isStory,
+      label: npc.name.trim() || t('pages.npcList.unnamedNpc'),
+      level: npc.level,
+      onDeleteClick: (event) => {
+        event.stopPropagation()
+        handleOpenDeleteDialog(npc)
+      },
+      onKeyDown: (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          openNpc(npc.id)
+        }
+      },
+      onOpen: () => {
         openNpc(npc.id)
-      }
-    },
-    onOpen: () => {
-      openNpc(npc.id)
-    },
-    roleLabel: t(`pages.npcEdit.roleOptions.${npc.role}`),
-    typeLabel: t(`pages.npcEdit.typeOptions.${npc.type}`),
-  }))
+      },
+      roleLabel: t(`pages.npcEdit.roleOptions.${npc.role}`),
+      storyLabel: t('pages.npcEdit.fields.isStory'),
+      typeLabel: t(`pages.npcEdit.typeOptions.${npc.type}`),
+    }
+  })
 
   const groupCards: NpcGroupCardViewModel[] = groups.map((group) => ({
     deleting: groupDeletingId === group.id,

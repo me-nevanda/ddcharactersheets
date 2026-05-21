@@ -295,6 +295,7 @@ export interface TranslationDictionary {
         damageSuggestion: string
         namePlaceholder: string
         descriptionPlaceholder: string
+        notApplicable: string
       }
       loot: {
         title: string
@@ -405,6 +406,7 @@ export interface TranslationDictionary {
         damageSuggestion: string
         namePlaceholder: string
         descriptionPlaceholder: string
+        notApplicable: string
       }
       loot: {
         title: string
@@ -460,6 +462,7 @@ export interface TranslationDictionary {
         lowDamage: string
         mediumDamage: string
         highDamage: string
+        isStory: string
       }
       placeholders: {
         titleName: string

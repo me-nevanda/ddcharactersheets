@@ -190,6 +190,7 @@ const normalizeAttack = (data: Partial<Record<keyof MonsterAttack, unknown>> = {
     area: normalizeAttackArea(data.area),
     attackBonusNumber: normalizeAttackBonusValue(data.attackBonusNumber),
     attackDefense: normalizeAttackDefense(data.attackDefense),
+    attackNotApplicable: data.attackNotApplicable === true,
     description: typeof data.description === 'string' ? data.description.trim() : '',
   }
 }

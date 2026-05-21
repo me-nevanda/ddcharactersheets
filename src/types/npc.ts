@@ -51,6 +51,7 @@ export interface NpcAttack {
   area: NpcAttackAreaType
   attackBonusNumber: number
   attackDefense: keyof NpcDefenses
+  attackNotApplicable: boolean
   description: string
 }
 
@@ -69,6 +70,7 @@ export interface NpcData {
   hp: number
   level: number
   speed: number
+  isStory: boolean
 }
 
 export interface Npc extends NpcData {

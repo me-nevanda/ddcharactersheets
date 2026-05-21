@@ -95,10 +95,12 @@ export const MonsterPrintPage = () => {
           </div>
         ) : null}
       </div>
-      <div className={styles.attackSection}>
-        <span className={styles.damageLabel}>{`${t('pages.characterAbilitiesPrint.attackLabel')}:`}</span>
-        <strong className={styles.damageValue}>{attack.attackDisplay}</strong>
-      </div>
+      {attack.attackNotApplicable ? null : (
+        <div className={styles.attackSection}>
+          <span className={styles.damageLabel}>{`${t('pages.characterAbilitiesPrint.attackLabel')}:`}</span>
+          <strong className={styles.damageValue}>{attack.attackDisplay}</strong>
+        </div>
+      )}
       {hasRichText(attack.description) ? <div className={styles.attackDescription} dangerouslySetInnerHTML={{ __html: attack.description }} /> : null}
     </article>
   )

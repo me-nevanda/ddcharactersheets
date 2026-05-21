@@ -188,6 +188,7 @@ const createEmptyMonsterAttack = (type: MonsterAttackType): MonsterAttack => {
     area: 'point',
     attackBonusNumber: 0,
     attackDefense: 'kp',
+    attackNotApplicable: false,
     description: '',
   }
 }
@@ -202,6 +203,7 @@ const normalizeMonsterAttack = (attack: Partial<Record<keyof MonsterAttack, unkn
     area: normalizeAttackArea(attack.area),
     attackBonusNumber: normalizeAttackBonusValue(typeof attack.attackBonusNumber === 'number' || typeof attack.attackBonusNumber === 'string' ? attack.attackBonusNumber : 0),
     attackDefense: normalizeAttackDefense(attack.attackDefense),
+    attackNotApplicable: attack.attackNotApplicable === true,
     description: typeof attack.description === 'string' ? attack.description : '',
   }
 }
@@ -422,11 +424,22 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     }))
   }
 
-  const handleAttackChange = (index: number, fieldName: keyof MonsterAttack, value: string | number) => {
+  const handleAttackChange = (index: number, fieldName: keyof MonsterAttack, value: string | number | boolean) => {
     setForm((current) => ({
       ...current,
       attacks: current.attacks.map((attack, attackIndex) => {
         if (attackIndex !== index) {
+          return attack
+        }
+
+        if (fieldName === 'attackNotApplicable') {
+          return {
+            ...attack,
+            attackNotApplicable: value === true,
+          }
+        }
+
+        if (typeof value === 'boolean') {
           return attack
         }
 

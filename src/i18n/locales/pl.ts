@@ -295,6 +295,7 @@ export const pl: TranslationDictionary = {
         damageSuggestion: 'Obrażenia niskie: {lowDamage}, średnie: {mediumDamage}, wysokie {highDamage}',
         namePlaceholder: 'Np. Pazury',
         descriptionPlaceholder: 'Opis działania ataku',
+        notApplicable: 'nie dotyczy',
       },
       loot: {
         title: 'Łupy',
@@ -404,6 +405,7 @@ export const pl: TranslationDictionary = {
         damageSuggestion: 'Obrażenia niskie: {lowDamage}, średnie: {mediumDamage}, wysokie {highDamage}',
         namePlaceholder: 'Np. Pazury',
         descriptionPlaceholder: 'Opis działania ataku',
+        notApplicable: 'nie dotyczy',
       },
       loot: {
         title: 'Ekwipunek',
@@ -459,6 +461,7 @@ export const pl: TranslationDictionary = {
         lowDamage: 'Obrażenia niskie',
         mediumDamage: 'Obrażenia średnie',
         highDamage: 'Obrażenia wysokie',
+        isStory: 'NPC fabularny',
       },
       placeholders: {
         titleName: 'Bezimienny NPC',

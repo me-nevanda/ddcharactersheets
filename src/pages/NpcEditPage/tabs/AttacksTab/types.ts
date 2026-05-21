@@ -14,7 +14,7 @@ export interface AttacksTabProps {
   attacks: NpcAttack[]
   suggested: NpcSuggestedStats
   onAttackAdd: (type: NpcAttackType) => void
-  onAttackChange: (index: number, fieldName: keyof NpcAttack, value: string | number) => void
+  onAttackChange: (index: number, fieldName: keyof NpcAttack, value: string | number | boolean) => void
   onAttackRemove: (index: number) => void
 }
 
@@ -26,7 +26,7 @@ export interface AttackCardProps {
   getAttackHeaderClass: (type: NpcAttackType) => string
   index: number
   suggested: NpcSuggestedStats
-  onAttackChange: (index: number, fieldName: keyof NpcAttack, value: string | number) => void
+  onAttackChange: (index: number, fieldName: keyof NpcAttack, value: string | number | boolean) => void
   onAttackRemove: (index: number) => void
   t: (key: string, variables?: Record<string, string | number>) => string
 }

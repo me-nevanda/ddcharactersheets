@@ -368,6 +368,37 @@
   align-items: start;
 }
 
+.generalGridStory {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.storyToggleRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.7rem;
+  background: rgba(255, 248, 235, 0.03);
+  color: var(--text-strong);
+  cursor: pointer;
+  width: fit-content;
+  user-select: none;
+}
+
+.storyToggleInput {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--accent-strong);
+}
+
+.storyToggleLabel {
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
 .emptyTabPanel {
   min-height: 10rem;
 }
@@ -633,6 +664,28 @@
 }
 
 .attackLabel {
+  color: var(--text-strong);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
+
+.attackNotApplicableField {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.attackNotApplicableInput {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--accent-strong);
+}
+
+.attackNotApplicableLabel {
   color: var(--text-strong);
   font-size: 0.8rem;
   letter-spacing: 0.06em;

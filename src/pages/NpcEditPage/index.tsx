@@ -1,4 +1,4 @@
-﻿import { useState, type MouseEvent as ReactMouseEvent } from 'react'
+﻿import { useEffect, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { SimpleWysiwygEditor } from '@components/SimpleWysiwygEditor'
@@ -15,10 +15,15 @@ export const NpcEditPage = () => {
   const { t } = useI18n()
   const navigate = useNavigate()
   const { handleTabChange } = useMainPageContext()
-  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useNpcEditPage()
+  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleIsStoryToggle, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useNpcEditPage()
   const [activeTab, setActiveTab] = useState<NpcEditTabKey>('general')
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
   const bloodiedValue = Math.floor(form.hp / 2)
+  useEffect(() => {
+    if (form.isStory && activeTab === 'attacks') {
+      setActiveTab('general')
+    }
+  }, [form.isStory, activeTab])
   const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
     if (hasChanges) {
       event.preventDefault()
@@ -102,17 +107,19 @@ export const NpcEditPage = () => {
                 <button className={`${styles.tabButton} ${activeTab === 'general' ? styles.tabButtonActive : ''}`} type="button" onClick={() => setActiveTab('general')}>
                   {t('pages.npcEdit.tabs.general')}
                 </button>
-                <button className={`${styles.tabButton} ${activeTab === 'attacks' ? styles.tabButtonActive : ''}`} type="button" onClick={() => setActiveTab('attacks')}>
-                  {t('pages.npcEdit.tabs.attacks')}
-                </button>
+                {!form.isStory ? (
+                  <button className={`${styles.tabButton} ${activeTab === 'attacks' ? styles.tabButtonActive : ''}`} type="button" onClick={() => setActiveTab('attacks')}>
+                    {t('pages.npcEdit.tabs.attacks')}
+                  </button>
+                ) : null}
                 <button className={`${styles.tabButton} ${activeTab === 'loot' ? styles.tabButtonActive : ''}`} type="button" onClick={() => setActiveTab('loot')}>
                   {t('pages.npcEdit.tabs.loot')}
                 </button>
               </aside>
 
               <div className={styles.tabPanel}>
-                {activeTab === 'general' ? <div className={styles.generalGrid}>
-                  <div className={styles.leftColumn}>
+                {activeTab === 'general' ? <div className={`${styles.generalGrid} ${form.isStory ? styles.generalGridStory : ''}`}>
+                  {!form.isStory ? <div className={styles.leftColumn}>
                     <section className={styles.section}>
                       <div className={styles.sectionHeader}>
                         <h2 className={styles.sectionTitle}>{t('pages.npcEdit.sections.defenses')}</h2>
@@ -216,28 +223,37 @@ export const NpcEditPage = () => {
                         </div>
                       </div>
                     </section>
-                  </div>
+                  </div> : null}
 
                   <div className={styles.rightColumn}>
-                    <section className={styles.section}>
-                      <div className={styles.sectionHeader}>
-                        <h2 className={styles.sectionTitle}>{t('pages.npcEdit.sections.resistances')}</h2>
-                      </div>
+                    <label className={styles.storyToggleRow} htmlFor="isStory">
+                      <input className={styles.storyToggleInput} id="isStory" name="isStory" type="checkbox" checked={form.isStory} onChange={handleIsStoryToggle} />
+                      <span className={styles.storyToggleLabel}>{t('pages.npcEdit.fields.isStory')}</span>
+                    </label>
 
-                      <div className={styles.descriptionField}>
-                        <SimpleWysiwygEditor ariaLabel={t('pages.npcEdit.sections.resistances')} minHeightClassName={styles.resistancesTextarea} name="resistances" placeholder={t('pages.npcEdit.placeholders.resistances')} toolbar={false} value={form.resistances} onChange={handleResistancesChange} />
-                      </div>
-                    </section>
+                    {!form.isStory ? (
+                      <section className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                          <h2 className={styles.sectionTitle}>{t('pages.npcEdit.sections.resistances')}</h2>
+                        </div>
 
-                    <section className={styles.section}>
-                      <div className={styles.sectionHeader}>
-                        <h2 className={styles.sectionTitle}>{t('pages.npcEdit.sections.special')}</h2>
-                      </div>
+                        <div className={styles.descriptionField}>
+                          <SimpleWysiwygEditor ariaLabel={t('pages.npcEdit.sections.resistances')} minHeightClassName={styles.resistancesTextarea} name="resistances" placeholder={t('pages.npcEdit.placeholders.resistances')} toolbar={false} value={form.resistances} onChange={handleResistancesChange} />
+                        </div>
+                      </section>
+                    ) : null}
 
-                      <div className={styles.descriptionField}>
-                        <SimpleWysiwygEditor ariaLabel={t('pages.npcEdit.sections.special')} minHeightClassName={styles.resistancesTextarea} name="special" placeholder={t('pages.npcEdit.placeholders.special')} toolbar={false} value={form.special} onChange={handleSpecialChange} />
-                      </div>
-                    </section>
+                    {!form.isStory ? (
+                      <section className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                          <h2 className={styles.sectionTitle}>{t('pages.npcEdit.sections.special')}</h2>
+                        </div>
+
+                        <div className={styles.descriptionField}>
+                          <SimpleWysiwygEditor ariaLabel={t('pages.npcEdit.sections.special')} minHeightClassName={styles.resistancesTextarea} name="special" placeholder={t('pages.npcEdit.placeholders.special')} toolbar={false} value={form.special} onChange={handleSpecialChange} />
+                        </div>
+                      </section>
+                    ) : null}
 
                     <section className={styles.section}>
                       <div className={styles.sectionHeader}>
@@ -250,7 +266,7 @@ export const NpcEditPage = () => {
                     </section>
                   </div>
                 </div> : null}
-                {activeTab === 'attacks' ? <AttacksTab attacks={form.attacks} suggested={form.suggested} onAttackAdd={handleAttackAdd} onAttackChange={handleAttackChange} onAttackRemove={handleAttackRemove} /> : null}
+                {activeTab === 'attacks' && !form.isStory ? <AttacksTab attacks={form.attacks} suggested={form.suggested} onAttackAdd={handleAttackAdd} onAttackChange={handleAttackChange} onAttackRemove={handleAttackRemove} /> : null}
                 {activeTab === 'loot' ? <LootTab items={form.items} onArmorBonusChange={handleArmorBonusChange} onItemBonusFieldChange={handleItemBonusFieldChange} onItemChange={handleItemChange} onItemCreateEmpty={handleItemCreateEmpty} onItemRemove={handleItemRemove} onWeaponDamageChange={handleWeaponDamageChange} /> : null}
               </div>
             </div>

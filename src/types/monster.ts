@@ -51,6 +51,7 @@ export interface MonsterAttack {
   area: MonsterAttackAreaType
   attackBonusNumber: number
   attackDefense: keyof MonsterDefenses
+  attackNotApplicable: boolean
   description: string
 }
 

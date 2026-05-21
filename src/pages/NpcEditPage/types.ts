@@ -9,7 +9,7 @@ export interface NpcEditPageState {
   error: string
   form: NpcData
   handleAttackAdd: (type: NpcAttackType) => void
-  handleAttackChange: (index: number, fieldName: keyof NpcAttack, value: string | number) => void
+  handleAttackChange: (index: number, fieldName: keyof NpcAttack, value: string | number | boolean) => void
   handleAttackRemove: (index: number) => void
   handleCancelGenerateAttributes: () => void
   handleConfirmGenerateAttributes: () => void
@@ -41,6 +41,7 @@ export interface NpcEditPageState {
   handlePrint: () => void
   handleResistancesChange: (value: string) => void
   handleSpecialChange: (value: string) => void
+  handleIsStoryToggle: (event: ChangeEvent<HTMLInputElement>) => void
   handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
   imageUrl: string

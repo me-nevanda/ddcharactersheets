@@ -618,6 +618,28 @@
   letter-spacing: 0.06em;
 }
 
+.attackNotApplicableField {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.attackNotApplicableInput {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--accent-strong);
+}
+
+.attackNotApplicableLabel {
+  color: var(--text-strong);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
+
 .attackSuggestion {
   display: flex;
   flex-wrap: wrap;

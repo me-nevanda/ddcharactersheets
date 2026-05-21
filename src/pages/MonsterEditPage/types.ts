@@ -9,7 +9,7 @@ export interface MonsterEditPageState {
   error: string
   form: MonsterData
   handleAttackAdd: (type: MonsterAttackType) => void
-  handleAttackChange: (index: number, fieldName: keyof MonsterAttack, value: string | number) => void
+  handleAttackChange: (index: number, fieldName: keyof MonsterAttack, value: string | number | boolean) => void
   handleAttackRemove: (index: number) => void
   handleCancelGenerateAttributes: () => void
   handleConfirmGenerateAttributes: () => void

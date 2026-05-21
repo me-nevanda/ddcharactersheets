@@ -14,7 +14,7 @@ export interface AttacksTabProps {
   attacks: MonsterAttack[]
   suggested: MonsterSuggestedStats
   onAttackAdd: (type: MonsterAttackType) => void
-  onAttackChange: (index: number, fieldName: keyof MonsterAttack, value: string | number) => void
+  onAttackChange: (index: number, fieldName: keyof MonsterAttack, value: string | number | boolean) => void
   onAttackRemove: (index: number) => void
 }
 
@@ -26,7 +26,7 @@ export interface AttackCardProps {
   getAttackHeaderClass: (type: MonsterAttackType) => string
   index: number
   suggested: MonsterSuggestedStats
-  onAttackChange: (index: number, fieldName: keyof MonsterAttack, value: string | number) => void
+  onAttackChange: (index: number, fieldName: keyof MonsterAttack, value: string | number | boolean) => void
   onAttackRemove: (index: number) => void
   t: (key: string, variables?: Record<string, string | number>) => string
 }

@@ -13,12 +13,14 @@ export interface NpcListCardViewModel {
   isMinion: boolean
   isNormal: boolean
   isSolo: boolean
+  isStory: boolean
   label: string
   level: number
   onDeleteClick: MouseEventHandler<HTMLButtonElement>
   onKeyDown: KeyboardEventHandler<HTMLElement>
   onOpen: () => void
   roleLabel: string
+  storyLabel: string
   typeLabel: string
 }
 

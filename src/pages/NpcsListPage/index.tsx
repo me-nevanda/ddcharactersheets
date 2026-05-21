@@ -30,15 +30,21 @@ const NpcListCard = ({ card }: { card: NpcListCardViewModel }) => {
             {card.isSolo ? <AppIcon className={styles.soloIcon} name="crown" /> : null}
             <span>{card.label}</span>
           </h2>
-          <div className={styles.cardMeta}>
-            <span className={styles.cardMetaItem}>{card.roleLabel}</span>
-            <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
-            <span className={styles.cardMetaItem}>
-              {t('pages.npcEdit.fields.level')} {card.level}
-            </span>
-            <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
-            <span className={styles.cardMetaItem}>{card.typeLabel}</span>
-          </div>
+          {card.isStory ? (
+            <div className={styles.cardMeta}>
+              <span className={styles.cardMetaItem}>{card.storyLabel}</span>
+            </div>
+          ) : (
+            <div className={styles.cardMeta}>
+              <span className={styles.cardMetaItem}>{card.roleLabel}</span>
+              <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
+              <span className={styles.cardMetaItem}>
+                {t('pages.npcEdit.fields.level')} {card.level}
+              </span>
+              <span className={styles.cardMetaSeparator} aria-hidden="true">|</span>
+              <span className={styles.cardMetaItem}>{card.typeLabel}</span>
+            </div>
+          )}
           {card.descriptionPreview ? <p className={styles.npcDescription}>{card.descriptionPreview}</p> : null}
         </div>
       </div>
