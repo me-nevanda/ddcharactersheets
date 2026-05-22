@@ -34,6 +34,22 @@ const buildAreaOptions = (t: ReturnType<typeof useI18n>['t']): MonsterPrintAreaO
   ]
 }
 
+const escapeHtml = (value: string): string => {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+const applySuggestedDamageToDescription = (description: string, monster: Monster): string => {
+  return description
+    .replace(/\[S\]/g, escapeHtml(monster.suggested.lowDamage))
+    .replace(/\[M\]/g, escapeHtml(monster.suggested.mediumDamage))
+    .replace(/\[L\]/g, escapeHtml(monster.suggested.highDamage))
+}
+
 const buildAttackRows = (t: ReturnType<typeof useI18n>['t'], monster: Monster): MonsterPrintAttackRow[] => {
   const areaOptions = buildAreaOptions(t)
 
@@ -49,6 +65,7 @@ const buildAttackRows = (t: ReturnType<typeof useI18n>['t'], monster: Monster): 
     return {
       ...attack,
       key: attack.id || `${attack.name}-${index}`,
+      description: applySuggestedDamageToDescription(attack.description, monster),
       meta,
       areaLabel,
       attackDisplay: `+${attack.attackBonusNumber} ${t('pages.characterEdit.abilities.weaponAgainstLabel')} ${defenseLabel}`,

@@ -1,5 +1,10 @@
 import type { ChangeEvent, FormEvent, KeyboardEvent, MouseEvent as ReactMouseEvent } from 'react'
+import type { Area } from '@appTypes/area'
+import type { Character } from '@appTypes/character'
 import type { ContextData } from '@appTypes/context'
+import type { Event } from '@appTypes/event'
+import type { Monster } from '@appTypes/monster'
+import type { Npc } from '@appTypes/npc'
 
 export interface ContextCharacterCardViewModel {
   id: string
@@ -134,11 +139,33 @@ export interface ContextEventOptionViewModel {
   selected: boolean
 }
 
+export interface UseContextCopyParams {
+  areas: Area[]
+  characters: Character[]
+  contextId: string
+  events: Event[]
+  form: ContextData
+  monsters: Monster[]
+  npcs: Npc[]
+  onClearError: () => void
+  onError: (message: string) => void
+  saveCurrentContext: () => Promise<ContextData>
+}
+
+export interface ContextCopyState {
+  copyingContext: boolean
+  copyStatus: string
+  handleCopyContext: () => Promise<void>
+}
+
 export interface ContextEditPageState {
   error: string
+  copyStatus: string
+  copyingContext: boolean
   form: ContextData
   handleChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
   handleChangeDescription: (value: string) => void
+  handleCopyContext: () => Promise<void>
   handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
   loading: boolean

@@ -4,6 +4,7 @@ import { useI18n } from '@i18n/index'
 import { getContext, listAreas, listCharacters, listEvents, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
+import { useContextCopy } from './contextCopyHooks'
 import type { Area, PlaceItem } from '@appTypes/area'
 import type { Character } from '@appTypes/character'
 import type { ContextAreaSnapshot, ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
@@ -794,37 +795,44 @@ export const useContextEditPage = (): ContextEditPageState => {
 
   // ----- Submit -----
 
+  const buildContextPayload = (): ContextData => ({
+    uniqueId: form.uniqueId,
+    name: form.name.trim(),
+    description: form.description.trim(),
+    characters: [...form.characters],
+    events: [...form.events],
+    npcGroups: form.npcGroups.map((group) => ({
+      id: group.id,
+      name: group.name,
+      npcIds: [...group.npcIds],
+    })),
+    monsterGroups: form.monsterGroups.map((group) => ({
+      id: group.id,
+      name: group.name,
+      monsterIds: [...group.monsterIds],
+    })),
+    areas: form.areas.map((area) => ({
+      id: area.id,
+      name: area.name,
+      placeIds: [...area.placeIds],
+    })),
+  })
+
+  const saveCurrentContext = async (): Promise<ContextData> => {
+    const nextForm = buildContextPayload()
+    await saveContext(contextId, nextForm)
+    setForm(nextForm)
+    setInitialForm(nextForm)
+    return nextForm
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSaving(true)
     setError('')
 
     try {
-      const nextForm: ContextData = {
-        uniqueId: form.uniqueId,
-        name: form.name.trim(),
-        description: form.description.trim(),
-        characters: [...form.characters],
-        events: [...form.events],
-        npcGroups: form.npcGroups.map((group) => ({
-          id: group.id,
-          name: group.name,
-          npcIds: [...group.npcIds],
-        })),
-        monsterGroups: form.monsterGroups.map((group) => ({
-          id: group.id,
-          name: group.name,
-          monsterIds: [...group.monsterIds],
-        })),
-        areas: form.areas.map((area) => ({
-          id: area.id,
-          name: area.name,
-          placeIds: [...area.placeIds],
-        })),
-      }
-      await saveContext(contextId, nextForm)
-      setForm(nextForm)
-      setInitialForm(nextForm)
+      await saveCurrentContext()
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
     } finally {
@@ -1200,11 +1208,31 @@ export const useContextEditPage = (): ContextEditPageState => {
     return false
   }, [form, initialForm])
 
+  const {
+    copyingContext,
+    copyStatus,
+    handleCopyContext,
+  } = useContextCopy({
+    areas: allAreas,
+    characters: allCharacters,
+    contextId,
+    events: allEvents,
+    form,
+    monsters: allMonsters,
+    npcs: allNpcs,
+    onClearError: () => setError(''),
+    onError: setError,
+    saveCurrentContext,
+  })
+
   return {
     error,
+    copyStatus,
+    copyingContext,
     form,
     handleChange,
     handleChangeDescription,
+    handleCopyContext,
     handleSubmit,
     hasChanges,
     loading,

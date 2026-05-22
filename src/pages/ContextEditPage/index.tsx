@@ -436,8 +436,11 @@ export const ContextEditPage = () => {
   const { handleTabChange } = useMainPageContext()
   const {
     error,
+    copyStatus,
+    copyingContext,
     form,
     handleChange,
+    handleCopyContext,
     handleSubmit,
     hasChanges,
     loading,
@@ -527,10 +530,10 @@ export const ContextEditPage = () => {
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.floatingSaveAction}>
-              <button className={styles.secondaryButton} type="button">
+              <button className={styles.secondaryButton} type="button" onClick={() => void handleCopyContext()} disabled={saving || copyingContext}>
                 <span className={styles.buttonContent}>
                   <AppIcon name="document" />
-                  <span>{t('pages.contextEdit.copyButton')}</span>
+                  <span>{copyingContext ? t('pages.contextEdit.copyingButton') : t('pages.contextEdit.copyButton')}</span>
                 </span>
               </button>
               <button className={styles.primaryButton} form="context-edit-form" type="submit" disabled={saving || !hasChanges}>
@@ -544,6 +547,7 @@ export const ContextEditPage = () => {
         </div>
 
         {error ? <p className={styles.status}>{error}</p> : null}
+        {copyStatus ? <p className={styles.successStatus}>{copyStatus}</p> : null}
 
         {loading ? (
           <p className={styles.loadingText}>{t('pages.contextEdit.loading')}</p>

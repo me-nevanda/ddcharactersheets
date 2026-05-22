@@ -34,6 +34,22 @@ const buildAreaOptions = (t: ReturnType<typeof useI18n>['t']): NpcPrintAreaOptio
   ]
 }
 
+const escapeHtml = (value: string): string => {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+const applySuggestedDamageToDescription = (description: string, npc: Npc): string => {
+  return description
+    .replace(/\[S\]/g, escapeHtml(npc.suggested.lowDamage))
+    .replace(/\[M\]/g, escapeHtml(npc.suggested.mediumDamage))
+    .replace(/\[L\]/g, escapeHtml(npc.suggested.highDamage))
+}
+
 const buildAttackRows = (t: ReturnType<typeof useI18n>['t'], npc: Npc): NpcPrintAttackRow[] => {
   const areaOptions = buildAreaOptions(t)
 
@@ -49,6 +65,7 @@ const buildAttackRows = (t: ReturnType<typeof useI18n>['t'], npc: Npc): NpcPrint
     return {
       ...attack,
       key: attack.id || `${attack.name}-${index}`,
+      description: applySuggestedDamageToDescription(attack.description, npc),
       meta,
       areaLabel,
       attackDisplay: `+${attack.attackBonusNumber} ${t('pages.characterEdit.abilities.weaponAgainstLabel')} ${defenseLabel}`,

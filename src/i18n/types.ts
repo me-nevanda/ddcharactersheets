@@ -138,6 +138,21 @@ export interface TranslationDictionary {
       eyebrow: string
       loading: string
       copyButton: string
+      copyingButton: string
+      copySuccess: string
+      copyError: string
+      copy: {
+        intro: string
+        heroesTitle: string
+        npcGroupsTitle: string
+        monsterGroupsTitle: string
+        areasTitle: string
+        eventsTitle: string
+        generalContextTitle: string
+        levelLabel: string
+        alive: string
+        dead: string
+      }
       fields: {
         name: string
         description: string
