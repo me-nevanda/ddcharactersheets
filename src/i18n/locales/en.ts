@@ -190,6 +190,22 @@ export const en: TranslationDictionary = {
           confirm: 'Add selected',
         },
       },
+      areas: {
+        title: 'Areas',
+        emptyState: 'No areas added to this context yet.',
+        addButton: 'Add areas',
+        removeAreaButton: 'Remove area from context',
+        removePlaceButton: 'Remove place from area',
+        areaEmpty: 'No places in this area.',
+        placeCount: 'Places: {count}',
+        addDialog: {
+          title: 'Add areas to the context',
+          searchLabel: 'Search area',
+          searchPlaceholder: 'Type area name',
+          emptyState: 'No areas available to add.',
+          confirm: 'Add selected',
+        },
+      },
     },
     areaEdit: {
       eyebrow: 'AREA',

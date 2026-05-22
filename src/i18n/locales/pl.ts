@@ -190,6 +190,22 @@ export const pl: TranslationDictionary = {
           confirm: 'Dodaj zaznaczone',
         },
       },
+      areas: {
+        title: 'Obszary',
+        emptyState: 'Nie dodano jeszcze żadnego obszaru do tego kontekstu.',
+        addButton: 'Dodaj obszary',
+        removeAreaButton: 'Usuń obszar z kontekstu',
+        removePlaceButton: 'Usuń miejsce z obszaru',
+        areaEmpty: 'Brak miejsc w tym obszarze.',
+        placeCount: 'Miejsca: {count}',
+        addDialog: {
+          title: 'Dodaj obszary do kontekstu',
+          searchLabel: 'Szukaj obszaru',
+          searchPlaceholder: 'Wpisz nazwę obszaru',
+          emptyState: 'Nie ma obszarów do dodania.',
+          confirm: 'Dodaj zaznaczone',
+        },
+      },
     },
     areaEdit: {
       eyebrow: 'OBSZAR',

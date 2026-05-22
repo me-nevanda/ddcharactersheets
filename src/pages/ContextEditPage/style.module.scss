@@ -213,6 +213,11 @@
   box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
 }
 
+.descriptionEditor :global(.rsw-ce) {
+  min-height: 22rem;
+  max-height: none;
+}
+
 .sectionHeader {
   display: flex;
   align-items: center;
@@ -483,6 +488,23 @@
 .npcCardDead {
   opacity: 0.55;
   filter: grayscale(0.4);
+}
+
+.placeIconFrame {
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  flex: 0 0 auto;
+  border-radius: 0.7rem;
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 248, 235, 0.04);
+  color: var(--accent);
+}
+
+.placeIconFrame svg {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 @media (max-width: 720px) {

@@ -101,14 +101,39 @@ const normalizeMonsterGroups = (value: unknown): ContextData['monsterGroups'] =>
     return groups;
 };
 
+const normalizeAreas = (value: unknown): ContextData['areas'] => {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+    const seenIds = new Set<string>();
+    const areas: ContextData['areas'] = [];
+    for (const item of value) {
+        if (!item || typeof item !== 'object') {
+            continue;
+        }
+        const record = item as Record<string, unknown>;
+        const id = typeof record.id === 'string' ? record.id.trim() : '';
+        if (!id || seenIds.has(id)) {
+            continue;
+        }
+        seenIds.add(id);
+        const name = typeof record.name === 'string' ? record.name : '';
+        const placeIds = normalizeStringArray(record.placeIds);
+        areas.push({ id, name, placeIds });
+    }
+    return areas;
+};
+
 const normalizeContext = (data: Partial<Record<keyof ContextData, unknown>> = {}): ContextData => {
     return {
         uniqueId: normalizeUniqueId(data.uniqueId),
         name: typeof data.name === 'string' ? data.name : '',
         description: typeof data.description === 'string' ? data.description : '',
         characters: normalizeCharacters(data.characters),
+        events: normalizeStringArray(data.events),
         npcGroups: normalizeNpcGroups(data.npcGroups),
         monsterGroups: normalizeMonsterGroups(data.monsterGroups),
+        areas: normalizeAreas(data.areas),
     };
 };
 

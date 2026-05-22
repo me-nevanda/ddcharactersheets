@@ -10,13 +10,21 @@ export interface ContextMonsterGroupSnapshot {
   monsterIds: string[]
 }
 
+export interface ContextAreaSnapshot {
+  id: string
+  name: string
+  placeIds: string[]
+}
+
 export interface ContextData {
   uniqueId: string
   name: string
   description: string
   characters: string[]
+  events: string[]
   npcGroups: ContextNpcGroupSnapshot[]
   monsterGroups: ContextMonsterGroupSnapshot[]
+  areas: ContextAreaSnapshot[]
 }
 
 export interface Context extends ContextData {

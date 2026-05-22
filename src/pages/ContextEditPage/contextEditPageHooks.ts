@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { getContext, listCharacters, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext } from '@lib/api'
+import { getContext, listAreas, listCharacters, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
+import type { Area, PlaceItem } from '@appTypes/area'
 import type { Character } from '@appTypes/character'
-import type { ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
+import type { ContextAreaSnapshot, ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
 import type { Npc, NpcGroup } from '@appTypes/npc'
 import type {
+  ContextAreaOptionViewModel,
+  ContextAreaSectionViewModel,
   ContextCharacterCardViewModel,
   ContextCharacterOptionViewModel,
   ContextEditPageState,
@@ -18,6 +21,7 @@ import type {
   ContextNpcCardViewModel,
   ContextNpcGroupOptionViewModel,
   ContextNpcGroupSectionViewModel,
+  ContextPlaceCardViewModel,
 } from './types'
 
 const emptyContextForm: ContextData = {
@@ -27,6 +31,19 @@ const emptyContextForm: ContextData = {
   characters: [],
   npcGroups: [],
   monsterGroups: [],
+  areas: [],
+}
+
+const buildPlainTextPreview = (value: string): string => {
+  if (!value) {
+    return ''
+  }
+  if (typeof document === 'undefined') {
+    return value.replace(/\s+/g, ' ').trim()
+  }
+  const template = document.createElement('template')
+  template.innerHTML = value
+  return (template.content.textContent ?? '').replace(/\s+/g, ' ').trim()
 }
 
 const areStringArraysEqual = (left: string[], right: string[]): boolean => {
@@ -81,6 +98,26 @@ const areMonsterGroupSnapshotsEqual = (
   return true
 }
 
+const areAreaSnapshotsEqual = (
+  left: ContextAreaSnapshot[],
+  right: ContextAreaSnapshot[],
+): boolean => {
+  if (left.length !== right.length) {
+    return false
+  }
+  for (let index = 0; index < left.length; index += 1) {
+    const a = left[index]
+    const b = right[index]
+    if (a.id !== b.id || a.name !== b.name) {
+      return false
+    }
+    if (!areStringArraysEqual(a.placeIds, b.placeIds)) {
+      return false
+    }
+  }
+  return true
+}
+
 const stripJsonExtension = (fileName: string): string => {
   if (typeof fileName !== 'string') {
     return ''
@@ -115,6 +152,11 @@ export const useContextEditPage = (): ContextEditPageState => {
   const [monsterGroupSearch, setMonsterGroupSearch] = useState('')
   const [selectedMonsterGroupIdsInDialog, setSelectedMonsterGroupIdsInDialog] = useState<string[]>([])
 
+  const [allAreas, setAllAreas] = useState<Area[]>([])
+  const [isAddAreaDialogOpen, setIsAddAreaDialogOpen] = useState(false)
+  const [areaSearch, setAreaSearch] = useState('')
+  const [selectedAreaIdsInDialog, setSelectedAreaIdsInDialog] = useState<string[]>([])
+
   useEffect(() => {
     let cancelled = false
 
@@ -128,6 +170,7 @@ export const useContextEditPage = (): ContextEditPageState => {
           characters: Array.isArray(context.characters) ? context.characters : [],
           npcGroups: Array.isArray(context.npcGroups) ? context.npcGroups : [],
           monsterGroups: Array.isArray(context.monsterGroups) ? context.monsterGroups : [],
+          areas: Array.isArray(context.areas) ? context.areas : [],
         }
 
         if (!cancelled) {
@@ -224,6 +267,29 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
   }, [t])
 
+  useEffect(() => {
+    let cancelled = false
+
+    const loadAreas = async () => {
+      try {
+        const areas = await listAreas()
+        if (!cancelled) {
+          setAllAreas(areas)
+        }
+      } catch (nextError) {
+        if (!cancelled) {
+          setError((current) => current || getErrorMessage(t, nextError))
+        }
+      }
+    }
+
+    void loadAreas()
+
+    return () => {
+      cancelled = true
+    }
+  }, [t])
+
   const charactersById = useMemo(() => {
     const map = new Map<string, Character>()
     for (const character of allCharacters) {
@@ -264,11 +330,40 @@ export const useContextEditPage = (): ContextEditPageState => {
     return map
   }, [allMonsterGroups])
 
+  const areasById = useMemo(() => {
+    const map = new Map<string, Area>()
+    for (const area of allAreas) {
+      map.set(area.id, area)
+    }
+    return map
+  }, [allAreas])
+
+  const placesByAreaId = useMemo(() => {
+    const map = new Map<string, Map<string, PlaceItem>>()
+    for (const area of allAreas) {
+      const placeMap = new Map<string, PlaceItem>()
+      for (const place of area.places ?? []) {
+        if (place && typeof place.id === 'string') {
+          placeMap.set(place.id, place)
+        }
+      }
+      map.set(area.id, placeMap)
+    }
+    return map
+  }, [allAreas])
+
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target
     setForm((current) => ({
       ...current,
       [name]: value,
+    }))
+  }
+
+  const handleChangeDescription = (value: string) => {
+    setForm((current) => ({
+      ...current,
+      description: value,
     }))
   }
 
@@ -462,6 +557,100 @@ export const useContextEditPage = (): ContextEditPageState => {
     setMonsterGroupSearch('')
   }
 
+  // ----- Areas -----
+
+  const handleRemoveArea = (areaId: string) => {
+    setForm((current) => ({
+      ...current,
+      areas: current.areas.filter((area) => area.id !== areaId),
+    }))
+  }
+
+  const handleRemovePlaceFromArea = (areaId: string, placeId: string) => {
+    setForm((current) => ({
+      ...current,
+      areas: current.areas.map((area) => {
+        if (area.id !== areaId) {
+          return area
+        }
+        return {
+          ...area,
+          placeIds: area.placeIds.filter((id) => id !== placeId),
+        }
+      }),
+    }))
+  }
+
+  const handleOpenAddAreaDialog = () => {
+    setSelectedAreaIdsInDialog([])
+    setAreaSearch('')
+    setIsAddAreaDialogOpen(true)
+  }
+
+  const handleCloseAddAreaDialog = () => {
+    setIsAddAreaDialogOpen(false)
+    setSelectedAreaIdsInDialog([])
+    setAreaSearch('')
+  }
+
+  const handleToggleAreaInDialog = (areaId: string) => {
+    setSelectedAreaIdsInDialog((current) => {
+      if (current.includes(areaId)) {
+        return current.filter((id) => id !== areaId)
+      }
+      return [...current, areaId]
+    })
+  }
+
+  const handleConfirmAddAreas = () => {
+    if (selectedAreaIdsInDialog.length === 0) {
+      setIsAddAreaDialogOpen(false)
+      return
+    }
+    setForm((current) => {
+      const existing = new Set(current.areas.map((area) => area.id))
+      const additions: ContextAreaSnapshot[] = []
+      for (const areaId of selectedAreaIdsInDialog) {
+        if (existing.has(areaId)) {
+          continue
+        }
+        const area = areasById.get(areaId)
+        if (!area) {
+          continue
+        }
+        const placeIds: string[] = []
+        const seenPlaceIds = new Set<string>()
+        for (const place of area.places ?? []) {
+          if (!place || typeof place.id !== 'string') {
+            continue
+          }
+          const placeId = place.id.trim()
+          if (!placeId || seenPlaceIds.has(placeId)) {
+            continue
+          }
+          seenPlaceIds.add(placeId)
+          placeIds.push(placeId)
+        }
+        additions.push({
+          id: area.id,
+          name: area.name,
+          placeIds,
+        })
+        existing.add(area.id)
+      }
+      if (additions.length === 0) {
+        return current
+      }
+      return {
+        ...current,
+        areas: [...current.areas, ...additions],
+      }
+    })
+    setIsAddAreaDialogOpen(false)
+    setSelectedAreaIdsInDialog([])
+    setAreaSearch('')
+  }
+
   const handleConfirmAddNpcGroups = () => {
     if (selectedNpcGroupIdsInDialog.length === 0) {
       setIsAddNpcGroupDialogOpen(false)
@@ -530,6 +719,11 @@ export const useContextEditPage = (): ContextEditPageState => {
           id: group.id,
           name: group.name,
           monsterIds: [...group.monsterIds],
+        })),
+        areas: form.areas.map((area) => ({
+          id: area.id,
+          name: area.name,
+          placeIds: [...area.placeIds],
         })),
       }
       await saveContext(contextId, nextForm)
@@ -760,6 +954,72 @@ export const useContextEditPage = (): ContextEditPageState => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allMonsterGroups, monsterGroupSearch, form.monsterGroups, selectedMonsterGroupIdsInDialog])
 
+  // ----- View models: Areas -----
+
+  const buildPlaceCard = (areaId: string, placeId: string): ContextPlaceCardViewModel => {
+    const placeMap = placesByAreaId.get(areaId)
+    const place = placeMap?.get(placeId)
+    const label = (place?.name && place.name.trim()) || t('pages.placeList.unnamedPlace')
+    const descriptionPreview = buildPlainTextPreview(place?.description ?? '')
+    return {
+      id: placeId,
+      label,
+      descriptionPreview,
+      onRemoveClick: (event) => {
+        event.stopPropagation()
+        handleRemovePlaceFromArea(areaId, placeId)
+      },
+    }
+  }
+
+  const areaSections: ContextAreaSectionViewModel[] = useMemo(() => {
+    return form.areas.map((area) => ({
+      id: area.id,
+      name: (area.name && area.name.trim()) || t('pages.areaList.unnamedArea'),
+      places: area.placeIds.map((placeId) => buildPlaceCard(area.id, placeId)),
+      onRemoveAreaClick: (event) => {
+        event.stopPropagation()
+        handleRemoveArea(area.id)
+      },
+    }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.areas, placesByAreaId, t])
+
+  const buildAreaOption = (area: Area, selected: boolean): ContextAreaOptionViewModel => {
+    const label = (area.name && area.name.trim()) || t('pages.areaList.unnamedArea')
+    const placeCount = Array.isArray(area.places) ? area.places.length : 0
+    const onToggleSelected = () => handleToggleAreaInDialog(area.id)
+    const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        handleToggleAreaInDialog(area.id)
+      }
+    }
+    return {
+      id: area.id,
+      label,
+      placeCount,
+      placeCountLabel: t('pages.contextEdit.areas.placeCount', { count: placeCount }),
+      onToggleSelected,
+      onKeyDown,
+      selected,
+    }
+  }
+
+  const areaOptions: ContextAreaOptionViewModel[] = useMemo(() => {
+    const assigned = new Set(form.areas.map((area) => area.id))
+    const search = areaSearch.trim().toLowerCase()
+    const available = allAreas.filter((area) => !assigned.has(area.id))
+    const filtered = search
+      ? available.filter((area) => {
+        const name = (area.name ?? '').toLowerCase()
+        return name.includes(search)
+      })
+      : available
+    return filtered.map((area) => buildAreaOption(area, selectedAreaIdsInDialog.includes(area.id)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allAreas, areaSearch, form.areas, selectedAreaIdsInDialog])
+
   const npcGroupOptions: ContextNpcGroupOptionViewModel[] = useMemo(() => {
     const assigned = new Set(form.npcGroups.map((group) => group.id))
     const search = npcGroupSearch.trim().toLowerCase()
@@ -783,6 +1043,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     if (!areStringArraysEqual(form.characters, initialForm.characters)) return true
     if (!areNpcGroupSnapshotsEqual(form.npcGroups, initialForm.npcGroups)) return true
     if (!areMonsterGroupSnapshotsEqual(form.monsterGroups, initialForm.monsterGroups)) return true
+    if (!areAreaSnapshotsEqual(form.areas, initialForm.areas)) return true
     return false
   }, [form, initialForm])
 
@@ -790,6 +1051,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     error,
     form,
     handleChange,
+    handleChangeDescription,
     handleSubmit,
     hasChanges,
     loading,
@@ -824,5 +1086,15 @@ export const useContextEditPage = (): ContextEditPageState => {
     handleConfirmAddMonsterGroups,
     selectedMonsterGroupIdsInDialog,
     hasSelectedMonsterGroupsInDialog: selectedMonsterGroupIdsInDialog.length > 0,
+    areaSections,
+    areaOptions,
+    areaSearch,
+    handleChangeAreaSearch: setAreaSearch,
+    isAddAreaDialogOpen,
+    handleOpenAddAreaDialog,
+    handleCloseAddAreaDialog,
+    handleConfirmAddAreas,
+    selectedAreaIdsInDialog,
+    hasSelectedAreasInDialog: selectedAreaIdsInDialog.length > 0,
   }
 }

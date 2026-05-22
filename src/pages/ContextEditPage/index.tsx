@@ -1,11 +1,14 @@
 import { useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
+import { SimpleWysiwygEditor } from '@components/SimpleWysiwygEditor'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
 import { useMainPageContext } from '@pages/main/mainPageContext'
 import { useContextEditPage } from './contextEditPageHooks'
 import type {
+  ContextAreaOptionViewModel,
+  ContextAreaSectionViewModel,
   ContextCharacterCardViewModel,
   ContextCharacterOptionViewModel,
   ContextMonsterCardViewModel,
@@ -14,6 +17,7 @@ import type {
   ContextNpcCardViewModel,
   ContextNpcGroupOptionViewModel,
   ContextNpcGroupSectionViewModel,
+  ContextPlaceCardViewModel,
 } from './types'
 import styles from './style.module.scss'
 
@@ -277,6 +281,80 @@ const MonsterGroupOption = ({ option }: { option: ContextMonsterGroupOptionViewM
   )
 }
 
+const PlaceCard = ({ card }: { card: ContextPlaceCardViewModel }) => {
+  const { t } = useI18n()
+  return (
+    <article className={styles.heroCard}>
+      <div className={styles.placeIconFrame} aria-hidden="true">
+        <AppIcon name="area" />
+      </div>
+      <div className={styles.heroSummary}>
+        <h3 className={styles.heroName}>{card.label}</h3>
+        {card.descriptionPreview ? (
+          <p className={styles.heroMeta}>{card.descriptionPreview}</p>
+        ) : null}
+      </div>
+      <button
+        type="button"
+        className={styles.heroRemoveButton}
+        aria-label={t('pages.contextEdit.areas.removePlaceButton')}
+        title={t('pages.contextEdit.areas.removePlaceButton')}
+        onClick={card.onRemoveClick}
+      >
+        <AppIcon name="trash" />
+      </button>
+    </article>
+  )
+}
+
+const AreaSection = ({ section }: { section: ContextAreaSectionViewModel }) => {
+  const { t } = useI18n()
+  return (
+    <section className={styles.npcGroupSection}>
+      <div className={styles.npcGroupSectionHeader}>
+        <h3 className={styles.npcGroupSectionTitle}>{section.name}</h3>
+        <button
+          type="button"
+          className={styles.heroRemoveButton}
+          aria-label={t('pages.contextEdit.areas.removeAreaButton')}
+          title={t('pages.contextEdit.areas.removeAreaButton')}
+          onClick={section.onRemoveAreaClick}
+        >
+          <AppIcon name="trash" />
+        </button>
+      </div>
+      {section.places.length > 0 ? (
+        <div className={styles.heroGrid}>
+          {section.places.map((place) => <PlaceCard key={place.id} card={place} />)}
+        </div>
+      ) : (
+        <p className={styles.emptyText}>{t('pages.contextEdit.areas.areaEmpty')}</p>
+      )}
+    </section>
+  )
+}
+
+const AreaOption = ({ option }: { option: ContextAreaOptionViewModel }) => {
+  return (
+    <article
+      className={`${styles.heroOption} ${option.selected ? styles.heroOptionSelected : ''}`}
+      role="button"
+      tabIndex={0}
+      aria-pressed={option.selected}
+      onClick={option.onToggleSelected}
+      onKeyDown={option.onKeyDown}
+    >
+      <span className={styles.heroOptionCheckbox} aria-hidden="true">
+        {option.selected ? <AppIcon name="check" /> : null}
+      </span>
+      <div className={styles.heroSummary}>
+        <h3 className={styles.heroName}>{option.label}</h3>
+        <p className={styles.heroMeta}>{option.placeCountLabel}</p>
+      </div>
+    </article>
+  )
+}
+
 const NpcGroupOption = ({ option }: { option: ContextNpcGroupOptionViewModel }) => {
   return (
     <article
@@ -337,6 +415,16 @@ export const ContextEditPage = () => {
     handleCloseAddMonsterGroupDialog,
     handleConfirmAddMonsterGroups,
     hasSelectedMonsterGroupsInDialog,
+    handleChangeDescription,
+    areaSections,
+    areaOptions,
+    areaSearch,
+    handleChangeAreaSearch,
+    isAddAreaDialogOpen,
+    handleOpenAddAreaDialog,
+    handleCloseAddAreaDialog,
+    handleConfirmAddAreas,
+    hasSelectedAreasInDialog,
   } = useContextEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
@@ -393,10 +481,18 @@ export const ContextEditPage = () => {
         ) : (
           <form id="context-edit-form" className={styles.editorForm} onSubmit={(event) => void handleSubmit(event)}>
             <section className={styles.section}>
-              <label className={styles.field} htmlFor="context-description">
+              <div className={styles.field}>
                 <span className={styles.fieldLabel}>{t('pages.contextEdit.fields.description')}</span>
-                <textarea className={styles.descriptionTextarea} id="context-description" name="description" value={form.description} onChange={handleChange} placeholder={t('pages.contextEdit.placeholders.description')} />
-              </label>
+                <SimpleWysiwygEditor
+                  ariaLabel={t('pages.contextEdit.fields.description')}
+                  minHeightClassName={styles.descriptionEditor}
+                  name="description"
+                  onChange={handleChangeDescription}
+                  placeholder={t('pages.contextEdit.placeholders.description')}
+                  toolbar={false}
+                  value={form.description}
+                />
+              </div>
             </section>
 
             <section className={styles.section}>
@@ -473,6 +569,31 @@ export const ContextEditPage = () => {
                 <p className={styles.emptyText}>{t('pages.contextEdit.monsterGroups.emptyState')}</p>
               )}
             </section>
+
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>{t('pages.contextEdit.areas.title')}</h2>
+                <button
+                  className={styles.secondaryButton}
+                  type="button"
+                  onClick={handleOpenAddAreaDialog}
+                >
+                  <span className={styles.buttonContent}>
+                    <AppIcon name="plus" />
+                    <span>{t('pages.contextEdit.areas.addButton')}</span>
+                  </span>
+                </button>
+              </div>
+              {areaSections.length > 0 ? (
+                <div className={styles.npcGroupList}>
+                  {areaSections.map((section) => (
+                    <AreaSection key={section.id} section={section} />
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.emptyText}>{t('pages.contextEdit.areas.emptyState')}</p>
+              )}
+            </section>
           </form>
         )}
 
@@ -511,6 +632,45 @@ export const ContextEditPage = () => {
                   disabled={!hasSelectedCharactersInDialog}
                 >
                   {t('pages.contextEdit.characters.addDialog.confirm')}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {isAddAreaDialogOpen ? (
+          <div className={styles.dialogBackdrop} role="presentation">
+            <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="context-add-areas-title">
+              <h2 className={styles.dialogTitle} id="context-add-areas-title">
+                {t('pages.contextEdit.areas.addDialog.title')}
+              </h2>
+              <input
+                className={styles.dialogSearch}
+                type="text"
+                value={areaSearch}
+                placeholder={t('pages.contextEdit.areas.addDialog.searchPlaceholder')}
+                aria-label={t('pages.contextEdit.areas.addDialog.searchLabel')}
+                autoComplete="off"
+                onChange={(event) => handleChangeAreaSearch(event.target.value)}
+              />
+              <div className={styles.dialogList}>
+                {areaOptions.length > 0 ? (
+                  areaOptions.map((option) => <AreaOption key={option.id} option={option} />)
+                ) : (
+                  <p className={styles.emptyText}>{t('pages.contextEdit.areas.addDialog.emptyState')}</p>
+                )}
+              </div>
+              <div className={styles.dialogActions}>
+                <button className={styles.secondaryButton} type="button" onClick={handleCloseAddAreaDialog}>
+                  {t('common.actions.cancel')}
+                </button>
+                <button
+                  className={styles.primaryButton}
+                  type="button"
+                  onClick={handleConfirmAddAreas}
+                  disabled={!hasSelectedAreasInDialog}
+                >
+                  {t('pages.contextEdit.areas.addDialog.confirm')}
                 </button>
               </div>
             </div>

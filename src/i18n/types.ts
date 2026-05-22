@@ -189,6 +189,22 @@ export interface TranslationDictionary {
           confirm: string
         }
       }
+      areas: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeAreaButton: string
+        removePlaceButton: string
+        areaEmpty: string
+        placeCount: string
+        addDialog: {
+          title: string
+          searchLabel: string
+          searchPlaceholder: string
+          emptyState: string
+          confirm: string
+        }
+      }
     }
     areaEdit: {
       eyebrow: string

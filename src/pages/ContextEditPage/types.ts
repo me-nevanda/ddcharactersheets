@@ -94,10 +94,51 @@ export interface ContextMonsterGroupOptionViewModel {
   selected: boolean
 }
 
+export interface ContextPlaceCardViewModel {
+  id: string
+  label: string
+  descriptionPreview: string
+  onRemoveClick: (event: ReactMouseEvent<HTMLButtonElement>) => void
+}
+
+export interface ContextAreaSectionViewModel {
+  id: string
+  name: string
+  places: ContextPlaceCardViewModel[]
+  onRemoveAreaClick: (event: ReactMouseEvent<HTMLButtonElement>) => void
+}
+
+export interface ContextAreaOptionViewModel {
+  id: string
+  label: string
+  placeCount: number
+  placeCountLabel: string
+  onToggleSelected: () => void
+  onKeyDown: (event: KeyboardEvent<HTMLElement>) => void
+  selected: boolean
+}
+
+export interface ContextEventCardViewModel {
+  id: string
+  label: string
+  descriptionPreview: string
+  onRemoveClick: (event: ReactMouseEvent<HTMLButtonElement>) => void
+}
+
+export interface ContextEventOptionViewModel {
+  id: string
+  label: string
+  descriptionPreview: string
+  onToggleSelected: () => void
+  onKeyDown: (event: KeyboardEvent<HTMLElement>) => void
+  selected: boolean
+}
+
 export interface ContextEditPageState {
   error: string
   form: ContextData
   handleChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  handleChangeDescription: (value: string) => void
   handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
   loading: boolean
@@ -132,4 +173,24 @@ export interface ContextEditPageState {
   handleConfirmAddMonsterGroups: () => void
   selectedMonsterGroupIdsInDialog: string[]
   hasSelectedMonsterGroupsInDialog: boolean
+  areaSections: ContextAreaSectionViewModel[]
+  areaOptions: ContextAreaOptionViewModel[]
+  areaSearch: string
+  handleChangeAreaSearch: (value: string) => void
+  isAddAreaDialogOpen: boolean
+  handleOpenAddAreaDialog: () => void
+  handleCloseAddAreaDialog: () => void
+  handleConfirmAddAreas: () => void
+  selectedAreaIdsInDialog: string[]
+  hasSelectedAreasInDialog: boolean
+  eventCards: ContextEventCardViewModel[]
+  eventOptions: ContextEventOptionViewModel[]
+  eventSearch: string
+  handleChangeEventSearch: (value: string) => void
+  isAddEventDialogOpen: boolean
+  handleOpenAddEventDialog: () => void
+  handleCloseAddEventDialog: () => void
+  handleConfirmAddEvents: () => void
+  selectedEventIdsInDialog: string[]
+  hasSelectedEventsInDialog: boolean
 }
