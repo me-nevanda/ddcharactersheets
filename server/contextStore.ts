@@ -15,11 +15,100 @@ const normalizeUniqueId = (value: unknown): string => {
     return typeof value === 'string' && value.trim().length > 0 ? value : randomUUID();
 };
 
+const normalizeCharacters = (value: unknown): string[] => {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+    const seen = new Set<string>();
+    const characters: string[] = [];
+    for (const item of value) {
+        if (typeof item !== 'string') {
+            continue;
+        }
+        const trimmed = item.trim();
+        if (!trimmed || seen.has(trimmed)) {
+            continue;
+        }
+        seen.add(trimmed);
+        characters.push(trimmed);
+    }
+    return characters;
+};
+
+const normalizeStringArray = (value: unknown): string[] => {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+    const seen = new Set<string>();
+    const result: string[] = [];
+    for (const item of value) {
+        if (typeof item !== 'string') {
+            continue;
+        }
+        const trimmed = item.trim();
+        if (!trimmed || seen.has(trimmed)) {
+            continue;
+        }
+        seen.add(trimmed);
+        result.push(trimmed);
+    }
+    return result;
+};
+
+const normalizeNpcGroups = (value: unknown): ContextData['npcGroups'] => {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+    const seenIds = new Set<string>();
+    const groups: ContextData['npcGroups'] = [];
+    for (const item of value) {
+        if (!item || typeof item !== 'object') {
+            continue;
+        }
+        const record = item as Record<string, unknown>;
+        const id = typeof record.id === 'string' ? record.id.trim() : '';
+        if (!id || seenIds.has(id)) {
+            continue;
+        }
+        seenIds.add(id);
+        const name = typeof record.name === 'string' ? record.name : '';
+        const npcIds = normalizeStringArray(record.npcIds);
+        groups.push({ id, name, npcIds });
+    }
+    return groups;
+};
+
+const normalizeMonsterGroups = (value: unknown): ContextData['monsterGroups'] => {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+    const seenIds = new Set<string>();
+    const groups: ContextData['monsterGroups'] = [];
+    for (const item of value) {
+        if (!item || typeof item !== 'object') {
+            continue;
+        }
+        const record = item as Record<string, unknown>;
+        const id = typeof record.id === 'string' ? record.id.trim() : '';
+        if (!id || seenIds.has(id)) {
+            continue;
+        }
+        seenIds.add(id);
+        const name = typeof record.name === 'string' ? record.name : '';
+        const monsterIds = normalizeStringArray(record.monsterIds);
+        groups.push({ id, name, monsterIds });
+    }
+    return groups;
+};
+
 const normalizeContext = (data: Partial<Record<keyof ContextData, unknown>> = {}): ContextData => {
     return {
         uniqueId: normalizeUniqueId(data.uniqueId),
         name: typeof data.name === 'string' ? data.name : '',
         description: typeof data.description === 'string' ? data.description : '',
+        characters: normalizeCharacters(data.characters),
+        npcGroups: normalizeNpcGroups(data.npcGroups),
+        monsterGroups: normalizeMonsterGroups(data.monsterGroups),
     };
 };
 

@@ -145,6 +145,50 @@ export interface TranslationDictionary {
         titleName: string
         description: string
       }
+      characters: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeButton: string
+        unknownCharacter: string
+        addDialog: {
+          title: string
+          searchLabel: string
+          searchPlaceholder: string
+          emptyState: string
+          confirm: string
+        }
+      }
+      npcGroups: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeGroupButton: string
+        removeNpcButton: string
+        groupEmpty: string
+        addDialog: {
+          title: string
+          searchLabel: string
+          searchPlaceholder: string
+          emptyState: string
+          confirm: string
+        }
+      }
+      monsterGroups: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeGroupButton: string
+        removeMonsterButton: string
+        groupEmpty: string
+        addDialog: {
+          title: string
+          searchLabel: string
+          searchPlaceholder: string
+          emptyState: string
+          confirm: string
+        }
+      }
     }
     placeEdit: {
       eyebrow: string
