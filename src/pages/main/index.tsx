@@ -1,6 +1,7 @@
 import { useI18n } from '@i18n/index'
 import { AdventureListPage } from '@pages/AdventureListPage'
 import { CharacterListPage } from '@pages/CharacterListPage'
+import { ContextsListPage } from '@pages/ContextsListPage'
 import { EventsListPage } from '@pages/EventsListPage'
 import { MonstersListPage } from '@pages/MonstersListPage'
 import { NpcsListPage } from '@pages/NpcsListPage'
@@ -34,6 +35,9 @@ export const MainPage = () => {
           <button className={`${styles.tabButton} ${activeTab === 'events' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('events')}>
             {t('pages.main.tabs.events')}
           </button>
+          <button className={`${styles.tabButton} ${activeTab === 'contexts' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('contexts')}>
+            {t('pages.main.tabs.contexts')}
+          </button>
         </aside>
 
         <div className={styles.tabPanel}>
@@ -43,6 +47,7 @@ export const MainPage = () => {
           {activeTab === 'adventures' ? <AdventureListPage /> : null}
           {activeTab === 'places' ? <PlaceListPage /> : null}
           {activeTab === 'events' ? <EventsListPage /> : null}
+          {activeTab === 'contexts' ? <ContextsListPage /> : null}
         </div>
       </div>
     </main>

@@ -10,11 +10,13 @@ export interface NpcGroupNpcViewModel {
   isMinion: boolean
   isNormal: boolean
   isSolo: boolean
+  isStory: boolean
   label: string
   level: number
   onKeyDown: KeyboardEventHandler<HTMLElement>
   onOpen: () => void
   roleLabel: string
+  storyLabel: string
   typeLabel: string
 }
 

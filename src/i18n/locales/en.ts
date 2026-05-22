@@ -49,6 +49,7 @@ export const en: TranslationDictionary = {
       invalidAdventureId: 'The adventure ID is invalid.',
       invalidPlaceId: 'The place ID is invalid.',
       invalidEventId: 'The event ID is invalid.',
+      invalidContextId: 'The context ID is invalid.',
       invalidJsonBody: 'The request payload is invalid.',
       invalidCharacterImage: 'The hero image must be a PNG or JPG file.',
       invalidMonsterImage: 'The monster image must be a PNG or JPG file.',
@@ -68,6 +69,7 @@ export const en: TranslationDictionary = {
       adventureNotFound: 'Adventure not found.',
       placeNotFound: 'Place not found.',
       eventNotFound: 'Event not found.',
+      contextNotFound: 'Context not found.',
       notFound: 'Resource not found.',
       unexpectedServerError: 'An unexpected server error occurred.',
     },
@@ -83,6 +85,7 @@ export const en: TranslationDictionary = {
         adventures: 'Adventures',
         places: 'Places',
         events: 'Events',
+        contexts: 'Contexts',
       },
     },
     placeList: {
@@ -117,6 +120,31 @@ export const en: TranslationDictionary = {
       placeholders: {
         titleName: 'Unnamed event',
         description: 'Event description',
+      },
+    },
+    contextList: {
+      actions: {
+        addContext: 'Add context',
+      },
+      emptyState: 'There are no contexts yet. Add one to start editing.',
+      loading: 'Loading contexts...',
+      unnamedContext: 'Unnamed context',
+      updatedAt: 'Last updated:',
+      deleteDialog: {
+        title: 'Delete this context?',
+        body: 'The context "{name}" will be deleted permanently.',
+      },
+    },
+    contextEdit: {
+      eyebrow: 'CONTEXT',
+      loading: 'Loading context...',
+      fields: {
+        name: 'Title',
+        description: 'Description',
+      },
+      placeholders: {
+        titleName: 'Unnamed context',
+        description: 'Context description',
       },
     },
     placeEdit: {

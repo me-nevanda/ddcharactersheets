@@ -31,16 +31,18 @@ const buildNpcViewModel = (
   t: ReturnType<typeof useI18n>['t'],
   openNpc: (npcId: string) => void,
 ): NpcGroupNpcViewModel => {
+  const isStory = npc.isStory === true
   return {
     descriptionPreview: buildTextPreview(npc.description),
     fileName: getNpcFileName(npc.id),
     id: npc.id,
     imageSrc: npc.imageUrl || '/favicon.png',
     isDead: npc.isDead === true,
-    isElite: npc.type === 'elite',
-    isMinion: npc.type === 'minion',
-    isNormal: npc.type === 'normal',
-    isSolo: npc.type === 'solo',
+    isElite: !isStory && npc.type === 'elite',
+    isMinion: !isStory && npc.type === 'minion',
+    isNormal: !isStory && npc.type === 'normal',
+    isSolo: !isStory && npc.type === 'solo',
+    isStory,
     label: npc.name.trim() || t('pages.npcList.unnamedNpc'),
     level: npc.level,
     onKeyDown: (event) => {
@@ -53,6 +55,7 @@ const buildNpcViewModel = (
       openNpc(npc.id)
     },
     roleLabel: t(`pages.npcEdit.roleOptions.${npc.role}`),
+    storyLabel: t('pages.npcEdit.fields.isStory'),
     typeLabel: t(`pages.npcEdit.typeOptions.${npc.type}`),
   }
 }

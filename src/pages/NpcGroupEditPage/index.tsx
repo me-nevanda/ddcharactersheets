@@ -37,13 +37,17 @@ const NpcRow = ({
           {npc.isSolo ? <AppIcon className={styles.soloIcon} name="crown" /> : null}
           <span>{npc.label}</span>
         </h3>
-        <p className={styles.npcPickerMeta}>
-          {npc.roleLabel}
-          <span aria-hidden="true"> | </span>
-          {t('pages.npcEdit.fields.level')} {npc.level}
-          <span aria-hidden="true"> | </span>
-          {npc.typeLabel}
-        </p>
+        {npc.isStory ? (
+          <p className={styles.npcPickerMeta}>{npc.storyLabel}</p>
+        ) : (
+          <p className={styles.npcPickerMeta}>
+            {npc.roleLabel}
+            <span aria-hidden="true"> | </span>
+            {t('pages.npcEdit.fields.level')} {npc.level}
+            <span aria-hidden="true"> | </span>
+            {npc.typeLabel}
+          </p>
+        )}
         {showDescription && npc.descriptionPreview ? <p className={styles.npcPickerDescription}>{npc.descriptionPreview}</p> : null}
       </div>
       {action}

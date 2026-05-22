@@ -3,6 +3,7 @@ import { defineConfig, type Connect, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { createAdventure, isSafeAdventureId, listAdventures, readAdventure, updateAdventure } from './server/adventureStore';
 import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacterId, listCharacters, readCharacter, readCharacterImage, updateCharacter, updateCharacterImage, } from './server/characterStore';
+import { createContext, deleteContext, isSafeContextId, listContexts, readContext, updateContext } from './server/contextStore';
 import { createEvent, deleteEvent, isSafeEventId, listEvents, readEvent, updateEvent } from './server/eventStore';
 import { countGeminiTokens, createGeminiResponse } from './server/geminiService';
 import { createMonsterGroup, deleteMonsterGroup, isSafeMonsterGroupId, listMonsterGroups, readMonsterGroup, updateMonsterGroup } from './server/monsterGroupStore';
@@ -558,6 +559,76 @@ const createPlacesApiPlugin = (): Plugin => {
         },
     };
 };
+const createContextsApiPlugin = (): Plugin => {
+    const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
+        const url = new URL(request.url ?? '/', 'http://localhost');
+        if (!url.pathname.startsWith('/api/contexts')) {
+            next();
+            return;
+        }
+        try {
+            if (request.method === 'GET' && url.pathname === '/api/contexts') {
+                sendJson(response, 200, { contexts: await listContexts() });
+                return;
+            }
+            if (request.method === 'POST' && url.pathname === '/api/contexts') {
+                sendJson(response, 201, { context: await createContext() });
+                return;
+            }
+            const match = url.pathname.match(/^\/api\/contexts\/([^/]+)$/);
+            if (match) {
+                const contextId = match[1];
+                if (!isSafeContextId(contextId)) {
+                    sendError(response, 400, 'errors.api.invalidContextId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    sendJson(response, 200, { context: await readContext(contextId) });
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const payload = await readJsonBody(request);
+                    sendJson(response, 200, {
+                        context: await updateContext(contextId, payload),
+                    });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    await deleteContext(contextId);
+                    response.statusCode = 204;
+                    response.end();
+                    return;
+                }
+            }
+            sendError(response, 404, 'errors.api.notFound');
+        }
+        catch (error) {
+            const apiError = error as ApiError;
+            if (apiError.code === 'ENOENT') {
+                sendError(response, 404, 'errors.api.contextNotFound');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_JSON_BODY') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidJsonBody');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_CONTEXT_ID') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidContextId');
+                return;
+            }
+            sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');
+        }
+    };
+    return {
+        name: 'contexts-api',
+        configureServer(server) {
+            server.middlewares.use(handler);
+        },
+        configurePreviewServer(server) {
+            server.middlewares.use(handler);
+        },
+    };
+};
 const createEventsApiPlugin = (): Plugin => {
     const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
         const url = new URL(request.url ?? '/', 'http://localhost');
@@ -692,7 +763,7 @@ const createGeminiApiPlugin = (): Plugin => {
     };
 };
 export default defineConfig({
-    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createNpcsApiPlugin(), createPlacesApiPlugin(), createEventsApiPlugin(), createGeminiApiPlugin()],
+    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createNpcsApiPlugin(), createPlacesApiPlugin(), createEventsApiPlugin(), createContextsApiPlugin(), createGeminiApiPlugin()],
     resolve: {
         alias: {
             '@pages': '/src/pages',

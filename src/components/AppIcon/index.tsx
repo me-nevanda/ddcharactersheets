@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from '@hugeicons/react';
-import { AddCircleIcon, AxeIcon, CheckCircle, Circle, ClothesIcon, CrownIcon, Delete, FileText, LongSleeveShirtIcon, MagicWand01Icon, MapPinIcon, MoneyBagIcon, NecklaceIcon, PencilEdit01Icon, Plus, Printer, Save, Shield, Sword, UserIcon, VestIcon, } from '@hugeicons/core-free-icons';
+import { AddCircleIcon, AxeIcon, BookOpen01Icon, Calendar03Icon, CheckCircle, Circle, ClothesIcon, CrownIcon, Delete, FileText, LongSleeveShirtIcon, MagicWand01Icon, MapPinIcon, MoneyBagIcon, NecklaceIcon, PencilEdit01Icon, Plus, Printer, Save, Shield, Sword, UserIcon, VestIcon, } from '@hugeicons/core-free-icons';
 import type { IconSvgElement } from '@hugeicons/react';
 import type { AppIconProps } from './types';
 import styles from './style.module.scss';
@@ -8,10 +8,12 @@ const iconMap: Record<AppIconProps['name'], IconSvgElement> = {
     check: CheckCircle,
     clothes: LongSleeveShirtIcon,
     circle: Circle,
+    context: BookOpen01Icon,
     crown: CrownIcon,
     delete: Delete,
     document: FileText,
     edit: PencilEdit01Icon,
+    event: Calendar03Icon,
     magic: MagicWand01Icon,
     minion: UserIcon,
     monster: AxeIcon,

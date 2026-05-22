@@ -1,5 +1,6 @@
 ﻿import type { Adventure, AdventureData } from '@appTypes/adventure';
 import type { Character, CharacterData } from '@appTypes/character';
+import type { Context, ContextData } from '@appTypes/context';
 import type { Event, EventData } from '@appTypes/event';
 import type { Monster, MonsterData, MonsterGroup } from '@appTypes/monster';
 import type { Npc, NpcData, NpcGroup } from '@appTypes/npc';
@@ -9,6 +10,8 @@ interface ApiEnvelope<T> {
     adventures?: T[];
     character?: T;
     characters?: T[];
+    context?: T;
+    contexts?: T[];
     event?: T;
     events?: T[];
     monster?: T;
@@ -362,6 +365,41 @@ export const deleteNpcImage = async (npcId: string): Promise<Npc> => {
         throw new Error('errors.api.generic');
     }
     return payload.npc;
+};
+export const listContexts = async (): Promise<Context[]> => {
+    const payload = await requestJson<ApiEnvelope<Context>>('/api/contexts');
+    return payload?.contexts ?? [];
+};
+export const createContext = async (): Promise<Context> => {
+    const payload = await requestJson<ApiEnvelope<Context>>('/api/contexts', {
+        method: 'POST',
+    });
+    if (!payload?.context) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.context;
+};
+export const getContext = async (contextId: string): Promise<Context> => {
+    const payload = await requestJson<ApiEnvelope<Context>>(`/api/contexts/${contextId}`);
+    if (!payload?.context) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.context;
+};
+export const saveContext = async (contextId: string, context: ContextData): Promise<Context> => {
+    const payload = await requestJson<ApiEnvelope<Context>>(`/api/contexts/${contextId}`, {
+        method: 'PUT',
+        body: JSON.stringify(context),
+    });
+    if (!payload?.context) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.context;
+};
+export const deleteContext = async (contextId: string): Promise<void> => {
+    await requestJson<null>(`/api/contexts/${contextId}`, {
+        method: 'DELETE',
+    });
 };
 export const listEvents = async (): Promise<Event[]> => {
     const payload = await requestJson<ApiEnvelope<Event>>('/api/events');

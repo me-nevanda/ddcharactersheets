@@ -48,6 +48,7 @@ export interface TranslationDictionary {
       invalidAdventureId: string
       invalidPlaceId: string
       invalidEventId: string
+      invalidContextId: string
       invalidJsonBody: string
       invalidCharacterImage: string
       invalidMonsterImage: string
@@ -67,6 +68,7 @@ export interface TranslationDictionary {
       adventureNotFound: string
       placeNotFound: string
       eventNotFound: string
+      contextNotFound: string
       notFound: string
       unexpectedServerError: string
     }
@@ -82,6 +84,7 @@ export interface TranslationDictionary {
         adventures: string
         places: string
         events: string
+        contexts: string
       }
     }
     placeList: {
@@ -107,6 +110,31 @@ export interface TranslationDictionary {
       }
     }
     eventEdit: {
+      eyebrow: string
+      loading: string
+      fields: {
+        name: string
+        description: string
+      }
+      placeholders: {
+        titleName: string
+        description: string
+      }
+    }
+    contextList: {
+      actions: {
+        addContext: string
+      }
+      emptyState: string
+      loading: string
+      unnamedContext: string
+      updatedAt: string
+      deleteDialog: {
+        title: string
+        body: string
+      }
+    }
+    contextEdit: {
       eyebrow: string
       loading: string
       fields: {

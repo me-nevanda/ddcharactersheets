@@ -49,6 +49,7 @@ export const pl: TranslationDictionary = {
       invalidAdventureId: 'Nieprawidłowy identyfikator przygody.',
       invalidPlaceId: 'Nieprawidłowy identyfikator obszaru.',
       invalidEventId: 'Nieprawidłowy identyfikator wydarzenia.',
+      invalidContextId: 'Nieprawidłowy identyfikator kontekstu.',
       invalidJsonBody: 'Nieprawidłowe dane żądania.',
       invalidCharacterImage: 'Obraz bohatera musi być plikiem PNG albo JPG.',
       invalidMonsterImage: 'Obraz potwora musi być plikiem PNG albo JPG.',
@@ -68,6 +69,7 @@ export const pl: TranslationDictionary = {
       adventureNotFound: 'Nie znaleziono przygody.',
       placeNotFound: 'Nie znaleziono obszaru.',
       eventNotFound: 'Nie znaleziono wydarzenia.',
+      contextNotFound: 'Nie znaleziono kontekstu.',
       notFound: 'Nie znaleziono zasobu.',
       unexpectedServerError: 'Wystąpił nieoczekiwany błąd serwera.',
     },
@@ -83,6 +85,7 @@ export const pl: TranslationDictionary = {
         adventures: 'Przygody',
         places: 'Miejsca',
         events: 'Wydarzenia',
+        contexts: 'Konteksty',
       },
     },
     placeList: {
@@ -117,6 +120,31 @@ export const pl: TranslationDictionary = {
       placeholders: {
         titleName: 'Bezimienne wydarzenie',
         description: 'Opis wydarzenia',
+      },
+    },
+    contextList: {
+      actions: {
+        addContext: 'Dodaj kontekst',
+      },
+      emptyState: 'Nie ma jeszcze żadnych kontekstów. Dodaj pierwszy i przejdź do edycji.',
+      loading: 'Wczytywanie kontekstów...',
+      unnamedContext: 'Bezimienny kontekst',
+      updatedAt: 'Ostatnia zmiana:',
+      deleteDialog: {
+        title: 'Usunąć kontekst?',
+        body: 'Kontekst „{name}” zostanie usunięty na stałe.',
+      },
+    },
+    contextEdit: {
+      eyebrow: 'KONTEKST',
+      loading: 'Wczytywanie kontekstu...',
+      fields: {
+        name: 'Tytuł',
+        description: 'Opis',
+      },
+      placeholders: {
+        titleName: 'Bezimienny kontekst',
+        description: 'Opis kontekstu',
       },
     },
     placeEdit: {
