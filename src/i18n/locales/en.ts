@@ -29,6 +29,11 @@ export const en: TranslationDictionary = {
       unsavedChangesTitle: 'Unsaved changes',
       unsavedChangesBody: 'You have unsaved changes. Are you sure you want to return to the list?',
     },
+    clipboard: {
+      copyDamageValue: 'Copy damage value',
+      damageCopied: 'Damage value copied.',
+      copyFailed: 'Could not copy to clipboard.',
+    },
     states: {
       creating: 'Creating...',
       deleting: 'Deleting...',

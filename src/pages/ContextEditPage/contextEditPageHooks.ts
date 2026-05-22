@@ -1210,7 +1210,6 @@ export const useContextEditPage = (): ContextEditPageState => {
 
   const {
     copyingContext,
-    copyStatus,
     handleCopyContext,
   } = useContextCopy({
     areas: allAreas,
@@ -1227,7 +1226,6 @@ export const useContextEditPage = (): ContextEditPageState => {
 
   return {
     error,
-    copyStatus,
     copyingContext,
     form,
     handleChange,

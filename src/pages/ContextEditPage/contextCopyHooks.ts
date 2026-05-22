@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useI18n } from '@i18n/index'
 import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
@@ -240,7 +241,6 @@ export const useContextCopy = ({
   const { t } = useI18n()
   const presentation = useCharacterPresentation()
   const [copyingContext, setCopyingContext] = useState(false)
-  const [copyStatus, setCopyStatus] = useState('')
 
   const charactersById = useMemo(() => createMapById(characters), [characters])
   const npcsById = useMemo(() => createMapById(npcs), [npcs])
@@ -250,7 +250,6 @@ export const useContextCopy = ({
 
   const handleCopyContext = async () => {
     setCopyingContext(true)
-    setCopyStatus('')
     onClearError()
 
     try {
@@ -269,11 +268,13 @@ export const useContextCopy = ({
         t,
       })
       await copyTextToClipboard(text)
-      setCopyStatus(t('pages.contextEdit.copySuccess'))
+      toast.success(t('pages.contextEdit.copySuccess'))
     } catch (nextError) {
-      onError(nextError instanceof Error && nextError.message === 'errors.api.generic'
+      const message = nextError instanceof Error && nextError.message === 'errors.api.generic'
         ? t('pages.contextEdit.copyError')
-        : getErrorMessage(t, nextError))
+        : getErrorMessage(t, nextError)
+      onError(message)
+      toast.error(message)
     } finally {
       setCopyingContext(false)
     }
@@ -281,7 +282,6 @@ export const useContextCopy = ({
 
   return {
     copyingContext,
-    copyStatus,
     handleCopyContext,
   }
 }

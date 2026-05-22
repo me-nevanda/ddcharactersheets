@@ -436,7 +436,6 @@ export const ContextEditPage = () => {
   const { handleTabChange } = useMainPageContext()
   const {
     error,
-    copyStatus,
     copyingContext,
     form,
     handleChange,
@@ -547,7 +546,6 @@ export const ContextEditPage = () => {
         </div>
 
         {error ? <p className={styles.status}>{error}</p> : null}
-        {copyStatus ? <p className={styles.successStatus}>{copyStatus}</p> : null}
 
         {loading ? (
           <p className={styles.loadingText}>{t('pages.contextEdit.loading')}</p>

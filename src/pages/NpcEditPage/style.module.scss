@@ -664,6 +664,22 @@
   font-weight: 700;
 }
 
+.attackSuggestionCopyButton {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent-strong);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.attackSuggestionCopyButton:hover {
+  color: var(--text-strong);
+  text-decoration: underline;
+}
+
 .attackInlineField {
   display: inline-flex;
   align-items: center;

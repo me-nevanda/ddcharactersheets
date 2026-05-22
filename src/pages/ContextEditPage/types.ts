@@ -154,13 +154,11 @@ export interface UseContextCopyParams {
 
 export interface ContextCopyState {
   copyingContext: boolean
-  copyStatus: string
   handleCopyContext: () => Promise<void>
 }
 
 export interface ContextEditPageState {
   error: string
-  copyStatus: string
   copyingContext: boolean
   form: ContextData
   handleChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void

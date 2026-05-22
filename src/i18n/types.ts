@@ -28,6 +28,11 @@ export interface TranslationDictionary {
       unsavedChangesTitle: string
       unsavedChangesBody: string
     }
+    clipboard: {
+      copyDamageValue: string
+      damageCopied: string
+      copyFailed: string
+    }
     states: {
       creating: string
       deleting: string

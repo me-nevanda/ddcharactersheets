@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { LanguageSwitcher } from '@components/LanguageSwitcher';
 import { AdventureEditPage } from '@pages/AdventureEditPage';
 import { CharacterEditPage } from '@pages/CharacterEditPage';
@@ -18,6 +19,7 @@ import { MonsterPrintPage } from '@pages/printPages/MonsterPrintPage';
 import { NpcPrintPage } from '@pages/printPages/NpcPrintPage';
 const App = () => {
     return (<>
+      <Toaster position="bottom-right" toastOptions={{ duration: 2200 }}/>
       <LanguageSwitcher />
       <MainPageProvider>
         <Routes>

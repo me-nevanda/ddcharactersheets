@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast'
 import { AppIcon } from '@components/AppIcon'
 import { SimpleWysiwygEditor } from '@components/SimpleWysiwygEditor'
 import styles from '../../style.module.scss'
@@ -5,6 +6,15 @@ import type { AttackCardProps } from './types'
 
 const formatSuggestedValue = (value: string): string => {
   return value.trim()
+}
+
+const copySuggestedDamage = async (value: string, t: AttackCardProps['t']) => {
+  try {
+    await navigator.clipboard.writeText(value)
+    toast.success(t('common.clipboard.damageCopied'))
+  } catch {
+    toast.error(t('common.clipboard.copyFailed'))
+  }
 }
 
 export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOptions, getAttackHeaderClass, index, suggested, onAttackChange, onAttackRemove, t }: AttackCardProps) => {
@@ -114,15 +124,27 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
           <p className={styles.attackSuggestion}>
             <span className={styles.attackSuggestionLabel}>{t('pages.monsterEdit.fields.damage')}</span>
             {lowDamage ? (
-              <span>{t('pages.monsterEdit.fields.low')}: {lowDamage}</span>
+              <span>
+                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamage(lowDamage, t)}>
+                  {t('pages.monsterEdit.fields.low')}
+                </button>: {lowDamage}
+              </span>
             ) : null}
             {lowDamage && (mediumDamage || highDamage) ? <span>,</span> : null}
             {mediumDamage ? (
-              <span>{t('pages.monsterEdit.fields.medium')}: {mediumDamage}</span>
+              <span>
+                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamage(mediumDamage, t)}>
+                  {t('pages.monsterEdit.fields.medium')}
+                </button>: {mediumDamage}
+              </span>
             ) : null}
             {mediumDamage && highDamage ? <span>,</span> : null}
             {highDamage ? (
-              <span>{t('pages.monsterEdit.fields.high')} {highDamage}</span>
+              <span>
+                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamage(highDamage, t)}>
+                  {t('pages.monsterEdit.fields.high')}
+                </button> {highDamage}
+              </span>
             ) : null}
           </p>
         ) : null}
