@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { getContext, listAreas, listCharacters, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext } from '@lib/api'
+import { getContext, listAreas, listCharacters, listEvents, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import type { Area, PlaceItem } from '@appTypes/area'
 import type { Character } from '@appTypes/character'
 import type { ContextAreaSnapshot, ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
+import type { Event } from '@appTypes/event'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
 import type { Npc, NpcGroup } from '@appTypes/npc'
 import type {
@@ -15,6 +16,8 @@ import type {
   ContextCharacterCardViewModel,
   ContextCharacterOptionViewModel,
   ContextEditPageState,
+  ContextEventCardViewModel,
+  ContextEventOptionViewModel,
   ContextMonsterCardViewModel,
   ContextMonsterGroupOptionViewModel,
   ContextMonsterGroupSectionViewModel,
@@ -29,6 +32,7 @@ const emptyContextForm: ContextData = {
   name: '',
   description: '',
   characters: [],
+  events: [],
   npcGroups: [],
   monsterGroups: [],
   areas: [],
@@ -140,6 +144,11 @@ export const useContextEditPage = (): ContextEditPageState => {
   const [characterSearch, setCharacterSearch] = useState('')
   const [selectedCharacterIdsInDialog, setSelectedCharacterIdsInDialog] = useState<string[]>([])
 
+  const [allEvents, setAllEvents] = useState<Event[]>([])
+  const [isAddEventDialogOpen, setIsAddEventDialogOpen] = useState(false)
+  const [eventSearch, setEventSearch] = useState('')
+  const [selectedEventIdsInDialog, setSelectedEventIdsInDialog] = useState<string[]>([])
+
   const [allNpcs, setAllNpcs] = useState<Npc[]>([])
   const [allNpcGroups, setAllNpcGroups] = useState<NpcGroup[]>([])
   const [isAddNpcGroupDialogOpen, setIsAddNpcGroupDialogOpen] = useState(false)
@@ -168,6 +177,7 @@ export const useContextEditPage = (): ContextEditPageState => {
           name: context.name,
           description: context.description,
           characters: Array.isArray(context.characters) ? context.characters : [],
+          events: Array.isArray(context.events) ? context.events : [],
           npcGroups: Array.isArray(context.npcGroups) ? context.npcGroups : [],
           monsterGroups: Array.isArray(context.monsterGroups) ? context.monsterGroups : [],
           areas: Array.isArray(context.areas) ? context.areas : [],
@@ -213,6 +223,29 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
 
     void loadCharacters()
+
+    return () => {
+      cancelled = true
+    }
+  }, [t])
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadEvents = async () => {
+      try {
+        const events = await listEvents()
+        if (!cancelled) {
+          setAllEvents(events)
+        }
+      } catch (nextError) {
+        if (!cancelled) {
+          setError((current) => current || getErrorMessage(t, nextError))
+        }
+      }
+    }
+
+    void loadEvents()
 
     return () => {
       cancelled = true
@@ -297,6 +330,14 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
     return map
   }, [allCharacters])
+
+  const eventsById = useMemo(() => {
+    const map = new Map<string, Event>()
+    for (const event of allEvents) {
+      map.set(event.id, event)
+    }
+    return map
+  }, [allEvents])
 
   const npcsById = useMemo(() => {
     const map = new Map<string, Npc>()
@@ -419,6 +460,60 @@ export const useContextEditPage = (): ContextEditPageState => {
     setIsAddCharacterDialogOpen(false)
     setSelectedCharacterIdsInDialog([])
     setCharacterSearch('')
+  }
+
+  // ----- Events -----
+
+  const handleRemoveEvent = (eventId: string) => {
+    setForm((current) => ({
+      ...current,
+      events: current.events.filter((id) => id !== eventId),
+    }))
+  }
+
+  const handleOpenAddEventDialog = () => {
+    setSelectedEventIdsInDialog([])
+    setEventSearch('')
+    setIsAddEventDialogOpen(true)
+  }
+
+  const handleCloseAddEventDialog = () => {
+    setIsAddEventDialogOpen(false)
+    setSelectedEventIdsInDialog([])
+    setEventSearch('')
+  }
+
+  const handleToggleEventInDialog = (eventId: string) => {
+    setSelectedEventIdsInDialog((current) => {
+      if (current.includes(eventId)) {
+        return current.filter((id) => id !== eventId)
+      }
+      return [...current, eventId]
+    })
+  }
+
+  const handleConfirmAddEvents = () => {
+    if (selectedEventIdsInDialog.length === 0) {
+      setIsAddEventDialogOpen(false)
+      return
+    }
+    setForm((current) => {
+      const existing = new Set(current.events)
+      const next = [...current.events]
+      for (const eventId of selectedEventIdsInDialog) {
+        if (!existing.has(eventId)) {
+          next.push(eventId)
+          existing.add(eventId)
+        }
+      }
+      return {
+        ...current,
+        events: next,
+      }
+    })
+    setIsAddEventDialogOpen(false)
+    setSelectedEventIdsInDialog([])
+    setEventSearch('')
   }
 
   // ----- NPC groups -----
@@ -710,6 +805,7 @@ export const useContextEditPage = (): ContextEditPageState => {
         name: form.name.trim(),
         description: form.description.trim(),
         characters: [...form.characters],
+        events: [...form.events],
         npcGroups: form.npcGroups.map((group) => ({
           id: group.id,
           name: group.name,
@@ -807,6 +903,62 @@ export const useContextEditPage = (): ContextEditPageState => {
     return filtered.map((character) => buildCharacterOption(character, selectedCharacterIdsInDialog.includes(character.id)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allCharacters, characterSearch, form.characters, selectedCharacterIdsInDialog])
+
+  // ----- View models: events -----
+
+  const buildEventCard = (eventId: string): ContextEventCardViewModel => {
+    const event = eventsById.get(eventId)
+    const label = (event?.name && event.name.trim()) || t('pages.eventList.unnamedEvent')
+    const descriptionPreview = buildPlainTextPreview(event?.description ?? '')
+    return {
+      id: eventId,
+      label,
+      descriptionPreview,
+      onRemoveClick: (clickEvent) => {
+        clickEvent.stopPropagation()
+        handleRemoveEvent(eventId)
+      },
+    }
+  }
+
+  const eventCards: ContextEventCardViewModel[] = useMemo(() => {
+    return form.events.map(buildEventCard)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.events, eventsById, t])
+
+  const buildEventOption = (event: Event, selected: boolean): ContextEventOptionViewModel => {
+    const label = (event.name && event.name.trim()) || t('pages.eventList.unnamedEvent')
+    const onToggleSelected = () => handleToggleEventInDialog(event.id)
+    const onKeyDown = (keyboardEvent: KeyboardEvent<HTMLElement>) => {
+      if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') {
+        keyboardEvent.preventDefault()
+        handleToggleEventInDialog(event.id)
+      }
+    }
+    return {
+      id: event.id,
+      label,
+      descriptionPreview: buildPlainTextPreview(event.description ?? ''),
+      onToggleSelected,
+      onKeyDown,
+      selected,
+    }
+  }
+
+  const eventOptions: ContextEventOptionViewModel[] = useMemo(() => {
+    const assigned = new Set(form.events)
+    const search = eventSearch.trim().toLowerCase()
+    const available = allEvents.filter((event) => !assigned.has(event.id))
+    const filtered = search
+      ? available.filter((event) => {
+        const name = (event.name ?? '').toLowerCase()
+        const description = buildPlainTextPreview(event.description ?? '').toLowerCase()
+        return name.includes(search) || description.includes(search)
+      })
+      : available
+    return filtered.map((event) => buildEventOption(event, selectedEventIdsInDialog.includes(event.id)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allEvents, eventSearch, form.events, selectedEventIdsInDialog])
 
   // ----- View models: NPC groups -----
 
@@ -1041,6 +1193,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     if (form.name !== initialForm.name) return true
     if (form.description !== initialForm.description) return true
     if (!areStringArraysEqual(form.characters, initialForm.characters)) return true
+    if (!areStringArraysEqual(form.events, initialForm.events)) return true
     if (!areNpcGroupSnapshotsEqual(form.npcGroups, initialForm.npcGroups)) return true
     if (!areMonsterGroupSnapshotsEqual(form.monsterGroups, initialForm.monsterGroups)) return true
     if (!areAreaSnapshotsEqual(form.areas, initialForm.areas)) return true
@@ -1066,6 +1219,16 @@ export const useContextEditPage = (): ContextEditPageState => {
     handleConfirmAddCharacters,
     selectedCharacterIdsInDialog,
     hasSelectedCharactersInDialog: selectedCharacterIdsInDialog.length > 0,
+    eventCards,
+    eventOptions,
+    eventSearch,
+    handleChangeEventSearch: setEventSearch,
+    isAddEventDialogOpen,
+    handleOpenAddEventDialog,
+    handleCloseAddEventDialog,
+    handleConfirmAddEvents,
+    selectedEventIdsInDialog,
+    hasSelectedEventsInDialog: selectedEventIdsInDialog.length > 0,
     npcGroupSections,
     npcGroupOptions,
     npcGroupSearch,

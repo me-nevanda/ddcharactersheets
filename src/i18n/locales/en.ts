@@ -138,6 +138,7 @@ export const en: TranslationDictionary = {
     contextEdit: {
       eyebrow: 'CONTEXT',
       loading: 'Loading context...',
+      copyButton: 'Copy context',
       fields: {
         name: 'Title',
         description: 'Description',
@@ -157,6 +158,19 @@ export const en: TranslationDictionary = {
           searchLabel: 'Search hero',
           searchPlaceholder: 'Type hero name',
           emptyState: 'No heroes available to add.',
+          confirm: 'Add selected',
+        },
+      },
+      events: {
+        title: 'Events',
+        emptyState: 'No events added to this context yet.',
+        addButton: 'Add events',
+        removeButton: 'Remove event from context',
+        addDialog: {
+          title: 'Add events to the context',
+          searchLabel: 'Search event',
+          searchPlaceholder: 'Type event name',
+          emptyState: 'No events available to add.',
           confirm: 'Add selected',
         },
       },

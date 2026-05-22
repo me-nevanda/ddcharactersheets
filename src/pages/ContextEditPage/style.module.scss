@@ -115,6 +115,9 @@
   top: calc(4rem + 20px);
   right: 1rem;
   z-index: 19;
+  display: grid;
+  justify-items: end;
+  gap: 0.6rem;
 }
 
 .ghostLink,
@@ -201,7 +204,7 @@
 
 .descriptionTextarea {
   @include input-field;
-  min-height: 22rem;
+  min-height: 8rem;
   padding: 0.8rem 0.9rem;
   font-size: 0.95rem;
   line-height: 1.45;
@@ -214,7 +217,7 @@
 }
 
 .descriptionEditor :global(.rsw-ce) {
-  min-height: 22rem;
+  min-height: 8rem;
   max-height: none;
 }
 

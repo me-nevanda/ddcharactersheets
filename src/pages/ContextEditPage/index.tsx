@@ -12,6 +12,8 @@ import type {
   ContextCharacterCardViewModel,
   ContextCharacterOptionViewModel,
   ContextMonsterCardViewModel,
+  ContextEventCardViewModel,
+  ContextEventOptionViewModel,
   ContextMonsterGroupOptionViewModel,
   ContextMonsterGroupSectionViewModel,
   ContextNpcCardViewModel,
@@ -109,6 +111,58 @@ const HeroOption = ({ option }: { option: ContextCharacterOptionViewModel }) => 
           {(option.raceLabel || option.classLabel) && option.level ? <span aria-hidden="true"> | </span> : null}
           {option.level ? <span>{t('pages.characterEdit.fields.level')} {option.level}</span> : null}
         </p>
+      </div>
+    </article>
+  )
+}
+
+const EventCard = ({ card }: { card: ContextEventCardViewModel }) => {
+  const { t } = useI18n()
+  return (
+    <article className={styles.heroCard}>
+      <div className={styles.placeIconFrame} aria-hidden="true">
+        <AppIcon name="event" />
+      </div>
+      <div className={styles.heroSummary}>
+        <h3 className={styles.heroName}>{card.label}</h3>
+        {card.descriptionPreview ? (
+          <p className={styles.heroMeta}>{card.descriptionPreview}</p>
+        ) : null}
+      </div>
+      <button
+        type="button"
+        className={styles.heroRemoveButton}
+        aria-label={t('pages.contextEdit.events.removeButton')}
+        title={t('pages.contextEdit.events.removeButton')}
+        onClick={card.onRemoveClick}
+      >
+        <AppIcon name="trash" />
+      </button>
+    </article>
+  )
+}
+
+const EventOption = ({ option }: { option: ContextEventOptionViewModel }) => {
+  return (
+    <article
+      className={`${styles.heroOption} ${option.selected ? styles.heroOptionSelected : ''}`}
+      role="button"
+      tabIndex={0}
+      aria-pressed={option.selected}
+      onClick={option.onToggleSelected}
+      onKeyDown={option.onKeyDown}
+    >
+      <span className={styles.heroOptionCheckbox} aria-hidden="true">
+        {option.selected ? <AppIcon name="check" /> : null}
+      </span>
+      <div className={styles.placeIconFrame} aria-hidden="true">
+        <AppIcon name="event" />
+      </div>
+      <div className={styles.heroSummary}>
+        <h3 className={styles.heroName}>{option.label}</h3>
+        {option.descriptionPreview ? (
+          <p className={styles.heroMeta}>{option.descriptionPreview}</p>
+        ) : null}
       </div>
     </article>
   )
@@ -397,6 +451,15 @@ export const ContextEditPage = () => {
     handleCloseAddCharacterDialog,
     handleConfirmAddCharacters,
     hasSelectedCharactersInDialog,
+    eventCards,
+    eventOptions,
+    eventSearch,
+    handleChangeEventSearch,
+    isAddEventDialogOpen,
+    handleOpenAddEventDialog,
+    handleCloseAddEventDialog,
+    handleConfirmAddEvents,
+    hasSelectedEventsInDialog,
     npcGroupSections,
     npcGroupOptions,
     npcGroupSearch,
@@ -464,6 +527,12 @@ export const ContextEditPage = () => {
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.floatingSaveAction}>
+              <button className={styles.secondaryButton} type="button">
+                <span className={styles.buttonContent}>
+                  <AppIcon name="document" />
+                  <span>{t('pages.contextEdit.copyButton')}</span>
+                </span>
+              </button>
               <button className={styles.primaryButton} form="context-edit-form" type="submit" disabled={saving || !hasChanges}>
                 <span className={styles.buttonContent}>
                   <AppIcon name="save" />
@@ -594,6 +663,31 @@ export const ContextEditPage = () => {
                 <p className={styles.emptyText}>{t('pages.contextEdit.areas.emptyState')}</p>
               )}
             </section>
+
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>{t('pages.contextEdit.events.title')}</h2>
+                <button
+                  className={styles.secondaryButton}
+                  type="button"
+                  onClick={handleOpenAddEventDialog}
+                >
+                  <span className={styles.buttonContent}>
+                    <AppIcon name="plus" />
+                    <span>{t('pages.contextEdit.events.addButton')}</span>
+                  </span>
+                </button>
+              </div>
+              {eventCards.length > 0 ? (
+                <div className={styles.heroGrid}>
+                  {eventCards.map((card) => (
+                    <EventCard key={card.id} card={card} />
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.emptyText}>{t('pages.contextEdit.events.emptyState')}</p>
+              )}
+            </section>
           </form>
         )}
 
@@ -632,6 +726,45 @@ export const ContextEditPage = () => {
                   disabled={!hasSelectedCharactersInDialog}
                 >
                   {t('pages.contextEdit.characters.addDialog.confirm')}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {isAddEventDialogOpen ? (
+          <div className={styles.dialogBackdrop} role="presentation">
+            <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="context-add-events-title">
+              <h2 className={styles.dialogTitle} id="context-add-events-title">
+                {t('pages.contextEdit.events.addDialog.title')}
+              </h2>
+              <input
+                className={styles.dialogSearch}
+                type="text"
+                value={eventSearch}
+                placeholder={t('pages.contextEdit.events.addDialog.searchPlaceholder')}
+                aria-label={t('pages.contextEdit.events.addDialog.searchLabel')}
+                autoComplete="off"
+                onChange={(event) => handleChangeEventSearch(event.target.value)}
+              />
+              <div className={styles.dialogList}>
+                {eventOptions.length > 0 ? (
+                  eventOptions.map((option) => <EventOption key={option.id} option={option} />)
+                ) : (
+                  <p className={styles.emptyText}>{t('pages.contextEdit.events.addDialog.emptyState')}</p>
+                )}
+              </div>
+              <div className={styles.dialogActions}>
+                <button className={styles.secondaryButton} type="button" onClick={handleCloseAddEventDialog}>
+                  {t('common.actions.cancel')}
+                </button>
+                <button
+                  className={styles.primaryButton}
+                  type="button"
+                  onClick={handleConfirmAddEvents}
+                  disabled={!hasSelectedEventsInDialog}
+                >
+                  {t('pages.contextEdit.events.addDialog.confirm')}
                 </button>
               </div>
             </div>

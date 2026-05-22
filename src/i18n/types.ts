@@ -137,6 +137,7 @@ export interface TranslationDictionary {
     contextEdit: {
       eyebrow: string
       loading: string
+      copyButton: string
       fields: {
         name: string
         description: string
@@ -151,6 +152,19 @@ export interface TranslationDictionary {
         addButton: string
         removeButton: string
         unknownCharacter: string
+        addDialog: {
+          title: string
+          searchLabel: string
+          searchPlaceholder: string
+          emptyState: string
+          confirm: string
+        }
+      }
+      events: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeButton: string
         addDialog: {
           title: string
           searchLabel: string

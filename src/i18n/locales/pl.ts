@@ -138,6 +138,7 @@ export const pl: TranslationDictionary = {
     contextEdit: {
       eyebrow: 'KONTEKST',
       loading: 'Wczytywanie kontekstu...',
+      copyButton: 'Kopiuj kontekst',
       fields: {
         name: 'Tytuł',
         description: 'Opis',
@@ -158,6 +159,19 @@ export const pl: TranslationDictionary = {
           searchPlaceholder: 'Wpisz imię bohatera',
           emptyState: 'Nie ma bohaterów do dodania.',
           confirm: 'Dodaj zaznaczonych',
+        },
+      },
+      events: {
+        title: 'Wydarzenia',
+        emptyState: 'Nie dodano jeszcze żadnego wydarzenia do tego kontekstu.',
+        addButton: 'Dodaj wydarzenia',
+        removeButton: 'Usuń wydarzenie z kontekstu',
+        addDialog: {
+          title: 'Dodaj wydarzenia do kontekstu',
+          searchLabel: 'Szukaj wydarzenia',
+          searchPlaceholder: 'Wpisz nazwę wydarzenia',
+          emptyState: 'Nie ma wydarzeń do dodania.',
+          confirm: 'Dodaj zaznaczone',
         },
       },
       npcGroups: {
