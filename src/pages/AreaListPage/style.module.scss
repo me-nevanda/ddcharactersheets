@@ -21,14 +21,14 @@
   color: var(--text-soft);
 }
 
-.placeGrid {
+.areaGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.55rem;
   margin-top: 2.25rem;
 }
 
-.placeCard {
+.areaCard {
   @include surface-card;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -39,11 +39,11 @@
   cursor: pointer;
 }
 
-.placeCard:hover {
+.areaCard:hover {
   border-color: var(--border-strong);
 }
 
-.placeCard:focus-visible {
+.areaCard:focus-visible {
   outline: 0;
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
@@ -65,13 +65,13 @@
   height: 2rem;
 }
 
-.placeSummary {
+.areaSummary {
   display: grid;
   gap: 0.24rem;
   min-width: 0;
 }
 
-.placeName {
+.areaName {
   margin: 0;
   overflow-wrap: anywhere;
   color: var(--text-strong);
@@ -99,11 +99,11 @@
 }
 
 @media (max-width: 720px) {
-  .placeGrid {
+  .areaGrid {
     grid-template-columns: 1fr;
   }
 
-  .placeCard {
+  .areaCard {
     align-items: start;
   }
 }

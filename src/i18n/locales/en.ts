@@ -47,7 +47,7 @@ export const en: TranslationDictionary = {
       invalidNpcId: 'The NPC ID is invalid.',
       invalidNpcGroupId: 'The NPC group ID is invalid.',
       invalidAdventureId: 'The adventure ID is invalid.',
-      invalidPlaceId: 'The place ID is invalid.',
+      invalidAreaId: 'The area ID is invalid.',
       invalidEventId: 'The event ID is invalid.',
       invalidContextId: 'The context ID is invalid.',
       invalidJsonBody: 'The request payload is invalid.',
@@ -67,7 +67,7 @@ export const en: TranslationDictionary = {
       monsterNotFound: 'Monster not found.',
       npcNotFound: 'NPC not found.',
       adventureNotFound: 'Adventure not found.',
-      placeNotFound: 'Place not found.',
+      areaNotFound: 'Area not found.',
       eventNotFound: 'Event not found.',
       contextNotFound: 'Context not found.',
       notFound: 'Resource not found.',
@@ -83,18 +83,18 @@ export const en: TranslationDictionary = {
         monsters: 'Monsters',
         npcs: 'NPC',
         adventures: 'Adventures',
-        places: 'Areas',
+        areas: 'Areas',
         events: 'Events',
         contexts: 'Contexts',
       },
     },
-    placeList: {
+    areaList: {
       actions: {
-        addPlace: 'New place',
+        addArea: 'New area',
       },
-      emptyState: 'There are no places yet. Add one to start editing.',
-      loading: 'Loading places...',
-      unnamedPlace: 'Unnamed place',
+      emptyState: 'There are no areas yet. Add one to start editing.',
+      loading: 'Loading areas...',
+      unnamedArea: 'Unnamed area',
       updatedAt: 'Last updated:',
     },
     eventList: {
@@ -191,16 +191,16 @@ export const en: TranslationDictionary = {
         },
       },
     },
-    placeEdit: {
-      eyebrow: 'PLACE',
-      loading: 'Loading place...',
+    areaEdit: {
+      eyebrow: 'AREA',
+      loading: 'Loading area...',
       fields: {
         name: 'Name',
         description: 'Description',
       },
       placeholders: {
-        titleName: 'Unnamed place',
-        description: 'Place description',
+        titleName: 'Unnamed area',
+        description: 'Area description',
       },
       places: {
         title: 'Places',

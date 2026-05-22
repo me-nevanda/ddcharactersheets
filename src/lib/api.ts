@@ -4,8 +4,10 @@ import type { Context, ContextData } from '@appTypes/context';
 import type { Event, EventData } from '@appTypes/event';
 import type { Monster, MonsterData, MonsterGroup } from '@appTypes/monster';
 import type { Npc, NpcData, NpcGroup } from '@appTypes/npc';
-import type { Place, PlaceData } from '@appTypes/place';
+import type { Area, AreaData } from '@appTypes/area';
 interface ApiEnvelope<T> {
+    area?: T;
+    areas?: T[];
     adventure?: T;
     adventures?: T[];
     character?: T;
@@ -22,8 +24,6 @@ interface ApiEnvelope<T> {
     npcs?: T[];
     npcGroup?: T;
     npcGroups?: T[];
-    place?: T;
-    places?: T[];
     response?: T;
     tokenCount?: T;
     errorCode?: string;
@@ -436,35 +436,35 @@ export const deleteEvent = async (eventId: string): Promise<void> => {
         method: 'DELETE',
     });
 };
-export const listPlaces = async (): Promise<Place[]> => {
-    const payload = await requestJson<ApiEnvelope<Place>>('/api/places');
-    return payload?.places ?? [];
+export const listAreas = async (): Promise<Area[]> => {
+    const payload = await requestJson<ApiEnvelope<Area>>('/api/areas');
+    return payload?.areas ?? [];
 };
-export const createPlace = async (): Promise<Place> => {
-    const payload = await requestJson<ApiEnvelope<Place>>('/api/places', {
+export const createArea = async (): Promise<Area> => {
+    const payload = await requestJson<ApiEnvelope<Area>>('/api/areas', {
         method: 'POST',
     });
-    if (!payload?.place) {
+    if (!payload?.area) {
         throw new Error('errors.api.generic');
     }
-    return payload.place;
+    return payload.area;
 };
-export const getPlace = async (placeId: string): Promise<Place> => {
-    const payload = await requestJson<ApiEnvelope<Place>>(`/api/places/${placeId}`);
-    if (!payload?.place) {
+export const getArea = async (areaId: string): Promise<Area> => {
+    const payload = await requestJson<ApiEnvelope<Area>>(`/api/areas/${areaId}`);
+    if (!payload?.area) {
         throw new Error('errors.api.generic');
     }
-    return payload.place;
+    return payload.area;
 };
-export const savePlace = async (placeId: string, place: PlaceData): Promise<Place> => {
-    const payload = await requestJson<ApiEnvelope<Place>>(`/api/places/${placeId}`, {
+export const saveArea = async (areaId: string, area: AreaData): Promise<Area> => {
+    const payload = await requestJson<ApiEnvelope<Area>>(`/api/areas/${areaId}`, {
         method: 'PUT',
-        body: JSON.stringify(place),
+        body: JSON.stringify(area),
     });
-    if (!payload?.place) {
+    if (!payload?.area) {
         throw new Error('errors.api.generic');
     }
-    return payload.place;
+    return payload.area;
 };
 export const createGeminiResponse = async (request: CreateGeminiResponseRequest): Promise<GeminiResponse> => {
     const payload = await requestJson<ApiEnvelope<GeminiResponse>>('/api/gemini/responses', {

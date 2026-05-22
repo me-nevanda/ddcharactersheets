@@ -17,7 +17,7 @@ const iconMap: Record<AppIconProps['name'], IconSvgElement> = {
     magic: MagicWand01Icon,
     minion: UserIcon,
     monster: AxeIcon,
-    place: MapPinIcon,
+    area: MapPinIcon,
     plus: AddCircleIcon,
     print: Printer,
     save: Save,

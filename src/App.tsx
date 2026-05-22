@@ -10,7 +10,7 @@ import { MonsterEditPage } from '@pages/MonsterEditPage';
 import { MonsterGroupEditPage } from '@pages/MonsterGroupEditPage';
 import { NpcEditPage } from '@pages/NpcEditPage';
 import { NpcGroupEditPage } from '@pages/NpcGroupEditPage';
-import { PlaceEditPage } from '@pages/PlaceEditPage';
+import { AreaEditPage } from '@pages/AreaEditPage';
 import { CharacterAbilitiesPrintPage } from '@pages/printPages/CharacterAbilitiesPrintPage';
 import { CharacterItemsPrintPage } from '@pages/printPages/CharacterItemsPrintPage';
 import { CharacterPrintPage } from '@pages/printPages/CharacterPrintPage';
@@ -28,7 +28,7 @@ const App = () => {
           <Route path="/monster-groups/:groupId/edit" element={<MonsterGroupEditPage />}/>
           <Route path="/npcs/:npcId/edit" element={<NpcEditPage />}/>
           <Route path="/npc-groups/:groupId/edit" element={<NpcGroupEditPage />}/>
-          <Route path="/places/:placeId/edit" element={<PlaceEditPage />}/>
+          <Route path="/areas/:areaId/edit" element={<AreaEditPage />}/>
           <Route path="/events/:eventId/edit" element={<EventEditPage />}/>
           <Route path="/contexts/:contextId/edit" element={<ContextEditPage />}/>
           <Route path="/characters/:characterId/print/abilities" element={<CharacterAbilitiesPrintPage />}/>

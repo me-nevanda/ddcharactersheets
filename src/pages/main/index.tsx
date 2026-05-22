@@ -5,7 +5,7 @@ import { ContextsListPage } from '@pages/ContextsListPage'
 import { EventsListPage } from '@pages/EventsListPage'
 import { MonstersListPage } from '@pages/MonstersListPage'
 import { NpcsListPage } from '@pages/NpcsListPage'
-import { PlaceListPage } from '@pages/PlaceListPage'
+import { AreaListPage } from '@pages/AreaListPage'
 import { useMainPage } from './mainPageHooks'
 import styles from './style.module.scss'
 
@@ -29,8 +29,8 @@ export const MainPage = () => {
           <button className={`${styles.tabButton} ${activeTab === 'adventures' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('adventures')}>
             {t('pages.main.tabs.adventures')}
           </button>
-          <button className={`${styles.tabButton} ${activeTab === 'places' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('places')}>
-            {t('pages.main.tabs.places')}
+          <button className={`${styles.tabButton} ${activeTab === 'areas' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('areas')}>
+            {t('pages.main.tabs.areas')}
           </button>
           <button className={`${styles.tabButton} ${activeTab === 'events' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('events')}>
             {t('pages.main.tabs.events')}
@@ -45,7 +45,7 @@ export const MainPage = () => {
           {activeTab === 'monsters' ? <MonstersListPage /> : null}
           {activeTab === 'npcs' ? <NpcsListPage /> : null}
           {activeTab === 'adventures' ? <AdventureListPage /> : null}
-          {activeTab === 'places' ? <PlaceListPage /> : null}
+          {activeTab === 'areas' ? <AreaListPage /> : null}
           {activeTab === 'events' ? <EventsListPage /> : null}
           {activeTab === 'contexts' ? <ContextsListPage /> : null}
         </div>

@@ -10,7 +10,7 @@ import { createMonsterGroup, deleteMonsterGroup, isSafeMonsterGroupId, listMonst
 import { createMonster, deleteMonster, deleteMonsterImage, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
 import { createNpcGroup, deleteNpcGroup, isSafeNpcGroupId, listNpcGroups, readNpcGroup, updateNpcGroup } from './server/npcGroupStore';
 import { createNpc, deleteNpc, deleteNpcImage, isSafeNpcId, listNpcs, readNpc, readNpcImage, updateNpc, updateNpcImage } from './server/npcStore';
-import { createPlace, isSafePlaceId, listPlaces, readPlace, updatePlace } from './server/placeStore';
+import { createArea, isSafeAreaId, listAreas, readArea, updateArea } from './server/areaStore';
 interface ApiError extends Error {
     code?: string;
     statusCode?: number;
@@ -495,37 +495,37 @@ const createNpcsApiPlugin = (): Plugin => {
         },
     };
 };
-const createPlacesApiPlugin = (): Plugin => {
+const createAreasApiPlugin = (): Plugin => {
     const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
         const url = new URL(request.url ?? '/', 'http://localhost');
-        if (!url.pathname.startsWith('/api/places')) {
+        if (!url.pathname.startsWith('/api/areas')) {
             next();
             return;
         }
         try {
-            if (request.method === 'GET' && url.pathname === '/api/places') {
-                sendJson(response, 200, { places: await listPlaces() });
+            if (request.method === 'GET' && url.pathname === '/api/areas') {
+                sendJson(response, 200, { areas: await listAreas() });
                 return;
             }
-            if (request.method === 'POST' && url.pathname === '/api/places') {
-                sendJson(response, 201, { place: await createPlace() });
+            if (request.method === 'POST' && url.pathname === '/api/areas') {
+                sendJson(response, 201, { area: await createArea() });
                 return;
             }
-            const match = url.pathname.match(/^\/api\/places\/([^/]+)$/);
+            const match = url.pathname.match(/^\/api\/areas\/([^/]+)$/);
             if (match) {
-                const placeId = match[1];
-                if (!isSafePlaceId(placeId)) {
-                    sendError(response, 400, 'errors.api.invalidPlaceId');
+                const areaId = match[1];
+                if (!isSafeAreaId(areaId)) {
+                    sendError(response, 400, 'errors.api.invalidAreaId');
                     return;
                 }
                 if (request.method === 'GET') {
-                    sendJson(response, 200, { place: await readPlace(placeId) });
+                    sendJson(response, 200, { area: await readArea(areaId) });
                     return;
                 }
                 if (request.method === 'PUT') {
                     const payload = await readJsonBody(request);
                     sendJson(response, 200, {
-                        place: await updatePlace(placeId, payload),
+                        area: await updateArea(areaId, payload),
                     });
                     return;
                 }
@@ -535,22 +535,22 @@ const createPlacesApiPlugin = (): Plugin => {
         catch (error) {
             const apiError = error as ApiError;
             if (apiError.code === 'ENOENT') {
-                sendError(response, 404, 'errors.api.placeNotFound');
+                sendError(response, 404, 'errors.api.areaNotFound');
                 return;
             }
             if (apiError.code === 'API_INVALID_JSON_BODY') {
                 sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidJsonBody');
                 return;
             }
-            if (apiError.code === 'API_INVALID_PLACE_ID') {
-                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidPlaceId');
+            if (apiError.code === 'API_INVALID_AREA_ID') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidAreaId');
                 return;
             }
             sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');
         }
     };
     return {
-        name: 'places-api',
+        name: 'areas-api',
         configureServer(server) {
             server.middlewares.use(handler);
         },
@@ -763,7 +763,7 @@ const createGeminiApiPlugin = (): Plugin => {
     };
 };
 export default defineConfig({
-    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createNpcsApiPlugin(), createPlacesApiPlugin(), createEventsApiPlugin(), createContextsApiPlugin(), createGeminiApiPlugin()],
+    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createNpcsApiPlugin(), createAreasApiPlugin(), createEventsApiPlugin(), createContextsApiPlugin(), createGeminiApiPlugin()],
     resolve: {
         alias: {
             '@pages': '/src/pages',

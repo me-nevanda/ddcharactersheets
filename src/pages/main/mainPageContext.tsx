@@ -6,7 +6,7 @@ const monsterListTabStorageKey = 'did.main.monsterList.activeTab'
 const npcListTabStorageKey = 'did.main.npcList.activeTab'
 
 const isMainTabKey = (value: string | null): value is MainTabKey => {
-  return value === 'heroes' || value === 'monsters' || value === 'npcs' || value === 'adventures' || value === 'places' || value === 'events' || value === 'contexts'
+  return value === 'heroes' || value === 'monsters' || value === 'npcs' || value === 'adventures' || value === 'areas' || value === 'events' || value === 'contexts'
 }
 
 const isMainMonsterListTabKey = (value: string | null): value is MainMonsterListTabKey => {
@@ -24,7 +24,7 @@ const getInitialTab = (): MainTabKey => {
 
   const storedTab = window.sessionStorage.getItem(mainTabStorageKey)
 
-  return isMainTabKey(storedTab) ? storedTab : 'heroes'
+  return storedTab === 'places' ? 'areas' : isMainTabKey(storedTab) ? storedTab : 'heroes'
 }
 
 const getInitialMonsterListTab = (): MainMonsterListTabKey => {

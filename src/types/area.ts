@@ -4,14 +4,14 @@ export interface PlaceItem {
   description: string
 }
 
-export interface PlaceData {
+export interface AreaData {
   uniqueId: string
   name: string
   description: string
   places: PlaceItem[]
 }
 
-export interface Place extends PlaceData {
+export interface Area extends AreaData {
   id: string
   updatedAt: string
 }

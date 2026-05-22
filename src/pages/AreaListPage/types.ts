@@ -1,6 +1,6 @@
 import type { KeyboardEventHandler } from 'react'
 
-export interface PlaceListCardViewModel {
+export interface AreaListCardViewModel {
   id: string
   label: string
   descriptionPreview: string
@@ -9,12 +9,12 @@ export interface PlaceListCardViewModel {
   onOpen: () => void
 }
 
-export interface PlaceListPageState {
-  cards: PlaceListCardViewModel[]
+export interface AreaListPageState {
+  cards: AreaListCardViewModel[]
   creating: boolean
   error: string
-  handleCreatePlace: () => Promise<void>
+  handleCreateArea: () => Promise<void>
   loading: boolean
-  showPlaceGrid: boolean
+  showAreaGrid: boolean
   showEmptyState: boolean
 }

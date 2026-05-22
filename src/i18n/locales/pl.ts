@@ -47,7 +47,7 @@ export const pl: TranslationDictionary = {
       invalidNpcId: 'Nieprawidłowy identyfikator NPC.',
       invalidNpcGroupId: 'Nieprawidłowy identyfikator grupy NPC.',
       invalidAdventureId: 'Nieprawidłowy identyfikator przygody.',
-      invalidPlaceId: 'Nieprawidłowy identyfikator obszaru.',
+      invalidAreaId: 'Nieprawidłowy identyfikator obszaru.',
       invalidEventId: 'Nieprawidłowy identyfikator wydarzenia.',
       invalidContextId: 'Nieprawidłowy identyfikator kontekstu.',
       invalidJsonBody: 'Nieprawidłowe dane żądania.',
@@ -67,7 +67,7 @@ export const pl: TranslationDictionary = {
       monsterNotFound: 'Nie znaleziono potwora.',
       npcNotFound: 'Nie znaleziono NPC.',
       adventureNotFound: 'Nie znaleziono przygody.',
-      placeNotFound: 'Nie znaleziono obszaru.',
+      areaNotFound: 'Nie znaleziono obszaru.',
       eventNotFound: 'Nie znaleziono wydarzenia.',
       contextNotFound: 'Nie znaleziono kontekstu.',
       notFound: 'Nie znaleziono zasobu.',
@@ -83,18 +83,18 @@ export const pl: TranslationDictionary = {
         monsters: 'Potwory',
         npcs: 'NPC',
         adventures: 'Przygody',
-        places: 'Obszary',
+        areas: 'Obszary',
         events: 'Wydarzenia',
         contexts: 'Konteksty',
       },
     },
-    placeList: {
+    areaList: {
       actions: {
-        addPlace: 'Nowy obszar',
+        addArea: 'Nowy obszar',
       },
       emptyState: 'Nie ma jeszcze żadnych obszarów. Dodaj pierwszy i przejdź do edycji.',
       loading: 'Wczytywanie obszarów...',
-      unnamedPlace: 'Nienazwany obszar',
+      unnamedArea: 'Nienazwany obszar',
       updatedAt: 'Ostatnia zmiana:',
     },
     eventList: {
@@ -191,7 +191,7 @@ export const pl: TranslationDictionary = {
         },
       },
     },
-    placeEdit: {
+    areaEdit: {
       eyebrow: 'OBSZAR',
       loading: 'Wczytywanie obszaru...',
       fields: {

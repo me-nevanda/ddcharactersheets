@@ -1,9 +1,9 @@
 import type { ChangeEventHandler, FormEventHandler } from 'react'
-import type { PlaceData, PlaceItem } from '@appTypes/place'
+import type { AreaData, PlaceItem } from '@appTypes/area'
 
-export interface PlaceEditPageState {
+export interface AreaEditPageState {
   error: string
-  form: PlaceData
+  form: AreaData
   handleBackToListClick: () => void
   handleNameChange: ChangeEventHandler<HTMLInputElement>
   handleDescriptionChange: (value: string) => void

@@ -46,7 +46,7 @@ export interface TranslationDictionary {
       invalidNpcId: string
       invalidNpcGroupId: string
       invalidAdventureId: string
-      invalidPlaceId: string
+      invalidAreaId: string
       invalidEventId: string
       invalidContextId: string
       invalidJsonBody: string
@@ -66,7 +66,7 @@ export interface TranslationDictionary {
       monsterNotFound: string
       npcNotFound: string
       adventureNotFound: string
-      placeNotFound: string
+      areaNotFound: string
       eventNotFound: string
       contextNotFound: string
       notFound: string
@@ -82,18 +82,18 @@ export interface TranslationDictionary {
         monsters: string
         npcs: string
         adventures: string
-        places: string
+        areas: string
         events: string
         contexts: string
       }
     }
-    placeList: {
+    areaList: {
       actions: {
-        addPlace: string
+        addArea: string
       }
       emptyState: string
       loading: string
-      unnamedPlace: string
+      unnamedArea: string
       updatedAt: string
     }
     eventList: {
@@ -190,7 +190,7 @@ export interface TranslationDictionary {
         }
       }
     }
-    placeEdit: {
+    areaEdit: {
       eyebrow: string
       loading: string
       fields: {

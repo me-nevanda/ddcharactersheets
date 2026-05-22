@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { getPlace, savePlace } from '@lib/api'
+import { getArea, saveArea } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useMainPageContext } from '@pages/main/mainPageContext'
-import type { PlaceData, PlaceItem } from '@appTypes/place'
-import type { PlaceEditPageState } from './types'
+import type { AreaData, PlaceItem } from '@appTypes/area'
+import type { AreaEditPageState } from './types'
 
-const emptyPlace: PlaceData = {
+const emptyArea: AreaData = {
   uniqueId: '',
   name: '',
   description: '',
@@ -24,7 +24,7 @@ const arePlaceItemsEqual = (left: PlaceItem[], right: PlaceItem[]): boolean => {
   })
 }
 
-const arePlacesEqual = (left: PlaceData, right: PlaceData): boolean => {
+const areAreasEqual = (left: AreaData, right: AreaData): boolean => {
   return left.uniqueId === right.uniqueId && left.name === right.name && left.description === right.description && arePlaceItemsEqual(left.places, right.places)
 }
 
@@ -39,13 +39,13 @@ const clonePlaceItems = (items: PlaceItem[]): PlaceItem[] => {
   return items.map((item) => ({ ...item }))
 }
 
-export const usePlaceEditPage = (): PlaceEditPageState => {
+export const useAreaEditPage = (): AreaEditPageState => {
   const { t } = useI18n()
-  const { placeId = '' } = useParams()
+  const { areaId = '' } = useParams()
   const navigate = useNavigate()
   const { handleTabChange } = useMainPageContext()
-  const [form, setForm] = useState<PlaceData>(emptyPlace)
-  const [savedPlace, setSavedPlace] = useState<PlaceData>(emptyPlace)
+  const [form, setForm] = useState<AreaData>(emptyArea)
+  const [savedArea, setSavedArea] = useState<AreaData>(emptyArea)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -54,18 +54,18 @@ export const usePlaceEditPage = (): PlaceEditPageState => {
   useEffect(() => {
     let cancelled = false
 
-    const loadPlace = async () => {
+    const loadArea = async () => {
       try {
-        const place = await getPlace(placeId)
-        const nextPlace: PlaceData = {
-          uniqueId: place.uniqueId,
-          name: place.name,
-          description: place.description,
-          places: clonePlaceItems(place.places),
+        const area = await getArea(areaId)
+        const nextArea: AreaData = {
+          uniqueId: area.uniqueId,
+          name: area.name,
+          description: area.description,
+          places: clonePlaceItems(area.places),
         }
         if (!cancelled) {
-          setForm(nextPlace)
-          setSavedPlace({ ...nextPlace, places: clonePlaceItems(nextPlace.places) })
+          setForm(nextArea)
+          setSavedArea({ ...nextArea, places: clonePlaceItems(nextArea.places) })
           setError('')
         }
       } catch (nextError) {
@@ -79,16 +79,16 @@ export const usePlaceEditPage = (): PlaceEditPageState => {
       }
     }
 
-    void loadPlace()
+    void loadArea()
 
     return () => {
       cancelled = true
     }
-  }, [placeId, t])
+  }, [areaId, t])
 
   const hasChanges = useMemo(() => {
-    return !arePlacesEqual(form, savedPlace)
-  }, [form, savedPlace])
+    return !areAreasEqual(form, savedArea)
+  }, [form, savedArea])
 
   const placeItemToRemove = useMemo(() => {
     if (placeItemToRemoveId === null) {
@@ -97,7 +97,7 @@ export const usePlaceEditPage = (): PlaceEditPageState => {
     return form.places.find((item) => item.id === placeItemToRemoveId) ?? null
   }, [form.places, placeItemToRemoveId])
 
-  const handleNameChange: PlaceEditPageState['handleNameChange'] = (event) => {
+  const handleNameChange: AreaEditPageState['handleNameChange'] = (event) => {
     const { value } = event.target
     setForm((currentForm) => ({
       ...currentForm,
@@ -105,29 +105,29 @@ export const usePlaceEditPage = (): PlaceEditPageState => {
     }))
   }
 
-  const handleDescriptionChange: PlaceEditPageState['handleDescriptionChange'] = (value) => {
+  const handleDescriptionChange: AreaEditPageState['handleDescriptionChange'] = (value) => {
     setForm((currentForm) => ({
       ...currentForm,
       description: value,
     }))
   }
 
-  const handleAddPlaceItem: PlaceEditPageState['handleAddPlaceItem'] = () => {
+  const handleAddPlaceItem: AreaEditPageState['handleAddPlaceItem'] = () => {
     setForm((currentForm) => ({
       ...currentForm,
       places: [...currentForm.places, { id: generatePlaceItemId(), name: '', description: '' }],
     }))
   }
 
-  const handleRequestRemovePlaceItem: PlaceEditPageState['handleRequestRemovePlaceItem'] = (id) => {
+  const handleRequestRemovePlaceItem: AreaEditPageState['handleRequestRemovePlaceItem'] = (id) => {
     setPlaceItemToRemoveId(id)
   }
 
-  const handleCancelRemovePlaceItem: PlaceEditPageState['handleCancelRemovePlaceItem'] = () => {
+  const handleCancelRemovePlaceItem: AreaEditPageState['handleCancelRemovePlaceItem'] = () => {
     setPlaceItemToRemoveId(null)
   }
 
-  const handleConfirmRemovePlaceItem: PlaceEditPageState['handleConfirmRemovePlaceItem'] = () => {
+  const handleConfirmRemovePlaceItem: AreaEditPageState['handleConfirmRemovePlaceItem'] = () => {
     if (placeItemToRemoveId === null) {
       return
     }
@@ -139,35 +139,35 @@ export const usePlaceEditPage = (): PlaceEditPageState => {
     setPlaceItemToRemoveId(null)
   }
 
-  const handlePlaceItemNameChange: PlaceEditPageState['handlePlaceItemNameChange'] = (id, value) => {
+  const handlePlaceItemNameChange: AreaEditPageState['handlePlaceItemNameChange'] = (id, value) => {
     setForm((currentForm) => ({
       ...currentForm,
       places: currentForm.places.map((item) => (item.id === id ? { ...item, name: value } : item)),
     }))
   }
 
-  const handlePlaceItemDescriptionChange: PlaceEditPageState['handlePlaceItemDescriptionChange'] = (id, value) => {
+  const handlePlaceItemDescriptionChange: AreaEditPageState['handlePlaceItemDescriptionChange'] = (id, value) => {
     setForm((currentForm) => ({
       ...currentForm,
       places: currentForm.places.map((item) => (item.id === id ? { ...item, description: value } : item)),
     }))
   }
 
-  const handleSubmit: PlaceEditPageState['handleSubmit'] = async (event) => {
+  const handleSubmit: AreaEditPageState['handleSubmit'] = async (event) => {
     event.preventDefault()
     setSaving(true)
     setError('')
 
     try {
-      const place = await savePlace(placeId, form)
-      const nextPlace: PlaceData = {
-        uniqueId: place.uniqueId,
-        name: place.name,
-        description: place.description,
-        places: clonePlaceItems(place.places),
+      const area = await saveArea(areaId, form)
+      const nextArea: AreaData = {
+        uniqueId: area.uniqueId,
+        name: area.name,
+        description: area.description,
+        places: clonePlaceItems(area.places),
       }
-      setForm(nextPlace)
-      setSavedPlace({ ...nextPlace, places: clonePlaceItems(nextPlace.places) })
+      setForm(nextArea)
+      setSavedArea({ ...nextArea, places: clonePlaceItems(nextArea.places) })
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
     } finally {
@@ -176,7 +176,7 @@ export const usePlaceEditPage = (): PlaceEditPageState => {
   }
 
   const handleBackToListClick = () => {
-    handleTabChange('places')
+    handleTabChange('areas')
     navigate('/')
   }
 

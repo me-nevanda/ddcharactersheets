@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { createPlace, listPlaces } from '@lib/api'
+import { createArea, listAreas } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
-import type { Place } from '@appTypes/place'
-import type { PlaceListCardViewModel, PlaceListPageState } from './types'
+import type { Area } from '@appTypes/area'
+import type { AreaListCardViewModel, AreaListPageState } from './types'
 
 const buildDescriptionPreview = (value: string): string => {
   if (typeof document === 'undefined') {
@@ -16,10 +16,10 @@ const buildDescriptionPreview = (value: string): string => {
   return (template.content.textContent ?? '').replace(/\s+/g, ' ').trim()
 }
 
-export const usePlaceListPage = (): PlaceListPageState => {
+export const useAreaListPage = (): AreaListPageState => {
   const { locale, t } = useI18n()
   const navigate = useNavigate()
-  const [places, setPlaces] = useState<Place[]>([])
+  const [areas, setAreas] = useState<Area[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
@@ -27,11 +27,11 @@ export const usePlaceListPage = (): PlaceListPageState => {
   useEffect(() => {
     let cancelled = false
 
-    const loadPlaces = async () => {
+    const loadAreas = async () => {
       try {
-        const nextPlaces = await listPlaces()
+        const nextAreas = await listAreas()
         if (!cancelled) {
-          setPlaces(nextPlaces)
+          setAreas(nextAreas)
           setError('')
         }
       } catch (nextError) {
@@ -45,23 +45,23 @@ export const usePlaceListPage = (): PlaceListPageState => {
       }
     }
 
-    void loadPlaces()
+    void loadAreas()
 
     return () => {
       cancelled = true
     }
   }, [t])
 
-  const openPlace = (placeId: string) => {
-    navigate(`/places/${placeId}/edit`)
+  const openArea = (areaId: string) => {
+    navigate(`/areas/${areaId}/edit`)
   }
 
-  const handleCreatePlace = async () => {
+  const handleCreateArea = async () => {
     setCreating(true)
     setError('')
     try {
-      const place = await createPlace()
-      navigate(`/places/${place.id}/edit`)
+      const area = await createArea()
+      navigate(`/areas/${area.id}/edit`)
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
       setCreating(false)
@@ -73,19 +73,19 @@ export const usePlaceListPage = (): PlaceListPageState => {
     timeStyle: 'short',
   })
 
-  const cards: PlaceListCardViewModel[] = places.map((place) => ({
-    id: place.id,
-    label: place.name.trim() || t('pages.placeList.unnamedPlace'),
-    descriptionPreview: buildDescriptionPreview(place.description),
-    updatedAtLabel: dateFormatter.format(new Date(place.updatedAt)),
+  const cards: AreaListCardViewModel[] = areas.map((area) => ({
+    id: area.id,
+    label: area.name.trim() || t('pages.areaList.unnamedArea'),
+    descriptionPreview: buildDescriptionPreview(area.description),
+    updatedAtLabel: dateFormatter.format(new Date(area.updatedAt)),
     onKeyDown: (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
-        openPlace(place.id)
+        openArea(area.id)
       }
     },
     onOpen: () => {
-      openPlace(place.id)
+      openArea(area.id)
     },
   }))
 
@@ -93,9 +93,9 @@ export const usePlaceListPage = (): PlaceListPageState => {
     cards,
     creating,
     error,
-    handleCreatePlace,
+    handleCreateArea,
     loading,
-    showPlaceGrid: !loading && cards.length > 0,
+    showAreaGrid: !loading && cards.length > 0,
     showEmptyState: !loading && cards.length === 0,
   }
 }
