@@ -24,7 +24,7 @@ export const useAttacksTab = ({ attacks, onAttackAdd, onAttackChange, onAttackRe
       label: `${t('pages.characterEdit.abilities.weaponAreaOptions.blast')} ${count}`,
     })),
   ]
-  const attackBonusOptions = Array.from({ length: 21 }, (_, bonus) => bonus)
+  const attackBonusOptions = Array.from({ length: 36 }, (_, bonus) => bonus)
   const defenseOptions: SelectOption<keyof MonsterDefenses>[] = [
     { value: 'kp', label: t('pages.monsterEdit.fields.kp') },
     { value: 'fortitude', label: t('pages.monsterEdit.fields.fortitude') },

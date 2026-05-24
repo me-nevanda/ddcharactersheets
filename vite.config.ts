@@ -3,14 +3,14 @@ import { defineConfig, type Connect, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { createAdventure, isSafeAdventureId, listAdventures, readAdventure, updateAdventure } from './server/adventureStore';
 import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacterId, listCharacters, readCharacter, readCharacterImage, updateCharacter, updateCharacterImage, } from './server/characterStore';
-import { createContext, deleteContext, isSafeContextId, listContexts, readContext, updateContext } from './server/contextStore';
-import { createEvent, deleteEvent, isSafeEventId, listEvents, readEvent, updateEvent } from './server/eventStore';
+import { createContext, deleteContext, deleteContextImage, isSafeContextId, listContexts, readContext, readContextImage, updateContext, updateContextImage } from './server/contextStore';
+import { createEvent, deleteEvent, deleteEventImage, isSafeEventId, listEvents, readEvent, readEventImage, updateEvent, updateEventImage } from './server/eventStore';
 import { countGeminiTokens, createGeminiResponse } from './server/geminiService';
 import { createMonsterGroup, deleteMonsterGroup, isSafeMonsterGroupId, listMonsterGroups, readMonsterGroup, updateMonsterGroup } from './server/monsterGroupStore';
 import { createMonster, deleteMonster, deleteMonsterImage, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
 import { createNpcGroup, deleteNpcGroup, isSafeNpcGroupId, listNpcGroups, readNpcGroup, updateNpcGroup } from './server/npcGroupStore';
 import { createNpc, deleteNpc, deleteNpcImage, isSafeNpcId, listNpcs, readNpc, readNpcImage, updateNpc, updateNpcImage } from './server/npcStore';
-import { createArea, isSafeAreaId, listAreas, readArea, updateArea } from './server/areaStore';
+import { createArea, deleteAreaImage, isSafeAreaId, listAreas, readArea, readAreaImage, updateArea, updateAreaImage } from './server/areaStore';
 interface ApiError extends Error {
     code?: string;
     statusCode?: number;
@@ -511,6 +511,31 @@ const createAreasApiPlugin = (): Plugin => {
                 sendJson(response, 201, { area: await createArea() });
                 return;
             }
+            const imageMatch = url.pathname.match(/^\/api\/areas\/([^/]+)\/image$/);
+            if (imageMatch) {
+                const areaId = imageMatch[1];
+                if (!isSafeAreaId(areaId)) {
+                    sendError(response, 400, 'errors.api.invalidAreaId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    const image = await readAreaImage(areaId);
+                    response.statusCode = 200;
+                    response.setHeader('Content-Type', image.contentType);
+                    response.end(image.data);
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const area = await updateAreaImage(areaId, request.headers['content-type'], await readRawBody(request));
+                    sendJson(response, 200, { area });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    const area = await deleteAreaImage(areaId);
+                    sendJson(response, 200, { area });
+                    return;
+                }
+            }
             const match = url.pathname.match(/^\/api\/areas\/([^/]+)$/);
             if (match) {
                 const areaId = match[1];
@@ -546,6 +571,10 @@ const createAreasApiPlugin = (): Plugin => {
                 sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidAreaId');
                 return;
             }
+            if (apiError.code === 'API_INVALID_AREA_IMAGE') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidAreaImage');
+                return;
+            }
             sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');
         }
     };
@@ -574,6 +603,31 @@ const createContextsApiPlugin = (): Plugin => {
             if (request.method === 'POST' && url.pathname === '/api/contexts') {
                 sendJson(response, 201, { context: await createContext() });
                 return;
+            }
+            const imageMatch = url.pathname.match(/^\/api\/contexts\/([^/]+)\/image$/);
+            if (imageMatch) {
+                const contextId = imageMatch[1];
+                if (!isSafeContextId(contextId)) {
+                    sendError(response, 400, 'errors.api.invalidContextId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    const image = await readContextImage(contextId);
+                    response.statusCode = 200;
+                    response.setHeader('Content-Type', image.contentType);
+                    response.end(image.data);
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const context = await updateContextImage(contextId, request.headers['content-type'], await readRawBody(request));
+                    sendJson(response, 200, { context });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    const context = await deleteContextImage(contextId);
+                    sendJson(response, 200, { context });
+                    return;
+                }
             }
             const match = url.pathname.match(/^\/api\/contexts\/([^/]+)$/);
             if (match) {
@@ -616,6 +670,10 @@ const createContextsApiPlugin = (): Plugin => {
                 sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidContextId');
                 return;
             }
+            if (apiError.code === 'API_INVALID_CONTEXT_IMAGE') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidContextImage');
+                return;
+            }
             sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');
         }
     };
@@ -644,6 +702,31 @@ const createEventsApiPlugin = (): Plugin => {
             if (request.method === 'POST' && url.pathname === '/api/events') {
                 sendJson(response, 201, { event: await createEvent() });
                 return;
+            }
+            const imageMatch = url.pathname.match(/^\/api\/events\/([^/]+)\/image$/);
+            if (imageMatch) {
+                const eventId = imageMatch[1];
+                if (!isSafeEventId(eventId)) {
+                    sendError(response, 400, 'errors.api.invalidEventId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    const image = await readEventImage(eventId);
+                    response.statusCode = 200;
+                    response.setHeader('Content-Type', image.contentType);
+                    response.end(image.data);
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const event = await updateEventImage(eventId, request.headers['content-type'], await readRawBody(request));
+                    sendJson(response, 200, { event });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    const event = await deleteEventImage(eventId);
+                    sendJson(response, 200, { event });
+                    return;
+                }
             }
             const match = url.pathname.match(/^\/api\/events\/([^/]+)$/);
             if (match) {
@@ -684,6 +767,10 @@ const createEventsApiPlugin = (): Plugin => {
             }
             if (apiError.code === 'API_INVALID_EVENT_ID') {
                 sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidEventId');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_EVENT_IMAGE') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidEventImage');
                 return;
             }
             sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');

@@ -8,6 +8,29 @@ const hasRichText = (value: string): boolean => {
   return value.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length > 0
 }
 
+const DESCRIPTION_CHAR_LIMIT = 800
+
+const escapeHtml = (value: string): string => {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+const truncateDescriptionHtml = (value: string): string => {
+  if (typeof document === 'undefined') {
+    const plainText = value.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
+    return plainText.length > DESCRIPTION_CHAR_LIMIT ? `${escapeHtml(plainText.slice(0, DESCRIPTION_CHAR_LIMIT).trimEnd())}...` : value
+  }
+
+  const template = document.createElement('template')
+  template.innerHTML = value
+  const plainText = (template.content.textContent ?? '').replace(/\s+/g, ' ').trim()
+  return plainText.length > DESCRIPTION_CHAR_LIMIT ? `${escapeHtml(plainText.slice(0, DESCRIPTION_CHAR_LIMIT).trimEnd())}...` : value
+}
+
 export const NpcPrintPage = () => {
   const { t } = useI18n()
   const { npc, loading, error, title, npcName, statRows, defenseRows, attackRows, weapons, armors, others, hasItems } = useNpcPrintPage()
@@ -161,7 +184,7 @@ export const NpcPrintPage = () => {
               <h2 className={styles.sectionTitle}>{t('pages.npcEdit.sections.description')}</h2>
               <div className={styles.descriptionCopy}>
                 {npc.imageUrl ? <img className={styles.npcImage} src={npc.imageUrl} alt={t('pages.npcEdit.fields.image')} /> : null}
-                {hasRichText(npc.description) ? <div className={styles.richText} dangerouslySetInnerHTML={{ __html: npc.description }} /> : null}
+                {hasRichText(npc.description) ? <div className={styles.richText} dangerouslySetInnerHTML={{ __html: truncateDescriptionHtml(npc.description) }} /> : null}
               </div>
             </section>
 

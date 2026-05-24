@@ -8,7 +8,7 @@ const formatSuggestedValue = (value: string): string => {
   return value.trim()
 }
 
-const copySuggestedDamage = async (value: string, t: AttackCardProps['t']) => {
+const copySuggestedDamageMarker = async (value: string, t: AttackCardProps['t']) => {
   try {
     await navigator.clipboard.writeText(value)
     toast.success(t('common.clipboard.damageCopied'))
@@ -125,7 +125,7 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
             <span className={styles.attackSuggestionLabel}>{t('pages.npcEdit.fields.damage')}</span>
             {lowDamage ? (
               <span>
-                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamage(lowDamage, t)}>
+                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(t('pages.npcEdit.fields.low'), t)}>
                   {t('pages.npcEdit.fields.low')}
                 </button>: {lowDamage}
               </span>
@@ -133,7 +133,7 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
             {lowDamage && (mediumDamage || highDamage) ? <span>,</span> : null}
             {mediumDamage ? (
               <span>
-                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamage(mediumDamage, t)}>
+                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(t('pages.npcEdit.fields.medium'), t)}>
                   {t('pages.npcEdit.fields.medium')}
                 </button>: {mediumDamage}
               </span>
@@ -141,7 +141,7 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
             {mediumDamage && highDamage ? <span>,</span> : null}
             {highDamage ? (
               <span>
-                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamage(highDamage, t)}>
+                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(t('pages.npcEdit.fields.high'), t)}>
                   {t('pages.npcEdit.fields.high')}
                 </button> {highDamage}
               </span>

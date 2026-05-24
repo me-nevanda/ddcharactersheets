@@ -99,6 +99,7 @@ export const useEventsListPage = (): EventsListPageState => {
     id: event.id,
     deleting: deletingId === event.id,
     description: buildTextPreview(event.description),
+    imageUrl: event.imageUrl,
     label: event.name.trim() || t('pages.eventList.unnamedEvent'),
     onDeleteClick: (mouseEvent) => {
       mouseEvent.stopPropagation()

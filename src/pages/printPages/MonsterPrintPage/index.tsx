@@ -8,6 +8,29 @@ const hasRichText = (value: string): boolean => {
   return value.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length > 0
 }
 
+const DESCRIPTION_CHAR_LIMIT = 800
+
+const escapeHtml = (value: string): string => {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+const truncateDescriptionHtml = (value: string): string => {
+  if (typeof document === 'undefined') {
+    const plainText = value.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
+    return plainText.length > DESCRIPTION_CHAR_LIMIT ? `${escapeHtml(plainText.slice(0, DESCRIPTION_CHAR_LIMIT).trimEnd())}...` : value
+  }
+
+  const template = document.createElement('template')
+  template.innerHTML = value
+  const plainText = (template.content.textContent ?? '').replace(/\s+/g, ' ').trim()
+  return plainText.length > DESCRIPTION_CHAR_LIMIT ? `${escapeHtml(plainText.slice(0, DESCRIPTION_CHAR_LIMIT).trimEnd())}...` : value
+}
+
 export const MonsterPrintPage = () => {
   const { t } = useI18n()
   const { monster, loading, error, title, monsterName, statRows, defenseRows, attackRows, weapons, armors, others, hasItems } = useMonsterPrintPage()
@@ -161,7 +184,7 @@ export const MonsterPrintPage = () => {
               <h2 className={styles.sectionTitle}>{t('pages.monsterEdit.sections.description')}</h2>
               <div className={styles.descriptionCopy}>
                 {monster.imageUrl ? <img className={styles.monsterImage} src={monster.imageUrl} alt={t('pages.monsterEdit.fields.image')} /> : null}
-                {hasRichText(monster.description) ? <div className={styles.richText} dangerouslySetInnerHTML={{ __html: monster.description }} /> : null}
+                {hasRichText(monster.description) ? <div className={styles.richText} dangerouslySetInnerHTML={{ __html: truncateDescriptionHtml(monster.description) }} /> : null}
               </div>
             </section>
 

@@ -5,6 +5,7 @@ export interface ContextListCardViewModel {
   id: string
   deleting: boolean
   description: string
+  imageUrl: string
   label: string
   onDeleteClick: MouseEventHandler<HTMLButtonElement>
   onKeyDown: KeyboardEventHandler<HTMLElement>

@@ -29,5 +29,6 @@ export interface ContextData {
 
 export interface Context extends ContextData {
   id: string
+  imageUrl: string
   updatedAt: string
 }

@@ -11,7 +11,7 @@ export const EventEditPage = () => {
   const { t } = useI18n()
   const navigate = useNavigate()
   const { handleTabChange } = useMainPageContext()
-  const { error, form, handleChange, handleSubmit, hasChanges, loading, saving } = useEventEditPage()
+  const { error, form, handleChange, handleImageChange, handleImageRemove, handleSubmit, hasChanges, imageUrl, loading, removingImage, saving, uploadingImage } = useEventEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
   const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
@@ -34,8 +34,27 @@ export const EventEditPage = () => {
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
           <div className={styles.headerBrand}>
-            <div className={styles.headerIconFrame}>
-              <AppIcon className={styles.headerIcon} name="document" />
+            <div className={`${styles.headerImagePicker} ${imageUrl ? styles.headerImagePickerWithImage : ''}`}>
+              <input id="event-image-input" className={styles.headerImageInput} type="file" accept="image/png,image/jpeg" onChange={(event) => void handleImageChange(event)} disabled={uploadingImage || removingImage} />
+              {imageUrl ? (
+                <>
+                  <img className={styles.headerImage} src={imageUrl} alt={t('pages.eventEdit.fields.image')} />
+                  <div className={styles.headerImageActions}>
+                    <label className={styles.headerImageAction} htmlFor="event-image-input" aria-disabled={uploadingImage || removingImage}>
+                      <AppIcon name="edit" />
+                      <span>{t('pages.eventEdit.imageActions.uploadNew')}</span>
+                    </label>
+                    <button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={() => void handleImageRemove()}>
+                      <AppIcon name="trash" />
+                      <span>{t('pages.eventEdit.imageActions.remove')}</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <label className={styles.headerImagePlaceholder} htmlFor="event-image-input">
+                  {t('pages.eventEdit.placeholders.image')}
+                </label>
+              )}
             </div>
             <div className={styles.headerCopy}>
               <p className={styles.eyebrow}>{t('pages.eventEdit.eyebrow')}</p>

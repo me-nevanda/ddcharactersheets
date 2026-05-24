@@ -152,14 +152,14 @@ export const normalizeAlignmentValue = (value: unknown): CharacterAlignment => {
 
 export const normalizeAbilityWeaponAttackBonusNumber = (value: unknown): number => {
   if (typeof value === 'number' && Number.isFinite(value)) {
-    return Math.min(10, Math.max(-5, Math.trunc(value)))
+    return Math.min(35, Math.max(-5, Math.trunc(value)))
   }
 
   if (typeof value === 'string') {
     const parsed = Number.parseInt(value, 10)
 
     if (Number.isFinite(parsed)) {
-      return Math.min(10, Math.max(-5, Math.trunc(parsed)))
+      return Math.min(35, Math.max(-5, Math.trunc(parsed)))
     }
   }
 

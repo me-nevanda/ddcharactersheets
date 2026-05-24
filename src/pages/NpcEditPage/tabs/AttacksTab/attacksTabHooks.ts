@@ -24,7 +24,7 @@ export const useAttacksTab = ({ attacks, onAttackAdd, onAttackChange, onAttackRe
       label: `${t('pages.characterEdit.abilities.weaponAreaOptions.blast')} ${count}`,
     })),
   ]
-  const attackBonusOptions = Array.from({ length: 21 }, (_, bonus) => bonus)
+  const attackBonusOptions = Array.from({ length: 36 }, (_, bonus) => bonus)
   const defenseOptions: SelectOption<keyof NpcDefenses>[] = [
     { value: 'kp', label: t('pages.npcEdit.fields.kp') },
     { value: 'fortitude', label: t('pages.npcEdit.fields.fortitude') },

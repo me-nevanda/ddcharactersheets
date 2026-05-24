@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { getContext, listAreas, listCharacters, listEvents, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext } from '@lib/api'
+import { deleteContextImage, getContext, listAreas, listCharacters, listEvents, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext, uploadContextImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import { useContextCopy } from './contextCopyHooks'
@@ -137,8 +137,11 @@ export const useContextEditPage = (): ContextEditPageState => {
   const [form, setForm] = useState<ContextData>(emptyContextForm)
   const [initialForm, setInitialForm] = useState<ContextData>(emptyContextForm)
   const [error, setError] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(true)
+  const [removingImage, setRemovingImage] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   const [allCharacters, setAllCharacters] = useState<Character[]>([])
   const [isAddCharacterDialogOpen, setIsAddCharacterDialogOpen] = useState(false)
@@ -187,6 +190,7 @@ export const useContextEditPage = (): ContextEditPageState => {
         if (!cancelled) {
           setForm(nextForm)
           setInitialForm(nextForm)
+          setImageUrl(context.imageUrl)
           setError('')
         }
       } catch (nextError) {
@@ -407,6 +411,45 @@ export const useContextEditPage = (): ContextEditPageState => {
       ...current,
       description: value,
     }))
+  }
+
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const image = event.target.files?.[0]
+    event.target.value = ''
+
+    if (!image) {
+      return
+    }
+
+    setUploadingImage(true)
+    setError('')
+
+    try {
+      const context = await uploadContextImage(contextId, image)
+      setImageUrl(context.imageUrl ? `${context.imageUrl}?v=${Date.now()}` : '')
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleImageRemove = async () => {
+    if (!imageUrl || removingImage) {
+      return
+    }
+
+    setRemovingImage(true)
+    setError('')
+
+    try {
+      const context = await deleteContextImage(contextId)
+      setImageUrl(context.imageUrl)
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+    } finally {
+      setRemovingImage(false)
+    }
   }
 
   // ----- Characters -----
@@ -1231,10 +1274,15 @@ export const useContextEditPage = (): ContextEditPageState => {
     handleChange,
     handleChangeDescription,
     handleCopyContext,
+    handleImageChange,
+    handleImageRemove,
     handleSubmit,
     hasChanges,
+    imageUrl,
     loading,
+    removingImage,
     saving,
+    uploadingImage,
     characterCards,
     characterOptions,
     characterSearch,

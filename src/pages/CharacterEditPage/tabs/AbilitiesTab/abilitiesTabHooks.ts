@@ -53,7 +53,7 @@ export const useAbilitiesTab = () => {
         { value: 'reflex', label: t('pages.characterEdit.fields.reflex') },
         { value: 'will', label: t('pages.characterEdit.fields.will') },
     ];
-    const attackBonusOptions = Array.from({ length: 16 }, (_, bonus) => bonus - 5);
+    const attackBonusOptions = Array.from({ length: 41 }, (_, bonus) => bonus - 5);
     const weaponDamageTypeOptions: SelectOption<CharacterWeaponDamageType>[] = [
         { value: 'normal', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.normal') },
         { value: 'acid', label: t('pages.characterEdit.abilities.weaponDamageTypeOptions.acid') },

@@ -7,7 +7,7 @@ import styles from './style.module.scss'
 
 export const AreaEditPage = () => {
   const { t } = useI18n()
-  const { error, form, handleAddPlaceItem, handleBackToListClick, handleCancelRemovePlaceItem, handleConfirmRemovePlaceItem, handleDescriptionChange, handleNameChange, handlePlaceItemDescriptionChange, handlePlaceItemNameChange, handleRequestRemovePlaceItem, handleSubmit, hasChanges, loading, placeItemToRemove, saving } = useAreaEditPage()
+  const { error, form, handleAddPlaceItem, handleBackToListClick, handleCancelRemovePlaceItem, handleConfirmRemovePlaceItem, handleDescriptionChange, handleImageChange, handleImageRemove, handleNameChange, handlePlaceItemDescriptionChange, handlePlaceItemNameChange, handleRequestRemovePlaceItem, handleSubmit, hasChanges, imageUrl, loading, placeItemToRemove, removingImage, saving, uploadingImage } = useAreaEditPage()
 
   const placeItemRemoveName = placeItemToRemove ? (placeItemToRemove.name.trim() || t('pages.areaEdit.places.unnamedItem')) : ''
 
@@ -16,8 +16,27 @@ export const AreaEditPage = () => {
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
           <div className={styles.headerBrand}>
-            <div className={styles.headerIconFrame}>
-              <AppIcon className={styles.headerIcon} name="area" />
+            <div className={`${styles.headerImagePicker} ${imageUrl ? styles.headerImagePickerWithImage : ''}`}>
+              <input id="area-image-input" className={styles.headerImageInput} type="file" accept="image/png,image/jpeg" onChange={(event) => void handleImageChange(event)} disabled={uploadingImage || removingImage} />
+              {imageUrl ? (
+                <>
+                  <img className={styles.headerImage} src={imageUrl} alt={t('pages.areaEdit.fields.image')} />
+                  <div className={styles.headerImageActions}>
+                    <label className={styles.headerImageAction} htmlFor="area-image-input" aria-disabled={uploadingImage || removingImage}>
+                      <AppIcon name="edit" />
+                      <span>{t('pages.areaEdit.imageActions.uploadNew')}</span>
+                    </label>
+                    <button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={() => void handleImageRemove()}>
+                      <AppIcon name="trash" />
+                      <span>{t('pages.areaEdit.imageActions.remove')}</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <label className={styles.headerImagePlaceholder} htmlFor="area-image-input">
+                  {t('pages.areaEdit.placeholders.image')}
+                </label>
+              )}
             </div>
             <div className={styles.headerCopy}>
               <p className={styles.eyebrow}>{t('pages.areaEdit.eyebrow')}</p>

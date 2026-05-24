@@ -1,4 +1,4 @@
-import type { ChangeEventHandler, FormEventHandler } from 'react'
+import type { ChangeEvent, ChangeEventHandler, FormEventHandler } from 'react'
 import type { AreaData, PlaceItem } from '@appTypes/area'
 
 export interface AreaEditPageState {
@@ -14,10 +14,15 @@ export interface AreaEditPageState {
   placeItemToRemove: PlaceItem | null
   handlePlaceItemNameChange: (id: string, value: string) => void
   handlePlaceItemDescriptionChange: (id: string, value: string) => void
+  handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
+  handleImageRemove: () => Promise<void>
   handleSubmit: FormEventHandler<HTMLFormElement>
   hasChanges: boolean
+  imageUrl: string
   loading: boolean
+  removingImage: boolean
   saving: boolean
+  uploadingImage: boolean
 }
 
 export type { PlaceItem }

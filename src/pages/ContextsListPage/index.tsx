@@ -12,7 +12,11 @@ const ContextListCard = ({ card }: { card: ContextListCardViewModel }) => {
   return (
     <article className={styles.contextCard} role="link" tabIndex={0} onClick={card.onOpen} onKeyDown={card.onKeyDown}>
       <div className={styles.cardIconFrame}>
-        <AppIcon className={styles.cardIcon} name="context" />
+        {card.imageUrl ? (
+          <img className={styles.cardImage} src={card.imageUrl} alt="" aria-hidden="true" />
+        ) : (
+          <AppIcon className={styles.cardIcon} name="context" />
+        )}
       </div>
       <div className={styles.contextSummary}>
         <h2 className={styles.contextName}>{card.label}</h2>

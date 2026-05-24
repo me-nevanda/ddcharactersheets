@@ -2,6 +2,7 @@ import type { KeyboardEventHandler } from 'react'
 
 export interface AreaListCardViewModel {
   id: string
+  imageUrl: string
   label: string
   descriptionPreview: string
   updatedAtLabel: string

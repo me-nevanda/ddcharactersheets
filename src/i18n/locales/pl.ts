@@ -30,8 +30,8 @@ export const pl: TranslationDictionary = {
       unsavedChangesBody: 'Masz niezapisane zmiany. Czy na pewno chcesz wrócić do listy?',
     },
     clipboard: {
-      copyDamageValue: 'Skopiuj wartość obrażeń',
-      damageCopied: 'Skopiowano wartość obrażeń.',
+      copyDamageValue: 'Skopiuj znacznik obrażeń',
+      damageCopied: 'Skopiowano znacznik obrażeń.',
       copyFailed: 'Nie udało się skopiować do schowka.',
     },
     states: {
@@ -59,6 +59,9 @@ export const pl: TranslationDictionary = {
       invalidCharacterImage: 'Obraz bohatera musi być plikiem PNG albo JPG.',
       invalidMonsterImage: 'Obraz potwora musi być plikiem PNG albo JPG.',
       invalidNpcImage: 'Obraz NPC musi być plikiem PNG albo JPG.',
+      invalidAreaImage: 'Obraz obszaru musi być plikiem PNG albo JPG.',
+      invalidEventImage: 'Obraz wydarzenia musi być plikiem PNG albo JPG.',
+      invalidContextImage: 'Obraz kontekstu musi być plikiem PNG albo JPG.',
       invalidMonsterGroupName: 'Nazwa grupy potworów jest wymagana.',
       invalidNpcGroupName: 'Nazwa grupy NPC jest wymagana.',
       geminiPromptRequired: 'Treść zapytania do Gemini jest wymagana.',
@@ -121,10 +124,16 @@ export const pl: TranslationDictionary = {
       fields: {
         name: 'Tytuł',
         description: 'Opis',
+        image: 'Obraz wydarzenia',
       },
       placeholders: {
         titleName: 'Bezimienne wydarzenie',
         description: 'Opis wydarzenia',
+        image: 'Dodaj obraz',
+      },
+      imageActions: {
+        uploadNew: 'Zmień',
+        remove: 'Usuń',
       },
     },
     contextList: {
@@ -162,10 +171,16 @@ export const pl: TranslationDictionary = {
       fields: {
         name: 'Tytuł',
         description: 'Opis',
+        image: 'Obraz kontekstu',
       },
       placeholders: {
         titleName: 'Bezimienny kontekst',
         description: 'Opis kontekstu',
+        image: 'Dodaj obraz',
+      },
+      imageActions: {
+        uploadNew: 'Zmień',
+        remove: 'Usuń',
       },
       characters: {
         title: 'Bohaterowie',
@@ -247,10 +262,16 @@ export const pl: TranslationDictionary = {
       fields: {
         name: 'Nazwa',
         description: 'Opis',
+        image: 'Obraz obszaru',
       },
       placeholders: {
         titleName: 'Nienazwany obszar',
         description: 'Opis obszaru',
+        image: 'Dodaj obraz',
+      },
+      imageActions: {
+        uploadNew: 'Zmień',
+        remove: 'Usuń',
       },
       places: {
         title: 'Miejsca',

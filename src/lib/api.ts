@@ -401,6 +401,34 @@ export const deleteContext = async (contextId: string): Promise<void> => {
         method: 'DELETE',
     });
 };
+export const uploadContextImage = async (contextId: string, image: File): Promise<Context> => {
+    const response = await fetch(`/api/contexts/${contextId}/image`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': image.type,
+        },
+        body: image,
+    });
+    const payload = (await response.json().catch(() => null)) as ApiEnvelope<Context> | null;
+    if (!response.ok) {
+        const error = new Error(payload?.errorCode ?? 'errors.api.generic') as ApiError;
+        error.code = payload?.errorCode ?? 'errors.api.generic';
+        throw error;
+    }
+    if (!payload?.context) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.context;
+};
+export const deleteContextImage = async (contextId: string): Promise<Context> => {
+    const payload = await requestJson<ApiEnvelope<Context>>(`/api/contexts/${contextId}/image`, {
+        method: 'DELETE',
+    });
+    if (!payload?.context) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.context;
+};
 export const listEvents = async (): Promise<Event[]> => {
     const payload = await requestJson<ApiEnvelope<Event>>('/api/events');
     return payload?.events ?? [];
@@ -436,6 +464,34 @@ export const deleteEvent = async (eventId: string): Promise<void> => {
         method: 'DELETE',
     });
 };
+export const uploadEventImage = async (eventId: string, image: File): Promise<Event> => {
+    const response = await fetch(`/api/events/${eventId}/image`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': image.type,
+        },
+        body: image,
+    });
+    const payload = (await response.json().catch(() => null)) as ApiEnvelope<Event> | null;
+    if (!response.ok) {
+        const error = new Error(payload?.errorCode ?? 'errors.api.generic') as ApiError;
+        error.code = payload?.errorCode ?? 'errors.api.generic';
+        throw error;
+    }
+    if (!payload?.event) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.event;
+};
+export const deleteEventImage = async (eventId: string): Promise<Event> => {
+    const payload = await requestJson<ApiEnvelope<Event>>(`/api/events/${eventId}/image`, {
+        method: 'DELETE',
+    });
+    if (!payload?.event) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.event;
+};
 export const listAreas = async (): Promise<Area[]> => {
     const payload = await requestJson<ApiEnvelope<Area>>('/api/areas');
     return payload?.areas ?? [];
@@ -460,6 +516,34 @@ export const saveArea = async (areaId: string, area: AreaData): Promise<Area> =>
     const payload = await requestJson<ApiEnvelope<Area>>(`/api/areas/${areaId}`, {
         method: 'PUT',
         body: JSON.stringify(area),
+    });
+    if (!payload?.area) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.area;
+};
+export const uploadAreaImage = async (areaId: string, image: File): Promise<Area> => {
+    const response = await fetch(`/api/areas/${areaId}/image`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': image.type,
+        },
+        body: image,
+    });
+    const payload = (await response.json().catch(() => null)) as ApiEnvelope<Area> | null;
+    if (!response.ok) {
+        const error = new Error(payload?.errorCode ?? 'errors.api.generic') as ApiError;
+        error.code = payload?.errorCode ?? 'errors.api.generic';
+        throw error;
+    }
+    if (!payload?.area) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.area;
+};
+export const deleteAreaImage = async (areaId: string): Promise<Area> => {
+    const payload = await requestJson<ApiEnvelope<Area>>(`/api/areas/${areaId}/image`, {
+        method: 'DELETE',
     });
     if (!payload?.area) {
         throw new Error('errors.api.generic');

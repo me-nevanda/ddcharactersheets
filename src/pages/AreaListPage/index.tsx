@@ -11,7 +11,11 @@ const AreaListCard = ({ card }: { card: AreaListCardViewModel }) => {
   return (
     <article className={styles.areaCard} role="link" tabIndex={0} onClick={card.onOpen} onKeyDown={card.onKeyDown}>
       <div className={styles.cardIconFrame}>
-        <AppIcon className={styles.cardIcon} name="area" />
+        {card.imageUrl ? (
+          <img className={styles.cardImage} src={card.imageUrl} alt="" aria-hidden="true" />
+        ) : (
+          <AppIcon className={styles.cardIcon} name="area" />
+        )}
       </div>
       <div className={styles.areaSummary}>
         <h2 className={styles.areaName}>{card.label}</h2>

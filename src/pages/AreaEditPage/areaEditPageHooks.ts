@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { getArea, saveArea } from '@lib/api'
+import { deleteAreaImage, getArea, saveArea, uploadAreaImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useMainPageContext } from '@pages/main/mainPageContext'
 import type { AreaData, PlaceItem } from '@appTypes/area'
@@ -49,7 +49,10 @@ export const useAreaEditPage = (): AreaEditPageState => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [placeItemToRemoveId, setPlaceItemToRemoveId] = useState<string | null>(null)
+  const [removingImage, setRemovingImage] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -66,6 +69,7 @@ export const useAreaEditPage = (): AreaEditPageState => {
         if (!cancelled) {
           setForm(nextArea)
           setSavedArea({ ...nextArea, places: clonePlaceItems(nextArea.places) })
+          setImageUrl(area.imageUrl)
           setError('')
         }
       } catch (nextError) {
@@ -153,6 +157,45 @@ export const useAreaEditPage = (): AreaEditPageState => {
     }))
   }
 
+  const handleImageChange: AreaEditPageState['handleImageChange'] = async (event) => {
+    const image = event.target.files?.[0]
+    event.target.value = ''
+
+    if (!image) {
+      return
+    }
+
+    setUploadingImage(true)
+    setError('')
+
+    try {
+      const area = await uploadAreaImage(areaId, image)
+      setImageUrl(area.imageUrl ? `${area.imageUrl}?v=${Date.now()}` : '')
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleImageRemove: AreaEditPageState['handleImageRemove'] = async () => {
+    if (!imageUrl || removingImage) {
+      return
+    }
+
+    setRemovingImage(true)
+    setError('')
+
+    try {
+      const area = await deleteAreaImage(areaId)
+      setImageUrl(area.imageUrl)
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+    } finally {
+      setRemovingImage(false)
+    }
+  }
+
   const handleSubmit: AreaEditPageState['handleSubmit'] = async (event) => {
     event.preventDefault()
     setSaving(true)
@@ -193,9 +236,14 @@ export const useAreaEditPage = (): AreaEditPageState => {
     placeItemToRemove,
     handlePlaceItemNameChange,
     handlePlaceItemDescriptionChange,
+    handleImageChange,
+    handleImageRemove,
     handleSubmit,
     hasChanges,
+    imageUrl,
     loading,
+    removingImage,
     saving,
+    uploadingImage,
   }
 }

@@ -24,7 +24,15 @@ const getInitialTab = (): MainTabKey => {
 
   const storedTab = window.sessionStorage.getItem(mainTabStorageKey)
 
-  return storedTab === 'places' ? 'areas' : isMainTabKey(storedTab) ? storedTab : 'heroes'
+  if (storedTab === 'places') {
+    return 'areas'
+  }
+
+  if (storedTab === 'adventures') {
+    return 'heroes'
+  }
+
+  return isMainTabKey(storedTab) ? storedTab : 'heroes'
 }
 
 const getInitialMonsterListTab = (): MainMonsterListTabKey => {

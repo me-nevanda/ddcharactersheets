@@ -164,10 +164,15 @@ export interface ContextEditPageState {
   handleChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
   handleChangeDescription: (value: string) => void
   handleCopyContext: () => Promise<void>
+  handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
+  handleImageRemove: () => Promise<void>
   handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
+  imageUrl: string
   loading: boolean
+  removingImage: boolean
   saving: boolean
+  uploadingImage: boolean
   characterCards: ContextCharacterCardViewModel[]
   characterOptions: ContextCharacterOptionViewModel[]
   characterSearch: string

@@ -6,5 +6,6 @@ export interface EventData {
 
 export interface Event extends EventData {
   id: string
+  imageUrl: string
   updatedAt: string
 }

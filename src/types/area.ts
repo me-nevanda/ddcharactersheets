@@ -13,5 +13,6 @@ export interface AreaData {
 
 export interface Area extends AreaData {
   id: string
+  imageUrl: string
   updatedAt: string
 }

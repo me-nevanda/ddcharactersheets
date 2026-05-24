@@ -440,10 +440,15 @@ export const ContextEditPage = () => {
     form,
     handleChange,
     handleCopyContext,
+    handleImageChange,
+    handleImageRemove,
     handleSubmit,
     hasChanges,
+    imageUrl,
     loading,
+    removingImage,
     saving,
+    uploadingImage,
     characterCards,
     characterOptions,
     characterSearch,
@@ -513,8 +518,27 @@ export const ContextEditPage = () => {
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
           <div className={styles.headerBrand}>
-            <div className={styles.headerIconFrame}>
-              <AppIcon className={styles.headerIcon} name="document" />
+            <div className={`${styles.headerImagePicker} ${imageUrl ? styles.headerImagePickerWithImage : ''}`}>
+              <input id="context-image-input" className={styles.headerImageInput} type="file" accept="image/png,image/jpeg" onChange={(event) => void handleImageChange(event)} disabled={uploadingImage || removingImage} />
+              {imageUrl ? (
+                <>
+                  <img className={styles.headerImage} src={imageUrl} alt={t('pages.contextEdit.fields.image')} />
+                  <div className={styles.headerImageActions}>
+                    <label className={styles.headerImageAction} htmlFor="context-image-input" aria-disabled={uploadingImage || removingImage}>
+                      <AppIcon name="edit" />
+                      <span>{t('pages.contextEdit.imageActions.uploadNew')}</span>
+                    </label>
+                    <button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={() => void handleImageRemove()}>
+                      <AppIcon name="trash" />
+                      <span>{t('pages.contextEdit.imageActions.remove')}</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <label className={styles.headerImagePlaceholder} htmlFor="context-image-input">
+                  {t('pages.contextEdit.placeholders.image')}
+                </label>
+              )}
             </div>
             <div className={styles.headerCopy}>
               <p className={styles.eyebrow}>{t('pages.contextEdit.eyebrow')}</p>

@@ -12,7 +12,11 @@ const EventListCard = ({ card }: { card: EventListCardViewModel }) => {
   return (
     <article className={styles.eventCard} role="link" tabIndex={0} onClick={card.onOpen} onKeyDown={card.onKeyDown}>
       <div className={styles.cardIconFrame}>
-        <AppIcon className={styles.cardIcon} name="event" />
+        {card.imageUrl ? (
+          <img className={styles.cardImage} src={card.imageUrl} alt="" aria-hidden="true" />
+        ) : (
+          <AppIcon className={styles.cardIcon} name="event" />
+        )}
       </div>
       <div className={styles.eventSummary}>
         <h2 className={styles.eventName}>{card.label}</h2>

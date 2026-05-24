@@ -99,6 +99,7 @@ export const useContextsListPage = (): ContextsListPageState => {
     id: context.id,
     deleting: deletingId === context.id,
     description: buildTextPreview(context.description),
+    imageUrl: context.imageUrl,
     label: context.name.trim() || t('pages.contextList.unnamedContext'),
     onDeleteClick: (mouseEvent) => {
       mouseEvent.stopPropagation()

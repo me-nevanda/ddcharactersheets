@@ -75,6 +75,7 @@ export const useAreaListPage = (): AreaListPageState => {
 
   const cards: AreaListCardViewModel[] = areas.map((area) => ({
     id: area.id,
+    imageUrl: area.imageUrl,
     label: area.name.trim() || t('pages.areaList.unnamedArea'),
     descriptionPreview: buildDescriptionPreview(area.description),
     updatedAtLabel: dateFormatter.format(new Date(area.updatedAt)),

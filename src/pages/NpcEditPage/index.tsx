@@ -180,7 +180,7 @@ export const NpcEditPage = () => {
                         </label>
                         <label className={styles.statCard} htmlFor="hp">
                           <span className={styles.defenseLabel}>{t('pages.npcEdit.fields.hp')}</span>
-                          <input className={`${styles.input} ${styles.statInput}`} id="hp" name="hp" type="number" min="0" max="999" value={form.hp} onChange={handleChange} />
+                          <input className={`${styles.input} ${styles.statInput}`} id="hp" name="hp" type="number" min="0" max="9999" value={form.hp} onChange={handleChange} />
                           <span className={styles.bloodiedValue}>
                             <span>{t('pages.npcEdit.fields.bloodied')}</span>
                             <span className={styles.modifierBadge}>{bloodiedValue}</span>

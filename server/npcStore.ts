@@ -59,12 +59,12 @@ const normalizeDefenseValue = (value: unknown): number => {
   return Math.min(50, Math.max(0, Math.trunc(value)))
 }
 
-const normalizeStatValue = (value: unknown, fallback: number): number => {
+const normalizeStatValue = (value: unknown, fallback: number, maxValue = 999): number => {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     return fallback
   }
 
-  return Math.min(999, Math.max(0, Math.trunc(value)))
+  return Math.min(maxValue, Math.max(0, Math.trunc(value)))
 }
 
 const normalizeSuggestedStatValue = (value: unknown): string => {
@@ -96,7 +96,7 @@ const normalizeAttackBonusValue = (value: unknown): number => {
     return 0
   }
 
-  return Math.min(20, Math.max(0, Math.trunc(value)))
+  return Math.min(35, Math.max(0, Math.trunc(value)))
 }
 
 const normalizeItemBonusValue = (value: unknown): number => {
@@ -331,7 +331,7 @@ const normalizeNpc = (data: Partial<Record<keyof NpcData, unknown>> = {}): NpcDa
       typeof data.suggested === 'object' && data.suggested !== null
         ? normalizeSuggestedStats(data.suggested as Partial<Record<keyof NpcSuggestedStats, unknown>>)
         : normalizeSuggestedStats(),
-    hp: normalizeStatValue(data.hp, 0),
+    hp: normalizeStatValue(data.hp, 0, 9999),
     level: normalizeLevelValue(data.level),
     speed: normalizeStatValue(data.speed, 6),
     isStory: data.isStory === true,

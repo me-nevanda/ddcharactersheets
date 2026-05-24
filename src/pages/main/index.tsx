@@ -26,9 +26,6 @@ export const MainPage = () => {
           <button className={`${styles.tabButton} ${activeTab === 'npcs' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('npcs')}>
             {t('pages.main.tabs.npcs')}
           </button>
-          <button className={`${styles.tabButton} ${activeTab === 'adventures' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('adventures')}>
-            {t('pages.main.tabs.adventures')}
-          </button>
           <button className={`${styles.tabButton} ${activeTab === 'areas' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('areas')}>
             {t('pages.main.tabs.areas')}
           </button>

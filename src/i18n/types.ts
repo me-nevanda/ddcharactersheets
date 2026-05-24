@@ -58,6 +58,9 @@ export interface TranslationDictionary {
       invalidCharacterImage: string
       invalidMonsterImage: string
       invalidNpcImage: string
+      invalidAreaImage: string
+      invalidEventImage: string
+      invalidContextImage: string
       invalidMonsterGroupName: string
       invalidNpcGroupName: string
       geminiPromptRequired: string
@@ -120,10 +123,16 @@ export interface TranslationDictionary {
       fields: {
         name: string
         description: string
+        image: string
       }
       placeholders: {
         titleName: string
         description: string
+        image: string
+      }
+      imageActions: {
+        uploadNew: string
+        remove: string
       }
     }
     contextList: {
@@ -161,10 +170,16 @@ export interface TranslationDictionary {
       fields: {
         name: string
         description: string
+        image: string
       }
       placeholders: {
         titleName: string
         description: string
+        image: string
+      }
+      imageActions: {
+        uploadNew: string
+        remove: string
       }
       characters: {
         title: string
@@ -246,10 +261,16 @@ export interface TranslationDictionary {
       fields: {
         name: string
         description: string
+        image: string
       }
       placeholders: {
         titleName: string
         description: string
+        image: string
+      }
+      imageActions: {
+        uploadNew: string
+        remove: string
       }
       places: {
         title: string

@@ -1,7 +1,7 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { getEvent, saveEvent } from '@lib/api'
+import { deleteEventImage, getEvent, saveEvent, uploadEventImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import type { EventData } from '@appTypes/event'
 import type { EventEditPageState } from './types'
@@ -18,8 +18,11 @@ export const useEventEditPage = (): EventEditPageState => {
   const [form, setForm] = useState<EventData>(emptyEventForm)
   const [initialForm, setInitialForm] = useState<EventData>(emptyEventForm)
   const [error, setError] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(true)
+  const [removingImage, setRemovingImage] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -36,6 +39,7 @@ export const useEventEditPage = (): EventEditPageState => {
         if (!cancelled) {
           setForm(nextForm)
           setInitialForm(nextForm)
+          setImageUrl(event.imageUrl)
           setError('')
         }
       } catch (nextError) {
@@ -85,13 +89,57 @@ export const useEventEditPage = (): EventEditPageState => {
     }
   }
 
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const image = event.target.files?.[0]
+    event.target.value = ''
+
+    if (!image) {
+      return
+    }
+
+    setUploadingImage(true)
+    setError('')
+
+    try {
+      const nextEvent = await uploadEventImage(eventId, image)
+      setImageUrl(nextEvent.imageUrl ? `${nextEvent.imageUrl}?v=${Date.now()}` : '')
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleImageRemove = async () => {
+    if (!imageUrl || removingImage) {
+      return
+    }
+
+    setRemovingImage(true)
+    setError('')
+
+    try {
+      const nextEvent = await deleteEventImage(eventId)
+      setImageUrl(nextEvent.imageUrl)
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+    } finally {
+      setRemovingImage(false)
+    }
+  }
+
   return {
     error,
     form,
     handleChange,
+    handleImageChange,
+    handleImageRemove,
     handleSubmit,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
+    imageUrl,
     loading,
+    removingImage,
     saving,
+    uploadingImage,
   }
 }

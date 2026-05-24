@@ -104,14 +104,14 @@ const normalizeDefenseInputValue = (value: string): number => {
   return Math.min(50, Math.max(0, Math.trunc(parsedValue)))
 }
 
-const normalizeStatInputValue = (value: string): number => {
+const normalizeStatInputValue = (value: string, maxValue = 999): number => {
   const parsedValue = Number.parseInt(value, 10)
 
   if (!Number.isFinite(parsedValue)) {
     return 0
   }
 
-  return Math.min(999, Math.max(0, Math.trunc(parsedValue)))
+  return Math.min(maxValue, Math.max(0, Math.trunc(parsedValue)))
 }
 
 const normalizeSuggestedInputValue = (value: string): string => {
@@ -155,7 +155,7 @@ const normalizeAttackBonusValue = (value: string | number): number => {
     return 0
   }
 
-  return Math.min(20, Math.max(0, Math.trunc(parsedValue)))
+  return Math.min(35, Math.max(0, Math.trunc(parsedValue)))
 }
 
 const normalizeAttackAction = (value: unknown): MonsterAttackAction => {
@@ -306,7 +306,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     if (isNumericField(name)) {
       setForm((current) => ({
         ...current,
-        [name]: name === 'level' ? normalizeLevelInputValue(value) : normalizeStatInputValue(value),
+        [name]: name === 'level' ? normalizeLevelInputValue(value) : normalizeStatInputValue(value, name === 'hp' ? 9999 : 999),
       }))
       return
     }

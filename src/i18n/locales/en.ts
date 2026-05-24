@@ -30,8 +30,8 @@ export const en: TranslationDictionary = {
       unsavedChangesBody: 'You have unsaved changes. Are you sure you want to return to the list?',
     },
     clipboard: {
-      copyDamageValue: 'Copy damage value',
-      damageCopied: 'Damage value copied.',
+      copyDamageValue: 'Copy damage marker',
+      damageCopied: 'Damage marker copied.',
       copyFailed: 'Could not copy to clipboard.',
     },
     states: {
@@ -59,6 +59,9 @@ export const en: TranslationDictionary = {
       invalidCharacterImage: 'The hero image must be a PNG or JPG file.',
       invalidMonsterImage: 'The monster image must be a PNG or JPG file.',
       invalidNpcImage: 'The NPC image must be a PNG or JPG file.',
+      invalidAreaImage: 'The area image must be a PNG or JPG file.',
+      invalidEventImage: 'The event image must be a PNG or JPG file.',
+      invalidContextImage: 'The context image must be a PNG or JPG file.',
       invalidMonsterGroupName: 'The monster group name is required.',
       invalidNpcGroupName: 'The NPC group name is required.',
       geminiPromptRequired: 'The Gemini prompt is required.',
@@ -121,10 +124,16 @@ export const en: TranslationDictionary = {
       fields: {
         name: 'Title',
         description: 'Description',
+        image: 'Event image',
       },
       placeholders: {
         titleName: 'Unnamed event',
         description: 'Event description',
+        image: 'Add image',
+      },
+      imageActions: {
+        uploadNew: 'Change',
+        remove: 'Remove',
       },
     },
     contextList: {
@@ -162,10 +171,16 @@ export const en: TranslationDictionary = {
       fields: {
         name: 'Title',
         description: 'Description',
+        image: 'Context image',
       },
       placeholders: {
         titleName: 'Unnamed context',
         description: 'Context description',
+        image: 'Add image',
+      },
+      imageActions: {
+        uploadNew: 'Change',
+        remove: 'Remove',
       },
       characters: {
         title: 'Heroes',
@@ -247,10 +262,16 @@ export const en: TranslationDictionary = {
       fields: {
         name: 'Name',
         description: 'Description',
+        image: 'Area image',
       },
       placeholders: {
         titleName: 'Unnamed area',
         description: 'Area description',
+        image: 'Add image',
+      },
+      imageActions: {
+        uploadNew: 'Change',
+        remove: 'Remove',
       },
       places: {
         title: 'Places',
