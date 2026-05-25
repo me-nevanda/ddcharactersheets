@@ -1,6 +1,7 @@
 import { useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
+import type { AppIconName } from '@components/AppIcon/types'
 import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
 import { SimpleWysiwygEditor } from '@components/SimpleWysiwygEditor'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
@@ -24,6 +25,24 @@ import type {
   ContextPlaceCardViewModel,
 } from './types'
 import styles from './style.module.scss'
+
+const MediaIconFrame = ({ iconName, imageSrc, label }: { iconName: AppIconName; imageSrc: string; label: string }) => {
+  const [imageFailed, setImageFailed] = useState(false)
+
+  if (imageSrc && !imageFailed) {
+    return (
+      <div className={styles.placeIconFrame}>
+        <img className={styles.placeImage} src={imageSrc} alt={label} onError={() => setImageFailed(true)} />
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.placeIconFrame} aria-hidden="true">
+      <AppIcon name={iconName} />
+    </div>
+  )
+}
 
 const CharacterPortrait = ({
   hasCustomImage,
@@ -136,9 +155,7 @@ const EventCard = ({ card }: { card: ContextEventCardViewModel }) => {
   const { t } = useI18n()
   return (
     <article className={styles.heroCard}>
-      <div className={styles.placeIconFrame} aria-hidden="true">
-        <AppIcon name="event" />
-      </div>
+      <MediaIconFrame iconName="event" imageSrc={card.imageSrc} label={card.label} />
       <div className={styles.heroSummary}>
         <h3 className={styles.heroName}>{card.label}</h3>
         {card.descriptionPreview ? (
@@ -171,9 +188,7 @@ const EventOption = ({ option }: { option: ContextEventOptionViewModel }) => {
       <span className={styles.heroOptionCheckbox} aria-hidden="true">
         {option.selected ? <AppIcon name="check" /> : null}
       </span>
-      <div className={styles.placeIconFrame} aria-hidden="true">
-        <AppIcon name="event" />
-      </div>
+      <MediaIconFrame iconName="event" imageSrc={option.imageSrc} label={option.label} />
       <div className={styles.heroSummary}>
         <h3 className={styles.heroName}>{option.label}</h3>
         {option.descriptionPreview ? (
@@ -355,9 +370,7 @@ const PlaceCard = ({ card }: { card: ContextPlaceCardViewModel }) => {
   const { t } = useI18n()
   return (
     <article className={styles.heroCard}>
-      <div className={styles.placeIconFrame} aria-hidden="true">
-        <AppIcon name="area" />
-      </div>
+      <MediaIconFrame iconName="area" imageSrc={card.areaImageSrc} label={card.label} />
       <div className={styles.heroSummary}>
         <h3 className={styles.heroName}>{card.label}</h3>
         {card.descriptionPreview ? (
@@ -382,7 +395,10 @@ const AreaSection = ({ section }: { section: ContextAreaSectionViewModel }) => {
   return (
     <section className={styles.npcGroupSection}>
       <div className={styles.npcGroupSectionHeader}>
-        <h3 className={styles.npcGroupSectionTitle}>{section.name}</h3>
+        <div className={styles.groupTitleWithImage}>
+          <MediaIconFrame iconName="area" imageSrc={section.imageSrc} label={section.name} />
+          <h3 className={styles.npcGroupSectionTitle}>{section.name}</h3>
+        </div>
         <button
           type="button"
           className={styles.heroRemoveButton}
@@ -417,6 +433,7 @@ const AreaOption = ({ option }: { option: ContextAreaOptionViewModel }) => {
       <span className={styles.heroOptionCheckbox} aria-hidden="true">
         {option.selected ? <AppIcon name="check" /> : null}
       </span>
+      <MediaIconFrame iconName="area" imageSrc={option.imageSrc} label={option.label} />
       <div className={styles.heroSummary}>
         <h3 className={styles.heroName}>{option.label}</h3>
         <p className={styles.heroMeta}>{option.placeCountLabel}</p>

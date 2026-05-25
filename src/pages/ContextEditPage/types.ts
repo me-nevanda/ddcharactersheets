@@ -105,11 +105,13 @@ export interface ContextPlaceCardViewModel {
   id: string
   label: string
   descriptionPreview: string
+  areaImageSrc: string
   onRemoveClick: (event: ReactMouseEvent<HTMLButtonElement>) => void
 }
 
 export interface ContextAreaSectionViewModel {
   id: string
+  imageSrc: string
   name: string
   places: ContextPlaceCardViewModel[]
   onRemoveAreaClick: (event: ReactMouseEvent<HTMLButtonElement>) => void
@@ -117,6 +119,7 @@ export interface ContextAreaSectionViewModel {
 
 export interface ContextAreaOptionViewModel {
   id: string
+  imageSrc: string
   label: string
   placeCount: number
   placeCountLabel: string
@@ -127,6 +130,7 @@ export interface ContextAreaOptionViewModel {
 
 export interface ContextEventCardViewModel {
   id: string
+  imageSrc: string
   label: string
   descriptionPreview: string
   onRemoveClick: (event: ReactMouseEvent<HTMLButtonElement>) => void
@@ -134,6 +138,7 @@ export interface ContextEventCardViewModel {
 
 export interface ContextEventOptionViewModel {
   id: string
+  imageSrc: string
   label: string
   descriptionPreview: string
   onToggleSelected: () => void

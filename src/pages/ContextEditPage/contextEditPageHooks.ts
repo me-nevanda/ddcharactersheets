@@ -1120,6 +1120,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     const descriptionPreview = buildPlainTextPreview(event?.description ?? '')
     return {
       id: eventId,
+      imageSrc: event?.imageUrl ?? '',
       label,
       descriptionPreview,
       onRemoveClick: (clickEvent) => {
@@ -1145,6 +1146,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
     return {
       id: event.id,
+      imageSrc: event.imageUrl ?? '',
       label,
       descriptionPreview: buildPlainTextPreview(event.description ?? ''),
       onToggleSelected,
@@ -1321,10 +1323,12 @@ export const useContextEditPage = (): ContextEditPageState => {
     const place = placeMap?.get(placeId)
     const label = (place?.name && place.name.trim()) || t('pages.placeList.unnamedPlace')
     const descriptionPreview = buildPlainTextPreview(place?.description ?? '')
+    const area = areasById.get(areaId)
     return {
       id: placeId,
       label,
       descriptionPreview,
+      areaImageSrc: area?.imageUrl ?? '',
       onRemoveClick: (event) => {
         event.stopPropagation()
         handleRemovePlaceFromArea(areaId, placeId)
@@ -1335,6 +1339,7 @@ export const useContextEditPage = (): ContextEditPageState => {
   const areaSections: ContextAreaSectionViewModel[] = useMemo(() => {
     return form.areas.map((area) => ({
       id: area.id,
+      imageSrc: areasById.get(area.id)?.imageUrl ?? '',
       name: (area.name && area.name.trim()) || t('pages.areaList.unnamedArea'),
       places: area.placeIds.map((placeId) => buildPlaceCard(area.id, placeId)),
       onRemoveAreaClick: (event) => {
@@ -1343,7 +1348,7 @@ export const useContextEditPage = (): ContextEditPageState => {
       },
     }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.areas, placesByAreaId, t])
+  }, [areasById, form.areas, placesByAreaId, t])
 
   const buildAreaOption = (area: Area, selected: boolean): ContextAreaOptionViewModel => {
     const label = (area.name && area.name.trim()) || t('pages.areaList.unnamedArea')
@@ -1357,6 +1362,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
     return {
       id: area.id,
+      imageSrc: area.imageUrl ?? '',
       label,
       placeCount,
       placeCountLabel: t('pages.contextEdit.areas.placeCount', { count: placeCount }),
