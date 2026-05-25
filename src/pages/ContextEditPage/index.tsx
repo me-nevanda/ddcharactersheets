@@ -1,6 +1,7 @@
 import { useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
+import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
 import { SimpleWysiwygEditor } from '@components/SimpleWysiwygEditor'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
@@ -438,13 +439,16 @@ export const ContextEditPage = () => {
     error,
     copyingContext,
     form,
+    handleCancelImageRemove,
     handleChange,
+    handleConfirmImageRemove,
     handleCopyContext,
     handleImageChange,
-    handleImageRemove,
+    handleRequestImageRemove,
     handleSubmit,
     hasChanges,
     imageUrl,
+    isImageRemoveDialogOpen,
     loading,
     removingImage,
     saving,
@@ -528,7 +532,7 @@ export const ContextEditPage = () => {
                       <AppIcon name="edit" />
                       <span>{t('pages.contextEdit.imageActions.uploadNew')}</span>
                     </label>
-                    <button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={() => void handleImageRemove()}>
+                    <button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={handleRequestImageRemove}>
                       <AppIcon name="trash" />
                       <span>{t('pages.contextEdit.imageActions.remove')}</span>
                     </button>
@@ -718,6 +722,7 @@ export const ContextEditPage = () => {
         )}
 
         <UnsavedChangesDialog open={isUnsavedChangesDialogOpen} onCancel={() => setUnsavedChangesDialogOpen(false)} onConfirm={handleConfirmBackToList} />
+        <DeleteCharacterDialog bodyKey="pages.contextEdit.imageActions.removeDialog.body" titleKey="pages.contextEdit.imageActions.removeDialog.title" characterName={t('pages.contextEdit.fields.image')} deleting={removingImage} open={isImageRemoveDialogOpen} onCancel={handleCancelImageRemove} onConfirm={() => void handleConfirmImageRemove()} />
 
         {isAddCharacterDialogOpen ? (
           <div className={styles.dialogBackdrop} role="presentation">

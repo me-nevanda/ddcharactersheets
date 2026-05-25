@@ -134,6 +134,10 @@ export const pl: TranslationDictionary = {
       imageActions: {
         uploadNew: 'Zmień',
         remove: 'Usuń',
+        removeDialog: {
+          title: 'Usunąć obraz wydarzenia?',
+          body: '„{name}” zostanie usunięty z wydarzenia.',
+        },
       },
     },
     contextList: {
@@ -181,6 +185,10 @@ export const pl: TranslationDictionary = {
       imageActions: {
         uploadNew: 'Zmień',
         remove: 'Usuń',
+        removeDialog: {
+          title: 'Usunąć obraz kontekstu?',
+          body: '„{name}” zostanie usunięty z kontekstu.',
+        },
       },
       characters: {
         title: 'Bohaterowie',
@@ -272,6 +280,10 @@ export const pl: TranslationDictionary = {
       imageActions: {
         uploadNew: 'Zmień',
         remove: 'Usuń',
+        removeDialog: {
+          title: 'Usunąć obraz obszaru?',
+          body: '„{name}” zostanie usunięty z obszaru.',
+        },
       },
       places: {
         title: 'Miejsca',

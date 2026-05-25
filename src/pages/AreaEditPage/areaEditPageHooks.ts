@@ -50,6 +50,7 @@ export const useAreaEditPage = (): AreaEditPageState => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [isImageRemoveDialogOpen, setIsImageRemoveDialogOpen] = useState(false)
   const [placeItemToRemoveId, setPlaceItemToRemoveId] = useState<string | null>(null)
   const [removingImage, setRemovingImage] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
@@ -178,7 +179,20 @@ export const useAreaEditPage = (): AreaEditPageState => {
     }
   }
 
-  const handleImageRemove: AreaEditPageState['handleImageRemove'] = async () => {
+  const handleRequestImageRemove: AreaEditPageState['handleRequestImageRemove'] = () => {
+    if (!imageUrl || removingImage) {
+      return
+    }
+    setIsImageRemoveDialogOpen(true)
+  }
+
+  const handleCancelImageRemove: AreaEditPageState['handleCancelImageRemove'] = () => {
+    if (!removingImage) {
+      setIsImageRemoveDialogOpen(false)
+    }
+  }
+
+  const handleConfirmImageRemove: AreaEditPageState['handleConfirmImageRemove'] = async () => {
     if (!imageUrl || removingImage) {
       return
     }
@@ -189,6 +203,7 @@ export const useAreaEditPage = (): AreaEditPageState => {
     try {
       const area = await deleteAreaImage(areaId)
       setImageUrl(area.imageUrl)
+      setIsImageRemoveDialogOpen(false)
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
     } finally {
@@ -236,11 +251,14 @@ export const useAreaEditPage = (): AreaEditPageState => {
     placeItemToRemove,
     handlePlaceItemNameChange,
     handlePlaceItemDescriptionChange,
+    handleCancelImageRemove,
+    handleConfirmImageRemove,
     handleImageChange,
-    handleImageRemove,
+    handleRequestImageRemove,
     handleSubmit,
     hasChanges,
     imageUrl,
+    isImageRemoveDialogOpen,
     loading,
     removingImage,
     saving,

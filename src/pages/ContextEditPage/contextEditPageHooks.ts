@@ -138,6 +138,7 @@ export const useContextEditPage = (): ContextEditPageState => {
   const [initialForm, setInitialForm] = useState<ContextData>(emptyContextForm)
   const [error, setError] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [isImageRemoveDialogOpen, setIsImageRemoveDialogOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [removingImage, setRemovingImage] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -434,7 +435,20 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
   }
 
-  const handleImageRemove = async () => {
+  const handleRequestImageRemove = () => {
+    if (!imageUrl || removingImage) {
+      return
+    }
+    setIsImageRemoveDialogOpen(true)
+  }
+
+  const handleCancelImageRemove = () => {
+    if (!removingImage) {
+      setIsImageRemoveDialogOpen(false)
+    }
+  }
+
+  const handleConfirmImageRemove = async () => {
     if (!imageUrl || removingImage) {
       return
     }
@@ -445,6 +459,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     try {
       const context = await deleteContextImage(contextId)
       setImageUrl(context.imageUrl)
+      setIsImageRemoveDialogOpen(false)
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
     } finally {
@@ -1273,12 +1288,15 @@ export const useContextEditPage = (): ContextEditPageState => {
     form,
     handleChange,
     handleChangeDescription,
+    handleCancelImageRemove,
+    handleConfirmImageRemove,
     handleCopyContext,
     handleImageChange,
-    handleImageRemove,
+    handleRequestImageRemove,
     handleSubmit,
     hasChanges,
     imageUrl,
+    isImageRemoveDialogOpen,
     loading,
     removingImage,
     saving,

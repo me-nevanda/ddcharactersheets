@@ -7,7 +7,7 @@ import styles from './style.module.scss'
 
 export const AreaEditPage = () => {
   const { t } = useI18n()
-  const { error, form, handleAddPlaceItem, handleBackToListClick, handleCancelRemovePlaceItem, handleConfirmRemovePlaceItem, handleDescriptionChange, handleImageChange, handleImageRemove, handleNameChange, handlePlaceItemDescriptionChange, handlePlaceItemNameChange, handleRequestRemovePlaceItem, handleSubmit, hasChanges, imageUrl, loading, placeItemToRemove, removingImage, saving, uploadingImage } = useAreaEditPage()
+  const { error, form, handleAddPlaceItem, handleBackToListClick, handleCancelImageRemove, handleCancelRemovePlaceItem, handleConfirmImageRemove, handleConfirmRemovePlaceItem, handleDescriptionChange, handleImageChange, handleNameChange, handlePlaceItemDescriptionChange, handlePlaceItemNameChange, handleRequestImageRemove, handleRequestRemovePlaceItem, handleSubmit, hasChanges, imageUrl, isImageRemoveDialogOpen, loading, placeItemToRemove, removingImage, saving, uploadingImage } = useAreaEditPage()
 
   const placeItemRemoveName = placeItemToRemove ? (placeItemToRemove.name.trim() || t('pages.areaEdit.places.unnamedItem')) : ''
 
@@ -26,7 +26,7 @@ export const AreaEditPage = () => {
                       <AppIcon name="edit" />
                       <span>{t('pages.areaEdit.imageActions.uploadNew')}</span>
                     </label>
-                    <button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={() => void handleImageRemove()}>
+                    <button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={handleRequestImageRemove}>
                       <AppIcon name="trash" />
                       <span>{t('pages.areaEdit.imageActions.remove')}</span>
                     </button>
@@ -115,6 +115,7 @@ export const AreaEditPage = () => {
       </section>
 
       <DeleteCharacterDialog bodyKey="pages.areaEdit.places.removeDialog.body" titleKey="pages.areaEdit.places.removeDialog.title" characterName={placeItemRemoveName} deleting={false} open={Boolean(placeItemToRemove)} onCancel={handleCancelRemovePlaceItem} onConfirm={handleConfirmRemovePlaceItem} />
+      <DeleteCharacterDialog bodyKey="pages.areaEdit.imageActions.removeDialog.body" titleKey="pages.areaEdit.imageActions.removeDialog.title" characterName={t('pages.areaEdit.fields.image')} deleting={removingImage} open={isImageRemoveDialogOpen} onCancel={handleCancelImageRemove} onConfirm={() => void handleConfirmImageRemove()} />
     </main>
   )
 }

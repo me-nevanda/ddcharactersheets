@@ -134,6 +134,10 @@ export const en: TranslationDictionary = {
       imageActions: {
         uploadNew: 'Change',
         remove: 'Remove',
+        removeDialog: {
+          title: 'Remove event image?',
+          body: 'The "{name}" will be removed from this event.',
+        },
       },
     },
     contextList: {
@@ -181,6 +185,10 @@ export const en: TranslationDictionary = {
       imageActions: {
         uploadNew: 'Change',
         remove: 'Remove',
+        removeDialog: {
+          title: 'Remove context image?',
+          body: 'The "{name}" will be removed from this context.',
+        },
       },
       characters: {
         title: 'Heroes',
@@ -272,6 +280,10 @@ export const en: TranslationDictionary = {
       imageActions: {
         uploadNew: 'Change',
         remove: 'Remove',
+        removeDialog: {
+          title: 'Remove area image?',
+          body: 'The "{name}" will be removed from this area.',
+        },
       },
       places: {
         title: 'Places',

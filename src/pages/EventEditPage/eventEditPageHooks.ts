@@ -19,6 +19,7 @@ export const useEventEditPage = (): EventEditPageState => {
   const [initialForm, setInitialForm] = useState<EventData>(emptyEventForm)
   const [error, setError] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [isImageRemoveDialogOpen, setIsImageRemoveDialogOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [removingImage, setRemovingImage] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -110,7 +111,20 @@ export const useEventEditPage = (): EventEditPageState => {
     }
   }
 
-  const handleImageRemove = async () => {
+  const handleRequestImageRemove = () => {
+    if (!imageUrl || removingImage) {
+      return
+    }
+    setIsImageRemoveDialogOpen(true)
+  }
+
+  const handleCancelImageRemove = () => {
+    if (!removingImage) {
+      setIsImageRemoveDialogOpen(false)
+    }
+  }
+
+  const handleConfirmImageRemove = async () => {
     if (!imageUrl || removingImage) {
       return
     }
@@ -121,6 +135,7 @@ export const useEventEditPage = (): EventEditPageState => {
     try {
       const nextEvent = await deleteEventImage(eventId)
       setImageUrl(nextEvent.imageUrl)
+      setIsImageRemoveDialogOpen(false)
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
     } finally {
@@ -132,11 +147,14 @@ export const useEventEditPage = (): EventEditPageState => {
     error,
     form,
     handleChange,
+    handleCancelImageRemove,
+    handleConfirmImageRemove,
     handleImageChange,
-    handleImageRemove,
+    handleRequestImageRemove,
     handleSubmit,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
     imageUrl,
+    isImageRemoveDialogOpen,
     loading,
     removingImage,
     saving,

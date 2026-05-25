@@ -15,10 +15,13 @@ export interface AreaEditPageState {
   handlePlaceItemNameChange: (id: string, value: string) => void
   handlePlaceItemDescriptionChange: (id: string, value: string) => void
   handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
-  handleImageRemove: () => Promise<void>
+  handleCancelImageRemove: () => void
+  handleConfirmImageRemove: () => Promise<void>
+  handleRequestImageRemove: () => void
   handleSubmit: FormEventHandler<HTMLFormElement>
   hasChanges: boolean
   imageUrl: string
+  isImageRemoveDialogOpen: boolean
   loading: boolean
   removingImage: boolean
   saving: boolean

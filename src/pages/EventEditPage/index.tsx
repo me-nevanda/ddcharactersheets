@@ -1,6 +1,7 @@
 import { useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
+import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
 import { useMainPageContext } from '@pages/main/mainPageContext'
@@ -11,7 +12,7 @@ export const EventEditPage = () => {
   const { t } = useI18n()
   const navigate = useNavigate()
   const { handleTabChange } = useMainPageContext()
-  const { error, form, handleChange, handleImageChange, handleImageRemove, handleSubmit, hasChanges, imageUrl, loading, removingImage, saving, uploadingImage } = useEventEditPage()
+  const { error, form, handleCancelImageRemove, handleChange, handleConfirmImageRemove, handleImageChange, handleRequestImageRemove, handleSubmit, hasChanges, imageUrl, isImageRemoveDialogOpen, loading, removingImage, saving, uploadingImage } = useEventEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
   const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
@@ -44,7 +45,7 @@ export const EventEditPage = () => {
                       <AppIcon name="edit" />
                       <span>{t('pages.eventEdit.imageActions.uploadNew')}</span>
                     </label>
-                    <button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={() => void handleImageRemove()}>
+                    <button className={`${styles.headerImageAction} ${styles.headerImageDangerAction}`} type="button" disabled={uploadingImage || removingImage} onClick={handleRequestImageRemove}>
                       <AppIcon name="trash" />
                       <span>{t('pages.eventEdit.imageActions.remove')}</span>
                     </button>
@@ -95,6 +96,7 @@ export const EventEditPage = () => {
         )}
 
         <UnsavedChangesDialog open={isUnsavedChangesDialogOpen} onCancel={() => setUnsavedChangesDialogOpen(false)} onConfirm={handleConfirmBackToList} />
+        <DeleteCharacterDialog bodyKey="pages.eventEdit.imageActions.removeDialog.body" titleKey="pages.eventEdit.imageActions.removeDialog.title" characterName={t('pages.eventEdit.fields.image')} deleting={removingImage} open={isImageRemoveDialogOpen} onCancel={handleCancelImageRemove} onConfirm={() => void handleConfirmImageRemove()} />
       </section>
     </main>
   )

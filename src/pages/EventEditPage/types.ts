@@ -6,10 +6,13 @@ export interface EventEditPageState {
   form: EventData
   handleChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
   handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
-  handleImageRemove: () => Promise<void>
+  handleCancelImageRemove: () => void
+  handleConfirmImageRemove: () => Promise<void>
+  handleRequestImageRemove: () => void
   handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
   imageUrl: string
+  isImageRemoveDialogOpen: boolean
   loading: boolean
   removingImage: boolean
   saving: boolean

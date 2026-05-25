@@ -133,6 +133,10 @@ export interface TranslationDictionary {
       imageActions: {
         uploadNew: string
         remove: string
+        removeDialog: {
+          title: string
+          body: string
+        }
       }
     }
     contextList: {
@@ -180,6 +184,10 @@ export interface TranslationDictionary {
       imageActions: {
         uploadNew: string
         remove: string
+        removeDialog: {
+          title: string
+          body: string
+        }
       }
       characters: {
         title: string
@@ -271,6 +279,10 @@ export interface TranslationDictionary {
       imageActions: {
         uploadNew: string
         remove: string
+        removeDialog: {
+          title: string
+          body: string
+        }
       }
       places: {
         title: string
