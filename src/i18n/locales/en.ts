@@ -47,6 +47,7 @@ export const en: TranslationDictionary = {
     api: {
       generic: 'The request could not be completed.',
       invalidCharacterId: 'The character ID is invalid.',
+      invalidCharacterGroupId: 'The hero group ID is invalid.',
       invalidMonsterId: 'The monster ID is invalid.',
       invalidMonsterGroupId: 'The monster group ID is invalid.',
       invalidNpcId: 'The NPC ID is invalid.',
@@ -57,6 +58,7 @@ export const en: TranslationDictionary = {
       invalidContextId: 'The context ID is invalid.',
       invalidJsonBody: 'The request payload is invalid.',
       invalidCharacterImage: 'The hero image must be a PNG or JPG file.',
+      invalidCharacterGroupName: 'The hero group name is required.',
       invalidMonsterImage: 'The monster image must be a PNG or JPG file.',
       invalidNpcImage: 'The NPC image must be a PNG or JPG file.',
       invalidAreaImage: 'The area image must be a PNG or JPG file.',
@@ -192,15 +194,18 @@ export const en: TranslationDictionary = {
       },
       characters: {
         title: 'Heroes',
-        emptyState: 'No heroes added to this context yet.',
-        addButton: 'Add heroes',
+        emptyState: 'No hero groups added to this context yet.',
+        addButton: 'Add hero groups',
+        groupEmpty: 'No heroes in this group.',
+        legacyGroupName: 'Ungrouped heroes',
         removeButton: 'Remove from context',
+        removeGroupButton: 'Remove group from context',
         unknownCharacter: 'Unknown hero',
         addDialog: {
-          title: 'Add heroes to the context',
-          searchLabel: 'Search hero',
-          searchPlaceholder: 'Type hero name',
-          emptyState: 'No heroes available to add.',
+          title: 'Add hero groups to the context',
+          searchLabel: 'Search hero group',
+          searchPlaceholder: 'Type group name',
+          emptyState: 'No hero groups available to add.',
           confirm: 'Add selected',
         },
       },
@@ -341,15 +346,61 @@ export const en: TranslationDictionary = {
       actions: {
         addHero: 'Add hero',
         addMonster: 'Add monster',
+        addGroup: 'Add group',
       },
       emptyState: 'There are no character sheets yet. Add one to start editing.',
       unnamedCharacter: 'Nameless hero',
       missingRace: 'No race',
       missingClass: 'No class',
       missingUpdatedAt: 'Never saved',
+      tabs: {
+        groups: 'Groups',
+        list: 'List',
+      },
+      groups: {
+        loading: 'Loading hero groups...',
+        emptyState: 'There are no hero groups yet.',
+        emptyCharacters: 'No heroes',
+        characterCount: 'Heroes: {count}',
+        moreCharacters: 'More heroes',
+        unnamedGroup: 'Unnamed group',
+        deleteDialog: {
+          title: 'Delete this hero group?',
+          body: 'The group "{name}" will be deleted permanently.',
+        },
+        createDialog: {
+          title: 'Add group',
+          nameLabel: 'Group name',
+          namePlaceholder: 'e.g. Fallcrest party',
+        },
+      },
       deleteDialog: {
         title: 'Delete this sheet?',
         body: 'The sheet "{name}" will be deleted permanently.',
+      },
+    },
+    characterGroupEdit: {
+      eyebrow: 'HERO GROUP',
+      loading: 'Loading hero group...',
+      emptyState: 'No heroes have been added to this group yet.',
+      actions: {
+        addCharacter: 'Add hero',
+        removeCharacter: 'Remove from group',
+      },
+      fields: {
+        name: 'Group name',
+      },
+      placeholders: {
+        name: 'Group name',
+      },
+      sections: {
+        availableCharacters: 'Available heroes',
+        characters: 'Heroes in group',
+      },
+      addCharacterDialog: {
+        searchLabel: 'Search hero',
+        searchPlaceholder: 'Type at least 3 characters',
+        emptyState: 'There are no heroes to add.',
       },
     },
     monsterList: {

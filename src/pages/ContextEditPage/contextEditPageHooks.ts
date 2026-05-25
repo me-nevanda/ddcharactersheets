@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type KeyboardEvent, type MouseEvent as ReactMouseEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { deleteContextImage, getContext, listAreas, listCharacters, listEvents, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext, uploadContextImage } from '@lib/api'
+import { deleteContextImage, getContext, listAreas, listCharacterGroups, listCharacters, listEvents, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext, uploadContextImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import { useContextCopy } from './contextCopyHooks'
 import type { Area, PlaceItem } from '@appTypes/area'
-import type { Character } from '@appTypes/character'
-import type { ContextAreaSnapshot, ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
+import type { Character, CharacterGroup } from '@appTypes/character'
+import type { ContextAreaSnapshot, ContextCharacterGroupSnapshot, ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
 import type { Event } from '@appTypes/event'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
 import type { Npc, NpcGroup } from '@appTypes/npc'
@@ -15,7 +15,8 @@ import type {
   ContextAreaOptionViewModel,
   ContextAreaSectionViewModel,
   ContextCharacterCardViewModel,
-  ContextCharacterOptionViewModel,
+  ContextCharacterGroupOptionViewModel,
+  ContextCharacterGroupSectionViewModel,
   ContextEditPageState,
   ContextEventCardViewModel,
   ContextEventOptionViewModel,
@@ -33,6 +34,7 @@ const emptyContextForm: ContextData = {
   name: '',
   description: '',
   characters: [],
+  characterGroups: [],
   events: [],
   npcGroups: [],
   monsterGroups: [],
@@ -77,6 +79,26 @@ const areNpcGroupSnapshotsEqual = (
       return false
     }
     if (!areStringArraysEqual(a.npcIds, b.npcIds)) {
+      return false
+    }
+  }
+  return true
+}
+
+const areCharacterGroupSnapshotsEqual = (
+  left: ContextCharacterGroupSnapshot[],
+  right: ContextCharacterGroupSnapshot[],
+): boolean => {
+  if (left.length !== right.length) {
+    return false
+  }
+  for (let index = 0; index < left.length; index += 1) {
+    const a = left[index]
+    const b = right[index]
+    if (a.id !== b.id || a.name !== b.name) {
+      return false
+    }
+    if (!areStringArraysEqual(a.characterIds, b.characterIds)) {
       return false
     }
   }
@@ -145,9 +167,10 @@ export const useContextEditPage = (): ContextEditPageState => {
   const [uploadingImage, setUploadingImage] = useState(false)
 
   const [allCharacters, setAllCharacters] = useState<Character[]>([])
-  const [isAddCharacterDialogOpen, setIsAddCharacterDialogOpen] = useState(false)
-  const [characterSearch, setCharacterSearch] = useState('')
-  const [selectedCharacterIdsInDialog, setSelectedCharacterIdsInDialog] = useState<string[]>([])
+  const [allCharacterGroups, setAllCharacterGroups] = useState<CharacterGroup[]>([])
+  const [isAddCharacterGroupDialogOpen, setIsAddCharacterGroupDialogOpen] = useState(false)
+  const [characterGroupSearch, setCharacterGroupSearch] = useState('')
+  const [selectedCharacterGroupIdsInDialog, setSelectedCharacterGroupIdsInDialog] = useState<string[]>([])
 
   const [allEvents, setAllEvents] = useState<Event[]>([])
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = useState(false)
@@ -182,6 +205,7 @@ export const useContextEditPage = (): ContextEditPageState => {
           name: context.name,
           description: context.description,
           characters: Array.isArray(context.characters) ? context.characters : [],
+          characterGroups: Array.isArray(context.characterGroups) ? context.characterGroups : [],
           events: Array.isArray(context.events) ? context.events : [],
           npcGroups: Array.isArray(context.npcGroups) ? context.npcGroups : [],
           monsterGroups: Array.isArray(context.monsterGroups) ? context.monsterGroups : [],
@@ -229,6 +253,29 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
 
     void loadCharacters()
+
+    return () => {
+      cancelled = true
+    }
+  }, [t])
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadCharacterGroups = async () => {
+      try {
+        const characterGroups = await listCharacterGroups()
+        if (!cancelled) {
+          setAllCharacterGroups(characterGroups)
+        }
+      } catch (nextError) {
+        if (!cancelled) {
+          setError((current) => current || getErrorMessage(t, nextError))
+        }
+      }
+    }
+
+    void loadCharacterGroups()
 
     return () => {
       cancelled = true
@@ -336,6 +383,14 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
     return map
   }, [allCharacters])
+
+  const characterGroupsById = useMemo(() => {
+    const map = new Map<string, CharacterGroup>()
+    for (const group of allCharacterGroups) {
+      map.set(group.id, group)
+    }
+    return map
+  }, [allCharacterGroups])
 
   const eventsById = useMemo(() => {
     const map = new Map<string, Event>()
@@ -467,58 +522,95 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
   }
 
-  // ----- Characters -----
+  // ----- Character groups -----
 
-  const handleRemoveCharacter = (characterId: string) => {
+  const handleRemoveCharacterGroup = (groupId: string) => {
     setForm((current) => ({
       ...current,
-      characters: current.characters.filter((id) => id !== characterId),
+      characterGroups: current.characterGroups.filter((group) => group.id !== groupId),
     }))
   }
 
-  const handleOpenAddCharacterDialog = () => {
-    setSelectedCharacterIdsInDialog([])
-    setCharacterSearch('')
-    setIsAddCharacterDialogOpen(true)
+  const handleRemoveCharacterFromGroup = (groupId: string, characterId: string) => {
+    setForm((current) => ({
+      ...current,
+      characterGroups: current.characterGroups.map((group) => {
+        if (group.id !== groupId) {
+          return group
+        }
+        return {
+          ...group,
+          characterIds: group.characterIds.filter((id) => id !== characterId),
+        }
+      }),
+    }))
   }
 
-  const handleCloseAddCharacterDialog = () => {
-    setIsAddCharacterDialogOpen(false)
-    setSelectedCharacterIdsInDialog([])
-    setCharacterSearch('')
+  const handleOpenAddCharacterGroupDialog = () => {
+    setSelectedCharacterGroupIdsInDialog([])
+    setCharacterGroupSearch('')
+    setIsAddCharacterGroupDialogOpen(true)
   }
 
-  const handleToggleCharacterInDialog = (characterId: string) => {
-    setSelectedCharacterIdsInDialog((current) => {
-      if (current.includes(characterId)) {
-        return current.filter((id) => id !== characterId)
+  const handleCloseAddCharacterGroupDialog = () => {
+    setIsAddCharacterGroupDialogOpen(false)
+    setSelectedCharacterGroupIdsInDialog([])
+    setCharacterGroupSearch('')
+  }
+
+  const handleToggleCharacterGroupInDialog = (groupId: string) => {
+    setSelectedCharacterGroupIdsInDialog((current) => {
+      if (current.includes(groupId)) {
+        return current.filter((id) => id !== groupId)
       }
-      return [...current, characterId]
+      return [...current, groupId]
     })
   }
 
-  const handleConfirmAddCharacters = () => {
-    if (selectedCharacterIdsInDialog.length === 0) {
-      setIsAddCharacterDialogOpen(false)
+  const handleConfirmAddCharacterGroups = () => {
+    if (selectedCharacterGroupIdsInDialog.length === 0) {
+      setIsAddCharacterGroupDialogOpen(false)
       return
     }
     setForm((current) => {
-      const existing = new Set(current.characters)
-      const next = [...current.characters]
-      for (const characterId of selectedCharacterIdsInDialog) {
-        if (!existing.has(characterId)) {
-          next.push(characterId)
-          existing.add(characterId)
+      const existing = new Set(current.characterGroups.map((group) => group.id))
+      const additions: ContextCharacterGroupSnapshot[] = []
+      for (const groupId of selectedCharacterGroupIdsInDialog) {
+        if (existing.has(groupId)) {
+          continue
         }
+        const group = characterGroupsById.get(groupId)
+        if (!group) {
+          continue
+        }
+        const characterIds: string[] = []
+        const seenCharacterIds = new Set<string>()
+        for (const fileName of group.characterFileNames ?? []) {
+          const characterId = stripJsonExtension(fileName)
+          if (!characterId || seenCharacterIds.has(characterId)) {
+            continue
+          }
+          seenCharacterIds.add(characterId)
+          characterIds.push(characterId)
+        }
+        additions.push({
+          id: group.id,
+          name: group.name,
+          characterIds,
+        })
+        existing.add(group.id)
+      }
+      if (additions.length === 0) {
+        return current
       }
       return {
         ...current,
-        characters: next,
+        characterGroups: [...current.characterGroups, ...additions],
       }
     })
-    setIsAddCharacterDialogOpen(false)
-    setSelectedCharacterIdsInDialog([])
-    setCharacterSearch('')
+    setIsAddCharacterGroupDialogOpen(false)
+    setSelectedCharacterGroupIdsInDialog([])
+    setCharacterGroupSearch('')
   }
 
   // ----- Events -----
@@ -858,6 +950,11 @@ export const useContextEditPage = (): ContextEditPageState => {
     name: form.name.trim(),
     description: form.description.trim(),
     characters: [...form.characters],
+    characterGroups: form.characterGroups.map((group) => ({
+      id: group.id,
+      name: group.name,
+      characterIds: [...group.characterIds],
+    })),
     events: [...form.events],
     npcGroups: form.npcGroups.map((group) => ({
       id: group.id,
@@ -898,7 +995,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
   }
 
-  // ----- View models: characters -----
+  // ----- View models: character groups -----
 
   const buildCharacterCard = (characterId: string): ContextCharacterCardViewModel => {
     const character = charactersById.get(characterId)
@@ -921,54 +1018,99 @@ export const useContextEditPage = (): ContextEditPageState => {
       hasCustomImage: Boolean(imageSrc),
       onRemoveClick: (event) => {
         event.stopPropagation()
-        handleRemoveCharacter(characterId)
+        handleRemoveCharacterFromGroup('__legacy-characters', characterId)
       },
     }
   }
 
-  const characterCards: ContextCharacterCardViewModel[] = useMemo(() => {
-    return form.characters.map(buildCharacterCard)
+  const legacyCharacterGroupSection: ContextCharacterGroupSectionViewModel | null = useMemo(() => {
+    if (form.characters.length === 0) {
+      return null
+    }
+    return {
+      id: '__legacy-characters',
+      name: t('pages.contextEdit.characters.legacyGroupName'),
+      characters: form.characters.map((characterId) => {
+        const card = buildCharacterCard(characterId)
+        return {
+          ...card,
+          onRemoveClick: (event) => {
+            event.stopPropagation()
+            setForm((current) => ({
+              ...current,
+              characters: current.characters.filter((id) => id !== characterId),
+            }))
+          },
+        }
+      }),
+      onRemoveGroupClick: (event) => {
+        event.stopPropagation()
+        setForm((current) => ({
+          ...current,
+          characters: [],
+        }))
+      },
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.characters, charactersById, t])
 
-  const buildCharacterOption = (character: Character, selected: boolean): ContextCharacterOptionViewModel => {
-    const label = presentation.getCharacterLabel(character.name)
-    const onToggleSelected = () => handleToggleCharacterInDialog(character.id)
+  const characterGroupSections: ContextCharacterGroupSectionViewModel[] = useMemo(() => {
+    const sections = form.characterGroups.map((group) => ({
+      id: group.id,
+      name: (group.name && group.name.trim()) || t('pages.characterList.groups.unnamedGroup'),
+      characters: group.characterIds.map((characterId) => {
+        const card = buildCharacterCard(characterId)
+        return {
+          ...card,
+          onRemoveClick: (event: ReactMouseEvent<HTMLButtonElement>) => {
+            event.stopPropagation()
+            handleRemoveCharacterFromGroup(group.id, characterId)
+          },
+        }
+      }),
+      onRemoveGroupClick: (event: ReactMouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation()
+        handleRemoveCharacterGroup(group.id)
+      },
+    }))
+    return legacyCharacterGroupSection ? [legacyCharacterGroupSection, ...sections] : sections
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.characterGroups, legacyCharacterGroupSection, charactersById, t])
+
+  const buildCharacterGroupOption = (group: CharacterGroup, selected: boolean): ContextCharacterGroupOptionViewModel => {
+    const label = (group.name && group.name.trim()) || t('pages.characterList.groups.unnamedGroup')
+    const characterCount = Array.isArray(group.characterFileNames) ? group.characterFileNames.length : 0
+    const onToggleSelected = () => handleToggleCharacterGroupInDialog(group.id)
     const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
-        handleToggleCharacterInDialog(character.id)
+        handleToggleCharacterGroupInDialog(group.id)
       }
     }
     return {
-      id: character.id,
+      id: group.id,
       label,
-      raceLabel: presentation.getRaceLabel(character.race),
-      classLabel: presentation.getClassLabel(character.class),
-      level: character.level,
-      imageSrc: character.imageUrl ?? '',
-      portraitSrc: presentation.getCharacterPortraitSrc(character.race, character.gender),
-      classSrc: presentation.getCharacterClassSrc(character.class),
-      hasCustomImage: Boolean(character.imageUrl),
+      characterCount,
+      characterCountLabel: t('pages.characterList.groups.characterCount', { count: characterCount }),
       onToggleSelected,
       onKeyDown,
       selected,
     }
   }
 
-  const characterOptions: ContextCharacterOptionViewModel[] = useMemo(() => {
-    const assigned = new Set(form.characters)
-    const search = characterSearch.trim().toLowerCase()
-    const available = allCharacters.filter((character) => !assigned.has(character.id))
+  const characterGroupOptions: ContextCharacterGroupOptionViewModel[] = useMemo(() => {
+    const assigned = new Set(form.characterGroups.map((group) => group.id))
+    const search = characterGroupSearch.trim().toLowerCase()
+    const available = allCharacterGroups.filter((group) => !assigned.has(group.id))
     const filtered = search
-      ? available.filter((character) => {
-        const name = (character.name ?? '').toLowerCase()
+      ? available.filter((group) => {
+        const name = (group.name ?? '').toLowerCase()
         return name.includes(search)
       })
       : available
-    return filtered.map((character) => buildCharacterOption(character, selectedCharacterIdsInDialog.includes(character.id)))
+    return filtered.map((group) => buildCharacterGroupOption(group, selectedCharacterGroupIdsInDialog.includes(group.id)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allCharacters, characterSearch, form.characters, selectedCharacterIdsInDialog])
+  }, [allCharacterGroups, characterGroupSearch, form.characterGroups, selectedCharacterGroupIdsInDialog])
 
   // ----- View models: events -----
 
@@ -1259,6 +1401,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     if (form.name !== initialForm.name) return true
     if (form.description !== initialForm.description) return true
     if (!areStringArraysEqual(form.characters, initialForm.characters)) return true
+    if (!areCharacterGroupSnapshotsEqual(form.characterGroups, initialForm.characterGroups)) return true
     if (!areStringArraysEqual(form.events, initialForm.events)) return true
     if (!areNpcGroupSnapshotsEqual(form.npcGroups, initialForm.npcGroups)) return true
     if (!areMonsterGroupSnapshotsEqual(form.monsterGroups, initialForm.monsterGroups)) return true
@@ -1301,16 +1444,16 @@ export const useContextEditPage = (): ContextEditPageState => {
     removingImage,
     saving,
     uploadingImage,
-    characterCards,
-    characterOptions,
-    characterSearch,
-    handleChangeCharacterSearch: setCharacterSearch,
-    isAddCharacterDialogOpen,
-    handleOpenAddCharacterDialog,
-    handleCloseAddCharacterDialog,
-    handleConfirmAddCharacters,
-    selectedCharacterIdsInDialog,
-    hasSelectedCharactersInDialog: selectedCharacterIdsInDialog.length > 0,
+    characterGroupSections,
+    characterGroupOptions,
+    characterGroupSearch,
+    handleChangeCharacterGroupSearch: setCharacterGroupSearch,
+    isAddCharacterGroupDialogOpen,
+    handleOpenAddCharacterGroupDialog,
+    handleCloseAddCharacterGroupDialog,
+    handleConfirmAddCharacterGroups,
+    selectedCharacterGroupIdsInDialog,
+    hasSelectedCharacterGroupsInDialog: selectedCharacterGroupIdsInDialog.length > 0,
     eventCards,
     eventOptions,
     eventSearch,

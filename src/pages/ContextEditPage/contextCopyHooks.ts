@@ -5,7 +5,7 @@ import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import type { Area, PlaceItem } from '@appTypes/area'
 import type { Character } from '@appTypes/character'
-import type { ContextAreaSnapshot, ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
+import type { ContextAreaSnapshot, ContextCharacterGroupSnapshot, ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
 import type { Event } from '@appTypes/event'
 import type { Monster } from '@appTypes/monster'
 import type { Npc } from '@appTypes/npc'
@@ -82,26 +82,31 @@ const appendBlock = (lines: string[], title: string, blockLines: string[]) => {
   lines.push(title, ...blockLines)
 }
 
-const buildCharacterLines = (
-  characterIds: string[],
+const buildCharacterGroupLines = (
+  groups: ContextCharacterGroupSnapshot[],
   charactersById: Map<string, Character>,
   getCharacterRaceLabel: (value: Character['race']) => string,
   getCharacterClassLabel: (value: Character['class']) => string,
 ): string[] => {
-  return characterIds.flatMap((characterId) => {
-    const character = charactersById.get(characterId)
-    if (!character) {
+  return groups.flatMap((group) => {
+    const characterLines = group.characterIds.flatMap((characterId) => {
+      const character = charactersById.get(characterId)
+      if (!character) {
+        return []
+      }
+      return [
+        `- ${[
+          normalizeText(character.name),
+          `${normalizeText(character.level)} ${getCharacterRaceLabel(character.race)}`,
+          getCharacterClassLabel(character.class),
+          normalizeText(character.description),
+        ].join(' | ')}`,
+      ]
+    })
+    if (characterLines.length === 0) {
       return []
     }
-    return [
-      [
-        normalizeText(character.name),
-        normalizeText(character.level),
-        getCharacterRaceLabel(character.race),
-        getCharacterClassLabel(character.class),
-        normalizeText(character.description),
-      ].join(' | '),
-    ]
+    return [normalizeText(group.name), ...characterLines]
   })
 }
 
@@ -208,11 +213,21 @@ const buildContextCopyText = ({
   t,
 }: BuildContextCopyTextParams): string => {
   const lines = [t('pages.contextEdit.copy.intro')]
+  const characterGroups = form.characters.length > 0
+    ? [
+      {
+        id: '__legacy-characters',
+        name: t('pages.contextEdit.characters.legacyGroupName'),
+        characterIds: form.characters,
+      },
+      ...form.characterGroups,
+    ]
+    : form.characterGroups
 
   appendBlock(
     lines,
     t('pages.contextEdit.copy.heroesTitle'),
-    buildCharacterLines(form.characters, charactersById, getCharacterRaceLabel, getCharacterClassLabel),
+    buildCharacterGroupLines(characterGroups, charactersById, getCharacterRaceLabel, getCharacterClassLabel),
   )
   appendBlock(lines, t('pages.contextEdit.copy.npcGroupsTitle'), buildNpcGroupLines(form.npcGroups, npcsById, t))
   appendBlock(

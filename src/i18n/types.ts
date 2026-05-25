@@ -46,6 +46,7 @@ export interface TranslationDictionary {
     api: {
       generic: string
       invalidCharacterId: string
+      invalidCharacterGroupId: string
       invalidMonsterId: string
       invalidMonsterGroupId: string
       invalidNpcId: string
@@ -56,6 +57,7 @@ export interface TranslationDictionary {
       invalidContextId: string
       invalidJsonBody: string
       invalidCharacterImage: string
+      invalidCharacterGroupName: string
       invalidMonsterImage: string
       invalidNpcImage: string
       invalidAreaImage: string
@@ -193,7 +195,10 @@ export interface TranslationDictionary {
         title: string
         emptyState: string
         addButton: string
+        groupEmpty: string
+        legacyGroupName: string
         removeButton: string
+        removeGroupButton: string
         unknownCharacter: string
         addDialog: {
           title: string
@@ -340,15 +345,61 @@ export interface TranslationDictionary {
       actions: {
         addHero: string
         addMonster: string
+        addGroup: string
       }
       emptyState: string
       unnamedCharacter: string
       missingRace: string
       missingClass: string
       missingUpdatedAt: string
+      tabs: {
+        groups: string
+        list: string
+      }
+      groups: {
+        loading: string
+        emptyState: string
+        emptyCharacters: string
+        characterCount: string
+        moreCharacters: string
+        unnamedGroup: string
+        deleteDialog: {
+          title: string
+          body: string
+        }
+        createDialog: {
+          title: string
+          nameLabel: string
+          namePlaceholder: string
+        }
+      }
       deleteDialog: {
         title: string
         body: string
+      }
+    }
+    characterGroupEdit: {
+      eyebrow: string
+      loading: string
+      emptyState: string
+      actions: {
+        addCharacter: string
+        removeCharacter: string
+      }
+      fields: {
+        name: string
+      }
+      placeholders: {
+        name: string
+      }
+      sections: {
+        availableCharacters: string
+        characters: string
+      }
+      addCharacterDialog: {
+        searchLabel: string
+        searchPlaceholder: string
+        emptyState: string
       }
     }
     monsterList: {

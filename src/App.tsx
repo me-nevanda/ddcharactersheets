@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { LanguageSwitcher } from '@components/LanguageSwitcher';
 import { AdventureEditPage } from '@pages/AdventureEditPage';
 import { CharacterEditPage } from '@pages/CharacterEditPage';
+import { CharacterGroupEditPage } from '@pages/CharacterGroupEditPage';
 import { ContextEditPage } from '@pages/ContextEditPage';
 import { EventEditPage } from '@pages/EventEditPage';
 import { MainPage } from '@pages/main';
@@ -26,6 +27,7 @@ const App = () => {
           <Route path="/" element={<MainPage />}/>
           <Route path="/adventures/:adventureId/edit" element={<AdventureEditPage />}/>
           <Route path="/characters/:characterId/edit" element={<CharacterEditPage />}/>
+          <Route path="/character-groups/:groupId/edit" element={<CharacterGroupEditPage />}/>
           <Route path="/monsters/:monsterId/edit" element={<MonsterEditPage />}/>
           <Route path="/monster-groups/:groupId/edit" element={<MonsterGroupEditPage />}/>
           <Route path="/npcs/:npcId/edit" element={<NpcEditPage />}/>

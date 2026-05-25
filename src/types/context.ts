@@ -1,3 +1,9 @@
+export interface ContextCharacterGroupSnapshot {
+  id: string
+  name: string
+  characterIds: string[]
+}
+
 export interface ContextNpcGroupSnapshot {
   id: string
   name: string
@@ -21,6 +27,7 @@ export interface ContextData {
   name: string
   description: string
   characters: string[]
+  characterGroups: ContextCharacterGroupSnapshot[]
   events: string[]
   npcGroups: ContextNpcGroupSnapshot[]
   monsterGroups: ContextMonsterGroupSnapshot[]

@@ -19,16 +19,18 @@ export interface ContextCharacterCardViewModel {
   onRemoveClick: (event: ReactMouseEvent<HTMLButtonElement>) => void
 }
 
-export interface ContextCharacterOptionViewModel {
+export interface ContextCharacterGroupSectionViewModel {
+  id: string
+  name: string
+  characters: ContextCharacterCardViewModel[]
+  onRemoveGroupClick: (event: ReactMouseEvent<HTMLButtonElement>) => void
+}
+
+export interface ContextCharacterGroupOptionViewModel {
   id: string
   label: string
-  raceLabel: string
-  classLabel: string
-  level: number
-  imageSrc: string
-  portraitSrc: string
-  classSrc: string
-  hasCustomImage: boolean
+  characterCount: number
+  characterCountLabel: string
   onToggleSelected: () => void
   onKeyDown: (event: KeyboardEvent<HTMLElement>) => void
   selected: boolean
@@ -176,16 +178,16 @@ export interface ContextEditPageState {
   removingImage: boolean
   saving: boolean
   uploadingImage: boolean
-  characterCards: ContextCharacterCardViewModel[]
-  characterOptions: ContextCharacterOptionViewModel[]
-  characterSearch: string
-  handleChangeCharacterSearch: (value: string) => void
-  isAddCharacterDialogOpen: boolean
-  handleOpenAddCharacterDialog: () => void
-  handleCloseAddCharacterDialog: () => void
-  handleConfirmAddCharacters: () => void
-  selectedCharacterIdsInDialog: string[]
-  hasSelectedCharactersInDialog: boolean
+  characterGroupSections: ContextCharacterGroupSectionViewModel[]
+  characterGroupOptions: ContextCharacterGroupOptionViewModel[]
+  characterGroupSearch: string
+  handleChangeCharacterGroupSearch: (value: string) => void
+  isAddCharacterGroupDialogOpen: boolean
+  handleOpenAddCharacterGroupDialog: () => void
+  handleCloseAddCharacterGroupDialog: () => void
+  handleConfirmAddCharacterGroups: () => void
+  selectedCharacterGroupIdsInDialog: string[]
+  hasSelectedCharacterGroupsInDialog: boolean
   npcGroupSections: ContextNpcGroupSectionViewModel[]
   npcGroupOptions: ContextNpcGroupOptionViewModel[]
   npcGroupSearch: string

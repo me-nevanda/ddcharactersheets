@@ -84,6 +84,29 @@ const normalizeNpcGroups = (value: unknown): ContextData['npcGroups'] => {
     return groups;
 };
 
+const normalizeCharacterGroups = (value: unknown): ContextData['characterGroups'] => {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+    const seenIds = new Set<string>();
+    const groups: ContextData['characterGroups'] = [];
+    for (const item of value) {
+        if (!item || typeof item !== 'object') {
+            continue;
+        }
+        const record = item as Record<string, unknown>;
+        const id = typeof record.id === 'string' ? record.id.trim() : '';
+        if (!id || seenIds.has(id)) {
+            continue;
+        }
+        seenIds.add(id);
+        const name = typeof record.name === 'string' ? record.name : '';
+        const characterIds = normalizeStringArray(record.characterIds);
+        groups.push({ id, name, characterIds });
+    }
+    return groups;
+};
+
 const normalizeMonsterGroups = (value: unknown): ContextData['monsterGroups'] => {
     if (!Array.isArray(value)) {
         return [];
@@ -136,6 +159,7 @@ const normalizeContext = (data: Partial<Record<keyof ContextData, unknown>> = {}
         name: typeof data.name === 'string' ? data.name : '',
         description: typeof data.description === 'string' ? data.description : '',
         characters: normalizeCharacters(data.characters),
+        characterGroups: normalizeCharacterGroups(data.characterGroups),
         events: normalizeStringArray(data.events),
         npcGroups: normalizeNpcGroups(data.npcGroups),
         monsterGroups: normalizeMonsterGroups(data.monsterGroups),

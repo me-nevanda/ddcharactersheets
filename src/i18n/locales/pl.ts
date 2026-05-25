@@ -47,6 +47,7 @@ export const pl: TranslationDictionary = {
     api: {
       generic: 'Nie udało się wykonać zadania.',
       invalidCharacterId: 'Nieprawidłowy identyfikator karty.',
+      invalidCharacterGroupId: 'Nieprawidłowy identyfikator grupy bohaterów.',
       invalidMonsterId: 'Nieprawidłowy identyfikator potwora.',
       invalidMonsterGroupId: 'Nieprawidłowy identyfikator grupy potworów.',
       invalidNpcId: 'Nieprawidłowy identyfikator NPC.',
@@ -57,6 +58,7 @@ export const pl: TranslationDictionary = {
       invalidContextId: 'Nieprawidłowy identyfikator kontekstu.',
       invalidJsonBody: 'Nieprawidłowe dane żądania.',
       invalidCharacterImage: 'Obraz bohatera musi być plikiem PNG albo JPG.',
+      invalidCharacterGroupName: 'Nazwa grupy bohaterów jest wymagana.',
       invalidMonsterImage: 'Obraz potwora musi być plikiem PNG albo JPG.',
       invalidNpcImage: 'Obraz NPC musi być plikiem PNG albo JPG.',
       invalidAreaImage: 'Obraz obszaru musi być plikiem PNG albo JPG.',
@@ -192,15 +194,18 @@ export const pl: TranslationDictionary = {
       },
       characters: {
         title: 'Bohaterowie',
-        emptyState: 'Nie dodano jeszcze żadnego bohatera do tego kontekstu.',
-        addButton: 'Dodaj bohaterów',
+        emptyState: 'Nie dodano jeszcze żadnej grupy bohaterów do tego kontekstu.',
+        addButton: 'Dodaj grupy bohaterów',
+        groupEmpty: 'Brak bohaterów w tej grupie.',
+        legacyGroupName: 'Bohaterowie bez grupy',
         removeButton: 'Usuń z kontekstu',
+        removeGroupButton: 'Usuń grupę z kontekstu',
         unknownCharacter: 'Nieznany bohater',
         addDialog: {
-          title: 'Dodaj bohaterów do kontekstu',
-          searchLabel: 'Szukaj bohatera',
-          searchPlaceholder: 'Wpisz imię bohatera',
-          emptyState: 'Nie ma bohaterów do dodania.',
+          title: 'Dodaj grupy bohaterów do kontekstu',
+          searchLabel: 'Szukaj grupy bohaterów',
+          searchPlaceholder: 'Wpisz nazwę grupy',
+          emptyState: 'Nie ma grup bohaterów do dodania.',
           confirm: 'Dodaj zaznaczonych',
         },
       },
@@ -341,15 +346,61 @@ export const pl: TranslationDictionary = {
       actions: {
         addHero: 'Dodaj bohatera',
         addMonster: 'Dodaj potwora',
+        addGroup: 'Dodaj grupę',
       },
       emptyState: 'Nie ma jeszcze żadnych kart. Dodaj pierwszą i przejdź do edycji.',
       unnamedCharacter: 'Bezimienny bohater',
       missingRace: 'Brak rasy',
       missingClass: 'Brak klasy',
       missingUpdatedAt: 'Brak zapisu',
+      tabs: {
+        groups: 'Grupy',
+        list: 'Lista',
+      },
+      groups: {
+        loading: 'Wczytywanie grup bohaterów...',
+        emptyState: 'Nie ma jeszcze żadnych grup bohaterów.',
+        emptyCharacters: 'Brak bohaterów',
+        characterCount: 'Bohaterowie: {count}',
+        moreCharacters: 'Więcej bohaterów',
+        unnamedGroup: 'Nienazwana grupa',
+        deleteDialog: {
+          title: 'Usunąć grupę bohaterów?',
+          body: 'Grupa „{name}” zostanie usunięta na stałe.',
+        },
+        createDialog: {
+          title: 'Dodaj grupę',
+          nameLabel: 'Nazwa grupy',
+          namePlaceholder: 'Np. Drużyna z Fallcrest',
+        },
+      },
       deleteDialog: {
         title: 'Usunąć kartę?',
         body: 'Karta „{name}” zostanie usunięta na stałe.',
+      },
+    },
+    characterGroupEdit: {
+      eyebrow: 'GRUPA BOHATERÓW',
+      loading: 'Wczytywanie grupy bohaterów...',
+      emptyState: 'Nie dodano jeszcze żadnych bohaterów do tej grupy.',
+      actions: {
+        addCharacter: 'Dodaj bohatera',
+        removeCharacter: 'Usuń z grupy',
+      },
+      fields: {
+        name: 'Nazwa grupy',
+      },
+      placeholders: {
+        name: 'Nazwa grupy',
+      },
+      sections: {
+        availableCharacters: 'Dostępni bohaterowie',
+        characters: 'Bohaterowie w grupie',
+      },
+      addCharacterDialog: {
+        searchLabel: 'Szukaj bohatera',
+        searchPlaceholder: 'Wpisz min. 3 znaki',
+        emptyState: 'Nie ma bohaterów do dodania.',
       },
     },
     monsterList: {

@@ -2,6 +2,7 @@
 import { defineConfig, type Connect, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { createAdventure, isSafeAdventureId, listAdventures, readAdventure, updateAdventure } from './server/adventureStore';
+import { createCharacterGroup, deleteCharacterGroup, isSafeCharacterGroupId, listCharacterGroups, readCharacterGroup, updateCharacterGroup } from './server/characterGroupStore';
 import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacterId, listCharacters, readCharacter, readCharacterImage, updateCharacter, updateCharacterImage, } from './server/characterStore';
 import { createContext, deleteContext, deleteContextImage, isSafeContextId, listContexts, readContext, readContextImage, updateContext, updateContextImage } from './server/contextStore';
 import { createEvent, deleteEvent, deleteEventImage, isSafeEventId, listEvents, readEvent, readEventImage, updateEvent, updateEventImage } from './server/eventStore';
@@ -57,11 +58,43 @@ const readRawBody = async (request: IncomingMessage): Promise<Buffer> => {
 const createCharactersApiPlugin = (): Plugin => {
     const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
         const url = new URL(request.url ?? '/', 'http://localhost');
-        if (!url.pathname.startsWith('/api/characters')) {
+        if (!url.pathname.startsWith('/api/characters') && !url.pathname.startsWith('/api/character-groups')) {
             next();
             return;
         }
         try {
+            if (request.method === 'GET' && url.pathname === '/api/character-groups') {
+                sendJson(response, 200, { characterGroups: await listCharacterGroups() });
+                return;
+            }
+            if (request.method === 'POST' && url.pathname === '/api/character-groups') {
+                const payload = await readJsonBody(request);
+                sendJson(response, 201, { characterGroup: await createCharacterGroup(payload) });
+                return;
+            }
+            const groupMatch = url.pathname.match(/^\/api\/character-groups\/([^/]+)$/);
+            if (groupMatch) {
+                const groupId = groupMatch[1];
+                if (!isSafeCharacterGroupId(groupId)) {
+                    sendError(response, 400, 'errors.api.invalidCharacterGroupId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    sendJson(response, 200, { characterGroup: await readCharacterGroup(groupId) });
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const payload = await readJsonBody(request);
+                    sendJson(response, 200, { characterGroup: await updateCharacterGroup(groupId, payload) });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    await deleteCharacterGroup(groupId);
+                    response.statusCode = 204;
+                    response.end();
+                    return;
+                }
+            }
             if (request.method === 'GET' && url.pathname === '/api/characters') {
                 sendJson(response, 200, { characters: await listCharacters() });
                 return;
@@ -134,6 +167,14 @@ const createCharactersApiPlugin = (): Plugin => {
             }
             if (apiError.code === 'API_INVALID_CHARACTER_ID') {
                 sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidCharacterId');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_CHARACTER_GROUP_ID') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidCharacterGroupId');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_CHARACTER_GROUP_NAME') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidCharacterGroupName');
                 return;
             }
             if (apiError.code === 'API_INVALID_CHARACTER_IMAGE') {

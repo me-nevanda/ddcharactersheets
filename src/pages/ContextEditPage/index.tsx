@@ -11,7 +11,8 @@ import type {
   ContextAreaOptionViewModel,
   ContextAreaSectionViewModel,
   ContextCharacterCardViewModel,
-  ContextCharacterOptionViewModel,
+  ContextCharacterGroupOptionViewModel,
+  ContextCharacterGroupSectionViewModel,
   ContextMonsterCardViewModel,
   ContextEventCardViewModel,
   ContextEventOptionViewModel,
@@ -83,8 +84,34 @@ const HeroCard = ({ card }: { card: ContextCharacterCardViewModel }) => {
   )
 }
 
-const HeroOption = ({ option }: { option: ContextCharacterOptionViewModel }) => {
+const CharacterGroupSection = ({ section }: { section: ContextCharacterGroupSectionViewModel }) => {
   const { t } = useI18n()
+  return (
+    <section className={styles.npcGroupSection}>
+      <div className={styles.npcGroupSectionHeader}>
+        <h3 className={styles.npcGroupSectionTitle}>{section.name}</h3>
+        <button
+          type="button"
+          className={styles.heroRemoveButton}
+          aria-label={t('pages.contextEdit.characters.removeGroupButton')}
+          title={t('pages.contextEdit.characters.removeGroupButton')}
+          onClick={section.onRemoveGroupClick}
+        >
+          <AppIcon name="trash" />
+        </button>
+      </div>
+      {section.characters.length > 0 ? (
+        <div className={styles.heroGrid}>
+          {section.characters.map((character) => <HeroCard key={character.id} card={character} />)}
+        </div>
+      ) : (
+        <p className={styles.emptyText}>{t('pages.contextEdit.characters.groupEmpty')}</p>
+      )}
+    </section>
+  )
+}
+
+const CharacterGroupOption = ({ option }: { option: ContextCharacterGroupOptionViewModel }) => {
   return (
     <article
       className={`${styles.heroOption} ${option.selected ? styles.heroOptionSelected : ''}`}
@@ -97,21 +124,9 @@ const HeroOption = ({ option }: { option: ContextCharacterOptionViewModel }) => 
       <span className={styles.heroOptionCheckbox} aria-hidden="true">
         {option.selected ? <AppIcon name="check" /> : null}
       </span>
-      <CharacterPortrait
-        hasCustomImage={option.hasCustomImage}
-        imageSrc={option.imageSrc}
-        portraitSrc={option.portraitSrc}
-        classSrc={option.classSrc}
-      />
       <div className={styles.heroSummary}>
         <h3 className={styles.heroName}>{option.label}</h3>
-        <p className={styles.heroMeta}>
-          {option.raceLabel ? <span>{option.raceLabel}</span> : null}
-          {option.raceLabel && option.classLabel ? <span aria-hidden="true"> | </span> : null}
-          {option.classLabel ? <span>{option.classLabel}</span> : null}
-          {(option.raceLabel || option.classLabel) && option.level ? <span aria-hidden="true"> | </span> : null}
-          {option.level ? <span>{t('pages.characterEdit.fields.level')} {option.level}</span> : null}
-        </p>
+        <p className={styles.heroMeta}>{option.characterCountLabel}</p>
       </div>
     </article>
   )
@@ -453,15 +468,15 @@ export const ContextEditPage = () => {
     removingImage,
     saving,
     uploadingImage,
-    characterCards,
-    characterOptions,
-    characterSearch,
-    handleChangeCharacterSearch,
-    isAddCharacterDialogOpen,
-    handleOpenAddCharacterDialog,
-    handleCloseAddCharacterDialog,
-    handleConfirmAddCharacters,
-    hasSelectedCharactersInDialog,
+    characterGroupSections,
+    characterGroupOptions,
+    characterGroupSearch,
+    handleChangeCharacterGroupSearch,
+    isAddCharacterGroupDialogOpen,
+    handleOpenAddCharacterGroupDialog,
+    handleCloseAddCharacterGroupDialog,
+    handleConfirmAddCharacterGroups,
+    hasSelectedCharacterGroupsInDialog,
     eventCards,
     eventOptions,
     eventSearch,
@@ -600,7 +615,7 @@ export const ContextEditPage = () => {
                 <button
                   className={styles.secondaryButton}
                   type="button"
-                  onClick={handleOpenAddCharacterDialog}
+                  onClick={handleOpenAddCharacterGroupDialog}
                 >
                   <span className={styles.buttonContent}>
                     <AppIcon name="plus" />
@@ -608,10 +623,10 @@ export const ContextEditPage = () => {
                   </span>
                 </button>
               </div>
-              {characterCards.length > 0 ? (
-                <div className={styles.heroGrid}>
-                  {characterCards.map((card) => (
-                    <HeroCard key={card.id} card={card} />
+              {characterGroupSections.length > 0 ? (
+                <div className={styles.npcGroupList}>
+                  {characterGroupSections.map((section) => (
+                    <CharacterGroupSection key={section.id} section={section} />
                   ))}
                 </div>
               ) : (
@@ -724,37 +739,37 @@ export const ContextEditPage = () => {
         <UnsavedChangesDialog open={isUnsavedChangesDialogOpen} onCancel={() => setUnsavedChangesDialogOpen(false)} onConfirm={handleConfirmBackToList} />
         <DeleteCharacterDialog bodyKey="pages.contextEdit.imageActions.removeDialog.body" titleKey="pages.contextEdit.imageActions.removeDialog.title" characterName={t('pages.contextEdit.fields.image')} deleting={removingImage} open={isImageRemoveDialogOpen} onCancel={handleCancelImageRemove} onConfirm={() => void handleConfirmImageRemove()} />
 
-        {isAddCharacterDialogOpen ? (
+        {isAddCharacterGroupDialogOpen ? (
           <div className={styles.dialogBackdrop} role="presentation">
-            <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="context-add-characters-title">
-              <h2 className={styles.dialogTitle} id="context-add-characters-title">
+            <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="context-add-character-groups-title">
+              <h2 className={styles.dialogTitle} id="context-add-character-groups-title">
                 {t('pages.contextEdit.characters.addDialog.title')}
               </h2>
               <input
                 className={styles.dialogSearch}
                 type="text"
-                value={characterSearch}
+                value={characterGroupSearch}
                 placeholder={t('pages.contextEdit.characters.addDialog.searchPlaceholder')}
                 aria-label={t('pages.contextEdit.characters.addDialog.searchLabel')}
                 autoComplete="off"
-                onChange={(event) => handleChangeCharacterSearch(event.target.value)}
+                onChange={(event) => handleChangeCharacterGroupSearch(event.target.value)}
               />
               <div className={styles.dialogList}>
-                {characterOptions.length > 0 ? (
-                  characterOptions.map((option) => <HeroOption key={option.id} option={option} />)
+                {characterGroupOptions.length > 0 ? (
+                  characterGroupOptions.map((option) => <CharacterGroupOption key={option.id} option={option} />)
                 ) : (
                   <p className={styles.emptyText}>{t('pages.contextEdit.characters.addDialog.emptyState')}</p>
                 )}
               </div>
               <div className={styles.dialogActions}>
-                <button className={styles.secondaryButton} type="button" onClick={handleCloseAddCharacterDialog}>
+                <button className={styles.secondaryButton} type="button" onClick={handleCloseAddCharacterGroupDialog}>
                   {t('common.actions.cancel')}
                 </button>
                 <button
                   className={styles.primaryButton}
                   type="button"
-                  onClick={handleConfirmAddCharacters}
-                  disabled={!hasSelectedCharactersInDialog}
+                  onClick={handleConfirmAddCharacterGroups}
+                  disabled={!hasSelectedCharacterGroupsInDialog}
                 >
                   {t('pages.contextEdit.characters.addDialog.confirm')}
                 </button>

@@ -1,5 +1,5 @@
 ﻿import type { Adventure, AdventureData } from '@appTypes/adventure';
-import type { Character, CharacterData } from '@appTypes/character';
+import type { Character, CharacterData, CharacterGroup } from '@appTypes/character';
 import type { Context, ContextData } from '@appTypes/context';
 import type { Event, EventData } from '@appTypes/event';
 import type { Monster, MonsterData, MonsterGroup } from '@appTypes/monster';
@@ -11,6 +11,8 @@ interface ApiEnvelope<T> {
     adventure?: T;
     adventures?: T[];
     character?: T;
+    characterGroup?: T;
+    characterGroups?: T[];
     characters?: T[];
     context?: T;
     contexts?: T[];
@@ -70,6 +72,46 @@ const requestJson = async <T>(url: string, options: RequestInit = {}): Promise<T
 export const listCharacters = async (): Promise<Character[]> => {
     const payload = await requestJson<ApiEnvelope<Character>>('/api/characters');
     return payload?.characters ?? [];
+};
+export const listCharacterGroups = async (): Promise<CharacterGroup[]> => {
+    const payload = await requestJson<ApiEnvelope<CharacterGroup>>('/api/character-groups');
+    return payload?.characterGroups ?? [];
+};
+export const createCharacterGroup = async (name: string): Promise<CharacterGroup> => {
+    const payload = await requestJson<ApiEnvelope<CharacterGroup>>('/api/character-groups', {
+        method: 'POST',
+        body: JSON.stringify({ name }),
+    });
+    if (!payload?.characterGroup) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.characterGroup;
+};
+export const getCharacterGroup = async (groupId: string): Promise<CharacterGroup> => {
+    const payload = await requestJson<ApiEnvelope<CharacterGroup>>(`/api/character-groups/${groupId}`);
+    if (!payload?.characterGroup) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.characterGroup;
+};
+export const saveCharacterGroup = async (groupId: string, characterGroup: CharacterGroup): Promise<CharacterGroup> => {
+    const payload = await requestJson<ApiEnvelope<CharacterGroup>>(`/api/character-groups/${groupId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            uniqueId: characterGroup.uniqueId,
+            name: characterGroup.name,
+            characterFileNames: characterGroup.characterFileNames,
+        }),
+    });
+    if (!payload?.characterGroup) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.characterGroup;
+};
+export const deleteCharacterGroup = async (groupId: string): Promise<void> => {
+    await requestJson<null>(`/api/character-groups/${groupId}`, {
+        method: 'DELETE',
+    });
 };
 export const listAdventures = async (): Promise<Adventure[]> => {
     const payload = await requestJson<ApiEnvelope<Adventure>>('/api/adventures');

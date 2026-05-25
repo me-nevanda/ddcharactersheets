@@ -341,3 +341,14 @@ export interface Character extends CharacterData {
   imageUrl: string
   updatedAt: string
 }
+
+export interface CharacterGroupData {
+  uniqueId: string
+  name: string
+  characterFileNames: string[]
+}
+
+export interface CharacterGroup extends CharacterGroupData {
+  id: string
+  updatedAt: string
+}
