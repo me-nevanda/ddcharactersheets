@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
+import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { Area, AreaData, PlaceItem } from '../src/types/area'
+import { assertStoredEntityExists, createStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -50,25 +51,6 @@ const normalizeArea = (data: Partial<Record<keyof AreaData, unknown>> = {}): Are
   }
 }
 
-const parseArea = (rawArea: string): Partial<Record<keyof AreaData, unknown>> => {
-  return JSON.parse(rawArea.replace(/^\uFEFF/, '') || '{}') as Partial<Record<keyof AreaData, unknown>>
-}
-
-const ensureAreasDirectory = async (): Promise<void> => {
-  await mkdir(areasDirectory, { recursive: true })
-}
-
-const getAreaFilePath = (areaId: string): string => {
-  if (!isSafeAreaId(areaId)) {
-    const error = new Error('Invalid area id') as ApiError
-    error.statusCode = 400
-    error.code = 'API_INVALID_AREA_ID'
-    throw error
-  }
-
-  return path.join(areasDirectory, `${areaId}.json`)
-}
-
 const getAreaImageFilePath = (areaId: string, extension: (typeof areaImageExtensions)[number]): string => {
   if (!isSafeAreaId(areaId)) {
     const error = new Error('Invalid area id') as ApiError
@@ -78,6 +60,20 @@ const getAreaImageFilePath = (areaId: string, extension: (typeof areaImageExtens
   }
 
   return path.join(areasDirectory, `${areaId}.${extension}`)
+}
+
+const areaStoreOptions = {
+  entityType: 'area',
+  imageUrl: (areaId: string): string => `/api/areas/${areaId}/image`,
+  normalize: normalizeArea,
+}
+
+const ensureAreasStore = async (): Promise<void> => {
+  await migrateJsonDirectoryToSqlite({
+    directory: areasDirectory,
+    entityType: areaStoreOptions.entityType,
+    isSafeId: isSafeAreaId,
+  })
 }
 
 const getAreaImageInfo = async (areaId: string): Promise<{ contentType: AreaImage['contentType']; filePath: string; imageUrl: string } | null> => {
@@ -121,71 +117,38 @@ export const isSafeAreaId = (areaId: string): boolean => {
 }
 
 export const listAreas = async (): Promise<Area[]> => {
-  await ensureAreasDirectory()
-  const entries = await readdir(areasDirectory, { withFileTypes: true })
-  const areaFiles = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const areas = await Promise.all(areaFiles.map(async (entry) => {
-    const areaId = path.basename(entry.name, '.json')
-    const filePath = getAreaFilePath(areaId)
-    const [rawArea, fileInfo, imageInfo] = await Promise.all([
-      readFile(filePath, 'utf8'),
-      stat(filePath),
-      getAreaImageInfo(areaId),
-    ])
-
-    return {
-      id: areaId,
-      imageUrl: imageInfo?.imageUrl ?? '',
-      ...normalizeArea(parseArea(rawArea)),
-      updatedAt: fileInfo.mtime.toISOString(),
-    }
-  }))
-
-  return areas.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+  await ensureAreasStore()
+  const areas = await listStoredEntities<AreaData, Area>(areaStoreOptions)
+  return Promise.all(areas.map(async (area) => ({
+    ...area,
+    imageUrl: (await getAreaImageInfo(area.id))?.imageUrl ?? '',
+  })))
 }
 
 export const readArea = async (areaId: string): Promise<Area> => {
-  await ensureAreasDirectory()
-  const filePath = getAreaFilePath(areaId)
-  const [rawArea, fileInfo, imageInfo] = await Promise.all([
-    readFile(filePath, 'utf8'),
-    stat(filePath),
+  await ensureAreasStore()
+  const [area, imageInfo] = await Promise.all([
+    readStoredEntity<AreaData, Area>(areaId, areaStoreOptions),
     getAreaImageInfo(areaId),
   ])
-
   return {
-    id: areaId,
+    ...area,
     imageUrl: imageInfo?.imageUrl ?? '',
-    ...normalizeArea(parseArea(rawArea)),
-    updatedAt: fileInfo.mtime.toISOString(),
   }
 }
 
 export const createArea = async (): Promise<Area> => {
-  await ensureAreasDirectory()
-  const areaId = `${Date.now()}-${randomUUID().slice(0, 8)}`
-  const filePath = getAreaFilePath(areaId)
-  await writeFile(filePath, `${JSON.stringify({ uniqueId: randomUUID() }, null, 2)}\n`, 'utf8')
-  return readArea(areaId)
+  await ensureAreasStore()
+  return createStoredEntity<AreaData, Area>(areaStoreOptions)
 }
 
 export const updateArea = async (areaId: string, data: unknown): Promise<Area> => {
-  await ensureAreasDirectory()
-  const filePath = getAreaFilePath(areaId)
-  const rawArea = await readFile(filePath, 'utf8')
-  const existingArea = parseArea(rawArea)
-  const nextArea = normalizeArea({
-    ...existingArea,
-    ...(typeof data === 'object' && data !== null
-      ? (data as Partial<Record<keyof AreaData, unknown>>)
-      : {}),
-  })
-  await writeFile(filePath, `${JSON.stringify(nextArea, null, 2)}\n`, 'utf8')
-  return readArea(areaId)
+  await ensureAreasStore()
+  return updateStoredEntity<AreaData, Area>(areaId, data, areaStoreOptions)
 }
 
 export const readAreaImage = async (areaId: string): Promise<AreaImage> => {
-  await ensureAreasDirectory()
+  await ensureAreasStore()
   const imageInfo = await getAreaImageInfo(areaId)
 
   if (!imageInfo) {
@@ -202,8 +165,8 @@ export const readAreaImage = async (areaId: string): Promise<AreaImage> => {
 }
 
 export const updateAreaImage = async (areaId: string, contentType: string | undefined, data: Buffer): Promise<Area> => {
-  await ensureAreasDirectory()
-  await stat(getAreaFilePath(areaId))
+  await ensureAreasStore()
+  await assertStoredEntityExists(areaStoreOptions.entityType, areaId)
 
   const extension = normalizeImageExtension(contentType)
   const nextFilePath = getAreaImageFilePath(areaId, extension)
@@ -227,8 +190,8 @@ export const updateAreaImage = async (areaId: string, contentType: string | unde
 }
 
 export const deleteAreaImage = async (areaId: string): Promise<Area> => {
-  await ensureAreasDirectory()
-  await stat(getAreaFilePath(areaId))
+  await ensureAreasStore()
+  await assertStoredEntityExists(areaStoreOptions.entityType, areaId)
 
   await Promise.all(
     areaImageExtensions.map(async (extension) => {

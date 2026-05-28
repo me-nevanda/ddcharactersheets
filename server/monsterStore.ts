@@ -3,6 +3,7 @@ import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promi
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
 import type { Monster, MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '../src/types/monster'
+import { assertStoredEntityExists, createStoredEntity, deleteStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -403,83 +404,59 @@ const normalizeImageExtension = (contentType: string | undefined): (typeof monst
   throw error
 }
 
+const monsterStoreOptions = {
+  entityType: 'monster',
+  imageUrl: (monsterId: string): string => `/api/monsters/${monsterId}/image`,
+  normalize: normalizeMonster,
+}
+
+const ensureMonstersStore = async (): Promise<void> => {
+  await migrateJsonDirectoryToSqlite({
+    directory: monstersDirectory,
+    entityType: monsterStoreOptions.entityType,
+    isSafeId: isSafeMonsterId,
+  })
+}
+
 export const isSafeMonsterId = (monsterId: string): boolean => {
   return safeMonsterIdPattern.test(monsterId)
 }
 
 export const listMonsters = async (): Promise<Monster[]> => {
-  await ensureMonstersDirectory()
-  const entries = await readdir(monstersDirectory, { withFileTypes: true })
-  const monsterFiles = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const monsters = await Promise.all(
-    monsterFiles.map(async (entry) => {
-      const monsterId = path.basename(entry.name, '.json')
-      const filePath = getMonsterFilePath(monsterId)
-      const [rawMonster, fileInfo, imageInfo] = await Promise.all([
-        readFile(filePath, 'utf8'),
-        stat(filePath),
-        getMonsterImageInfo(monsterId),
-      ])
-
-      return {
-        id: monsterId,
-        imageUrl: imageInfo?.imageUrl ?? '',
-        ...normalizeMonster(parseMonster(rawMonster)),
-        updatedAt: fileInfo.mtime.toISOString(),
-      }
-    }),
-  )
-
-  return monsters.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+  await ensureMonstersStore()
+  const monsters = await listStoredEntities<MonsterData, Monster>(monsterStoreOptions)
+  return Promise.all(monsters.map(async (monster) => ({
+    ...monster,
+    imageUrl: (await getMonsterImageInfo(monster.id))?.imageUrl ?? '',
+  })))
 }
 
 export const readMonster = async (monsterId: string): Promise<Monster> => {
-  await ensureMonstersDirectory()
-  const filePath = getMonsterFilePath(monsterId)
-  const [rawMonster, fileInfo, imageInfo] = await Promise.all([
-    readFile(filePath, 'utf8'),
-    stat(filePath),
+  await ensureMonstersStore()
+  const [monster, imageInfo] = await Promise.all([
+    readStoredEntity<MonsterData, Monster>(monsterId, monsterStoreOptions),
     getMonsterImageInfo(monsterId),
   ])
 
   return {
-    id: monsterId,
+    ...monster,
     imageUrl: imageInfo?.imageUrl ?? '',
-    ...normalizeMonster(parseMonster(rawMonster)),
-    updatedAt: fileInfo.mtime.toISOString(),
   }
 }
 
 export const createMonster = async (): Promise<Monster> => {
-  await ensureMonstersDirectory()
-  const monsterId = `${Date.now()}-${randomUUID().slice(0, 8)}`
-  const filePath = getMonsterFilePath(monsterId)
-  await writeFile(filePath, `${JSON.stringify({ uniqueId: randomUUID() }, null, 2)}\n`, 'utf8')
-
-  return readMonster(monsterId)
+  await ensureMonstersStore()
+  return createStoredEntity<MonsterData, Monster>(monsterStoreOptions)
 }
 
 export const updateMonster = async (monsterId: string, data: unknown): Promise<Monster> => {
-  await ensureMonstersDirectory()
-  const filePath = getMonsterFilePath(monsterId)
-  const rawMonster = await readFile(filePath, 'utf8')
-  const existingMonster = parseMonster(rawMonster)
-  const nextMonster = {
-    ...normalizeMonster({
-      ...existingMonster,
-      ...(typeof data === 'object' && data !== null ? (data as Partial<Record<keyof MonsterData, unknown>>) : {}),
-    }),
-  }
-
-  await writeFile(filePath, `${JSON.stringify(nextMonster, null, 2)}\n`, 'utf8')
-
-  return readMonster(monsterId)
+  await ensureMonstersStore()
+  return updateStoredEntity<MonsterData, Monster>(monsterId, data, monsterStoreOptions)
 }
 
 export const deleteMonster = async (monsterId: string): Promise<void> => {
-  await ensureMonstersDirectory()
-  const filePath = getMonsterFilePath(monsterId)
-  await unlink(filePath)
+  await ensureMonstersStore()
+  await deleteStoredEntity(monsterStoreOptions.entityType, monsterId)
 
   await Promise.all(
     monsterImageExtensions.map(async (extension) => {
@@ -495,7 +472,7 @@ export const deleteMonster = async (monsterId: string): Promise<void> => {
 }
 
 export const readMonsterImage = async (monsterId: string): Promise<MonsterImage> => {
-  await ensureMonstersDirectory()
+  await ensureMonstersStore()
   const imageInfo = await getMonsterImageInfo(monsterId)
 
   if (!imageInfo) {
@@ -512,8 +489,8 @@ export const readMonsterImage = async (monsterId: string): Promise<MonsterImage>
 }
 
 export const updateMonsterImage = async (monsterId: string, contentType: string | undefined, data: Buffer): Promise<Monster> => {
-  await ensureMonstersDirectory()
-  await stat(getMonsterFilePath(monsterId))
+  await ensureMonstersStore()
+  await assertStoredEntityExists(monsterStoreOptions.entityType, monsterId)
 
   const extension = normalizeImageExtension(contentType)
   const nextFilePath = getMonsterImageFilePath(monsterId, extension)
@@ -537,8 +514,8 @@ export const updateMonsterImage = async (monsterId: string, contentType: string 
 }
 
 export const deleteMonsterImage = async (monsterId: string): Promise<Monster> => {
-  await ensureMonstersDirectory()
-  await stat(getMonsterFilePath(monsterId))
+  await ensureMonstersStore()
+  await assertStoredEntityExists(monsterStoreOptions.entityType, monsterId)
 
   await Promise.all(
     monsterImageExtensions.map(async (extension) => {

@@ -3,6 +3,7 @@ import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promi
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
 import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcRole, NpcSuggestedStats, NpcType } from '../src/types/npc'
+import { assertStoredEntityExists, createStoredEntity, deleteStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -405,83 +406,59 @@ const normalizeImageExtension = (contentType: string | undefined): (typeof npcIm
   throw error
 }
 
+const npcStoreOptions = {
+  entityType: 'npc',
+  imageUrl: (npcId: string): string => `/api/npcs/${npcId}/image`,
+  normalize: normalizeNpc,
+}
+
+const ensureNpcsStore = async (): Promise<void> => {
+  await migrateJsonDirectoryToSqlite({
+    directory: npcsDirectory,
+    entityType: npcStoreOptions.entityType,
+    isSafeId: isSafeNpcId,
+  })
+}
+
 export const isSafeNpcId = (npcId: string): boolean => {
   return safeNpcIdPattern.test(npcId)
 }
 
 export const listNpcs = async (): Promise<Npc[]> => {
-  await ensureNpcsDirectory()
-  const entries = await readdir(npcsDirectory, { withFileTypes: true })
-  const npcFiles = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const npcs = await Promise.all(
-    npcFiles.map(async (entry) => {
-      const npcId = path.basename(entry.name, '.json')
-      const filePath = getNpcFilePath(npcId)
-      const [rawNpc, fileInfo, imageInfo] = await Promise.all([
-        readFile(filePath, 'utf8'),
-        stat(filePath),
-        getNpcImageInfo(npcId),
-      ])
-
-      return {
-        id: npcId,
-        imageUrl: imageInfo?.imageUrl ?? '',
-        ...normalizeNpc(parseNpc(rawNpc)),
-        updatedAt: fileInfo.mtime.toISOString(),
-      }
-    }),
-  )
-
-  return npcs.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+  await ensureNpcsStore()
+  const npcs = await listStoredEntities<NpcData, Npc>(npcStoreOptions)
+  return Promise.all(npcs.map(async (npc) => ({
+    ...npc,
+    imageUrl: (await getNpcImageInfo(npc.id))?.imageUrl ?? '',
+  })))
 }
 
 export const readNpc = async (npcId: string): Promise<Npc> => {
-  await ensureNpcsDirectory()
-  const filePath = getNpcFilePath(npcId)
-  const [rawNpc, fileInfo, imageInfo] = await Promise.all([
-    readFile(filePath, 'utf8'),
-    stat(filePath),
+  await ensureNpcsStore()
+  const [npc, imageInfo] = await Promise.all([
+    readStoredEntity<NpcData, Npc>(npcId, npcStoreOptions),
     getNpcImageInfo(npcId),
   ])
 
   return {
-    id: npcId,
+    ...npc,
     imageUrl: imageInfo?.imageUrl ?? '',
-    ...normalizeNpc(parseNpc(rawNpc)),
-    updatedAt: fileInfo.mtime.toISOString(),
   }
 }
 
 export const createNpc = async (): Promise<Npc> => {
-  await ensureNpcsDirectory()
-  const npcId = `${Date.now()}-${randomUUID().slice(0, 8)}`
-  const filePath = getNpcFilePath(npcId)
-  await writeFile(filePath, `${JSON.stringify({ uniqueId: randomUUID() }, null, 2)}\n`, 'utf8')
-
-  return readNpc(npcId)
+  await ensureNpcsStore()
+  return createStoredEntity<NpcData, Npc>(npcStoreOptions)
 }
 
 export const updateNpc = async (npcId: string, data: unknown): Promise<Npc> => {
-  await ensureNpcsDirectory()
-  const filePath = getNpcFilePath(npcId)
-  const rawNpc = await readFile(filePath, 'utf8')
-  const existingNpc = parseNpc(rawNpc)
-  const nextNpc = {
-    ...normalizeNpc({
-      ...existingNpc,
-      ...(typeof data === 'object' && data !== null ? (data as Partial<Record<keyof NpcData, unknown>>) : {}),
-    }),
-  }
-
-  await writeFile(filePath, `${JSON.stringify(nextNpc, null, 2)}\n`, 'utf8')
-
-  return readNpc(npcId)
+  await ensureNpcsStore()
+  return updateStoredEntity<NpcData, Npc>(npcId, data, npcStoreOptions)
 }
 
 export const deleteNpc = async (npcId: string): Promise<void> => {
-  await ensureNpcsDirectory()
-  const filePath = getNpcFilePath(npcId)
-  await unlink(filePath)
+  await ensureNpcsStore()
+  await deleteStoredEntity(npcStoreOptions.entityType, npcId)
 
   await Promise.all(
     npcImageExtensions.map(async (extension) => {
@@ -497,7 +474,7 @@ export const deleteNpc = async (npcId: string): Promise<void> => {
 }
 
 export const readNpcImage = async (npcId: string): Promise<NpcImage> => {
-  await ensureNpcsDirectory()
+  await ensureNpcsStore()
   const imageInfo = await getNpcImageInfo(npcId)
 
   if (!imageInfo) {
@@ -514,8 +491,8 @@ export const readNpcImage = async (npcId: string): Promise<NpcImage> => {
 }
 
 export const updateNpcImage = async (npcId: string, contentType: string | undefined, data: Buffer): Promise<Npc> => {
-  await ensureNpcsDirectory()
-  await stat(getNpcFilePath(npcId))
+  await ensureNpcsStore()
+  await assertStoredEntityExists(npcStoreOptions.entityType, npcId)
 
   const extension = normalizeImageExtension(contentType)
   const nextFilePath = getNpcImageFilePath(npcId, extension)
@@ -539,8 +516,8 @@ export const updateNpcImage = async (npcId: string, contentType: string | undefi
 }
 
 export const deleteNpcImage = async (npcId: string): Promise<Npc> => {
-  await ensureNpcsDirectory()
-  await stat(getNpcFilePath(npcId))
+  await ensureNpcsStore()
+  await assertStoredEntityExists(npcStoreOptions.entityType, npcId)
 
   await Promise.all(
     npcImageExtensions.map(async (extension) => {

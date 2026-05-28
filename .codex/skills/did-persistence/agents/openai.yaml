@@ -1,0 +1,4 @@
+interface:
+  display_name: "DID Persistence"
+  short_description: "Use the DID SQLite persistence patterns."
+  default_prompt: "Use $did-persistence for server-side storage, SQLite reads and writes, migrations, image persistence, and group relations in this repository."

@@ -4,6 +4,7 @@ import path from 'node:path';
 import type { CharacterAbility, CharacterAbilityAreaType, Character, CharacterAbilityAction, CharacterAbilityKind, CharacterAbilityType, CharacterAttributeBonuses, CharacterAttributes, CharacterBonuses, CharacterData, CharacterDefenses, CharacterArmor, CharacterFeat, CharacterWeapon, CharacterOtherItem, CharacterWeaponDamageDiceType, CharacterWeaponDamageType, CharacterSkillBonuses, CharacterTraining, CharacterDefenseBonuses, } from '../src/types/character';
 import { CharacterAlignment, CharacterClass as CharacterClassValue, CharacterGender, CharacterRace as CharacterRaceValue, } from '../src/types/character';
 import { CharacterClass, CharacterRace, isCharacterWeaponDamageType } from '../src/types/character';
+import { assertStoredEntityExists, createStoredEntity, deleteStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore';
 interface ApiError extends Error {
     code?: string;
     statusCode?: number;
@@ -786,72 +787,54 @@ const normalizeImageExtension = (contentType: string | undefined): (typeof chara
     error.code = 'API_INVALID_CHARACTER_IMAGE';
     throw error;
 };
+
+const characterStoreOptions = {
+    entityType: 'character',
+    imageUrl: (characterId: string): string => `/api/characters/${characterId}/image`,
+    normalize: normalizeCharacter,
+};
+
+const ensureCharactersStore = async (): Promise<void> => {
+    await migrateJsonDirectoryToSqlite({
+        directory: charactersDirectory,
+        entityType: characterStoreOptions.entityType,
+        isSafeId: isSafeCharacterId,
+    });
+};
+
 export const isSafeCharacterId = (characterId: string): boolean => {
     return safeCharacterIdPattern.test(characterId);
 };
 export const listCharacters = async (): Promise<Character[]> => {
-    await ensureCharactersDirectory();
-    const entries = await readdir(charactersDirectory, { withFileTypes: true });
-    const characterFiles = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'));
-    const characters = await Promise.all(characterFiles.map(async (entry) => {
-        const characterId = path.basename(entry.name, '.json');
-        const filePath = getCharacterFilePath(characterId);
-        const [rawCharacter, fileInfo, imageInfo] = await Promise.all([
-            readFile(filePath, 'utf8'),
-            stat(filePath),
-            getCharacterImageInfo(characterId),
-        ]);
-        return {
-            id: characterId,
-            imageUrl: imageInfo?.imageUrl ?? '',
-            ...normalizeCharacter(parseCharacter(rawCharacter)),
-            updatedAt: fileInfo.mtime.toISOString(),
-        };
-    }));
-    return characters.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+    await ensureCharactersStore();
+    const characters = await listStoredEntities<CharacterData, Character>(characterStoreOptions);
+    return Promise.all(characters.map(async (character) => ({
+        ...character,
+        imageUrl: (await getCharacterImageInfo(character.id))?.imageUrl ?? '',
+    })));
 };
 export const readCharacter = async (characterId: string): Promise<Character> => {
-    await ensureCharactersDirectory();
-    const filePath = getCharacterFilePath(characterId);
-    const [rawCharacter, fileInfo, imageInfo] = await Promise.all([
-        readFile(filePath, 'utf8'),
-        stat(filePath),
+    await ensureCharactersStore();
+    const [character, imageInfo] = await Promise.all([
+        readStoredEntity<CharacterData, Character>(characterId, characterStoreOptions),
         getCharacterImageInfo(characterId),
     ]);
     return {
-        id: characterId,
+        ...character,
         imageUrl: imageInfo?.imageUrl ?? '',
-        ...normalizeCharacter(parseCharacter(rawCharacter)),
-        updatedAt: fileInfo.mtime.toISOString(),
     };
 };
 export const createCharacter = async (): Promise<Character> => {
-    await ensureCharactersDirectory();
-    const characterId = `${Date.now()}-${randomUUID().slice(0, 8)}`;
-    const filePath = getCharacterFilePath(characterId);
-    await writeFile(filePath, `${JSON.stringify({ uniqueId: randomUUID() }, null, 2)}\n`, 'utf8');
-    return readCharacter(characterId);
+    await ensureCharactersStore();
+    return createStoredEntity<CharacterData, Character>(characterStoreOptions);
 };
 export const updateCharacter = async (characterId: string, data: unknown): Promise<Character> => {
-    await ensureCharactersDirectory();
-    const filePath = getCharacterFilePath(characterId);
-    const rawCharacter = await readFile(filePath, 'utf8');
-    const existingCharacter = parseCharacter(rawCharacter);
-    const nextCharacter = {
-        ...normalizeCharacter({
-            ...existingCharacter,
-            ...(typeof data === 'object' && data !== null
-            ? (data as Partial<Record<keyof CharacterData, unknown>>)
-            : {}),
-        }),
-    };
-    await writeFile(filePath, `${JSON.stringify(nextCharacter, null, 2)}\n`, 'utf8');
-    return readCharacter(characterId);
+    await ensureCharactersStore();
+    return updateStoredEntity<CharacterData, Character>(characterId, data, characterStoreOptions);
 };
 export const deleteCharacter = async (characterId: string): Promise<void> => {
-    await ensureCharactersDirectory();
-    const filePath = getCharacterFilePath(characterId);
-    await unlink(filePath);
+    await ensureCharactersStore();
+    await deleteStoredEntity(characterStoreOptions.entityType, characterId);
     await Promise.all(characterImageExtensions.map(async (extension) => {
         try {
             await unlink(getCharacterImageFilePath(characterId, extension));
@@ -864,7 +847,7 @@ export const deleteCharacter = async (characterId: string): Promise<void> => {
     }));
 };
 export const readCharacterImage = async (characterId: string): Promise<CharacterImage> => {
-    await ensureCharactersDirectory();
+    await ensureCharactersStore();
     const imageInfo = await getCharacterImageInfo(characterId);
     if (!imageInfo) {
         const error = new Error('Character image not found') as ApiError;
@@ -878,8 +861,8 @@ export const readCharacterImage = async (characterId: string): Promise<Character
     };
 };
 export const updateCharacterImage = async (characterId: string, contentType: string | undefined, data: Buffer): Promise<Character> => {
-    await ensureCharactersDirectory();
-    await stat(getCharacterFilePath(characterId));
+    await ensureCharactersStore();
+    await assertStoredEntityExists(characterStoreOptions.entityType, characterId);
     const extension = normalizeImageExtension(contentType);
     const nextFilePath = getCharacterImageFilePath(characterId, extension);
     const staleExtensions = characterImageExtensions.filter((imageExtension) => imageExtension !== extension);
@@ -897,8 +880,8 @@ export const updateCharacterImage = async (characterId: string, contentType: str
     return readCharacter(characterId);
 };
 export const deleteCharacterImage = async (characterId: string): Promise<Character> => {
-    await ensureCharactersDirectory();
-    await stat(getCharacterFilePath(characterId));
+    await ensureCharactersStore();
+    await assertStoredEntityExists(characterStoreOptions.entityType, characterId);
     await Promise.all(characterImageExtensions.map(async (extension) => {
         try {
             await unlink(getCharacterImageFilePath(characterId, extension));

@@ -1,7 +1,7 @@
 ﻿import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { NpcGroup, NpcGroupData } from '../src/types/npc'
+import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, migrateJsonDirectoryToSqlite, migrateStoredGroupMembers, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -35,25 +35,6 @@ const normalizeNpcGroup = (data: Partial<Record<keyof NpcGroupData, unknown>> = 
   }
 }
 
-const parseNpcGroup = (rawGroup: string): Partial<Record<keyof NpcGroupData, unknown>> => {
-  return JSON.parse(rawGroup.replace(/^\uFEFF/, '') || '{}') as Partial<Record<keyof NpcGroupData, unknown>>
-}
-
-const ensureNpcGroupsDirectory = async (): Promise<void> => {
-  await mkdir(npcGroupsDirectory, { recursive: true })
-}
-
-const getNpcGroupFilePath = (groupId: string): string => {
-  if (!isSafeNpcGroupId(groupId)) {
-    const error = new Error('Invalid npc group id') as ApiError
-    error.statusCode = 400
-    error.code = 'API_INVALID_NPC_GROUP_ID'
-    throw error
-  }
-
-  return path.join(npcGroupsDirectory, `${groupId}.json`)
-}
-
 const assertValidGroupName = (name: string): void => {
   if (!name) {
     const error = new Error('Invalid npc group name') as ApiError
@@ -63,51 +44,43 @@ const assertValidGroupName = (name: string): void => {
   }
 }
 
+const npcGroupStoreOptions = {
+  entityType: 'npc-group',
+  normalize: normalizeNpcGroup,
+  validate: (group: NpcGroupData): void => assertValidGroupName(group.name),
+}
+
+const npcGroupRelationOptions = {
+  fileNamesKey: 'npcFileNames',
+  groupEntityType: npcGroupStoreOptions.entityType,
+  memberEntityType: 'npc',
+} as const
+
+const ensureNpcGroupsStore = async (): Promise<void> => {
+  await migrateJsonDirectoryToSqlite({
+    directory: npcGroupsDirectory,
+    entityType: npcGroupStoreOptions.entityType,
+    isSafeId: isSafeNpcGroupId,
+  })
+  await migrateStoredGroupMembers<NpcGroupData>(npcGroupRelationOptions)
+}
+
 export const isSafeNpcGroupId = (groupId: string): boolean => {
   return safeNpcGroupIdPattern.test(groupId)
 }
 
 export const listNpcGroups = async (): Promise<NpcGroup[]> => {
-  await ensureNpcGroupsDirectory()
-  const entries = await readdir(npcGroupsDirectory, { withFileTypes: true })
-  const groupFiles = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const groups = await Promise.all(
-    groupFiles.map(async (entry) => {
-      const groupId = path.basename(entry.name, '.json')
-      const filePath = getNpcGroupFilePath(groupId)
-      const [rawGroup, fileInfo] = await Promise.all([
-        readFile(filePath, 'utf8'),
-        stat(filePath),
-      ])
-
-      return {
-        id: groupId,
-        ...normalizeNpcGroup(parseNpcGroup(rawGroup)),
-        updatedAt: fileInfo.mtime.toISOString(),
-      }
-    }),
-  )
-
-  return groups.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+  await ensureNpcGroupsStore()
+  return listStoredGroupEntities<NpcGroupData, NpcGroup>(npcGroupStoreOptions, npcGroupRelationOptions)
 }
 
 export const readNpcGroup = async (groupId: string): Promise<NpcGroup> => {
-  await ensureNpcGroupsDirectory()
-  const filePath = getNpcGroupFilePath(groupId)
-  const [rawGroup, fileInfo] = await Promise.all([
-    readFile(filePath, 'utf8'),
-    stat(filePath),
-  ])
-
-  return {
-    id: groupId,
-    ...normalizeNpcGroup(parseNpcGroup(rawGroup)),
-    updatedAt: fileInfo.mtime.toISOString(),
-  }
+  await ensureNpcGroupsStore()
+  return readStoredGroupEntity<NpcGroupData, NpcGroup>(groupId, npcGroupStoreOptions, npcGroupRelationOptions)
 }
 
 export const createNpcGroup = async (data: unknown): Promise<NpcGroup> => {
-  await ensureNpcGroupsDirectory()
+  await ensureNpcGroupsStore()
   const source = typeof data === 'object' && data !== null ? (data as Partial<Record<keyof NpcGroupData, unknown>>) : {}
   const group = normalizeNpcGroup({
     uniqueId: randomUUID(),
@@ -116,43 +89,15 @@ export const createNpcGroup = async (data: unknown): Promise<NpcGroup> => {
   })
 
   assertValidGroupName(group.name)
-
-  const groupId = `${Date.now()}-${randomUUID().slice(0, 8)}`
-  const filePath = getNpcGroupFilePath(groupId)
-  await writeFile(filePath, `${JSON.stringify(group, null, 2)}\n`, 'utf8')
-
-  const fileInfo = await stat(filePath)
-
-  return {
-    id: groupId,
-    ...group,
-    updatedAt: fileInfo.mtime.toISOString(),
-  }
+  return createStoredGroupEntity<NpcGroupData, NpcGroup>(npcGroupStoreOptions, npcGroupRelationOptions, group)
 }
 
 export const updateNpcGroup = async (groupId: string, data: unknown): Promise<NpcGroup> => {
-  await ensureNpcGroupsDirectory()
-  const filePath = getNpcGroupFilePath(groupId)
-  const rawGroup = await readFile(filePath, 'utf8')
-  const existingGroup = parseNpcGroup(rawGroup)
-  const nextGroup = normalizeNpcGroup({
-    ...existingGroup,
-    ...(typeof data === 'object' && data !== null ? (data as Partial<Record<keyof NpcGroupData, unknown>>) : {}),
-  })
-
-  assertValidGroupName(nextGroup.name)
-  await writeFile(filePath, `${JSON.stringify(nextGroup, null, 2)}\n`, 'utf8')
-
-  const fileInfo = await stat(filePath)
-
-  return {
-    id: groupId,
-    ...nextGroup,
-    updatedAt: fileInfo.mtime.toISOString(),
-  }
+  await ensureNpcGroupsStore()
+  return updateStoredGroupEntity<NpcGroupData, NpcGroup>(groupId, data, npcGroupStoreOptions, npcGroupRelationOptions)
 }
 
 export const deleteNpcGroup = async (groupId: string): Promise<void> => {
-  await ensureNpcGroupsDirectory()
-  await unlink(getNpcGroupFilePath(groupId))
+  await ensureNpcGroupsStore()
+  await deleteStoredEntity(npcGroupStoreOptions.entityType, groupId)
 }

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { MonsterGroup, MonsterGroupData } from '../src/types/monster'
+import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, migrateJsonDirectoryToSqlite, migrateStoredGroupMembers, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -35,25 +35,6 @@ const normalizeMonsterGroup = (data: Partial<Record<keyof MonsterGroupData, unkn
   }
 }
 
-const parseMonsterGroup = (rawGroup: string): Partial<Record<keyof MonsterGroupData, unknown>> => {
-  return JSON.parse(rawGroup.replace(/^\uFEFF/, '') || '{}') as Partial<Record<keyof MonsterGroupData, unknown>>
-}
-
-const ensureMonsterGroupsDirectory = async (): Promise<void> => {
-  await mkdir(monsterGroupsDirectory, { recursive: true })
-}
-
-const getMonsterGroupFilePath = (groupId: string): string => {
-  if (!isSafeMonsterGroupId(groupId)) {
-    const error = new Error('Invalid monster group id') as ApiError
-    error.statusCode = 400
-    error.code = 'API_INVALID_MONSTER_GROUP_ID'
-    throw error
-  }
-
-  return path.join(monsterGroupsDirectory, `${groupId}.json`)
-}
-
 const assertValidGroupName = (name: string): void => {
   if (!name) {
     const error = new Error('Invalid monster group name') as ApiError
@@ -63,51 +44,43 @@ const assertValidGroupName = (name: string): void => {
   }
 }
 
+const monsterGroupStoreOptions = {
+  entityType: 'monster-group',
+  normalize: normalizeMonsterGroup,
+  validate: (group: MonsterGroupData): void => assertValidGroupName(group.name),
+}
+
+const monsterGroupRelationOptions = {
+  fileNamesKey: 'monsterFileNames',
+  groupEntityType: monsterGroupStoreOptions.entityType,
+  memberEntityType: 'monster',
+} as const
+
+const ensureMonsterGroupsStore = async (): Promise<void> => {
+  await migrateJsonDirectoryToSqlite({
+    directory: monsterGroupsDirectory,
+    entityType: monsterGroupStoreOptions.entityType,
+    isSafeId: isSafeMonsterGroupId,
+  })
+  await migrateStoredGroupMembers<MonsterGroupData>(monsterGroupRelationOptions)
+}
+
 export const isSafeMonsterGroupId = (groupId: string): boolean => {
   return safeMonsterGroupIdPattern.test(groupId)
 }
 
 export const listMonsterGroups = async (): Promise<MonsterGroup[]> => {
-  await ensureMonsterGroupsDirectory()
-  const entries = await readdir(monsterGroupsDirectory, { withFileTypes: true })
-  const groupFiles = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const groups = await Promise.all(
-    groupFiles.map(async (entry) => {
-      const groupId = path.basename(entry.name, '.json')
-      const filePath = getMonsterGroupFilePath(groupId)
-      const [rawGroup, fileInfo] = await Promise.all([
-        readFile(filePath, 'utf8'),
-        stat(filePath),
-      ])
-
-      return {
-        id: groupId,
-        ...normalizeMonsterGroup(parseMonsterGroup(rawGroup)),
-        updatedAt: fileInfo.mtime.toISOString(),
-      }
-    }),
-  )
-
-  return groups.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+  await ensureMonsterGroupsStore()
+  return listStoredGroupEntities<MonsterGroupData, MonsterGroup>(monsterGroupStoreOptions, monsterGroupRelationOptions)
 }
 
 export const readMonsterGroup = async (groupId: string): Promise<MonsterGroup> => {
-  await ensureMonsterGroupsDirectory()
-  const filePath = getMonsterGroupFilePath(groupId)
-  const [rawGroup, fileInfo] = await Promise.all([
-    readFile(filePath, 'utf8'),
-    stat(filePath),
-  ])
-
-  return {
-    id: groupId,
-    ...normalizeMonsterGroup(parseMonsterGroup(rawGroup)),
-    updatedAt: fileInfo.mtime.toISOString(),
-  }
+  await ensureMonsterGroupsStore()
+  return readStoredGroupEntity<MonsterGroupData, MonsterGroup>(groupId, monsterGroupStoreOptions, monsterGroupRelationOptions)
 }
 
 export const createMonsterGroup = async (data: unknown): Promise<MonsterGroup> => {
-  await ensureMonsterGroupsDirectory()
+  await ensureMonsterGroupsStore()
   const source = typeof data === 'object' && data !== null ? (data as Partial<Record<keyof MonsterGroupData, unknown>>) : {}
   const group = normalizeMonsterGroup({
     uniqueId: randomUUID(),
@@ -116,43 +89,15 @@ export const createMonsterGroup = async (data: unknown): Promise<MonsterGroup> =
   })
 
   assertValidGroupName(group.name)
-
-  const groupId = `${Date.now()}-${randomUUID().slice(0, 8)}`
-  const filePath = getMonsterGroupFilePath(groupId)
-  await writeFile(filePath, `${JSON.stringify(group, null, 2)}\n`, 'utf8')
-
-  const fileInfo = await stat(filePath)
-
-  return {
-    id: groupId,
-    ...group,
-    updatedAt: fileInfo.mtime.toISOString(),
-  }
+  return createStoredGroupEntity<MonsterGroupData, MonsterGroup>(monsterGroupStoreOptions, monsterGroupRelationOptions, group)
 }
 
 export const updateMonsterGroup = async (groupId: string, data: unknown): Promise<MonsterGroup> => {
-  await ensureMonsterGroupsDirectory()
-  const filePath = getMonsterGroupFilePath(groupId)
-  const rawGroup = await readFile(filePath, 'utf8')
-  const existingGroup = parseMonsterGroup(rawGroup)
-  const nextGroup = normalizeMonsterGroup({
-    ...existingGroup,
-    ...(typeof data === 'object' && data !== null ? (data as Partial<Record<keyof MonsterGroupData, unknown>>) : {}),
-  })
-
-  assertValidGroupName(nextGroup.name)
-  await writeFile(filePath, `${JSON.stringify(nextGroup, null, 2)}\n`, 'utf8')
-
-  const fileInfo = await stat(filePath)
-
-  return {
-    id: groupId,
-    ...nextGroup,
-    updatedAt: fileInfo.mtime.toISOString(),
-  }
+  await ensureMonsterGroupsStore()
+  return updateStoredGroupEntity<MonsterGroupData, MonsterGroup>(groupId, data, monsterGroupStoreOptions, monsterGroupRelationOptions)
 }
 
 export const deleteMonsterGroup = async (groupId: string): Promise<void> => {
-  await ensureMonsterGroupsDirectory()
-  await unlink(getMonsterGroupFilePath(groupId))
+  await ensureMonsterGroupsStore()
+  await deleteStoredEntity(monsterGroupStoreOptions.entityType, groupId)
 }

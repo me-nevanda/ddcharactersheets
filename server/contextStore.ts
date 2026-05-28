@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Context, ContextData } from '../src/types/context';
+import { assertStoredEntityExists, createStoredEntity, deleteStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore';
 
 interface ApiError extends Error {
     code?: string;
@@ -228,75 +229,58 @@ const normalizeImageExtension = (contentType: string | undefined): (typeof conte
     throw error;
 };
 
+const contextStoreOptions = {
+    entityType: 'context',
+    imageUrl: (contextId: string): string => `/api/contexts/${contextId}/image`,
+    normalize: normalizeContext,
+};
+
+const ensureContextsStore = async (): Promise<void> => {
+    await migrateJsonDirectoryToSqlite({
+        directory: contextsDirectory,
+        entityType: contextStoreOptions.entityType,
+        isSafeId: isSafeContextId,
+    });
+};
+
 export const isSafeContextId = (contextId: string): boolean => {
     return safeContextIdPattern.test(contextId);
 };
 
 export const listContexts = async (): Promise<Context[]> => {
-    await ensureContextsDirectory();
-    const entries = await readdir(contextsDirectory, { withFileTypes: true });
-    const contextFiles = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'));
-    const contexts = await Promise.all(contextFiles.map(async (entry) => {
-        const contextId = path.basename(entry.name, '.json');
-        const filePath = getContextFilePath(contextId);
-        const [rawContext, fileInfo, imageInfo] = await Promise.all([
-            readFile(filePath, 'utf8'),
-            stat(filePath),
-            getContextImageInfo(contextId),
-        ]);
-        return {
-            id: contextId,
-            imageUrl: imageInfo?.imageUrl ?? '',
-            ...normalizeContext(parseContext(rawContext)),
-            updatedAt: fileInfo.mtime.toISOString(),
-        };
-    }));
-    return contexts.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+    await ensureContextsStore();
+    const contexts = await listStoredEntities<ContextData, Context>(contextStoreOptions);
+    return Promise.all(contexts.map(async (context) => ({
+        ...context,
+        imageUrl: (await getContextImageInfo(context.id))?.imageUrl ?? '',
+    })));
 };
 
 export const readContext = async (contextId: string): Promise<Context> => {
-    await ensureContextsDirectory();
-    const filePath = getContextFilePath(contextId);
-    const [rawContext, fileInfo, imageInfo] = await Promise.all([
-        readFile(filePath, 'utf8'),
-        stat(filePath),
+    await ensureContextsStore();
+    const [context, imageInfo] = await Promise.all([
+        readStoredEntity<ContextData, Context>(contextId, contextStoreOptions),
         getContextImageInfo(contextId),
     ]);
     return {
-        id: contextId,
+        ...context,
         imageUrl: imageInfo?.imageUrl ?? '',
-        ...normalizeContext(parseContext(rawContext)),
-        updatedAt: fileInfo.mtime.toISOString(),
     };
 };
 
 export const createContext = async (): Promise<Context> => {
-    await ensureContextsDirectory();
-    const contextId = `${Date.now()}-${randomUUID().slice(0, 8)}`;
-    const filePath = getContextFilePath(contextId);
-    await writeFile(filePath, `${JSON.stringify({ uniqueId: randomUUID() }, null, 2)}\n`, 'utf8');
-    return readContext(contextId);
+    await ensureContextsStore();
+    return createStoredEntity<ContextData, Context>(contextStoreOptions);
 };
 
 export const updateContext = async (contextId: string, data: unknown): Promise<Context> => {
-    await ensureContextsDirectory();
-    const filePath = getContextFilePath(contextId);
-    const rawContext = await readFile(filePath, 'utf8');
-    const existingContext = parseContext(rawContext);
-    const nextContext = normalizeContext({
-        ...existingContext,
-        ...(typeof data === 'object' && data !== null
-            ? (data as Partial<Record<keyof ContextData, unknown>>)
-            : {}),
-    });
-    await writeFile(filePath, `${JSON.stringify(nextContext, null, 2)}\n`, 'utf8');
-    return readContext(contextId);
+    await ensureContextsStore();
+    return updateStoredEntity<ContextData, Context>(contextId, data, contextStoreOptions);
 };
 
 export const deleteContext = async (contextId: string): Promise<void> => {
-    await ensureContextsDirectory();
-    const filePath = getContextFilePath(contextId);
-    await unlink(filePath);
+    await ensureContextsStore();
+    await deleteStoredEntity(contextStoreOptions.entityType, contextId);
     await Promise.all(contextImageExtensions.map(async (extension) => {
         try {
             await unlink(getContextImageFilePath(contextId, extension));
@@ -310,7 +294,7 @@ export const deleteContext = async (contextId: string): Promise<void> => {
 };
 
 export const readContextImage = async (contextId: string): Promise<ContextImage> => {
-    await ensureContextsDirectory();
+    await ensureContextsStore();
     const imageInfo = await getContextImageInfo(contextId);
     if (!imageInfo) {
         const error = new Error('Context image not found') as ApiError;
@@ -325,8 +309,8 @@ export const readContextImage = async (contextId: string): Promise<ContextImage>
 };
 
 export const updateContextImage = async (contextId: string, contentType: string | undefined, data: Buffer): Promise<Context> => {
-    await ensureContextsDirectory();
-    await stat(getContextFilePath(contextId));
+    await ensureContextsStore();
+    await assertStoredEntityExists(contextStoreOptions.entityType, contextId);
     const extension = normalizeImageExtension(contentType);
     const nextFilePath = getContextImageFilePath(contextId, extension);
     const staleExtensions = contextImageExtensions.filter((imageExtension) => imageExtension !== extension);
@@ -345,8 +329,8 @@ export const updateContextImage = async (contextId: string, contentType: string 
 };
 
 export const deleteContextImage = async (contextId: string): Promise<Context> => {
-    await ensureContextsDirectory();
-    await stat(getContextFilePath(contextId));
+    await ensureContextsStore();
+    await assertStoredEntityExists(contextStoreOptions.entityType, contextId);
     await Promise.all(contextImageExtensions.map(async (extension) => {
         try {
             await unlink(getContextImageFilePath(contextId, extension));
