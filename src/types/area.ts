@@ -5,7 +5,6 @@ export interface PlaceItem {
 }
 
 export interface AreaData {
-  uniqueId: string
   name: string
   description: string
   places: PlaceItem[]

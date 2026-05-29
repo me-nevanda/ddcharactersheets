@@ -8,10 +8,6 @@ import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import type { Character, CharacterGroup } from '@appTypes/character'
 import type { CharacterGroupCardViewModel, CharacterListCardViewModel } from './types'
 
-const getCharacterFileName = (characterId: string): string => {
-  return `${characterId}.json`
-}
-
 const getPlainTextDescription = (description: string): string => {
   if (!description) {
     return ''
@@ -268,9 +264,9 @@ export const useCharacterGroupCards = (
   const { getCharacterClassSrc, getCharacterLabel, getCharacterPortraitSrc } = useCharacterPresentation()
 
   return groups.map((group) => ({
-    characterCount: group.characterFileNames.length,
-    characterThumbnails: group.characterFileNames
-      .map((fileName) => characters.find((character) => getCharacterFileName(character.id) === fileName))
+    characterCount: group.characterIds.length,
+    characterThumbnails: group.characterIds
+      .map((characterId) => characters.find((character) => character.id === characterId))
       .filter((character): character is Character => Boolean(character))
       .slice(0, 4)
       .map((character) => ({
@@ -293,7 +289,7 @@ export const useCharacterGroupCards = (
         classSrc: getCharacterClassSrc(character.class),
       })),
     deleting: groupDeletingId === group.id,
-    hasMoreCharacters: group.characterFileNames.length > 4,
+    hasMoreCharacters: group.characterIds.length > 4,
     id: group.id,
     name: group.name,
     onDeleteClick: (event) => {

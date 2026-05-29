@@ -1,5 +1,4 @@
 export interface EventData {
-  uniqueId: string
   name: string
   description: string
 }

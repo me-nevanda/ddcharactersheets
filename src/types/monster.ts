@@ -79,9 +79,8 @@ export interface Monster extends MonsterData {
 }
 
 export interface MonsterGroupData {
-  uniqueId: string
   name: string
-  monsterFileNames: string[]
+  monsterIds: string[]
 }
 
 export interface MonsterGroup extends MonsterGroupData {

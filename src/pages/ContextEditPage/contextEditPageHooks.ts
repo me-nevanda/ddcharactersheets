@@ -30,7 +30,6 @@ import type {
 } from './types'
 
 const emptyContextForm: ContextData = {
-  uniqueId: '',
   name: '',
   description: '',
   characters: [],
@@ -201,7 +200,6 @@ export const useContextEditPage = (): ContextEditPageState => {
       try {
         const context = await getContext(contextId)
         const nextForm: ContextData = {
-          uniqueId: context.uniqueId,
           name: context.name,
           description: context.description,
           characters: Array.isArray(context.characters) ? context.characters : [],
@@ -585,8 +583,8 @@ export const useContextEditPage = (): ContextEditPageState => {
         }
         const characterIds: string[] = []
         const seenCharacterIds = new Set<string>()
-        for (const fileName of group.characterFileNames ?? []) {
-          const characterId = stripJsonExtension(fileName)
+        for (const rawCharacterId of group.characterIds ?? []) {
+          const characterId = stripJsonExtension(rawCharacterId)
           if (!characterId || seenCharacterIds.has(characterId)) {
             continue
           }
@@ -775,8 +773,8 @@ export const useContextEditPage = (): ContextEditPageState => {
         }
         const monsterIds: string[] = []
         const seenMonsterIds = new Set<string>()
-        for (const fileName of group.monsterFileNames ?? []) {
-          const monsterId = stripJsonExtension(fileName)
+        for (const rawMonsterId of group.monsterIds ?? []) {
+          const monsterId = stripJsonExtension(rawMonsterId)
           if (!monsterId || seenMonsterIds.has(monsterId)) {
             continue
           }
@@ -915,8 +913,8 @@ export const useContextEditPage = (): ContextEditPageState => {
         }
         const npcIds: string[] = []
         const seenNpcIds = new Set<string>()
-        for (const fileName of group.npcFileNames ?? []) {
-          const npcId = stripJsonExtension(fileName)
+        for (const rawNpcId of group.npcIds ?? []) {
+          const npcId = stripJsonExtension(rawNpcId)
           if (!npcId || seenNpcIds.has(npcId)) {
             continue
           }
@@ -946,7 +944,6 @@ export const useContextEditPage = (): ContextEditPageState => {
   // ----- Submit -----
 
   const buildContextPayload = (): ContextData => ({
-    uniqueId: form.uniqueId,
     name: form.name.trim(),
     description: form.description.trim(),
     characters: [...form.characters],
@@ -1079,7 +1076,7 @@ export const useContextEditPage = (): ContextEditPageState => {
 
   const buildCharacterGroupOption = (group: CharacterGroup, selected: boolean): ContextCharacterGroupOptionViewModel => {
     const label = (group.name && group.name.trim()) || t('pages.characterList.groups.unnamedGroup')
-    const characterCount = Array.isArray(group.characterFileNames) ? group.characterFileNames.length : 0
+    const characterCount = Array.isArray(group.characterIds) ? group.characterIds.length : 0
     const onToggleSelected = () => handleToggleCharacterGroupInDialog(group.id)
     const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
       if (event.key === 'Enter' || event.key === ' ') {
@@ -1219,7 +1216,7 @@ export const useContextEditPage = (): ContextEditPageState => {
 
   const buildNpcGroupOption = (group: NpcGroup, selected: boolean): ContextNpcGroupOptionViewModel => {
     const label = (group.name && group.name.trim()) || t('pages.npcList.groups.unnamedGroup')
-    const npcCount = Array.isArray(group.npcFileNames) ? group.npcFileNames.length : 0
+    const npcCount = Array.isArray(group.npcIds) ? group.npcIds.length : 0
     const onToggleSelected = () => handleToggleNpcGroupInDialog(group.id)
     const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
       if (event.key === 'Enter' || event.key === ' ') {
@@ -1283,7 +1280,7 @@ export const useContextEditPage = (): ContextEditPageState => {
 
   const buildMonsterGroupOption = (group: MonsterGroup, selected: boolean): ContextMonsterGroupOptionViewModel => {
     const label = (group.name && group.name.trim()) || t('pages.monsterList.groups.unnamedGroup')
-    const monsterCount = Array.isArray(group.monsterFileNames) ? group.monsterFileNames.length : 0
+    const monsterCount = Array.isArray(group.monsterIds) ? group.monsterIds.length : 0
     const onToggleSelected = () => handleToggleMonsterGroupInDialog(group.id)
     const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
       if (event.key === 'Enter' || event.key === ' ') {
@@ -1403,7 +1400,6 @@ export const useContextEditPage = (): ContextEditPageState => {
   // ----- hasChanges -----
 
   const hasChanges = useMemo(() => {
-    if (form.uniqueId !== initialForm.uniqueId) return true
     if (form.name !== initialForm.name) return true
     if (form.description !== initialForm.description) return true
     if (!areStringArraysEqual(form.characters, initialForm.characters)) return true

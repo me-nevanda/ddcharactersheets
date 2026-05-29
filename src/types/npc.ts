@@ -1,4 +1,4 @@
-﻿import type { CharacterItems } from './character'
+import type { CharacterItems } from './character'
 
 export interface NpcDefenses {
   kp: number
@@ -81,9 +81,8 @@ export interface Npc extends NpcData {
 }
 
 export interface NpcGroupData {
-  uniqueId: string
   name: string
-  npcFileNames: string[]
+  npcIds: string[]
 }
 
 export interface NpcGroup extends NpcGroupData {

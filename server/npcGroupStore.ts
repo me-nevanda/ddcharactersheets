@@ -1,7 +1,6 @@
-﻿import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import type { NpcGroup, NpcGroupData } from '../src/types/npc'
-import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, migrateJsonDirectoryToSqlite, migrateStoredGroupMembers, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
+import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, migrateGroupsJsonDirectoryToSqlite, migrateJsonDirectoryToSqlite, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -9,29 +8,28 @@ interface ApiError extends Error {
 }
 
 const npcGroupsDirectory = path.resolve(process.cwd(), 'data', 'npc-groups')
+const npcsDirectory = path.resolve(process.cwd(), 'data', 'npcs')
 const safeNpcGroupIdPattern = /^[a-z0-9-]+$/i
-
-const normalizeUniqueId = (value: unknown): string => {
-  return typeof value === 'string' && value.trim().length > 0 ? value : randomUUID()
-}
 
 const normalizeGroupName = (value: unknown): string => {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-const normalizeNpcFileNames = (value: unknown): string[] => {
+const normalizeNpcIds = (value: unknown): string[] => {
   if (!Array.isArray(value)) {
     return []
   }
 
-  return Array.from(new Set(value.filter((fileName): fileName is string => typeof fileName === 'string' && fileName.toLowerCase().endsWith('.json'))))
+  return Array.from(new Set(value
+    .filter((id): id is string => typeof id === 'string')
+    .map((id) => id.trim())
+    .filter(Boolean)))
 }
 
 const normalizeNpcGroup = (data: Partial<Record<keyof NpcGroupData, unknown>> = {}): NpcGroupData => {
   return {
-    uniqueId: normalizeUniqueId(data.uniqueId),
     name: normalizeGroupName(data.name),
-    npcFileNames: normalizeNpcFileNames(data.npcFileNames),
+    npcIds: normalizeNpcIds(data.npcIds),
   }
 }
 
@@ -45,24 +43,31 @@ const assertValidGroupName = (name: string): void => {
 }
 
 const npcGroupStoreOptions = {
-  entityType: 'npc-group',
+  tableName: 'npc_groups',
   normalize: normalizeNpcGroup,
   validate: (group: NpcGroupData): void => assertValidGroupName(group.name),
 }
 
 const npcGroupRelationOptions = {
-  fileNamesKey: 'npcFileNames',
-  groupEntityType: npcGroupStoreOptions.entityType,
-  memberEntityType: 'npc',
+  idsKey: 'npcIds',
+  legacyFileNamesKey: 'npcFileNames',
+  groupTableName: npcGroupStoreOptions.tableName,
+  memberTableName: 'npcs',
+  relationTableName: 'npc_group_members',
+  memberColumnName: 'npc_id',
 } as const
 
 const ensureNpcGroupsStore = async (): Promise<void> => {
   await migrateJsonDirectoryToSqlite({
-    directory: npcGroupsDirectory,
-    entityType: npcGroupStoreOptions.entityType,
+    directory: npcsDirectory,
+    tableName: npcGroupRelationOptions.memberTableName,
     isSafeId: isSafeNpcGroupId,
   })
-  await migrateStoredGroupMembers<NpcGroupData>(npcGroupRelationOptions)
+  await migrateGroupsJsonDirectoryToSqlite({
+    directory: npcGroupsDirectory,
+    isSafeId: isSafeNpcGroupId,
+    relationOptions: npcGroupRelationOptions,
+  })
 }
 
 export const isSafeNpcGroupId = (groupId: string): boolean => {
@@ -83,9 +88,8 @@ export const createNpcGroup = async (data: unknown): Promise<NpcGroup> => {
   await ensureNpcGroupsStore()
   const source = typeof data === 'object' && data !== null ? (data as Partial<Record<keyof NpcGroupData, unknown>>) : {}
   const group = normalizeNpcGroup({
-    uniqueId: randomUUID(),
     name: source.name,
-    npcFileNames: [],
+    npcIds: [],
   })
 
   assertValidGroupName(group.name)
@@ -99,5 +103,5 @@ export const updateNpcGroup = async (groupId: string, data: unknown): Promise<Np
 
 export const deleteNpcGroup = async (groupId: string): Promise<void> => {
   await ensureNpcGroupsStore()
-  await deleteStoredEntity(npcGroupStoreOptions.entityType, groupId)
+  await deleteStoredEntity(npcGroupStoreOptions.tableName, groupId)
 }

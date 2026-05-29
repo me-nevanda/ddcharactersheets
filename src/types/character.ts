@@ -343,9 +343,8 @@ export interface Character extends CharacterData {
 }
 
 export interface CharacterGroupData {
-  uniqueId: string
   name: string
-  characterFileNames: string[]
+  characterIds: string[]
 }
 
 export interface CharacterGroup extends CharacterGroupData {

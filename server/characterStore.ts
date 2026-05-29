@@ -4,7 +4,7 @@ import path from 'node:path';
 import type { CharacterAbility, CharacterAbilityAreaType, Character, CharacterAbilityAction, CharacterAbilityKind, CharacterAbilityType, CharacterAttributeBonuses, CharacterAttributes, CharacterBonuses, CharacterData, CharacterDefenses, CharacterArmor, CharacterFeat, CharacterWeapon, CharacterOtherItem, CharacterWeaponDamageDiceType, CharacterWeaponDamageType, CharacterSkillBonuses, CharacterTraining, CharacterDefenseBonuses, } from '../src/types/character';
 import { CharacterAlignment, CharacterClass as CharacterClassValue, CharacterGender, CharacterRace as CharacterRaceValue, } from '../src/types/character';
 import { CharacterClass, CharacterRace, isCharacterWeaponDamageType } from '../src/types/character';
-import { assertStoredEntityExists, createStoredEntity, deleteStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore';
+import { assertStoredEntityExists, createStoredCharacter, deleteStoredEntity, listStoredCharacters, migrateJsonDirectoryToSqlite, readStoredCharacter, updateStoredCharacter } from './sqliteStore';
 interface ApiError extends Error {
     code?: string;
     statusCode?: number;
@@ -789,7 +789,7 @@ const normalizeImageExtension = (contentType: string | undefined): (typeof chara
 };
 
 const characterStoreOptions = {
-    entityType: 'character',
+    tableName: 'characters',
     imageUrl: (characterId: string): string => `/api/characters/${characterId}/image`,
     normalize: normalizeCharacter,
 };
@@ -797,7 +797,7 @@ const characterStoreOptions = {
 const ensureCharactersStore = async (): Promise<void> => {
     await migrateJsonDirectoryToSqlite({
         directory: charactersDirectory,
-        entityType: characterStoreOptions.entityType,
+        tableName: characterStoreOptions.tableName,
         isSafeId: isSafeCharacterId,
     });
 };
@@ -807,7 +807,7 @@ export const isSafeCharacterId = (characterId: string): boolean => {
 };
 export const listCharacters = async (): Promise<Character[]> => {
     await ensureCharactersStore();
-    const characters = await listStoredEntities<CharacterData, Character>(characterStoreOptions);
+    const characters = await listStoredCharacters<CharacterData, Character>(characterStoreOptions);
     return Promise.all(characters.map(async (character) => ({
         ...character,
         imageUrl: (await getCharacterImageInfo(character.id))?.imageUrl ?? '',
@@ -816,7 +816,7 @@ export const listCharacters = async (): Promise<Character[]> => {
 export const readCharacter = async (characterId: string): Promise<Character> => {
     await ensureCharactersStore();
     const [character, imageInfo] = await Promise.all([
-        readStoredEntity<CharacterData, Character>(characterId, characterStoreOptions),
+        readStoredCharacter<CharacterData, Character>(characterId, characterStoreOptions),
         getCharacterImageInfo(characterId),
     ]);
     return {
@@ -826,15 +826,15 @@ export const readCharacter = async (characterId: string): Promise<Character> => 
 };
 export const createCharacter = async (): Promise<Character> => {
     await ensureCharactersStore();
-    return createStoredEntity<CharacterData, Character>(characterStoreOptions);
+    return createStoredCharacter<CharacterData, Character>(characterStoreOptions);
 };
 export const updateCharacter = async (characterId: string, data: unknown): Promise<Character> => {
     await ensureCharactersStore();
-    return updateStoredEntity<CharacterData, Character>(characterId, data, characterStoreOptions);
+    return updateStoredCharacter<CharacterData, Character>(characterId, data, characterStoreOptions);
 };
 export const deleteCharacter = async (characterId: string): Promise<void> => {
     await ensureCharactersStore();
-    await deleteStoredEntity(characterStoreOptions.entityType, characterId);
+    await deleteStoredEntity(characterStoreOptions.tableName, characterId);
     await Promise.all(characterImageExtensions.map(async (extension) => {
         try {
             await unlink(getCharacterImageFilePath(characterId, extension));
@@ -862,7 +862,7 @@ export const readCharacterImage = async (characterId: string): Promise<Character
 };
 export const updateCharacterImage = async (characterId: string, contentType: string | undefined, data: Buffer): Promise<Character> => {
     await ensureCharactersStore();
-    await assertStoredEntityExists(characterStoreOptions.entityType, characterId);
+    await assertStoredEntityExists(characterStoreOptions.tableName, characterId);
     const extension = normalizeImageExtension(contentType);
     const nextFilePath = getCharacterImageFilePath(characterId, extension);
     const staleExtensions = characterImageExtensions.filter((imageExtension) => imageExtension !== extension);
@@ -881,7 +881,7 @@ export const updateCharacterImage = async (characterId: string, contentType: str
 };
 export const deleteCharacterImage = async (characterId: string): Promise<Character> => {
     await ensureCharactersStore();
-    await assertStoredEntityExists(characterStoreOptions.entityType, characterId);
+    await assertStoredEntityExists(characterStoreOptions.tableName, characterId);
     await Promise.all(characterImageExtensions.map(async (extension) => {
         try {
             await unlink(getCharacterImageFilePath(characterId, extension));

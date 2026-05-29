@@ -9,14 +9,9 @@ import type { AssignedCharacterGroupCharacterViewModel, CharacterGroupCharacterO
 
 const emptyGroup: CharacterGroup = {
   id: '',
-  uniqueId: '',
   name: '',
-  characterFileNames: [],
+  characterIds: [],
   updatedAt: '',
-}
-
-const getCharacterFileName = (characterId: string): string => {
-  return `${characterId}.json`
 }
 
 const buildTextPreview = (value: string): string => {
@@ -37,7 +32,7 @@ const buildCharacterViewModel = (
     classLabel: presentation.getClassLabel(character.class),
     classSrc: presentation.getCharacterClassSrc(character.class),
     descriptionPreview: buildTextPreview(character.description),
-    fileName: getCharacterFileName(character.id),
+    fileName: character.id,
     id: character.id,
     imageSrc: character.imageUrl,
     label: presentation.getCharacterLabel(character.name),
@@ -125,24 +120,22 @@ export const useCharacterGroupEditPage = (): CharacterGroupEditPageState => {
   }
 
   const handleAddCharacter = (characterId: string) => {
-    const fileName = getCharacterFileName(characterId)
     setForm((current) => {
-      if (current.characterFileNames.includes(fileName)) {
+      if (current.characterIds.includes(characterId)) {
         return current
       }
 
       return {
         ...current,
-        characterFileNames: [...current.characterFileNames, fileName],
+        characterIds: [...current.characterIds, characterId],
       }
     })
   }
 
   const handleRemoveCharacter = (characterId: string) => {
-    const fileName = getCharacterFileName(characterId)
     setForm((current) => ({
       ...current,
-      characterFileNames: current.characterFileNames.filter((currentFileName) => currentFileName !== fileName),
+      characterIds: current.characterIds.filter((currentCharacterId) => currentCharacterId !== characterId),
     }))
   }
 
@@ -169,10 +162,10 @@ export const useCharacterGroupEditPage = (): CharacterGroupEditPageState => {
     navigate(`/characters/${characterId}/edit`)
   }
 
-  const assignedCharacterFileNames = new Set(form.characterFileNames)
+  const assignedCharacterIds = new Set(form.characterIds)
   const normalizedAssignedCharacterSearch = assignedCharacterSearch.trim().toLocaleLowerCase()
-  const allAssignedCharacters: AssignedCharacterGroupCharacterViewModel[] = form.characterFileNames
-    .map((fileName) => characters.find((character) => getCharacterFileName(character.id) === fileName))
+  const allAssignedCharacters: AssignedCharacterGroupCharacterViewModel[] = form.characterIds
+    .map((characterId) => characters.find((character) => character.id === characterId))
     .filter((character): character is Character => Boolean(character))
     .map((character) => ({
       ...buildCharacterViewModel(character, presentation, openCharacter, handleImageError),
@@ -186,7 +179,7 @@ export const useCharacterGroupEditPage = (): CharacterGroupEditPageState => {
     : allAssignedCharacters
 
   const normalizedCharacterSearch = characterSearch.trim().toLocaleLowerCase()
-  const availableCharacters = characters.filter((character) => !assignedCharacterFileNames.has(getCharacterFileName(character.id)))
+  const availableCharacters = characters.filter((character) => !assignedCharacterIds.has(character.id))
   const filteredCharacters = normalizedCharacterSearch.length >= 3
     ? availableCharacters.filter((character) => presentation.getCharacterLabel(character.name).toLocaleLowerCase().includes(normalizedCharacterSearch))
     : availableCharacters.slice(0, 8)

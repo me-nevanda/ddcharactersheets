@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getNpcGroup, listNpcs, saveNpcGroup } from '@lib/api'
@@ -8,14 +8,9 @@ import type { AssignedNpcGroupNpcViewModel, NpcGroupEditPageState, NpcGroupNpcOp
 
 const emptyGroup: NpcGroup = {
   id: '',
-  uniqueId: '',
   name: '',
-  npcFileNames: [],
+  npcIds: [],
   updatedAt: '',
-}
-
-const getNpcFileName = (npcId: string): string => {
-  return `${npcId}.json`
 }
 
 const buildTextPreview = (value: string): string => {
@@ -34,7 +29,7 @@ const buildNpcViewModel = (
   const isStory = npc.isStory === true
   return {
     descriptionPreview: buildTextPreview(npc.description),
-    fileName: getNpcFileName(npc.id),
+    fileName: npc.id,
     id: npc.id,
     imageSrc: npc.imageUrl || '/favicon.png',
     isDead: npc.isDead === true,
@@ -123,24 +118,22 @@ export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
   }
 
   const handleAddNpc = (npcId: string) => {
-    const fileName = getNpcFileName(npcId)
     setForm((current) => {
-      if (current.npcFileNames.includes(fileName)) {
+      if (current.npcIds.includes(npcId)) {
         return current
       }
 
       return {
         ...current,
-        npcFileNames: [...current.npcFileNames, fileName],
+        npcIds: [...current.npcIds, npcId],
       }
     })
   }
 
   const handleRemoveNpc = (npcId: string) => {
-    const fileName = getNpcFileName(npcId)
     setForm((current) => ({
       ...current,
-      npcFileNames: current.npcFileNames.filter((currentFileName) => currentFileName !== fileName),
+      npcIds: current.npcIds.filter((currentNpcId) => currentNpcId !== npcId),
     }))
   }
 
@@ -167,10 +160,10 @@ export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
     navigate(`/npcs/${npcId}/edit`)
   }
 
-  const assignedNpcFileNames = new Set(form.npcFileNames)
+  const assignedNpcIds = new Set(form.npcIds)
   const normalizedAssignedNpcSearch = assignedNpcSearch.trim().toLocaleLowerCase()
-  const allAssignedNpcs: AssignedNpcGroupNpcViewModel[] = form.npcFileNames
-    .map((fileName) => npcs.find((npc) => getNpcFileName(npc.id) === fileName))
+  const allAssignedNpcs: AssignedNpcGroupNpcViewModel[] = form.npcIds
+    .map((npcId) => npcs.find((npc) => npc.id === npcId))
     .filter((npc): npc is Npc => Boolean(npc))
     .map((npc) => ({
       ...buildNpcViewModel(npc, t, openNpc),
@@ -184,7 +177,7 @@ export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
     : allAssignedNpcs
 
   const normalizedNpcSearch = npcSearch.trim().toLocaleLowerCase()
-  const availableNpcs = npcs.filter((npc) => !assignedNpcFileNames.has(getNpcFileName(npc.id)))
+  const availableNpcs = npcs.filter((npc) => !assignedNpcIds.has(npc.id))
   const filteredNpcs = normalizedNpcSearch.length >= 3
     ? availableNpcs.filter((npc) => (npc.name.trim() || t('pages.npcList.unnamedNpc')).toLocaleLowerCase().includes(normalizedNpcSearch))
     : availableNpcs.slice(0, 8)

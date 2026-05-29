@@ -8,7 +8,6 @@ import type { AreaData, PlaceItem } from '@appTypes/area'
 import type { AreaEditPageState } from './types'
 
 const emptyArea: AreaData = {
-  uniqueId: '',
   name: '',
   description: '',
   places: [],
@@ -25,7 +24,7 @@ const arePlaceItemsEqual = (left: PlaceItem[], right: PlaceItem[]): boolean => {
 }
 
 const areAreasEqual = (left: AreaData, right: AreaData): boolean => {
-  return left.uniqueId === right.uniqueId && left.name === right.name && left.description === right.description && arePlaceItemsEqual(left.places, right.places)
+  return left.name === right.name && left.description === right.description && arePlaceItemsEqual(left.places, right.places)
 }
 
 const generatePlaceItemId = (): string => {
@@ -62,7 +61,6 @@ export const useAreaEditPage = (): AreaEditPageState => {
       try {
         const area = await getArea(areaId)
         const nextArea: AreaData = {
-          uniqueId: area.uniqueId,
           name: area.name,
           description: area.description,
           places: clonePlaceItems(area.places),
@@ -219,7 +217,6 @@ export const useAreaEditPage = (): AreaEditPageState => {
     try {
       const area = await saveArea(areaId, form)
       const nextArea: AreaData = {
-        uniqueId: area.uniqueId,
         name: area.name,
         description: area.description,
         places: clonePlaceItems(area.places),

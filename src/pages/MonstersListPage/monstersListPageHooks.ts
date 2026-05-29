@@ -15,10 +15,6 @@ const buildTextPreview = (value: string): string => {
     .trim()
 }
 
-const getMonsterFileName = (monsterId: string): string => {
-  return `${monsterId}.json`
-}
-
 export const useMonstersListPage = (): MonstersListPageState => {
   const { t } = useI18n()
   const { activeMonsterListTab, handleMonsterListTabChange } = useMainPageContext()
@@ -213,11 +209,11 @@ export const useMonstersListPage = (): MonstersListPageState => {
 
   const groupCards: MonsterGroupCardViewModel[] = groups.map((group) => ({
     deleting: groupDeletingId === group.id,
-    hasMoreMonsters: group.monsterFileNames.length > 4,
+    hasMoreMonsters: group.monsterIds.length > 4,
     id: group.id,
-    monsterCount: group.monsterFileNames.length,
-    monsterThumbnails: group.monsterFileNames
-      .map((fileName) => monsters.find((monster) => getMonsterFileName(monster.id) === fileName))
+    monsterCount: group.monsterIds.length,
+    monsterThumbnails: group.monsterIds
+      .map((monsterId) => monsters.find((monster) => monster.id === monsterId))
       .filter((monster): monster is Monster => Boolean(monster))
       .slice(0, 4)
       .map((monster) => ({

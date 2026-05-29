@@ -1,7 +1,6 @@
-import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import type { CharacterGroup, CharacterGroupData } from '../src/types/character'
-import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, migrateJsonDirectoryToSqlite, migrateStoredGroupMembers, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
+import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, migrateGroupsJsonDirectoryToSqlite, migrateJsonDirectoryToSqlite, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -9,29 +8,28 @@ interface ApiError extends Error {
 }
 
 const characterGroupsDirectory = path.resolve(process.cwd(), 'data', 'character-groups')
+const charactersDirectory = path.resolve(process.cwd(), 'data', 'characters')
 const safeCharacterGroupIdPattern = /^[a-z0-9-]+$/i
-
-const normalizeUniqueId = (value: unknown): string => {
-  return typeof value === 'string' && value.trim().length > 0 ? value : randomUUID()
-}
 
 const normalizeGroupName = (value: unknown): string => {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-const normalizeCharacterFileNames = (value: unknown): string[] => {
+const normalizeCharacterIds = (value: unknown): string[] => {
   if (!Array.isArray(value)) {
     return []
   }
 
-  return Array.from(new Set(value.filter((fileName): fileName is string => typeof fileName === 'string' && fileName.toLowerCase().endsWith('.json'))))
+  return Array.from(new Set(value
+    .filter((id): id is string => typeof id === 'string')
+    .map((id) => id.trim())
+    .filter(Boolean)))
 }
 
 const normalizeCharacterGroup = (data: Partial<Record<keyof CharacterGroupData, unknown>> = {}): CharacterGroupData => {
   return {
-    uniqueId: normalizeUniqueId(data.uniqueId),
     name: normalizeGroupName(data.name),
-    characterFileNames: normalizeCharacterFileNames(data.characterFileNames),
+    characterIds: normalizeCharacterIds(data.characterIds),
   }
 }
 
@@ -45,24 +43,31 @@ const assertValidGroupName = (name: string): void => {
 }
 
 const characterGroupStoreOptions = {
-  entityType: 'character-group',
+  tableName: 'character_groups',
   normalize: normalizeCharacterGroup,
   validate: (group: CharacterGroupData): void => assertValidGroupName(group.name),
 }
 
 const characterGroupRelationOptions = {
-  fileNamesKey: 'characterFileNames',
-  groupEntityType: characterGroupStoreOptions.entityType,
-  memberEntityType: 'character',
+  idsKey: 'characterIds',
+  legacyFileNamesKey: 'characterFileNames',
+  groupTableName: characterGroupStoreOptions.tableName,
+  memberTableName: 'characters',
+  relationTableName: 'character_group_members',
+  memberColumnName: 'character_id',
 } as const
 
 const ensureCharacterGroupsStore = async (): Promise<void> => {
   await migrateJsonDirectoryToSqlite({
-    directory: characterGroupsDirectory,
-    entityType: characterGroupStoreOptions.entityType,
+    directory: charactersDirectory,
+    tableName: characterGroupRelationOptions.memberTableName,
     isSafeId: isSafeCharacterGroupId,
   })
-  await migrateStoredGroupMembers<CharacterGroupData>(characterGroupRelationOptions)
+  await migrateGroupsJsonDirectoryToSqlite({
+    directory: characterGroupsDirectory,
+    isSafeId: isSafeCharacterGroupId,
+    relationOptions: characterGroupRelationOptions,
+  })
 }
 
 export const isSafeCharacterGroupId = (groupId: string): boolean => {
@@ -83,9 +88,8 @@ export const createCharacterGroup = async (data: unknown): Promise<CharacterGrou
   await ensureCharacterGroupsStore()
   const source = typeof data === 'object' && data !== null ? (data as Partial<Record<keyof CharacterGroupData, unknown>>) : {}
   const group = normalizeCharacterGroup({
-    uniqueId: randomUUID(),
     name: source.name,
-    characterFileNames: [],
+    characterIds: [],
   })
 
   assertValidGroupName(group.name)
@@ -99,5 +103,5 @@ export const updateCharacterGroup = async (groupId: string, data: unknown): Prom
 
 export const deleteCharacterGroup = async (groupId: string): Promise<void> => {
   await ensureCharacterGroupsStore()
-  await deleteStoredEntity(characterGroupStoreOptions.entityType, groupId)
+  await deleteStoredEntity(characterGroupStoreOptions.tableName, groupId)
 }

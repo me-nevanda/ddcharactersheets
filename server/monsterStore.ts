@@ -3,7 +3,7 @@ import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promi
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
 import type { Monster, MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '../src/types/monster'
-import { assertStoredEntityExists, createStoredEntity, deleteStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore'
+import { assertStoredEntityExists, createStoredMonster, deleteStoredEntity, listStoredMonsters, migrateJsonDirectoryToSqlite, readStoredMonster, updateStoredMonster } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -405,7 +405,7 @@ const normalizeImageExtension = (contentType: string | undefined): (typeof monst
 }
 
 const monsterStoreOptions = {
-  entityType: 'monster',
+  tableName: 'monsters',
   imageUrl: (monsterId: string): string => `/api/monsters/${monsterId}/image`,
   normalize: normalizeMonster,
 }
@@ -413,7 +413,7 @@ const monsterStoreOptions = {
 const ensureMonstersStore = async (): Promise<void> => {
   await migrateJsonDirectoryToSqlite({
     directory: monstersDirectory,
-    entityType: monsterStoreOptions.entityType,
+    tableName: monsterStoreOptions.tableName,
     isSafeId: isSafeMonsterId,
   })
 }
@@ -424,7 +424,7 @@ export const isSafeMonsterId = (monsterId: string): boolean => {
 
 export const listMonsters = async (): Promise<Monster[]> => {
   await ensureMonstersStore()
-  const monsters = await listStoredEntities<MonsterData, Monster>(monsterStoreOptions)
+  const monsters = await listStoredMonsters<MonsterData, Monster>(monsterStoreOptions)
   return Promise.all(monsters.map(async (monster) => ({
     ...monster,
     imageUrl: (await getMonsterImageInfo(monster.id))?.imageUrl ?? '',
@@ -434,7 +434,7 @@ export const listMonsters = async (): Promise<Monster[]> => {
 export const readMonster = async (monsterId: string): Promise<Monster> => {
   await ensureMonstersStore()
   const [monster, imageInfo] = await Promise.all([
-    readStoredEntity<MonsterData, Monster>(monsterId, monsterStoreOptions),
+    readStoredMonster<MonsterData, Monster>(monsterId, monsterStoreOptions),
     getMonsterImageInfo(monsterId),
   ])
 
@@ -446,17 +446,17 @@ export const readMonster = async (monsterId: string): Promise<Monster> => {
 
 export const createMonster = async (): Promise<Monster> => {
   await ensureMonstersStore()
-  return createStoredEntity<MonsterData, Monster>(monsterStoreOptions)
+  return createStoredMonster<MonsterData, Monster>(monsterStoreOptions)
 }
 
 export const updateMonster = async (monsterId: string, data: unknown): Promise<Monster> => {
   await ensureMonstersStore()
-  return updateStoredEntity<MonsterData, Monster>(monsterId, data, monsterStoreOptions)
+  return updateStoredMonster<MonsterData, Monster>(monsterId, data, monsterStoreOptions)
 }
 
 export const deleteMonster = async (monsterId: string): Promise<void> => {
   await ensureMonstersStore()
-  await deleteStoredEntity(monsterStoreOptions.entityType, monsterId)
+  await deleteStoredEntity(monsterStoreOptions.tableName, monsterId)
 
   await Promise.all(
     monsterImageExtensions.map(async (extension) => {
@@ -490,7 +490,7 @@ export const readMonsterImage = async (monsterId: string): Promise<MonsterImage>
 
 export const updateMonsterImage = async (monsterId: string, contentType: string | undefined, data: Buffer): Promise<Monster> => {
   await ensureMonstersStore()
-  await assertStoredEntityExists(monsterStoreOptions.entityType, monsterId)
+  await assertStoredEntityExists(monsterStoreOptions.tableName, monsterId)
 
   const extension = normalizeImageExtension(contentType)
   const nextFilePath = getMonsterImageFilePath(monsterId, extension)
@@ -515,7 +515,7 @@ export const updateMonsterImage = async (monsterId: string, contentType: string 
 
 export const deleteMonsterImage = async (monsterId: string): Promise<Monster> => {
   await ensureMonstersStore()
-  await assertStoredEntityExists(monsterStoreOptions.entityType, monsterId)
+  await assertStoredEntityExists(monsterStoreOptions.tableName, monsterId)
 
   await Promise.all(
     monsterImageExtensions.map(async (extension) => {

@@ -23,7 +23,6 @@ export interface ContextAreaSnapshot {
 }
 
 export interface ContextData {
-  uniqueId: string
   name: string
   description: string
   characters: string[]

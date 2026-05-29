@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { createNpc, createNpcGroup, deleteNpc, deleteNpcGroup, listNpcGroups, listNpcs } from '@lib/api'
@@ -13,10 +13,6 @@ const buildTextPreview = (value: string): string => {
     .replace(/&nbsp;/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
-}
-
-const getNpcFileName = (npcId: string): string => {
-  return `${npcId}.json`
 }
 
 export const useNpcsListPage = (): NpcsListPageState => {
@@ -219,11 +215,11 @@ export const useNpcsListPage = (): NpcsListPageState => {
 
   const groupCards: NpcGroupCardViewModel[] = groups.map((group) => ({
     deleting: groupDeletingId === group.id,
-    hasMoreNpcs: group.npcFileNames.length > 4,
+    hasMoreNpcs: group.npcIds.length > 4,
     id: group.id,
-    npcCount: group.npcFileNames.length,
-    npcThumbnails: group.npcFileNames
-      .map((fileName) => npcs.find((npc) => getNpcFileName(npc.id) === fileName))
+    npcCount: group.npcIds.length,
+    npcThumbnails: group.npcIds
+      .map((npcId) => npcs.find((npc) => npc.id === npcId))
       .filter((npc): npc is Npc => Boolean(npc))
       .slice(0, 4)
       .map((npc) => ({

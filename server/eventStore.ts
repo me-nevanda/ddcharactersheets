@@ -1,8 +1,7 @@
-import { randomUUID } from 'node:crypto'
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { Event, EventData } from '../src/types/event'
-import { assertStoredEntityExists, createStoredEntity, deleteStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore'
+import { assertStoredEntityExists, createStoredEvent, deleteStoredEntity, listStoredEvents, migrateEventsJsonDirectoryToSqlite, readStoredEvent, updateStoredEvent } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -18,13 +17,8 @@ const eventsDirectory = path.resolve(process.cwd(), 'data', 'events')
 const safeEventIdPattern = /^[a-z0-9-]+$/i
 const eventImageExtensions = ['jpg', 'png'] as const
 
-const normalizeUniqueId = (value: unknown): string => {
-  return typeof value === 'string' && value.trim().length > 0 ? value : randomUUID()
-}
-
 const normalizeEvent = (data: Partial<Record<keyof EventData, unknown>> = {}): EventData => {
   return {
-    uniqueId: normalizeUniqueId(data.uniqueId),
     name: typeof data.name === 'string' ? data.name : '',
     description: typeof data.description === 'string' ? data.description : '',
   }
@@ -77,15 +71,14 @@ const normalizeImageExtension = (contentType: string | undefined): (typeof event
 }
 
 const eventStoreOptions = {
-  entityType: 'event',
+  tableName: 'events',
   imageUrl: (eventId: string): string => `/api/events/${eventId}/image`,
   normalize: normalizeEvent,
 }
 
 const ensureEventsStore = async (): Promise<void> => {
-  await migrateJsonDirectoryToSqlite({
+  await migrateEventsJsonDirectoryToSqlite({
     directory: eventsDirectory,
-    entityType: eventStoreOptions.entityType,
     isSafeId: isSafeEventId,
   })
 }
@@ -96,7 +89,7 @@ export const isSafeEventId = (eventId: string): boolean => {
 
 export const listEvents = async (): Promise<Event[]> => {
   await ensureEventsStore()
-  const events = await listStoredEntities<EventData, Event>(eventStoreOptions)
+  const events = await listStoredEvents<EventData, Event>(eventStoreOptions)
   return Promise.all(events.map(async (event) => ({
     ...event,
     imageUrl: (await getEventImageInfo(event.id))?.imageUrl ?? '',
@@ -106,7 +99,7 @@ export const listEvents = async (): Promise<Event[]> => {
 export const readEvent = async (eventId: string): Promise<Event> => {
   await ensureEventsStore()
   const [event, imageInfo] = await Promise.all([
-    readStoredEntity<EventData, Event>(eventId, eventStoreOptions),
+    readStoredEvent<EventData, Event>(eventId, eventStoreOptions),
     getEventImageInfo(eventId),
   ])
 
@@ -118,17 +111,17 @@ export const readEvent = async (eventId: string): Promise<Event> => {
 
 export const createEvent = async (): Promise<Event> => {
   await ensureEventsStore()
-  return createStoredEntity<EventData, Event>(eventStoreOptions)
+  return createStoredEvent<EventData, Event>(eventStoreOptions)
 }
 
 export const updateEvent = async (eventId: string, data: unknown): Promise<Event> => {
   await ensureEventsStore()
-  return updateStoredEntity<EventData, Event>(eventId, data, eventStoreOptions)
+  return updateStoredEvent<EventData, Event>(eventId, data, eventStoreOptions)
 }
 
 export const deleteEvent = async (eventId: string): Promise<void> => {
   await ensureEventsStore()
-  await deleteStoredEntity(eventStoreOptions.entityType, eventId)
+  await deleteStoredEntity(eventStoreOptions.tableName, eventId)
   await Promise.all(eventImageExtensions.map(async (extension) => {
     try {
       await unlink(getEventImageFilePath(eventId, extension))
@@ -159,7 +152,7 @@ export const readEventImage = async (eventId: string): Promise<EventImage> => {
 
 export const updateEventImage = async (eventId: string, contentType: string | undefined, data: Buffer): Promise<Event> => {
   await ensureEventsStore()
-  await assertStoredEntityExists(eventStoreOptions.entityType, eventId)
+  await assertStoredEntityExists(eventStoreOptions.tableName, eventId)
 
   const extension = normalizeImageExtension(contentType)
   const nextFilePath = getEventImageFilePath(eventId, extension)
@@ -181,7 +174,7 @@ export const updateEventImage = async (eventId: string, contentType: string | un
 
 export const deleteEventImage = async (eventId: string): Promise<Event> => {
   await ensureEventsStore()
-  await assertStoredEntityExists(eventStoreOptions.entityType, eventId)
+  await assertStoredEntityExists(eventStoreOptions.tableName, eventId)
 
   await Promise.all(eventImageExtensions.map(async (extension) => {
     try {

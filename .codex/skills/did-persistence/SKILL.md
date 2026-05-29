@@ -26,13 +26,27 @@ Use this skill for backend persistence work in this repository.
 
 ## Entity Records
 
-Store normal entities in the `entities` table:
+Store each domain in its own table. Do not use a shared `entities(entity_type, ...)` table.
 
-- `entity_type`: logical type such as `character`, `npc`, `monster`, `character-group`.
+Current entity tables:
+
+- `adventures`
+- `areas`
+- `characters`
+- `character_groups`
+- `contexts`
+- `events`
+- `monsters`
+- `monster_groups`
+- `npcs`
+- `npc_groups`
+
+Each entity table uses this common shape:
+
 - `id`: stable route/API id.
 - `unique_id`: copied from payload for lookup/indexing.
 - `name`: copied from payload for lookup/indexing.
-- `payload_json`: normalized entity JSON.
+- `payload_json`: normalized entity JSON without relational group membership data.
 - `created_at`, `updated_at`: ISO timestamps.
 
 Use the shared helpers in `server/sqliteStore.ts`:
@@ -63,13 +77,13 @@ Preserve the public API shape returned by existing store functions unless the us
 
 ## Group Relations
 
-Use `group_members` as the source of truth for group assignments.
+Use dedicated relation tables as the source of truth for group assignments.
 
 Supported relations:
 
-- `character-group` -> `character`
-- `monster-group` -> `monster`
-- `npc-group` -> `npc`
+- `character_group_members`: `character_groups` -> `characters`
+- `monster_group_members`: `monster_groups` -> `monsters`
+- `npc_group_members`: `npc_groups` -> `npcs`
 
 Use the group helpers in `server/sqliteStore.ts`:
 
@@ -85,7 +99,7 @@ Keep frontend compatibility by returning existing fields:
 - `monsterFileNames`
 - `npcFileNames`
 
-Generate those arrays from `group_members` as `${member_id}.json`. Do not store memberships in `payload_json` except as empty arrays for compatibility.
+Generate those arrays from the dedicated relation table as `${member_id}.json`. Do not store memberships in `payload_json` except as empty arrays for compatibility.
 
 When migrating or saving group assignments:
 
@@ -99,7 +113,7 @@ When migrating or saving group assignments:
 
 - Add schema changes in `server/sqliteStore.ts` inside the initialization block.
 - Add indexes when a query needs them; avoid speculative indexes.
-- Prefer composite indexes that match access patterns, e.g. `(entity_type, updated_at DESC)` or `(group_entity_type, group_id, position)`.
+- Prefer indexes that match access patterns, e.g. `updated_at DESC`, `name COLLATE NOCASE`, `unique_id`, or `(group_id, position)` for group relation tables.
 - Make migrations idempotent with marker tables when importing from old file data.
 
 ## Verification

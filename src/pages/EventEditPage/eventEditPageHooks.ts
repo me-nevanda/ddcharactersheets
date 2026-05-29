@@ -7,7 +7,6 @@ import type { EventData } from '@appTypes/event'
 import type { EventEditPageState } from './types'
 
 const emptyEventForm: EventData = {
-  uniqueId: '',
   name: '',
   description: '',
 }
@@ -32,7 +31,6 @@ export const useEventEditPage = (): EventEditPageState => {
       try {
         const event = await getEvent(eventId)
         const nextForm: EventData = {
-          uniqueId: event.uniqueId,
           name: event.name,
           description: event.description,
         }
@@ -76,7 +74,6 @@ export const useEventEditPage = (): EventEditPageState => {
 
     try {
       const nextForm: EventData = {
-        uniqueId: form.uniqueId,
         name: form.name.trim(),
         description: form.description.trim(),
       }

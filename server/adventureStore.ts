@@ -25,14 +25,14 @@ const normalizeAdventure = (data: Partial<Record<keyof AdventureData, unknown>> 
 };
 
 const adventureStoreOptions = {
-    entityType: 'adventure',
+    tableName: 'adventures',
     normalize: normalizeAdventure,
 };
 
 const ensureAdventuresStore = async (): Promise<void> => {
     await migrateJsonDirectoryToSqlite({
         directory: adventuresDirectory,
-        entityType: adventureStoreOptions.entityType,
+        tableName: adventureStoreOptions.tableName,
         isSafeId: isSafeAdventureId,
     });
 };

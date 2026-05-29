@@ -1,4 +1,4 @@
-﻿import type { Adventure, AdventureData } from '@appTypes/adventure';
+import type { Adventure, AdventureData } from '@appTypes/adventure';
 import type { Character, CharacterData, CharacterGroup } from '@appTypes/character';
 import type { Context, ContextData } from '@appTypes/context';
 import type { Event, EventData } from '@appTypes/event';
@@ -98,9 +98,8 @@ export const saveCharacterGroup = async (groupId: string, characterGroup: Charac
     const payload = await requestJson<ApiEnvelope<CharacterGroup>>(`/api/character-groups/${groupId}`, {
         method: 'PUT',
         body: JSON.stringify({
-            uniqueId: characterGroup.uniqueId,
             name: characterGroup.name,
-            characterFileNames: characterGroup.characterFileNames,
+            characterIds: characterGroup.characterIds,
         }),
     });
     if (!payload?.characterGroup) {
@@ -231,9 +230,8 @@ export const saveMonsterGroup = async (groupId: string, monsterGroup: MonsterGro
     const payload = await requestJson<ApiEnvelope<MonsterGroup>>(`/api/monster-groups/${groupId}`, {
         method: 'PUT',
         body: JSON.stringify({
-            uniqueId: monsterGroup.uniqueId,
             name: monsterGroup.name,
-            monsterFileNames: monsterGroup.monsterFileNames,
+            monsterIds: monsterGroup.monsterIds,
         }),
     });
     if (!payload?.monsterGroup) {
@@ -334,9 +332,8 @@ export const saveNpcGroup = async (groupId: string, npcGroup: NpcGroup): Promise
     const payload = await requestJson<ApiEnvelope<NpcGroup>>(`/api/npc-groups/${groupId}`, {
         method: 'PUT',
         body: JSON.stringify({
-            uniqueId: npcGroup.uniqueId,
             name: npcGroup.name,
-            npcFileNames: npcGroup.npcFileNames,
+            npcIds: npcGroup.npcIds,
         }),
     });
     if (!payload?.npcGroup) {

@@ -8,14 +8,9 @@ import type { AssignedMonsterGroupMonsterViewModel, MonsterGroupEditPageState, M
 
 const emptyGroup: MonsterGroup = {
   id: '',
-  uniqueId: '',
   name: '',
-  monsterFileNames: [],
+  monsterIds: [],
   updatedAt: '',
-}
-
-const getMonsterFileName = (monsterId: string): string => {
-  return `${monsterId}.json`
 }
 
 const buildTextPreview = (value: string): string => {
@@ -33,7 +28,7 @@ const buildMonsterViewModel = (
 ): MonsterGroupMonsterViewModel => {
   return {
     descriptionPreview: buildTextPreview(monster.description),
-    fileName: getMonsterFileName(monster.id),
+    fileName: monster.id,
     id: monster.id,
     imageSrc: monster.imageUrl || '/favicon.png',
     isElite: monster.type === 'elite',
@@ -119,24 +114,22 @@ export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
   }
 
   const handleAddMonster = (monsterId: string) => {
-    const fileName = getMonsterFileName(monsterId)
     setForm((current) => {
-      if (current.monsterFileNames.includes(fileName)) {
+      if (current.monsterIds.includes(monsterId)) {
         return current
       }
 
       return {
         ...current,
-        monsterFileNames: [...current.monsterFileNames, fileName],
+        monsterIds: [...current.monsterIds, monsterId],
       }
     })
   }
 
   const handleRemoveMonster = (monsterId: string) => {
-    const fileName = getMonsterFileName(monsterId)
     setForm((current) => ({
       ...current,
-      monsterFileNames: current.monsterFileNames.filter((currentFileName) => currentFileName !== fileName),
+      monsterIds: current.monsterIds.filter((currentMonsterId) => currentMonsterId !== monsterId),
     }))
   }
 
@@ -163,10 +156,10 @@ export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
     navigate(`/monsters/${monsterId}/edit`)
   }
 
-  const assignedMonsterFileNames = new Set(form.monsterFileNames)
+  const assignedMonsterIds = new Set(form.monsterIds)
   const normalizedAssignedMonsterSearch = assignedMonsterSearch.trim().toLocaleLowerCase()
-  const allAssignedMonsters: AssignedMonsterGroupMonsterViewModel[] = form.monsterFileNames
-    .map((fileName) => monsters.find((monster) => getMonsterFileName(monster.id) === fileName))
+  const allAssignedMonsters: AssignedMonsterGroupMonsterViewModel[] = form.monsterIds
+    .map((monsterId) => monsters.find((monster) => monster.id === monsterId))
     .filter((monster): monster is Monster => Boolean(monster))
     .map((monster) => ({
       ...buildMonsterViewModel(monster, t, openMonster),
@@ -180,7 +173,7 @@ export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
     : allAssignedMonsters
 
   const normalizedMonsterSearch = monsterSearch.trim().toLocaleLowerCase()
-  const availableMonsters = monsters.filter((monster) => !assignedMonsterFileNames.has(getMonsterFileName(monster.id)))
+  const availableMonsters = monsters.filter((monster) => !assignedMonsterIds.has(monster.id))
   const filteredMonsters = normalizedMonsterSearch.length >= 3
     ? availableMonsters.filter((monster) => (monster.name.trim() || t('pages.monsterList.unnamedMonster')).toLocaleLowerCase().includes(normalizedMonsterSearch))
     : availableMonsters.slice(0, 8)

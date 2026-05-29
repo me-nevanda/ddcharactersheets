@@ -3,7 +3,7 @@ import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promi
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
 import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcRole, NpcSuggestedStats, NpcType } from '../src/types/npc'
-import { assertStoredEntityExists, createStoredEntity, deleteStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore'
+import { assertStoredEntityExists, createStoredNpc, deleteStoredEntity, listStoredNpcs, migrateJsonDirectoryToSqlite, readStoredNpc, updateStoredNpc } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -407,7 +407,7 @@ const normalizeImageExtension = (contentType: string | undefined): (typeof npcIm
 }
 
 const npcStoreOptions = {
-  entityType: 'npc',
+  tableName: 'npcs',
   imageUrl: (npcId: string): string => `/api/npcs/${npcId}/image`,
   normalize: normalizeNpc,
 }
@@ -415,7 +415,7 @@ const npcStoreOptions = {
 const ensureNpcsStore = async (): Promise<void> => {
   await migrateJsonDirectoryToSqlite({
     directory: npcsDirectory,
-    entityType: npcStoreOptions.entityType,
+    tableName: npcStoreOptions.tableName,
     isSafeId: isSafeNpcId,
   })
 }
@@ -426,7 +426,7 @@ export const isSafeNpcId = (npcId: string): boolean => {
 
 export const listNpcs = async (): Promise<Npc[]> => {
   await ensureNpcsStore()
-  const npcs = await listStoredEntities<NpcData, Npc>(npcStoreOptions)
+  const npcs = await listStoredNpcs<NpcData, Npc>(npcStoreOptions)
   return Promise.all(npcs.map(async (npc) => ({
     ...npc,
     imageUrl: (await getNpcImageInfo(npc.id))?.imageUrl ?? '',
@@ -436,7 +436,7 @@ export const listNpcs = async (): Promise<Npc[]> => {
 export const readNpc = async (npcId: string): Promise<Npc> => {
   await ensureNpcsStore()
   const [npc, imageInfo] = await Promise.all([
-    readStoredEntity<NpcData, Npc>(npcId, npcStoreOptions),
+    readStoredNpc<NpcData, Npc>(npcId, npcStoreOptions),
     getNpcImageInfo(npcId),
   ])
 
@@ -448,17 +448,17 @@ export const readNpc = async (npcId: string): Promise<Npc> => {
 
 export const createNpc = async (): Promise<Npc> => {
   await ensureNpcsStore()
-  return createStoredEntity<NpcData, Npc>(npcStoreOptions)
+  return createStoredNpc<NpcData, Npc>(npcStoreOptions)
 }
 
 export const updateNpc = async (npcId: string, data: unknown): Promise<Npc> => {
   await ensureNpcsStore()
-  return updateStoredEntity<NpcData, Npc>(npcId, data, npcStoreOptions)
+  return updateStoredNpc<NpcData, Npc>(npcId, data, npcStoreOptions)
 }
 
 export const deleteNpc = async (npcId: string): Promise<void> => {
   await ensureNpcsStore()
-  await deleteStoredEntity(npcStoreOptions.entityType, npcId)
+  await deleteStoredEntity(npcStoreOptions.tableName, npcId)
 
   await Promise.all(
     npcImageExtensions.map(async (extension) => {
@@ -492,7 +492,7 @@ export const readNpcImage = async (npcId: string): Promise<NpcImage> => {
 
 export const updateNpcImage = async (npcId: string, contentType: string | undefined, data: Buffer): Promise<Npc> => {
   await ensureNpcsStore()
-  await assertStoredEntityExists(npcStoreOptions.entityType, npcId)
+  await assertStoredEntityExists(npcStoreOptions.tableName, npcId)
 
   const extension = normalizeImageExtension(contentType)
   const nextFilePath = getNpcImageFilePath(npcId, extension)
@@ -517,7 +517,7 @@ export const updateNpcImage = async (npcId: string, contentType: string | undefi
 
 export const deleteNpcImage = async (npcId: string): Promise<Npc> => {
   await ensureNpcsStore()
-  await assertStoredEntityExists(npcStoreOptions.entityType, npcId)
+  await assertStoredEntityExists(npcStoreOptions.tableName, npcId)
 
   await Promise.all(
     npcImageExtensions.map(async (extension) => {
