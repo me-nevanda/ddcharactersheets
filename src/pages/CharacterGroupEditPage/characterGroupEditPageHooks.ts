@@ -1,8 +1,9 @@
 import { useEffect, useState, type SyntheticEvent } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getCharacterGroup, listCharacters, saveCharacterGroup } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
+import { getCurrentEditReturnState } from '@pages/useEditReturnNavigation'
 import { useI18n } from '@i18n/index'
 import type { Character, CharacterGroup } from '@appTypes/character'
 import type { AssignedCharacterGroupCharacterViewModel, CharacterGroupCharacterOptionViewModel, CharacterGroupCharacterViewModel, CharacterGroupEditPageState } from './types'
@@ -55,6 +56,7 @@ const buildCharacterViewModel = (
 export const useCharacterGroupEditPage = (): CharacterGroupEditPageState => {
   const { t } = useI18n()
   const navigate = useNavigate()
+  const location = useLocation()
   const presentation = useCharacterPresentation()
   const { groupId = '' } = useParams()
   const [form, setForm] = useState<CharacterGroup>(emptyGroup)
@@ -159,7 +161,12 @@ export const useCharacterGroupEditPage = (): CharacterGroupEditPageState => {
   }
 
   const openCharacter = (characterId: string) => {
-    navigate(`/characters/${characterId}/edit`)
+    navigate(`/characters/${characterId}/edit`, {
+      state: getCurrentEditReturnState(location, {
+        characterListTab: 'groups',
+        mainTab: 'heroes',
+      }),
+    })
   }
 
   const assignedCharacterIds = new Set(form.characterIds)

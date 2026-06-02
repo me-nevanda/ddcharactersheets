@@ -1,9 +1,9 @@
 import { useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
-import { useMainPageContext } from '@pages/main/mainPageContext'
+import { useEditReturnNavigation } from '@pages/useEditReturnNavigation'
 import { useCharacterGroupEditPage } from './characterGroupEditPageHooks'
 import type { AssignedCharacterGroupCharacterViewModel, CharacterGroupCharacterOptionViewModel } from './types'
 import styles from './style.module.scss'
@@ -49,8 +49,11 @@ const CharacterRow = ({
 
 export const CharacterGroupEditPage = () => {
   const { t } = useI18n()
-  const navigate = useNavigate()
-  const { handleCharacterListTabChange, handleTabChange } = useMainPageContext()
+  const { applyReturnTabs, navigateBack, returnTo } = useEditReturnNavigation({
+    characterListTab: 'groups',
+    mainTab: 'heroes',
+    returnTo: '/',
+  })
   const { assignedCharacters, assignedCharacterSearch, characterOptions, characterSearch, error, groupName, handleChangeAssignedCharacterSearch, handleChangeCharacterSearch, handleChangeGroupName, handleSubmit, hasChanges, loading, saving } = useCharacterGroupEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
@@ -61,15 +64,12 @@ export const CharacterGroupEditPage = () => {
       return
     }
 
-    handleTabChange('heroes')
-    handleCharacterListTabChange('groups')
+    applyReturnTabs()
   }
 
   const handleConfirmBackToList = () => {
     setUnsavedChangesDialogOpen(false)
-    handleTabChange('heroes')
-    handleCharacterListTabChange('groups')
-    navigate('/')
+    navigateBack()
   }
 
   return (
@@ -89,7 +89,7 @@ export const CharacterGroupEditPage = () => {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={handleBackToListClick}>
+            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to={returnTo} onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.floatingSaveAction}>

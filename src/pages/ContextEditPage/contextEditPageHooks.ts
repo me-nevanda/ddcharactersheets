@@ -1005,6 +1005,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     const classSrc = character ? presentation.getCharacterClassSrc(character.class) : '/unnamed.png'
     return {
       id: characterId,
+      editPath: `/characters/${characterId}/edit`,
       label,
       raceLabel,
       classLabel,
@@ -1117,6 +1118,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     const descriptionPreview = buildPlainTextPreview(event?.description ?? '')
     return {
       id: eventId,
+      editPath: `/events/${eventId}/edit`,
       imageSrc: event?.imageUrl ?? '',
       label,
       descriptionPreview,
@@ -1182,6 +1184,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     const imageSrc = npc?.imageUrl || '/favicon.png'
     return {
       id: npcId,
+      editPath: `/npcs/${npcId}/edit`,
       label,
       roleLabel,
       typeLabel,
@@ -1249,6 +1252,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     const imageSrc = monster?.imageUrl || '/favicon.png'
     return {
       id: monsterId,
+      editPath: `/monsters/${monsterId}/edit`,
       label,
       roleLabel,
       typeLabel,
@@ -1323,6 +1327,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     const area = areasById.get(areaId)
     return {
       id: placeId,
+      editPath: `/areas/${areaId}/edit`,
       label,
       descriptionPreview,
       areaImageSrc: area?.imageUrl ?? '',

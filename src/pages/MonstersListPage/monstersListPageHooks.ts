@@ -4,6 +4,7 @@ import { useI18n } from '@i18n/index'
 import { createMonster, createMonsterGroup, deleteMonster, deleteMonsterGroup, listMonsterGroups, listMonsters } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useMainPageContext } from '@pages/main/mainPageContext'
+import type { EditReturnState } from '@pages/useEditReturnNavigation'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
 import type { MonsterGroupCardViewModel, MonsterListCardViewModel, MonsterListTabKey, MonstersListPageState } from './types'
 
@@ -13,6 +14,18 @@ const buildTextPreview = (value: string): string => {
     .replace(/&nbsp;/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+const monsterListReturnState: EditReturnState = {
+  mainTab: 'monsters',
+  monsterListTab: 'list',
+  returnTo: '/',
+}
+
+const monsterGroupListReturnState: EditReturnState = {
+  mainTab: 'monsters',
+  monsterListTab: 'groups',
+  returnTo: '/',
 }
 
 export const useMonstersListPage = (): MonstersListPageState => {
@@ -66,12 +79,12 @@ export const useMonstersListPage = (): MonstersListPageState => {
     }
   }, [t])
 
-  const openMonster = (monsterId: string) => {
-    navigate(`/monsters/${monsterId}/edit`)
+  const openMonster = (monsterId: string, returnState: EditReturnState = monsterListReturnState) => {
+    navigate(`/monsters/${monsterId}/edit`, { state: returnState })
   }
 
   const openGroup = (groupId: string) => {
-    navigate(`/monster-groups/${groupId}/edit`)
+    navigate(`/monster-groups/${groupId}/edit`, { state: monsterGroupListReturnState })
   }
 
   const handleCreateMonster = async () => {
@@ -79,7 +92,7 @@ export const useMonstersListPage = (): MonstersListPageState => {
     setError('')
     try {
       const monster = await createMonster()
-      navigate(`/monsters/${monster.id}/edit`)
+      navigate(`/monsters/${monster.id}/edit`, { state: monsterListReturnState })
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
       setCreating(false)
@@ -117,7 +130,7 @@ export const useMonstersListPage = (): MonstersListPageState => {
 
     try {
       const group = await createMonsterGroup(nextName)
-      navigate(`/monster-groups/${group.id}/edit`)
+      navigate(`/monster-groups/${group.id}/edit`, { state: monsterGroupListReturnState })
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
     } finally {
@@ -224,12 +237,12 @@ export const useMonstersListPage = (): MonstersListPageState => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault()
             event.stopPropagation()
-            openMonster(monster.id)
+            openMonster(monster.id, monsterGroupListReturnState)
           }
         },
         onOpen: (event) => {
           event.stopPropagation()
-          openMonster(monster.id)
+          openMonster(monster.id, monsterGroupListReturnState)
         },
       })),
     name: group.name,

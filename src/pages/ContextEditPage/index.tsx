@@ -1,12 +1,12 @@
 import { useState, type MouseEvent as ReactMouseEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import type { AppIconName } from '@components/AppIcon/types'
 import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
 import { SimpleWysiwygEditor } from '@components/SimpleWysiwygEditor'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
-import { useMainPageContext } from '@pages/main/mainPageContext'
+import { getCurrentEditReturnState, useEditReturnNavigation } from '@pages/useEditReturnNavigation'
 import { useContextEditPage } from './contextEditPageHooks'
 import type {
   ContextAreaOptionViewModel,
@@ -70,26 +70,28 @@ const CharacterPortrait = ({
   )
 }
 
-const HeroCard = ({ card }: { card: ContextCharacterCardViewModel }) => {
+const HeroCard = ({ card, editReturnState }: { card: ContextCharacterCardViewModel; editReturnState: ReturnType<typeof getCurrentEditReturnState> }) => {
   const { t } = useI18n()
   return (
     <article className={styles.heroCard}>
-      <CharacterPortrait
-        hasCustomImage={card.hasCustomImage}
-        imageSrc={card.imageSrc}
-        portraitSrc={card.portraitSrc}
-        classSrc={card.classSrc}
-      />
-      <div className={styles.heroSummary}>
-        <h3 className={styles.heroName}>{card.label}</h3>
-        <p className={styles.heroMeta}>
-          {card.raceLabel ? <span>{card.raceLabel}</span> : null}
-          {card.raceLabel && card.classLabel ? <span aria-hidden="true"> | </span> : null}
-          {card.classLabel ? <span>{card.classLabel}</span> : null}
-          {(card.raceLabel || card.classLabel) && card.level ? <span aria-hidden="true"> | </span> : null}
-          {card.level ? <span>{t('pages.characterEdit.fields.level')} {card.level}</span> : null}
-        </p>
-      </div>
+      <Link className={styles.heroCardLink} to={card.editPath} state={editReturnState}>
+        <CharacterPortrait
+          hasCustomImage={card.hasCustomImage}
+          imageSrc={card.imageSrc}
+          portraitSrc={card.portraitSrc}
+          classSrc={card.classSrc}
+        />
+        <div className={styles.heroSummary}>
+          <h3 className={styles.heroName}>{card.label}</h3>
+          <p className={styles.heroMeta}>
+            {card.raceLabel ? <span>{card.raceLabel}</span> : null}
+            {card.raceLabel && card.classLabel ? <span aria-hidden="true"> | </span> : null}
+            {card.classLabel ? <span>{card.classLabel}</span> : null}
+            {(card.raceLabel || card.classLabel) && card.level ? <span aria-hidden="true"> | </span> : null}
+            {card.level ? <span>{t('pages.characterEdit.fields.level')} {card.level}</span> : null}
+          </p>
+        </div>
+      </Link>
       <button
         type="button"
         className={styles.heroRemoveButton}
@@ -103,7 +105,7 @@ const HeroCard = ({ card }: { card: ContextCharacterCardViewModel }) => {
   )
 }
 
-const CharacterGroupSection = ({ section }: { section: ContextCharacterGroupSectionViewModel }) => {
+const CharacterGroupSection = ({ editReturnState, section }: { editReturnState: ReturnType<typeof getCurrentEditReturnState>; section: ContextCharacterGroupSectionViewModel }) => {
   const { t } = useI18n()
   return (
     <section className={styles.npcGroupSection}>
@@ -121,7 +123,7 @@ const CharacterGroupSection = ({ section }: { section: ContextCharacterGroupSect
       </div>
       {section.characters.length > 0 ? (
         <div className={styles.heroGrid}>
-          {section.characters.map((character) => <HeroCard key={character.id} card={character} />)}
+          {section.characters.map((character) => <HeroCard key={character.id} card={character} editReturnState={editReturnState} />)}
         </div>
       ) : (
         <p className={styles.emptyText}>{t('pages.contextEdit.characters.groupEmpty')}</p>
@@ -151,17 +153,19 @@ const CharacterGroupOption = ({ option }: { option: ContextCharacterGroupOptionV
   )
 }
 
-const EventCard = ({ card }: { card: ContextEventCardViewModel }) => {
+const EventCard = ({ card, editReturnState }: { card: ContextEventCardViewModel; editReturnState: ReturnType<typeof getCurrentEditReturnState> }) => {
   const { t } = useI18n()
   return (
     <article className={styles.heroCard}>
-      <MediaIconFrame iconName="event" imageSrc={card.imageSrc} label={card.label} />
-      <div className={styles.heroSummary}>
-        <h3 className={styles.heroName}>{card.label}</h3>
-        {card.descriptionPreview ? (
-          <p className={styles.heroMeta}>{card.descriptionPreview}</p>
-        ) : null}
-      </div>
+      <Link className={styles.heroCardLink} to={card.editPath} state={editReturnState}>
+        <MediaIconFrame iconName="event" imageSrc={card.imageSrc} label={card.label} />
+        <div className={styles.heroSummary}>
+          <h3 className={styles.heroName}>{card.label}</h3>
+          {card.descriptionPreview ? (
+            <p className={styles.heroMeta}>{card.descriptionPreview}</p>
+          ) : null}
+        </div>
+      </Link>
       <button
         type="button"
         className={styles.heroRemoveButton}
@@ -199,7 +203,7 @@ const EventOption = ({ option }: { option: ContextEventOptionViewModel }) => {
   )
 }
 
-const NpcCard = ({ card }: { card: ContextNpcCardViewModel }) => {
+const NpcCard = ({ card, editReturnState }: { card: ContextNpcCardViewModel; editReturnState: ReturnType<typeof getCurrentEditReturnState> }) => {
   const { t } = useI18n()
   const nameClassName = [
     styles.heroName,
@@ -211,29 +215,31 @@ const NpcCard = ({ card }: { card: ContextNpcCardViewModel }) => {
 
   return (
     <article className={`${styles.heroCard} ${card.isDead ? styles.npcCardDead : ''}`}>
-      <div className={styles.heroPortraitStack}>
-        <img className={styles.heroPortraitCustom} src={card.imageSrc} alt="" aria-hidden="true" />
-      </div>
-      <div className={styles.heroSummary}>
-        <h3 className={nameClassName}>
-          {card.isElite ? <AppIcon className={styles.npcRoleIcon} name="crown" /> : null}
-          {card.isMinion ? <AppIcon className={styles.npcRoleIcon} name="minion" /> : null}
-          {card.isNormal ? <AppIcon className={styles.npcRoleIcon} name="minion" /> : null}
-          {card.isSolo ? <AppIcon className={styles.npcRoleIcon} name="crown" /> : null}
-          <span>{card.label}</span>
-        </h3>
-        {card.isStory ? (
-          <p className={styles.heroMeta}>{card.storyLabel}</p>
-        ) : (
-          <p className={styles.heroMeta}>
-            {card.roleLabel ? <span>{card.roleLabel}</span> : null}
-            {card.roleLabel && card.level ? <span aria-hidden="true"> | </span> : null}
-            {card.level ? <span>{t('pages.npcEdit.fields.level')} {card.level}</span> : null}
-            {(card.roleLabel || card.level) && card.typeLabel ? <span aria-hidden="true"> | </span> : null}
-            {card.typeLabel ? <span>{card.typeLabel}</span> : null}
-          </p>
-        )}
-      </div>
+      <Link className={styles.heroCardLink} to={card.editPath} state={editReturnState}>
+        <div className={styles.heroPortraitStack}>
+          <img className={styles.heroPortraitCustom} src={card.imageSrc} alt="" aria-hidden="true" />
+        </div>
+        <div className={styles.heroSummary}>
+          <h3 className={nameClassName}>
+            {card.isElite ? <AppIcon className={styles.npcRoleIcon} name="crown" /> : null}
+            {card.isMinion ? <AppIcon className={styles.npcRoleIcon} name="minion" /> : null}
+            {card.isNormal ? <AppIcon className={styles.npcRoleIcon} name="minion" /> : null}
+            {card.isSolo ? <AppIcon className={styles.npcRoleIcon} name="crown" /> : null}
+            <span>{card.label}</span>
+          </h3>
+          {card.isStory ? (
+            <p className={styles.heroMeta}>{card.storyLabel}</p>
+          ) : (
+            <p className={styles.heroMeta}>
+              {card.roleLabel ? <span>{card.roleLabel}</span> : null}
+              {card.roleLabel && card.level ? <span aria-hidden="true"> | </span> : null}
+              {card.level ? <span>{t('pages.npcEdit.fields.level')} {card.level}</span> : null}
+              {(card.roleLabel || card.level) && card.typeLabel ? <span aria-hidden="true"> | </span> : null}
+              {card.typeLabel ? <span>{card.typeLabel}</span> : null}
+            </p>
+          )}
+        </div>
+      </Link>
       <button
         type="button"
         className={styles.heroRemoveButton}
@@ -247,7 +253,7 @@ const NpcCard = ({ card }: { card: ContextNpcCardViewModel }) => {
   )
 }
 
-const NpcGroupSection = ({ section }: { section: ContextNpcGroupSectionViewModel }) => {
+const NpcGroupSection = ({ editReturnState, section }: { editReturnState: ReturnType<typeof getCurrentEditReturnState>; section: ContextNpcGroupSectionViewModel }) => {
   const { t } = useI18n()
   return (
     <section className={styles.npcGroupSection}>
@@ -265,7 +271,7 @@ const NpcGroupSection = ({ section }: { section: ContextNpcGroupSectionViewModel
       </div>
       {section.npcs.length > 0 ? (
         <div className={styles.heroGrid}>
-          {section.npcs.map((npc) => <NpcCard key={npc.id} card={npc} />)}
+          {section.npcs.map((npc) => <NpcCard key={npc.id} card={npc} editReturnState={editReturnState} />)}
         </div>
       ) : (
         <p className={styles.emptyText}>{t('pages.contextEdit.npcGroups.groupEmpty')}</p>
@@ -274,7 +280,7 @@ const NpcGroupSection = ({ section }: { section: ContextNpcGroupSectionViewModel
   )
 }
 
-const MonsterCard = ({ card }: { card: ContextMonsterCardViewModel }) => {
+const MonsterCard = ({ card, editReturnState }: { card: ContextMonsterCardViewModel; editReturnState: ReturnType<typeof getCurrentEditReturnState> }) => {
   const { t } = useI18n()
   const nameClassName = [
     styles.heroName,
@@ -286,25 +292,27 @@ const MonsterCard = ({ card }: { card: ContextMonsterCardViewModel }) => {
 
   return (
     <article className={styles.heroCard}>
-      <div className={styles.heroPortraitStack}>
-        <img className={styles.heroPortraitCustom} src={card.imageSrc} alt="" aria-hidden="true" />
-      </div>
-      <div className={styles.heroSummary}>
-        <h3 className={nameClassName}>
-          {card.isElite ? <AppIcon className={styles.npcRoleIcon} name="crown" /> : null}
-          {card.isMinion ? <AppIcon className={styles.npcRoleIcon} name="minion" /> : null}
-          {card.isNormal ? <AppIcon className={styles.npcRoleIcon} name="minion" /> : null}
-          {card.isSolo ? <AppIcon className={styles.npcRoleIcon} name="crown" /> : null}
-          <span>{card.label}</span>
-        </h3>
-        <p className={styles.heroMeta}>
-          {card.roleLabel ? <span>{card.roleLabel}</span> : null}
-          {card.roleLabel && card.level ? <span aria-hidden="true"> | </span> : null}
-          {card.level ? <span>{t('pages.monsterEdit.fields.level')} {card.level}</span> : null}
-          {(card.roleLabel || card.level) && card.typeLabel ? <span aria-hidden="true"> | </span> : null}
-          {card.typeLabel ? <span>{card.typeLabel}</span> : null}
-        </p>
-      </div>
+      <Link className={styles.heroCardLink} to={card.editPath} state={editReturnState}>
+        <div className={styles.heroPortraitStack}>
+          <img className={styles.heroPortraitCustom} src={card.imageSrc} alt="" aria-hidden="true" />
+        </div>
+        <div className={styles.heroSummary}>
+          <h3 className={nameClassName}>
+            {card.isElite ? <AppIcon className={styles.npcRoleIcon} name="crown" /> : null}
+            {card.isMinion ? <AppIcon className={styles.npcRoleIcon} name="minion" /> : null}
+            {card.isNormal ? <AppIcon className={styles.npcRoleIcon} name="minion" /> : null}
+            {card.isSolo ? <AppIcon className={styles.npcRoleIcon} name="crown" /> : null}
+            <span>{card.label}</span>
+          </h3>
+          <p className={styles.heroMeta}>
+            {card.roleLabel ? <span>{card.roleLabel}</span> : null}
+            {card.roleLabel && card.level ? <span aria-hidden="true"> | </span> : null}
+            {card.level ? <span>{t('pages.monsterEdit.fields.level')} {card.level}</span> : null}
+            {(card.roleLabel || card.level) && card.typeLabel ? <span aria-hidden="true"> | </span> : null}
+            {card.typeLabel ? <span>{card.typeLabel}</span> : null}
+          </p>
+        </div>
+      </Link>
       <button
         type="button"
         className={styles.heroRemoveButton}
@@ -318,7 +326,7 @@ const MonsterCard = ({ card }: { card: ContextMonsterCardViewModel }) => {
   )
 }
 
-const MonsterGroupSection = ({ section }: { section: ContextMonsterGroupSectionViewModel }) => {
+const MonsterGroupSection = ({ editReturnState, section }: { editReturnState: ReturnType<typeof getCurrentEditReturnState>; section: ContextMonsterGroupSectionViewModel }) => {
   const { t } = useI18n()
   return (
     <section className={styles.npcGroupSection}>
@@ -336,7 +344,7 @@ const MonsterGroupSection = ({ section }: { section: ContextMonsterGroupSectionV
       </div>
       {section.monsters.length > 0 ? (
         <div className={styles.heroGrid}>
-          {section.monsters.map((monster) => <MonsterCard key={monster.id} card={monster} />)}
+          {section.monsters.map((monster) => <MonsterCard key={monster.id} card={monster} editReturnState={editReturnState} />)}
         </div>
       ) : (
         <p className={styles.emptyText}>{t('pages.contextEdit.monsterGroups.groupEmpty')}</p>
@@ -366,17 +374,19 @@ const MonsterGroupOption = ({ option }: { option: ContextMonsterGroupOptionViewM
   )
 }
 
-const PlaceCard = ({ card }: { card: ContextPlaceCardViewModel }) => {
+const PlaceCard = ({ card, editReturnState }: { card: ContextPlaceCardViewModel; editReturnState: ReturnType<typeof getCurrentEditReturnState> }) => {
   const { t } = useI18n()
   return (
     <article className={styles.heroCard}>
-      <MediaIconFrame iconName="area" imageSrc={card.areaImageSrc} label={card.label} />
-      <div className={styles.heroSummary}>
-        <h3 className={styles.heroName}>{card.label}</h3>
-        {card.descriptionPreview ? (
-          <p className={styles.heroMeta}>{card.descriptionPreview}</p>
-        ) : null}
-      </div>
+      <Link className={styles.heroCardLink} to={card.editPath} state={editReturnState}>
+        <MediaIconFrame iconName="area" imageSrc={card.areaImageSrc} label={card.label} />
+        <div className={styles.heroSummary}>
+          <h3 className={styles.heroName}>{card.label}</h3>
+          {card.descriptionPreview ? (
+            <p className={styles.heroMeta}>{card.descriptionPreview}</p>
+          ) : null}
+        </div>
+      </Link>
       <button
         type="button"
         className={styles.heroRemoveButton}
@@ -390,7 +400,7 @@ const PlaceCard = ({ card }: { card: ContextPlaceCardViewModel }) => {
   )
 }
 
-const AreaSection = ({ section }: { section: ContextAreaSectionViewModel }) => {
+const AreaSection = ({ editReturnState, section }: { editReturnState: ReturnType<typeof getCurrentEditReturnState>; section: ContextAreaSectionViewModel }) => {
   const { t } = useI18n()
   return (
     <section className={styles.npcGroupSection}>
@@ -411,7 +421,7 @@ const AreaSection = ({ section }: { section: ContextAreaSectionViewModel }) => {
       </div>
       {section.places.length > 0 ? (
         <div className={styles.heroGrid}>
-          {section.places.map((place) => <PlaceCard key={place.id} card={place} />)}
+          {section.places.map((place) => <PlaceCard key={place.id} card={place} editReturnState={editReturnState} />)}
         </div>
       ) : (
         <p className={styles.emptyText}>{t('pages.contextEdit.areas.areaEmpty')}</p>
@@ -465,8 +475,14 @@ const NpcGroupOption = ({ option }: { option: ContextNpcGroupOptionViewModel }) 
 
 export const ContextEditPage = () => {
   const { t } = useI18n()
-  const navigate = useNavigate()
-  const { handleTabChange } = useMainPageContext()
+  const location = useLocation()
+  const editReturnState = getCurrentEditReturnState(location, {
+    mainTab: 'contexts',
+  })
+  const { applyReturnTabs, navigateBack, returnTo } = useEditReturnNavigation({
+    mainTab: 'contexts',
+    returnTo: '/',
+  })
   const {
     error,
     copyingContext,
@@ -540,13 +556,12 @@ export const ContextEditPage = () => {
       setUnsavedChangesDialogOpen(true)
       return
     }
-    handleTabChange('contexts')
+    applyReturnTabs()
   }
 
   const handleConfirmBackToList = () => {
     setUnsavedChangesDialogOpen(false)
-    handleTabChange('contexts')
-    navigate('/')
+    navigateBack()
   }
 
   return (
@@ -585,7 +600,7 @@ export const ContextEditPage = () => {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={handleBackToListClick}>
+            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to={returnTo} onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.floatingSaveAction}>
@@ -643,7 +658,7 @@ export const ContextEditPage = () => {
               {characterGroupSections.length > 0 ? (
                 <div className={styles.npcGroupList}>
                   {characterGroupSections.map((section) => (
-                    <CharacterGroupSection key={section.id} section={section} />
+                    <CharacterGroupSection key={section.id} section={section} editReturnState={editReturnState} />
                   ))}
                 </div>
               ) : (
@@ -668,7 +683,7 @@ export const ContextEditPage = () => {
               {npcGroupSections.length > 0 ? (
                 <div className={styles.npcGroupList}>
                   {npcGroupSections.map((section) => (
-                    <NpcGroupSection key={section.id} section={section} />
+                    <NpcGroupSection key={section.id} section={section} editReturnState={editReturnState} />
                   ))}
                 </div>
               ) : (
@@ -693,7 +708,7 @@ export const ContextEditPage = () => {
               {monsterGroupSections.length > 0 ? (
                 <div className={styles.npcGroupList}>
                   {monsterGroupSections.map((section) => (
-                    <MonsterGroupSection key={section.id} section={section} />
+                    <MonsterGroupSection key={section.id} section={section} editReturnState={editReturnState} />
                   ))}
                 </div>
               ) : (
@@ -718,7 +733,7 @@ export const ContextEditPage = () => {
               {areaSections.length > 0 ? (
                 <div className={styles.npcGroupList}>
                   {areaSections.map((section) => (
-                    <AreaSection key={section.id} section={section} />
+                    <AreaSection key={section.id} section={section} editReturnState={editReturnState} />
                   ))}
                 </div>
               ) : (
@@ -743,7 +758,7 @@ export const ContextEditPage = () => {
               {eventCards.length > 0 ? (
                 <div className={styles.heroGrid}>
                   {eventCards.map((card) => (
-                    <EventCard key={card.id} card={card} />
+                    <EventCard key={card.id} card={card} editReturnState={editReturnState} />
                   ))}
                 </div>
               ) : (

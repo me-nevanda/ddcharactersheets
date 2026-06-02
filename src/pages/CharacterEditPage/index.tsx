@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { AppIcon } from '@components/AppIcon';
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog';
 import { useUnnamedCharacterImageFallback } from '@pages/characterPageHooks';
 import { useI18n } from '@i18n/index';
 import { CharacterEditPageProvider, useCharacterEditPageContext } from '@pages/CharacterEditPage/characterEditPageContext';
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
-import { useMainPageContext } from '@pages/main/mainPageContext';
+import { useEditReturnNavigation } from '@pages/useEditReturnNavigation';
 import styles from './style.module.scss';
 import type { CharacterEditTabKey } from '@pages/CharacterEditPage/types';
 import { AbilitiesTab } from '@pages/CharacterEditPage/tabs/AbilitiesTab';
@@ -18,8 +18,11 @@ const CharacterEditPageContent = () => {
     const { getCharacterClassSrc, getCharacterPortraitSrc } = useCharacterPresentation();
     const handleImageError = useUnnamedCharacterImageFallback();
     const { characterId = '' } = useParams();
-    const navigate = useNavigate();
-    const { handleTabChange: handleMainTabChange } = useMainPageContext();
+    const { applyReturnTabs, navigateBack, returnTo } = useEditReturnNavigation({
+        characterListTab: 'list',
+        mainTab: 'heroes',
+        returnTo: '/',
+    });
     const [searchParams, setSearchParams] = useSearchParams();
     const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false);
     const [isPrintMenuOpen, setPrintMenuOpen] = useState(false);
@@ -77,12 +80,11 @@ const CharacterEditPageContent = () => {
             setUnsavedChangesDialogOpen(true);
             return;
         }
-        handleMainTabChange('heroes');
+        applyReturnTabs();
     };
     const handleConfirmBackToList = () => {
         setUnsavedChangesDialogOpen(false);
-        handleMainTabChange('heroes');
-        navigate('/');
+        navigateBack();
     };
     return (<main className={styles.editorLayout}>
       <section className={styles.editorCard}>
@@ -114,7 +116,7 @@ const CharacterEditPageContent = () => {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={handleBackToListClick}>
+            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to={returnTo} onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.printAction} ref={printMenuRef}>

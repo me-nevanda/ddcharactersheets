@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { createContext, deleteContext, listContexts } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
+import type { EditReturnState } from '@pages/useEditReturnNavigation'
 import type { Context } from '@appTypes/context'
 import type { ContextListCardViewModel, ContextsListPageState } from './types'
 
@@ -12,6 +13,11 @@ const buildTextPreview = (value: string): string => {
     .replace(/&nbsp;/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+const contextListReturnState: EditReturnState = {
+  mainTab: 'contexts',
+  returnTo: '/',
 }
 
 export const useContextsListPage = (): ContextsListPageState => {
@@ -53,7 +59,7 @@ export const useContextsListPage = (): ContextsListPageState => {
   }, [t])
 
   const openContext = (contextId: string) => {
-    navigate(`/contexts/${contextId}/edit`)
+    navigate(`/contexts/${contextId}/edit`, { state: contextListReturnState })
   }
 
   const handleCreateContext = async () => {
@@ -61,7 +67,7 @@ export const useContextsListPage = (): ContextsListPageState => {
     setError('')
     try {
       const context = await createContext()
-      navigate(`/contexts/${context.id}/edit`)
+      navigate(`/contexts/${context.id}/edit`, { state: contextListReturnState })
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
       setCreating(false)

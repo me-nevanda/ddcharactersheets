@@ -8,6 +8,7 @@ import type { Npc } from '@appTypes/npc'
 
 export interface ContextCharacterCardViewModel {
   id: string
+  editPath: string
   label: string
   raceLabel: string
   classLabel: string
@@ -38,6 +39,7 @@ export interface ContextCharacterGroupOptionViewModel {
 
 export interface ContextNpcCardViewModel {
   id: string
+  editPath: string
   label: string
   roleLabel: string
   typeLabel: string
@@ -72,6 +74,7 @@ export interface ContextNpcGroupOptionViewModel {
 
 export interface ContextMonsterCardViewModel {
   id: string
+  editPath: string
   label: string
   roleLabel: string
   typeLabel: string
@@ -103,6 +106,7 @@ export interface ContextMonsterGroupOptionViewModel {
 
 export interface ContextPlaceCardViewModel {
   id: string
+  editPath: string
   label: string
   descriptionPreview: string
   areaImageSrc: string
@@ -130,6 +134,7 @@ export interface ContextAreaOptionViewModel {
 
 export interface ContextEventCardViewModel {
   id: string
+  editPath: string
   imageSrc: string
   label: string
   descriptionPreview: string

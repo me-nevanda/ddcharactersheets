@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { createEvent, deleteEvent, listEvents } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
+import type { EditReturnState } from '@pages/useEditReturnNavigation'
 import type { Event } from '@appTypes/event'
 import type { EventListCardViewModel, EventsListPageState } from './types'
 
@@ -12,6 +13,11 @@ const buildTextPreview = (value: string): string => {
     .replace(/&nbsp;/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+const eventListReturnState: EditReturnState = {
+  mainTab: 'events',
+  returnTo: '/',
 }
 
 export const useEventsListPage = (): EventsListPageState => {
@@ -53,7 +59,7 @@ export const useEventsListPage = (): EventsListPageState => {
   }, [t])
 
   const openEvent = (eventId: string) => {
-    navigate(`/events/${eventId}/edit`)
+    navigate(`/events/${eventId}/edit`, { state: eventListReturnState })
   }
 
   const handleCreateEvent = async () => {
@@ -61,7 +67,7 @@ export const useEventsListPage = (): EventsListPageState => {
     setError('')
     try {
       const event = await createEvent()
-      navigate(`/events/${event.id}/edit`)
+      navigate(`/events/${event.id}/edit`, { state: eventListReturnState })
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
       setCreating(false)

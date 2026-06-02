@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getMonsterGroup, listMonsters, saveMonsterGroup } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
+import { getCurrentEditReturnState } from '@pages/useEditReturnNavigation'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
 import type { AssignedMonsterGroupMonsterViewModel, MonsterGroupEditPageState, MonsterGroupMonsterOptionViewModel, MonsterGroupMonsterViewModel } from './types'
 
@@ -54,6 +55,7 @@ const buildMonsterViewModel = (
 export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
   const { t } = useI18n()
   const navigate = useNavigate()
+  const location = useLocation()
   const { groupId = '' } = useParams()
   const [form, setForm] = useState<MonsterGroup>(emptyGroup)
   const [initialForm, setInitialForm] = useState<MonsterGroup>(emptyGroup)
@@ -153,7 +155,12 @@ export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
   }
 
   const openMonster = (monsterId: string) => {
-    navigate(`/monsters/${monsterId}/edit`)
+    navigate(`/monsters/${monsterId}/edit`, {
+      state: getCurrentEditReturnState(location, {
+        mainTab: 'monsters',
+        monsterListTab: 'groups',
+      }),
+    })
   }
 
   const assignedMonsterIds = new Set(form.monsterIds)

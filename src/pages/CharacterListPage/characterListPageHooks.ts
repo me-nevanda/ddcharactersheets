@@ -5,6 +5,7 @@ import { createCharacter, createCharacterGroup, deleteCharacter, deleteCharacter
 import { getErrorMessage } from '@lib/errors'
 import { useUnnamedCharacterImageFallback } from '@pages/characterPageHooks'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
+import type { EditReturnState } from '@pages/useEditReturnNavigation'
 import type { Character, CharacterGroup } from '@appTypes/character'
 import type { CharacterGroupCardViewModel, CharacterListCardViewModel } from './types'
 
@@ -18,6 +19,18 @@ const getPlainTextDescription = (description: string): string => {
   const template = document.createElement('template')
   template.innerHTML = description
   return (template.content.textContent ?? '').trim()
+}
+
+const characterListReturnState: EditReturnState = {
+  characterListTab: 'list',
+  mainTab: 'heroes',
+  returnTo: '/',
+}
+
+const characterGroupListReturnState: EditReturnState = {
+  characterListTab: 'groups',
+  mainTab: 'heroes',
+  returnTo: '/',
 }
 
 export const useCharacterListData = (t: (key: string) => string) => {
@@ -85,12 +98,12 @@ export const useCharacterListActions = (
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false)
   const [groupName, setGroupName] = useState('')
 
-  const openCharacter = (characterId: string) => {
-    navigate(`/characters/${characterId}/edit`)
+  const openCharacter = (characterId: string, returnState: EditReturnState = characterListReturnState) => {
+    navigate(`/characters/${characterId}/edit`, { state: returnState })
   }
 
   const openGroup = (groupId: string) => {
-    navigate(`/character-groups/${groupId}/edit`)
+    navigate(`/character-groups/${groupId}/edit`, { state: characterGroupListReturnState })
   }
 
   const handleCreateCharacter = async () => {
@@ -98,7 +111,7 @@ export const useCharacterListActions = (
     setError('')
     try {
       const character = await createCharacter()
-      navigate(`/characters/${character.id}/edit`)
+      navigate(`/characters/${character.id}/edit`, { state: characterListReturnState })
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
       setCreating(false)
@@ -136,7 +149,7 @@ export const useCharacterListActions = (
 
     try {
       const group = await createCharacterGroup(nextName)
-      navigate(`/character-groups/${group.id}/edit`)
+      navigate(`/character-groups/${group.id}/edit`, { state: characterGroupListReturnState })
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
     } finally {
@@ -256,7 +269,7 @@ export const useCharacterGroupCards = (
   groups: CharacterGroup[],
   characters: Character[],
   groupDeletingId: string,
-  openCharacter: (characterId: string) => void,
+  openCharacter: (characterId: string, returnState?: EditReturnState) => void,
   openGroup: (groupId: string) => void,
   handleOpenDeleteGroupDialog: (group: CharacterGroup) => void,
   handleImageError: (event: SyntheticEvent<HTMLImageElement>) => void,
@@ -278,12 +291,12 @@ export const useCharacterGroupCards = (
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault()
             event.stopPropagation()
-            openCharacter(character.id)
+            openCharacter(character.id, characterGroupListReturnState)
           }
         },
         onOpen: (event) => {
           event.stopPropagation()
-          openCharacter(character.id)
+          openCharacter(character.id, characterGroupListReturnState)
         },
         portraitSrc: getCharacterPortraitSrc(character.race, character.gender),
         classSrc: getCharacterClassSrc(character.class),

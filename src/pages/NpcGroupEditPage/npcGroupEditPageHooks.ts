@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getNpcGroup, listNpcs, saveNpcGroup } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
+import { getCurrentEditReturnState } from '@pages/useEditReturnNavigation'
 import type { Npc, NpcGroup } from '@appTypes/npc'
 import type { AssignedNpcGroupNpcViewModel, NpcGroupEditPageState, NpcGroupNpcOptionViewModel, NpcGroupNpcViewModel } from './types'
 
@@ -58,6 +59,7 @@ const buildNpcViewModel = (
 export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
   const { t } = useI18n()
   const navigate = useNavigate()
+  const location = useLocation()
   const { groupId = '' } = useParams()
   const [form, setForm] = useState<NpcGroup>(emptyGroup)
   const [initialForm, setInitialForm] = useState<NpcGroup>(emptyGroup)
@@ -157,7 +159,12 @@ export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
   }
 
   const openNpc = (npcId: string) => {
-    navigate(`/npcs/${npcId}/edit`)
+    navigate(`/npcs/${npcId}/edit`, {
+      state: getCurrentEditReturnState(location, {
+        mainTab: 'npcs',
+        npcListTab: 'groups',
+      }),
+    })
   }
 
   const assignedNpcIds = new Set(form.npcIds)

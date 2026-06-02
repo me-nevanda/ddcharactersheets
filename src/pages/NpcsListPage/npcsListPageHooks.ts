@@ -4,6 +4,7 @@ import { useI18n } from '@i18n/index'
 import { createNpc, createNpcGroup, deleteNpc, deleteNpcGroup, listNpcGroups, listNpcs } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useMainPageContext } from '@pages/main/mainPageContext'
+import type { EditReturnState } from '@pages/useEditReturnNavigation'
 import type { Npc, NpcGroup } from '@appTypes/npc'
 import type { NpcGroupCardViewModel, NpcListCardViewModel, NpcListTabKey, NpcsListPageState } from './types'
 
@@ -13,6 +14,18 @@ const buildTextPreview = (value: string): string => {
     .replace(/&nbsp;/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+const npcListReturnState: EditReturnState = {
+  mainTab: 'npcs',
+  npcListTab: 'list',
+  returnTo: '/',
+}
+
+const npcGroupListReturnState: EditReturnState = {
+  mainTab: 'npcs',
+  npcListTab: 'groups',
+  returnTo: '/',
 }
 
 export const useNpcsListPage = (): NpcsListPageState => {
@@ -66,12 +79,12 @@ export const useNpcsListPage = (): NpcsListPageState => {
     }
   }, [t])
 
-  const openNpc = (npcId: string) => {
-    navigate(`/npcs/${npcId}/edit`)
+  const openNpc = (npcId: string, returnState: EditReturnState = npcListReturnState) => {
+    navigate(`/npcs/${npcId}/edit`, { state: returnState })
   }
 
   const openGroup = (groupId: string) => {
-    navigate(`/npc-groups/${groupId}/edit`)
+    navigate(`/npc-groups/${groupId}/edit`, { state: npcGroupListReturnState })
   }
 
   const handleCreateNpc = async () => {
@@ -79,7 +92,7 @@ export const useNpcsListPage = (): NpcsListPageState => {
     setError('')
     try {
       const npc = await createNpc()
-      navigate(`/npcs/${npc.id}/edit`)
+      navigate(`/npcs/${npc.id}/edit`, { state: npcListReturnState })
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
       setCreating(false)
@@ -117,7 +130,7 @@ export const useNpcsListPage = (): NpcsListPageState => {
 
     try {
       const group = await createNpcGroup(nextName)
-      navigate(`/npc-groups/${group.id}/edit`)
+      navigate(`/npc-groups/${group.id}/edit`, { state: npcGroupListReturnState })
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
     } finally {
@@ -231,12 +244,12 @@ export const useNpcsListPage = (): NpcsListPageState => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault()
             event.stopPropagation()
-            openNpc(npc.id)
+            openNpc(npc.id, npcGroupListReturnState)
           }
         },
         onOpen: (event) => {
           event.stopPropagation()
-          openNpc(npc.id)
+          openNpc(npc.id, npcGroupListReturnState)
         },
       })),
     name: group.name,

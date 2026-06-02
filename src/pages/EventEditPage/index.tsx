@@ -1,17 +1,19 @@
 import { useState, type MouseEvent as ReactMouseEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
-import { useMainPageContext } from '@pages/main/mainPageContext'
+import { useEditReturnNavigation } from '@pages/useEditReturnNavigation'
 import { useEventEditPage } from './eventEditPageHooks'
 import styles from './style.module.scss'
 
 export const EventEditPage = () => {
   const { t } = useI18n()
-  const navigate = useNavigate()
-  const { handleTabChange } = useMainPageContext()
+  const { applyReturnTabs, navigateBack, returnTo } = useEditReturnNavigation({
+    mainTab: 'events',
+    returnTo: '/',
+  })
   const { error, form, handleCancelImageRemove, handleChange, handleConfirmImageRemove, handleImageChange, handleRequestImageRemove, handleSubmit, hasChanges, imageUrl, isImageRemoveDialogOpen, loading, removingImage, saving, uploadingImage } = useEventEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
@@ -21,13 +23,12 @@ export const EventEditPage = () => {
       setUnsavedChangesDialogOpen(true)
       return
     }
-    handleTabChange('events')
+    applyReturnTabs()
   }
 
   const handleConfirmBackToList = () => {
     setUnsavedChangesDialogOpen(false)
-    handleTabChange('events')
-    navigate('/')
+    navigateBack()
   }
 
   return (
@@ -66,7 +67,7 @@ export const EventEditPage = () => {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={handleBackToListClick}>
+            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to={returnTo} onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.floatingSaveAction}>

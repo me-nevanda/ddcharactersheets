@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { createArea, listAreas } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
+import type { EditReturnState } from '@pages/useEditReturnNavigation'
 import type { Area } from '@appTypes/area'
 import type { AreaListCardViewModel, AreaListPageState } from './types'
 
@@ -14,6 +15,11 @@ const buildDescriptionPreview = (value: string): string => {
   const template = document.createElement('template')
   template.innerHTML = value
   return (template.content.textContent ?? '').replace(/\s+/g, ' ').trim()
+}
+
+const areaListReturnState: EditReturnState = {
+  mainTab: 'areas',
+  returnTo: '/',
 }
 
 export const useAreaListPage = (): AreaListPageState => {
@@ -53,7 +59,7 @@ export const useAreaListPage = (): AreaListPageState => {
   }, [t])
 
   const openArea = (areaId: string) => {
-    navigate(`/areas/${areaId}/edit`)
+    navigate(`/areas/${areaId}/edit`, { state: areaListReturnState })
   }
 
   const handleCreateArea = async () => {
@@ -61,7 +67,7 @@ export const useAreaListPage = (): AreaListPageState => {
     setError('')
     try {
       const area = await createArea()
-      navigate(`/areas/${area.id}/edit`)
+      navigate(`/areas/${area.id}/edit`, { state: areaListReturnState })
     } catch (nextError) {
       setError(getErrorMessage(t, nextError))
       setCreating(false)

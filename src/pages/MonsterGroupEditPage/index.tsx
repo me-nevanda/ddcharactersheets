@@ -1,9 +1,9 @@
 import { useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
-import { useMainPageContext } from '@pages/main/mainPageContext'
+import { useEditReturnNavigation } from '@pages/useEditReturnNavigation'
 import { useMonsterGroupEditPage } from './monsterGroupEditPageHooks'
 import type { AssignedMonsterGroupMonsterViewModel, MonsterGroupMonsterOptionViewModel } from './types'
 import styles from './style.module.scss'
@@ -53,8 +53,11 @@ const MonsterRow = ({
 
 export const MonsterGroupEditPage = () => {
   const { t } = useI18n()
-  const navigate = useNavigate()
-  const { handleTabChange } = useMainPageContext()
+  const { applyReturnTabs, navigateBack, returnTo } = useEditReturnNavigation({
+    mainTab: 'monsters',
+    monsterListTab: 'groups',
+    returnTo: '/',
+  })
   const { assignedMonsters, assignedMonsterSearch, error, groupName, handleChangeAssignedMonsterSearch, handleChangeGroupName, handleChangeMonsterSearch, handleSubmit, hasChanges, loading, monsterOptions, monsterSearch, saving } = useMonsterGroupEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
@@ -65,13 +68,12 @@ export const MonsterGroupEditPage = () => {
       return
     }
 
-    handleTabChange('monsters')
+    applyReturnTabs()
   }
 
   const handleConfirmBackToList = () => {
     setUnsavedChangesDialogOpen(false)
-    handleTabChange('monsters')
-    navigate('/')
+    navigateBack()
   }
 
   return (
@@ -91,7 +93,7 @@ export const MonsterGroupEditPage = () => {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={handleBackToListClick}>
+            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to={returnTo} onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.floatingSaveAction}>

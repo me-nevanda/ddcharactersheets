@@ -1,9 +1,9 @@
 ﻿import { useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
-import { useMainPageContext } from '@pages/main/mainPageContext'
+import { useEditReturnNavigation } from '@pages/useEditReturnNavigation'
 import { useNpcGroupEditPage } from './npcGroupEditPageHooks'
 import type { AssignedNpcGroupNpcViewModel, NpcGroupNpcOptionViewModel } from './types'
 import styles from './style.module.scss'
@@ -57,8 +57,11 @@ const NpcRow = ({
 
 export const NpcGroupEditPage = () => {
   const { t } = useI18n()
-  const navigate = useNavigate()
-  const { handleTabChange } = useMainPageContext()
+  const { applyReturnTabs, navigateBack, returnTo } = useEditReturnNavigation({
+    mainTab: 'npcs',
+    npcListTab: 'groups',
+    returnTo: '/',
+  })
   const { assignedNpcs, assignedNpcSearch, error, groupName, handleChangeAssignedNpcSearch, handleChangeGroupName, handleChangeNpcSearch, handleSubmit, hasChanges, loading, npcOptions, npcSearch, saving } = useNpcGroupEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
@@ -69,13 +72,12 @@ export const NpcGroupEditPage = () => {
       return
     }
 
-    handleTabChange('npcs')
+    applyReturnTabs()
   }
 
   const handleConfirmBackToList = () => {
     setUnsavedChangesDialogOpen(false)
-    handleTabChange('npcs')
-    navigate('/')
+    navigateBack()
   }
 
   return (
@@ -95,7 +97,7 @@ export const NpcGroupEditPage = () => {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to="/" onClick={handleBackToListClick}>
+            <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to={returnTo} onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
             <div className={styles.floatingSaveAction}>

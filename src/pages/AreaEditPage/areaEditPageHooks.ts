@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { deleteAreaImage, getArea, saveArea, uploadAreaImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
-import { useMainPageContext } from '@pages/main/mainPageContext'
+import { useEditReturnNavigation } from '@pages/useEditReturnNavigation'
 import type { AreaData, PlaceItem } from '@appTypes/area'
 import type { AreaEditPageState } from './types'
 
@@ -41,8 +41,10 @@ const clonePlaceItems = (items: PlaceItem[]): PlaceItem[] => {
 export const useAreaEditPage = (): AreaEditPageState => {
   const { t } = useI18n()
   const { areaId = '' } = useParams()
-  const navigate = useNavigate()
-  const { handleTabChange } = useMainPageContext()
+  const { navigateBack } = useEditReturnNavigation({
+    mainTab: 'areas',
+    returnTo: '/',
+  })
   const [form, setForm] = useState<AreaData>(emptyArea)
   const [savedArea, setSavedArea] = useState<AreaData>(emptyArea)
   const [loading, setLoading] = useState(true)
@@ -231,8 +233,7 @@ export const useAreaEditPage = (): AreaEditPageState => {
   }
 
   const handleBackToListClick = () => {
-    handleTabChange('areas')
-    navigate('/')
+    navigateBack()
   }
 
   return {
