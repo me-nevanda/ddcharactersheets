@@ -1,6 +1,7 @@
 import { AppIcon } from '@components/AppIcon'
 import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
 import { useI18n } from '@i18n/index'
+import { useStickySentinel } from '@pages/useStickyStateHooks'
 import { CharacterListCard } from './CharacterListCard'
 import { CharacterListHeader } from './CharacterListHeader'
 import styles from './style.module.scss'
@@ -92,14 +93,17 @@ const CharacterListPageContent = ({
   error,
   groupDeletingId,
   groupName,
+  groupSearch,
   groups,
   groupToDelete,
   handleCancelCreateGroup,
   handleCardImageError,
   handleChangeGroupName,
+  handleChangeGroupSearch,
   loading,
   loadingGroups,
   characterToDelete,
+  listSearch,
   handleCloseDeleteDialog,
   handleCloseDeleteGroupDialog,
   handleConfirmDeleteCharacter,
@@ -107,14 +111,18 @@ const CharacterListPageContent = ({
   handleCreateGroupSubmit,
   handleCreateCharacter,
   handleOpenCreateGroupDialog,
+  handleChangeListSearch,
   setActiveTab,
   showCharacterGrid,
   showCreateGroupDialog,
   showEmptyGroupsState,
+  showEmptyGroupSearchState,
   showEmptyState,
+  showEmptySearchState,
   showGroupList,
 }: CharacterListPageState) => {
   const { t } = useI18n()
+  const { isSticky, sentinelRef } = useStickySentinel()
   return (
     <>
       <CharacterListHeader actionLabel={t('pages.characterList.actions.addHero')} creating={creating} secondaryActionLabel={t('pages.characterList.actions.addGroup')} secondaryCreating={creatingGroup} onAction={() => void handleCreateCharacter()} onSecondaryAction={handleOpenCreateGroupDialog} subtitle={t('pages.main.subtitle')} title={t('pages.main.tabs.heroes')} />
@@ -122,13 +130,27 @@ const CharacterListPageContent = ({
       {error ? <p className={styles.status}>{error}</p> : null}
 
       <div className={styles.tabsContainer}>
-        <div className={styles.characterTabs} role="tablist" aria-label={t('pages.main.tabs.heroes')}>
-          <button className={`${styles.characterTabButton} ${activeTab === 'groups' ? styles.characterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'groups'} onClick={() => setActiveTab('groups')}>
-            {t('pages.characterList.tabs.groups')}
-          </button>
-          <button className={`${styles.characterTabButton} ${activeTab === 'list' ? styles.characterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'list'} onClick={() => setActiveTab('list')}>
-            {t('pages.characterList.tabs.list')}
-          </button>
+        <div ref={sentinelRef} className={styles.stickySentinel} aria-hidden="true" />
+        <div className={`${styles.listToolbar} ${isSticky ? styles.listToolbarSticky : ''}`}>
+          {activeTab === 'groups' && !loadingGroups ? (
+            <label className={styles.tabSearchField} htmlFor="character-group-search">
+              <span className={styles.visuallyHidden}>{t('pages.characterList.groups.searchLabel')}</span>
+              <input className={styles.groupSearchInput} id="character-group-search" value={groupSearch} placeholder={t('pages.characterList.groups.searchPlaceholder')} autoComplete="off" onChange={(event) => handleChangeGroupSearch(event.target.value)} />
+            </label>
+          ) : activeTab === 'list' && !loading ? (
+            <label className={styles.tabSearchField} htmlFor="character-list-search">
+              <span className={styles.visuallyHidden}>{t('pages.characterList.searchLabel')}</span>
+              <input className={styles.groupSearchInput} id="character-list-search" value={listSearch} placeholder={t('pages.characterList.searchPlaceholder')} autoComplete="off" onChange={(event) => handleChangeListSearch(event.target.value)} />
+            </label>
+          ) : <span aria-hidden="true" />}
+          <div className={styles.characterTabs} role="tablist" aria-label={t('pages.main.tabs.heroes')}>
+            <button className={`${styles.characterTabButton} ${activeTab === 'groups' ? styles.characterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'groups'} onClick={() => setActiveTab('groups')}>
+              {t('pages.characterList.tabs.groups')}
+            </button>
+            <button className={`${styles.characterTabButton} ${activeTab === 'list' ? styles.characterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'list'} onClick={() => setActiveTab('list')}>
+              {t('pages.characterList.tabs.list')}
+            </button>
+          </div>
         </div>
 
         {activeTab === 'groups' ? (
@@ -141,6 +163,11 @@ const CharacterListPageContent = ({
             {showEmptyGroupsState ? (
               <section className={styles.emptyState}>
                 <p className={styles.emptyText}>{t('pages.characterList.groups.emptyState')}</p>
+              </section>
+            ) : null}
+            {showEmptyGroupSearchState ? (
+              <section className={styles.emptyState}>
+                <p className={styles.emptyText}>{t('pages.characterList.groups.emptySearchState')}</p>
               </section>
             ) : null}
             {showGroupList ? (
@@ -163,6 +190,11 @@ const CharacterListPageContent = ({
             {showEmptyState ? (
               <section className={styles.emptyState}>
                 <p className={styles.emptyText}>{t('pages.characterList.emptyState')}</p>
+              </section>
+            ) : null}
+            {showEmptySearchState ? (
+              <section className={styles.emptyState}>
+                <p className={styles.emptyText}>{t('pages.characterList.emptySearchState')}</p>
               </section>
             ) : null}
             {showCharacterGrid ? (

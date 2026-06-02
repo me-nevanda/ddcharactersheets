@@ -102,16 +102,26 @@ export interface TranslationDictionary {
         addArea: string
       }
       emptyState: string
+      emptySearchState: string
       loading: string
+      searchLabel: string
+      searchPlaceholder: string
       unnamedArea: string
       updatedAt: string
+      deleteDialog: {
+        title: string
+        body: string
+      }
     }
     eventList: {
       actions: {
         addEvent: string
       }
       emptyState: string
+      emptySearchState: string
       loading: string
+      searchLabel: string
+      searchPlaceholder: string
       unnamedEvent: string
       updatedAt: string
       deleteDialog: {
@@ -146,7 +156,10 @@ export interface TranslationDictionary {
         addContext: string
       }
       emptyState: string
+      emptySearchState: string
       loading: string
+      searchLabel: string
+      searchPlaceholder: string
       unnamedContext: string
       updatedAt: string
       deleteDialog: {
@@ -348,6 +361,9 @@ export interface TranslationDictionary {
         addGroup: string
       }
       emptyState: string
+      emptySearchState: string
+      searchLabel: string
+      searchPlaceholder: string
       unnamedCharacter: string
       missingRace: string
       missingClass: string
@@ -359,6 +375,9 @@ export interface TranslationDictionary {
       groups: {
         loading: string
         emptyState: string
+        emptySearchState: string
+        searchLabel: string
+        searchPlaceholder: string
         emptyCharacters: string
         characterCount: string
         moreCharacters: string
@@ -414,6 +433,9 @@ export interface TranslationDictionary {
         addMonster: string
         loading: string
         emptyState: string
+        emptySearchState: string
+        searchLabel: string
+        searchPlaceholder: string
         emptyMonsters: string
         monsterCount: string
         moreMonsters: string
@@ -436,6 +458,9 @@ export interface TranslationDictionary {
         }
       }
       emptyState: string
+      emptySearchState: string
+      searchLabel: string
+      searchPlaceholder: string
       unnamedMonster: string
       deleteDialog: {
         title: string
@@ -456,6 +481,9 @@ export interface TranslationDictionary {
         addNpc: string
         loading: string
         emptyState: string
+        emptySearchState: string
+        searchLabel: string
+        searchPlaceholder: string
         emptyNpcs: string
         npcCount: string
         moreNpcs: string
@@ -478,6 +506,9 @@ export interface TranslationDictionary {
         }
       }
       emptyState: string
+      emptySearchState: string
+      searchLabel: string
+      searchPlaceholder: string
       unnamedNpc: string
       deleteDialog: {
         title: string
@@ -580,11 +611,13 @@ export interface TranslationDictionary {
         low: string
         medium: string
         high: string
+        custom: string
         attackVsKp: string
         attackVsOtherDefenses: string
         lowDamage: string
         mediumDamage: string
         highDamage: string
+        customDamage: string
       }
       placeholders: {
         titleName: string
@@ -691,11 +724,13 @@ export interface TranslationDictionary {
         low: string
         medium: string
         high: string
+        custom: string
         attackVsKp: string
         attackVsOtherDefenses: string
         lowDamage: string
         mediumDamage: string
         highDamage: string
+        customDamage: string
         isStory: string
         isDead: string
       }

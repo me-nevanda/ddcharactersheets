@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import type { NpcData, NpcDefenses, NpcRole, NpcType } from '@appTypes/npc'
+import type { NpcData, NpcDefenses, NpcRole, NpcSuggestedStats, NpcType } from '@appTypes/npc'
 
 interface NpcRoleAttributeRules {
   hpBase: number
@@ -10,7 +10,9 @@ interface NpcRoleAttributeRules {
   attackVsOtherDefensesBase: number
 }
 
-type GeneratedNpcAttributes = Pick<NpcData, 'defenses' | 'hp' | 'suggested'>
+type GeneratedNpcAttributes = Pick<NpcData, 'defenses' | 'hp'> & {
+  suggested: Omit<NpcSuggestedStats, 'customDamage'>
+}
 
 const roleRules: Record<NpcRole, NpcRoleAttributeRules> = {
   skirmisher: {

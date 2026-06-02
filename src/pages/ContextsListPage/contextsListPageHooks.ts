@@ -15,6 +15,10 @@ const buildTextPreview = (value: string): string => {
     .trim()
 }
 
+const normalizeSearchValue = (value: string): string => {
+  return value.trim().toLocaleLowerCase()
+}
+
 const contextListReturnState: EditReturnState = {
   mainTab: 'contexts',
   returnTo: '/',
@@ -28,6 +32,7 @@ export const useContextsListPage = (): ContextsListPageState => {
   const [creating, setCreating] = useState(false)
   const [deletingId, setDeletingId] = useState('')
   const [contextToDelete, setContextToDelete] = useState<Context | null>(null)
+  const [listSearch, setListSearch] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -101,7 +106,12 @@ export const useContextsListPage = (): ContextsListPageState => {
     }
   }
 
-  const cards: ContextListCardViewModel[] = contexts.map((context) => ({
+  const normalizedListSearch = normalizeSearchValue(listSearch)
+  const filteredContexts = normalizedListSearch
+    ? contexts.filter((context) => normalizeSearchValue(context.name.trim() || t('pages.contextList.unnamedContext')).includes(normalizedListSearch))
+    : contexts
+
+  const cards: ContextListCardViewModel[] = filteredContexts.map((context) => ({
     id: context.id,
     deleting: deletingId === context.id,
     description: buildTextPreview(context.description),
@@ -129,12 +139,15 @@ export const useContextsListPage = (): ContextsListPageState => {
     deletingId,
     error,
     contextToDelete,
+    handleChangeListSearch: setListSearch,
     handleCloseDeleteDialog,
     handleConfirmDeleteContext,
     handleCreateContext,
     handleOpenDeleteDialog,
+    listSearch,
     loading,
-    showEmptyState: !loading && cards.length === 0,
+    showEmptySearchState: !loading && contexts.length > 0 && cards.length === 0,
+    showEmptyState: !loading && contexts.length === 0,
     showContextGrid: !loading && cards.length > 0,
   }
 }

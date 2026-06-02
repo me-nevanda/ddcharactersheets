@@ -13,6 +13,7 @@ export interface NpcSuggestedStats {
   lowDamage: string
   mediumDamage: string
   highDamage: string
+  customDamage: string
 }
 
 export type NpcType = 'minion' | 'normal' | 'solo' | 'elite'

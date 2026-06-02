@@ -64,11 +64,13 @@ export interface CharacterListPageState {
   error: string
   groupDeletingId: string
   groupName: string
+  groupSearch: string
   groups: CharacterGroupCardViewModel[]
   groupToDelete: CharacterGroup | null
   handleCancelCreateGroup: () => void
   handleCardImageError: (event: SyntheticEvent<HTMLImageElement>) => void
   handleChangeGroupName: (value: string) => void
+  handleChangeGroupSearch: (value: string) => void
   handleCloseDeleteDialog: () => void
   handleCloseDeleteGroupDialog: () => void
   handleConfirmDeleteCharacter: () => Promise<void>
@@ -80,10 +82,14 @@ export interface CharacterListPageState {
   loading: boolean
   loadingGroups: boolean
   characterToDelete: Character | null
+  listSearch: string
   setActiveTab: (tab: CharacterListTabKey) => void
+  handleChangeListSearch: (value: string) => void
   showCreateGroupDialog: boolean
   showCharacterGrid: boolean
   showEmptyGroupsState: boolean
+  showEmptyGroupSearchState: boolean
   showEmptyState: boolean
+  showEmptySearchState: boolean
   showGroupList: boolean
 }

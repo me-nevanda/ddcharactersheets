@@ -19,11 +19,14 @@ export interface ContextsListPageState {
   deletingId: string
   error: string
   contextToDelete: Context | null
+  handleChangeListSearch: (value: string) => void
   handleCloseDeleteDialog: () => void
   handleConfirmDeleteContext: () => Promise<void>
   handleCreateContext: () => Promise<void>
   handleOpenDeleteDialog: (context: Context) => void
+  listSearch: string
   loading: boolean
+  showEmptySearchState: boolean
   showEmptyState: boolean
   showContextGrid: boolean
 }

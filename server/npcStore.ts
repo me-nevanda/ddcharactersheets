@@ -178,6 +178,7 @@ const normalizeSuggestedStats = (data: Partial<Record<keyof NpcSuggestedStats, u
     lowDamage: normalizeSuggestedStatValue(data.lowDamage),
     mediumDamage: normalizeSuggestedStatValue(data.mediumDamage),
     highDamage: normalizeSuggestedStatValue(data.highDamage),
+    customDamage: normalizeSuggestedStatValue(data.customDamage),
   }
 }
 

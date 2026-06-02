@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import type { MonsterData, MonsterDefenses, MonsterRole, MonsterType } from '@appTypes/monster'
+import type { MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '@appTypes/monster'
 
 interface MonsterRoleAttributeRules {
   hpBase: number
@@ -10,7 +10,9 @@ interface MonsterRoleAttributeRules {
   attackVsOtherDefensesBase: number
 }
 
-type GeneratedMonsterAttributes = Pick<MonsterData, 'defenses' | 'hp' | 'suggested'>
+type GeneratedMonsterAttributes = Pick<MonsterData, 'defenses' | 'hp'> & {
+  suggested: Omit<MonsterSuggestedStats, 'customDamage'>
+}
 
 const roleRules: Record<MonsterRole, MonsterRoleAttributeRules> = {
   skirmisher: {

@@ -16,6 +16,10 @@ const buildTextPreview = (value: string): string => {
     .trim()
 }
 
+const normalizeSearchValue = (value: string): string => {
+  return value.trim().toLocaleLowerCase()
+}
+
 const monsterListReturnState: EditReturnState = {
   mainTab: 'monsters',
   monsterListTab: 'list',
@@ -40,10 +44,12 @@ export const useMonstersListPage = (): MonstersListPageState => {
   const [creatingGroup, setCreatingGroup] = useState(false)
   const [deletingId, setDeletingId] = useState('')
   const [groupDeletingId, setGroupDeletingId] = useState('')
+  const [listSearch, setListSearch] = useState('')
   const [monsterToDelete, setMonsterToDelete] = useState<Monster | null>(null)
   const [groupToDelete, setGroupToDelete] = useState<MonsterGroup | null>(null)
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false)
   const [groupName, setGroupName] = useState('')
+  const [groupSearch, setGroupSearch] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -192,7 +198,12 @@ export const useMonstersListPage = (): MonstersListPageState => {
     }
   }
 
-  const cards: MonsterListCardViewModel[] = monsters.map((monster) => ({
+  const normalizedListSearch = normalizeSearchValue(listSearch)
+  const filteredMonsters = normalizedListSearch
+    ? monsters.filter((monster) => normalizeSearchValue(monster.name.trim() || t('pages.monsterList.unnamedMonster')).includes(normalizedListSearch))
+    : monsters
+
+  const cards: MonsterListCardViewModel[] = filteredMonsters.map((monster) => ({
     deleting: deletingId === monster.id,
     descriptionPreview: buildTextPreview(monster.description),
     id: monster.id,
@@ -220,7 +231,20 @@ export const useMonstersListPage = (): MonstersListPageState => {
     typeLabel: t(`pages.monsterEdit.typeOptions.${monster.type}`),
   }))
 
-  const groupCards: MonsterGroupCardViewModel[] = groups.map((group) => ({
+  const normalizedGroupSearch = normalizeSearchValue(groupSearch)
+  const filteredGroups = normalizedGroupSearch
+    ? groups.filter((group) => {
+      const groupNameMatches = normalizeSearchValue(group.name).includes(normalizedGroupSearch)
+      const monsterNameMatches = group.monsterIds
+        .map((monsterId) => monsters.find((monster) => monster.id === monsterId))
+        .filter((monster): monster is Monster => Boolean(monster))
+        .some((monster) => normalizeSearchValue(monster.name.trim() || t('pages.monsterList.unnamedMonster')).includes(normalizedGroupSearch))
+
+      return groupNameMatches || monsterNameMatches
+    })
+    : groups
+
+  const groupCards: MonsterGroupCardViewModel[] = filteredGroups.map((group) => ({
     deleting: groupDeletingId === group.id,
     hasMoreMonsters: group.monsterIds.length > 4,
     id: group.id,
@@ -272,10 +296,12 @@ export const useMonstersListPage = (): MonstersListPageState => {
     error,
     groupDeletingId,
     groupName,
+    groupSearch,
     groupToDelete,
     groups: groupCards,
     handleCancelCreateGroup,
     handleChangeGroupName,
+    handleChangeGroupSearch: setGroupSearch,
     handleCloseDeleteDialog,
     handleCloseDeleteGroupDialog,
     handleConfirmDeleteMonster,
@@ -283,13 +309,17 @@ export const useMonstersListPage = (): MonstersListPageState => {
     handleCreateGroupSubmit,
     handleCreateMonster,
     handleOpenCreateGroupDialog,
+    handleChangeListSearch: setListSearch,
+    listSearch,
     loading,
     loadingGroups,
     monsterToDelete,
     setActiveTab: handleMonsterListTabChange as (tab: MonsterListTabKey) => void,
     showCreateGroupDialog,
-    showEmptyState: !loading && cards.length === 0,
-    showEmptyGroupsState: !loadingGroups && groupCards.length === 0,
+    showEmptyState: !loading && monsters.length === 0,
+    showEmptySearchState: !loading && monsters.length > 0 && cards.length === 0,
+    showEmptyGroupsState: !loadingGroups && groups.length === 0,
+    showEmptyGroupSearchState: !loadingGroups && groups.length > 0 && groupCards.length === 0,
     showGroupList: !loadingGroups && groupCards.length > 0,
     showMonsterGrid: !loading && cards.length > 0,
   }

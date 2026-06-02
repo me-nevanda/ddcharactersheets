@@ -23,8 +23,15 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
   const lowDamage = formatSuggestedValue(suggested.lowDamage)
   const mediumDamage = formatSuggestedValue(suggested.mediumDamage)
   const highDamage = formatSuggestedValue(suggested.highDamage)
+  const customDamage = formatSuggestedValue(suggested.customDamage)
   const showAttackSuggestion = attackVsKp || attackVsOtherDefenses
-  const showDamageSuggestion = lowDamage || mediumDamage || highDamage
+  const showDamageSuggestion = lowDamage || mediumDamage || highDamage || customDamage
+  const damageSuggestions = [
+    { marker: t('pages.monsterEdit.fields.low'), value: lowDamage },
+    { marker: t('pages.monsterEdit.fields.medium'), value: mediumDamage },
+    { marker: t('pages.monsterEdit.fields.high'), value: highDamage },
+    { marker: t('pages.monsterEdit.fields.custom'), value: customDamage },
+  ].filter((suggestion) => suggestion.value)
 
   return (
     <article className={styles.attackCard}>
@@ -123,29 +130,14 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
         {showDamageSuggestion ? (
           <p className={styles.attackSuggestion}>
             <span className={styles.attackSuggestionLabel}>{t('pages.monsterEdit.fields.damage')}</span>
-            {lowDamage ? (
-              <span>
-                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(t('pages.monsterEdit.fields.low'), t)}>
-                  {t('pages.monsterEdit.fields.low')}
-                </button>: {lowDamage}
+            {damageSuggestions.map((suggestion, suggestionIndex) => (
+              <span key={suggestion.marker}>
+                {suggestionIndex > 0 ? <span>, </span> : null}
+                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(suggestion.marker, t)}>
+                  {suggestion.marker}
+                </button>: {suggestion.value}
               </span>
-            ) : null}
-            {lowDamage && (mediumDamage || highDamage) ? <span>,</span> : null}
-            {mediumDamage ? (
-              <span>
-                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(t('pages.monsterEdit.fields.medium'), t)}>
-                  {t('pages.monsterEdit.fields.medium')}
-                </button>: {mediumDamage}
-              </span>
-            ) : null}
-            {mediumDamage && highDamage ? <span>,</span> : null}
-            {highDamage ? (
-              <span>
-                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(t('pages.monsterEdit.fields.high'), t)}>
-                  {t('pages.monsterEdit.fields.high')}
-                </button> {highDamage}
-              </span>
-            ) : null}
+            ))}
           </p>
         ) : null}
         <SimpleWysiwygEditor ariaLabel={t('pages.characterEdit.abilities.descriptionLabel')} minHeightClassName={styles.attackTextarea} name={`monster-attack-description-${index}`} placeholder={t('pages.monsterEdit.attacks.descriptionPlaceholder')} toolbar={false} value={attack.description} onChange={(value) => onAttackChange(index, 'description', value)} />

@@ -178,6 +178,7 @@ const normalizeSuggestedStats = (data: Partial<Record<keyof MonsterSuggestedStat
     lowDamage: normalizeSuggestedStatValue(data.lowDamage),
     mediumDamage: normalizeSuggestedStatValue(data.mediumDamage),
     highDamage: normalizeSuggestedStatValue(data.highDamage),
+    customDamage: normalizeSuggestedStatValue(data.customDamage),
   }
 }
 

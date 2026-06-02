@@ -23,8 +23,15 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
   const lowDamage = formatSuggestedValue(suggested.lowDamage)
   const mediumDamage = formatSuggestedValue(suggested.mediumDamage)
   const highDamage = formatSuggestedValue(suggested.highDamage)
+  const customDamage = formatSuggestedValue(suggested.customDamage)
   const showAttackSuggestion = attackVsKp || attackVsOtherDefenses
-  const showDamageSuggestion = lowDamage || mediumDamage || highDamage
+  const showDamageSuggestion = lowDamage || mediumDamage || highDamage || customDamage
+  const damageSuggestions = [
+    { marker: t('pages.npcEdit.fields.low'), value: lowDamage },
+    { marker: t('pages.npcEdit.fields.medium'), value: mediumDamage },
+    { marker: t('pages.npcEdit.fields.high'), value: highDamage },
+    { marker: t('pages.npcEdit.fields.custom'), value: customDamage },
+  ].filter((suggestion) => suggestion.value)
 
   return (
     <article className={styles.attackCard}>
@@ -123,29 +130,14 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
         {showDamageSuggestion ? (
           <p className={styles.attackSuggestion}>
             <span className={styles.attackSuggestionLabel}>{t('pages.npcEdit.fields.damage')}</span>
-            {lowDamage ? (
-              <span>
-                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(t('pages.npcEdit.fields.low'), t)}>
-                  {t('pages.npcEdit.fields.low')}
-                </button>: {lowDamage}
+            {damageSuggestions.map((suggestion, suggestionIndex) => (
+              <span key={suggestion.marker}>
+                {suggestionIndex > 0 ? <span>, </span> : null}
+                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(suggestion.marker, t)}>
+                  {suggestion.marker}
+                </button>: {suggestion.value}
               </span>
-            ) : null}
-            {lowDamage && (mediumDamage || highDamage) ? <span>,</span> : null}
-            {mediumDamage ? (
-              <span>
-                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(t('pages.npcEdit.fields.medium'), t)}>
-                  {t('pages.npcEdit.fields.medium')}
-                </button>: {mediumDamage}
-              </span>
-            ) : null}
-            {mediumDamage && highDamage ? <span>,</span> : null}
-            {highDamage ? (
-              <span>
-                <button className={styles.attackSuggestionCopyButton} type="button" title={t('common.clipboard.copyDamageValue')} onClick={() => void copySuggestedDamageMarker(t('pages.npcEdit.fields.high'), t)}>
-                  {t('pages.npcEdit.fields.high')}
-                </button> {highDamage}
-              </span>
-            ) : null}
+            ))}
           </p>
         ) : null}
         <SimpleWysiwygEditor ariaLabel={t('pages.characterEdit.abilities.descriptionLabel')} minHeightClassName={styles.attackTextarea} name={`npc-attack-description-${index}`} placeholder={t('pages.npcEdit.attacks.descriptionPlaceholder')} toolbar={false} value={attack.description} onChange={(value) => onAttackChange(index, 'description', value)} />

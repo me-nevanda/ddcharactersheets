@@ -209,7 +209,6 @@ export const NpcEditPage = () => {
                           </label>
                         </div>
                         <div className={styles.suggestedRow}>
-                          <span className={styles.suggestedRowLabel}>{t('pages.npcEdit.fields.damage')}</span>
                           <label className={styles.suggestedInlineField} htmlFor="lowDamage">
                             <span className={styles.defenseLabel}>{t('pages.npcEdit.fields.low')}</span>
                             <input className={`${styles.input} ${styles.suggestedInput}`} id="lowDamage" name="lowDamage" type="text" value={form.suggested.lowDamage} onChange={handleChange} />
@@ -221,6 +220,10 @@ export const NpcEditPage = () => {
                           <label className={styles.suggestedInlineField} htmlFor="highDamage">
                             <span className={styles.defenseLabel}>{t('pages.npcEdit.fields.high')}</span>
                             <input className={`${styles.input} ${styles.suggestedInput}`} id="highDamage" name="highDamage" type="text" value={form.suggested.highDamage} onChange={handleChange} />
+                          </label>
+                          <label className={styles.suggestedInlineField} htmlFor="customDamage">
+                            <span className={styles.defenseLabel}>{t('pages.npcEdit.fields.custom')}</span>
+                            <input className={`${styles.input} ${styles.suggestedInput}`} id="customDamage" name="customDamage" type="text" value={form.suggested.customDamage} onChange={handleChange} />
                           </label>
                         </div>
                       </div>

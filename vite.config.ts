@@ -11,7 +11,7 @@ import { createMonsterGroup, deleteMonsterGroup, isSafeMonsterGroupId, listMonst
 import { createMonster, deleteMonster, deleteMonsterImage, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
 import { createNpcGroup, deleteNpcGroup, isSafeNpcGroupId, listNpcGroups, readNpcGroup, updateNpcGroup } from './server/npcGroupStore';
 import { createNpc, deleteNpc, deleteNpcImage, isSafeNpcId, listNpcs, readNpc, readNpcImage, updateNpc, updateNpcImage } from './server/npcStore';
-import { createArea, deleteAreaImage, isSafeAreaId, listAreas, readArea, readAreaImage, updateArea, updateAreaImage } from './server/areaStore';
+import { createArea, deleteArea, deleteAreaImage, isSafeAreaId, listAreas, readArea, readAreaImage, updateArea, updateAreaImage } from './server/areaStore';
 interface ApiError extends Error {
     code?: string;
     statusCode?: number;
@@ -593,6 +593,11 @@ const createAreasApiPlugin = (): Plugin => {
                     sendJson(response, 200, {
                         area: await updateArea(areaId, payload),
                     });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    await deleteArea(areaId);
+                    sendJson(response, 200, null);
                     return;
                 }
             }

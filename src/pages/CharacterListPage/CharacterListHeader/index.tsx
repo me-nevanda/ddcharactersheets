@@ -11,18 +11,18 @@ export const CharacterListHeader = ({ actionLabel, creating, onAction, onSeconda
         <h1 className={styles.title}>{title}</h1>
       </div>
       <div className={styles.actions}>
-        <button className={styles.primaryButton} type="button" onClick={onAction} disabled={creating}>
-          <span className={styles.buttonContent}>
-            <AppIcon name="plus"/>
-            <span>{creating ? t('common.states.creating') : actionLabel}</span>
-          </span>
-        </button>
         {onSecondaryAction && secondaryActionLabel ? (<button className={styles.secondaryButton} type="button" onClick={onSecondaryAction} disabled={secondaryCreating}>
           <span className={styles.buttonContent}>
             <AppIcon name="plus"/>
             <span>{secondaryCreating ? t('common.states.creating') : secondaryActionLabel}</span>
           </span>
         </button>) : null}
+        <button className={styles.primaryButton} type="button" onClick={onAction} disabled={creating}>
+          <span className={styles.buttonContent}>
+            <AppIcon name="plus"/>
+            <span>{creating ? t('common.states.creating') : actionLabel}</span>
+          </span>
+        </button>
       </div>
     </header>);
 };

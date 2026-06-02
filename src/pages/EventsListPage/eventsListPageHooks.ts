@@ -15,6 +15,10 @@ const buildTextPreview = (value: string): string => {
     .trim()
 }
 
+const normalizeSearchValue = (value: string): string => {
+  return value.trim().toLocaleLowerCase()
+}
+
 const eventListReturnState: EditReturnState = {
   mainTab: 'events',
   returnTo: '/',
@@ -28,6 +32,7 @@ export const useEventsListPage = (): EventsListPageState => {
   const [creating, setCreating] = useState(false)
   const [deletingId, setDeletingId] = useState('')
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null)
+  const [listSearch, setListSearch] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -101,7 +106,12 @@ export const useEventsListPage = (): EventsListPageState => {
     }
   }
 
-  const cards: EventListCardViewModel[] = events.map((event) => ({
+  const normalizedListSearch = normalizeSearchValue(listSearch)
+  const filteredEvents = normalizedListSearch
+    ? events.filter((event) => normalizeSearchValue(event.name.trim() || t('pages.eventList.unnamedEvent')).includes(normalizedListSearch))
+    : events
+
+  const cards: EventListCardViewModel[] = filteredEvents.map((event) => ({
     id: event.id,
     deleting: deletingId === event.id,
     description: buildTextPreview(event.description),
@@ -129,12 +139,15 @@ export const useEventsListPage = (): EventsListPageState => {
     deletingId,
     error,
     eventToDelete,
+    handleChangeListSearch: setListSearch,
     handleCloseDeleteDialog,
     handleConfirmDeleteEvent,
     handleCreateEvent,
     handleOpenDeleteDialog,
+    listSearch,
     loading,
-    showEmptyState: !loading && cards.length === 0,
+    showEmptySearchState: !loading && events.length > 0 && cards.length === 0,
+    showEmptyState: !loading && events.length === 0,
     showEventGrid: !loading && cards.length > 0,
   }
 }

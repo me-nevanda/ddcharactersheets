@@ -2,6 +2,7 @@ import { AppIcon } from '@components/AppIcon'
 import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
 import { useI18n } from '@i18n/index'
 import { CharacterListHeader } from '@pages/CharacterListPage/CharacterListHeader'
+import { useStickySentinel } from '@pages/useStickyStateHooks'
 import { useMonstersListPage } from './monstersListPageHooks'
 import type { CreateMonsterGroupDialogProps, MonsterGroupCardViewModel, MonsterListCardViewModel } from './types'
 import styles from './style.module.scss'
@@ -118,20 +119,35 @@ const CreateMonsterGroupDialog = ({
 
 export const MonstersListPage = () => {
   const { t } = useI18n()
-  const { activeTab, cards, creating, creatingGroup, deleteDialogGroupName, deletingId, deleteDialogMonsterName, error, groupDeletingId, groupName, groups, groupToDelete, handleCancelCreateGroup, handleChangeGroupName, handleCloseDeleteDialog, handleCloseDeleteGroupDialog, handleConfirmDeleteMonster, handleConfirmDeleteMonsterGroup, handleCreateGroupSubmit, handleCreateMonster, handleOpenCreateGroupDialog, loading, loadingGroups, monsterToDelete, setActiveTab, showCreateGroupDialog, showEmptyGroupsState, showEmptyState, showGroupList, showMonsterGrid } = useMonstersListPage()
+  const { isSticky, sentinelRef } = useStickySentinel()
+  const { activeTab, cards, creating, creatingGroup, deleteDialogGroupName, deletingId, deleteDialogMonsterName, error, groupDeletingId, groupName, groupSearch, groups, groupToDelete, handleCancelCreateGroup, handleChangeGroupName, handleChangeGroupSearch, handleChangeListSearch, handleCloseDeleteDialog, handleCloseDeleteGroupDialog, handleConfirmDeleteMonster, handleConfirmDeleteMonsterGroup, handleCreateGroupSubmit, handleCreateMonster, handleOpenCreateGroupDialog, listSearch, loading, loadingGroups, monsterToDelete, setActiveTab, showCreateGroupDialog, showEmptyGroupsState, showEmptyGroupSearchState, showEmptySearchState, showEmptyState, showGroupList, showMonsterGrid } = useMonstersListPage()
 
   return (
     <>
       <CharacterListHeader actionLabel={t('pages.characterList.actions.addMonster')} creating={creating} secondaryActionLabel={t('pages.monsterList.actions.addGroup')} secondaryCreating={creatingGroup} onAction={() => void handleCreateMonster()} onSecondaryAction={handleOpenCreateGroupDialog} subtitle={t('pages.main.subtitle')} title={t('pages.main.tabs.monsters')} />
       {error ? <p className={styles.status}>{error}</p> : null}
       <div className={styles.tabsContainer}>
-        <div className={styles.monsterTabs} role="tablist" aria-label={t('pages.main.tabs.monsters')}>
-          <button className={`${styles.monsterTabButton} ${activeTab === 'groups' ? styles.monsterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'groups'} onClick={() => setActiveTab('groups')}>
-            {t('pages.monsterList.tabs.groups')}
-          </button>
-          <button className={`${styles.monsterTabButton} ${activeTab === 'list' ? styles.monsterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'list'} onClick={() => setActiveTab('list')}>
-            {t('pages.monsterList.tabs.list')}
-          </button>
+        <div ref={sentinelRef} className={styles.stickySentinel} aria-hidden="true" />
+        <div className={`${styles.listToolbar} ${isSticky ? styles.listToolbarSticky : ''}`}>
+          {activeTab === 'groups' && !loadingGroups ? (
+            <label className={styles.tabSearchField} htmlFor="monster-group-search">
+              <span className={styles.visuallyHidden}>{t('pages.monsterList.groups.searchLabel')}</span>
+              <input className={styles.groupSearchInput} id="monster-group-search" value={groupSearch} placeholder={t('pages.monsterList.groups.searchPlaceholder')} autoComplete="off" onChange={(event) => handleChangeGroupSearch(event.target.value)} />
+            </label>
+          ) : activeTab === 'list' && !loading ? (
+            <label className={styles.tabSearchField} htmlFor="monster-list-search">
+              <span className={styles.visuallyHidden}>{t('pages.monsterList.searchLabel')}</span>
+              <input className={styles.groupSearchInput} id="monster-list-search" value={listSearch} placeholder={t('pages.monsterList.searchPlaceholder')} autoComplete="off" onChange={(event) => handleChangeListSearch(event.target.value)} />
+            </label>
+          ) : <span aria-hidden="true" />}
+          <div className={styles.monsterTabs} role="tablist" aria-label={t('pages.main.tabs.monsters')}>
+            <button className={`${styles.monsterTabButton} ${activeTab === 'groups' ? styles.monsterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'groups'} onClick={() => setActiveTab('groups')}>
+              {t('pages.monsterList.tabs.groups')}
+            </button>
+            <button className={`${styles.monsterTabButton} ${activeTab === 'list' ? styles.monsterTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'list'} onClick={() => setActiveTab('list')}>
+              {t('pages.monsterList.tabs.list')}
+            </button>
+          </div>
         </div>
         {activeTab === 'groups' ? (
           <>
@@ -143,6 +159,11 @@ export const MonstersListPage = () => {
             {showEmptyGroupsState ? (
               <section className={styles.emptyPanel}>
                 <p className={styles.emptyText}>{t('pages.monsterList.groups.emptyState')}</p>
+              </section>
+            ) : null}
+            {showEmptyGroupSearchState ? (
+              <section className={styles.emptyPanel}>
+                <p className={styles.emptyText}>{t('pages.monsterList.groups.emptySearchState')}</p>
               </section>
             ) : null}
             {showGroupList ? (
@@ -164,6 +185,11 @@ export const MonstersListPage = () => {
             {showEmptyState ? (
               <section className={styles.emptyPanel}>
                 <p className={styles.emptyText}>{t('pages.monsterList.emptyState')}</p>
+              </section>
+            ) : null}
+            {showEmptySearchState ? (
+              <section className={styles.emptyPanel}>
+                <p className={styles.emptyText}>{t('pages.monsterList.emptySearchState')}</p>
               </section>
             ) : null}
             {showMonsterGrid ? (

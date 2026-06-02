@@ -13,6 +13,7 @@ export interface MonsterSuggestedStats {
   lowDamage: string
   mediumDamage: string
   highDamage: string
+  customDamage: string
 }
 
 export type MonsterType = 'minion' | 'normal' | 'solo' | 'elite'

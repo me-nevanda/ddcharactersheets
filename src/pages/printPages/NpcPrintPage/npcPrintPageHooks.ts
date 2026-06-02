@@ -48,6 +48,7 @@ const applySuggestedDamageToDescription = (description: string, npc: Npc): strin
     .replace(/\[S\]/g, escapeHtml(npc.suggested.lowDamage))
     .replace(/\[M\]/g, escapeHtml(npc.suggested.mediumDamage))
     .replace(/\[L\]/g, escapeHtml(npc.suggested.highDamage))
+    .replace(/\[C\]/g, escapeHtml(npc.suggested.customDamage))
 }
 
 const buildAttackRows = (t: ReturnType<typeof useI18n>['t'], npc: Npc): NpcPrintAttackRow[] => {

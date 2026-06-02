@@ -48,6 +48,7 @@ const applySuggestedDamageToDescription = (description: string, monster: Monster
     .replace(/\[S\]/g, escapeHtml(monster.suggested.lowDamage))
     .replace(/\[M\]/g, escapeHtml(monster.suggested.mediumDamage))
     .replace(/\[L\]/g, escapeHtml(monster.suggested.highDamage))
+    .replace(/\[C\]/g, escapeHtml(monster.suggested.customDamage))
 }
 
 const buildAttackRows = (t: ReturnType<typeof useI18n>['t'], monster: Monster): MonsterPrintAttackRow[] => {

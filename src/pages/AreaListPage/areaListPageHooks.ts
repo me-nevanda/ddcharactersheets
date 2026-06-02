@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { createArea, listAreas } from '@lib/api'
+import { createArea, deleteArea, listAreas } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import type { EditReturnState } from '@pages/useEditReturnNavigation'
 import type { Area } from '@appTypes/area'
@@ -17,6 +17,10 @@ const buildDescriptionPreview = (value: string): string => {
   return (template.content.textContent ?? '').replace(/\s+/g, ' ').trim()
 }
 
+const normalizeSearchValue = (value: string): string => {
+  return value.trim().toLocaleLowerCase()
+}
+
 const areaListReturnState: EditReturnState = {
   mainTab: 'areas',
   returnTo: '/',
@@ -28,6 +32,9 @@ export const useAreaListPage = (): AreaListPageState => {
   const [areas, setAreas] = useState<Area[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+  const [deletingId, setDeletingId] = useState('')
+  const [areaToDelete, setAreaToDelete] = useState<Area | null>(null)
+  const [listSearch, setListSearch] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -74,17 +81,54 @@ export const useAreaListPage = (): AreaListPageState => {
     }
   }
 
+  const handleOpenDeleteDialog = (area: Area) => {
+    setAreaToDelete(area)
+  }
+
+  const handleCloseDeleteDialog = () => {
+    setAreaToDelete(null)
+  }
+
+  const handleConfirmDeleteArea = async () => {
+    if (!areaToDelete) {
+      return
+    }
+
+    setDeletingId(areaToDelete.id)
+    setError('')
+
+    try {
+      await deleteArea(areaToDelete.id)
+      setAreas((current) => current.filter((item) => item.id !== areaToDelete.id))
+      setAreaToDelete(null)
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+    } finally {
+      setDeletingId('')
+    }
+  }
+
   const dateFormatter = new Intl.DateTimeFormat(locale === 'pl' ? 'pl-PL' : 'en-US', {
     dateStyle: 'medium',
     timeStyle: 'short',
   })
 
-  const cards: AreaListCardViewModel[] = areas.map((area) => ({
+  const normalizedListSearch = normalizeSearchValue(listSearch)
+  const filteredAreas = normalizedListSearch
+    ? areas.filter((area) => normalizeSearchValue(area.name.trim() || t('pages.areaList.unnamedArea')).includes(normalizedListSearch))
+    : areas
+
+  const cards: AreaListCardViewModel[] = filteredAreas.map((area) => ({
     id: area.id,
+    deleting: deletingId === area.id,
     imageUrl: area.imageUrl,
     label: area.name.trim() || t('pages.areaList.unnamedArea'),
     descriptionPreview: buildDescriptionPreview(area.description),
     updatedAtLabel: dateFormatter.format(new Date(area.updatedAt)),
+    onDeleteClick: (event) => {
+      event.stopPropagation()
+      handleOpenDeleteDialog(area)
+    },
     onKeyDown: (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
@@ -98,11 +142,19 @@ export const useAreaListPage = (): AreaListPageState => {
 
   return {
     cards,
+    areaToDelete,
     creating,
+    deleteDialogAreaName: areaToDelete?.name.trim() || t('pages.areaList.unnamedArea'),
+    deletingId,
     error,
+    handleCloseDeleteDialog,
+    handleConfirmDeleteArea,
+    handleChangeListSearch: setListSearch,
     handleCreateArea,
+    listSearch,
     loading,
     showAreaGrid: !loading && cards.length > 0,
-    showEmptyState: !loading && cards.length === 0,
+    showEmptySearchState: !loading && areas.length > 0 && cards.length === 0,
+    showEmptyState: !loading && areas.length === 0,
   }
 }

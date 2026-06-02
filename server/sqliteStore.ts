@@ -278,6 +278,20 @@ const ensureEntityUniqueIdIndexes = (db: Database.Database): void => {
   }
 }
 
+const ensureColumn = (db: Database.Database, tableName: string, columnName: string, definition: string): void => {
+  const columns = db.prepare(`PRAGMA table_info(${quoteName(tableName)})`).all() as { name: string }[]
+  if (columns.some((column) => column.name === columnName)) {
+    return
+  }
+
+  db.exec(`ALTER TABLE ${quoteName(tableName)} ADD COLUMN ${quoteName(columnName)} ${definition};`)
+}
+
+const ensureMonsterAndNpcSuggestedColumns = (db: Database.Database): void => {
+  ensureColumn(db, 'monsters', 'suggested_custom_damage', "TEXT NOT NULL DEFAULT ''")
+  ensureColumn(db, 'npcs', 'suggested_custom_damage', "TEXT NOT NULL DEFAULT ''")
+}
+
 const ensureGroupTables = (db: Database.Database): void => {
   for (const config of groupTableConfigs) {
     const groupColumns = db.prepare(`PRAGMA table_info(${quoteName(config.tableName)})`).all() as { name: string }[]
@@ -1172,6 +1186,7 @@ const getDatabase = (): Database.Database => {
   `)
 
   ensureEntityUniqueIdIndexes(database)
+  ensureMonsterAndNpcSuggestedColumns(database)
   ensureGroupTables(database)
   database.exec(`
     CREATE TABLE IF NOT EXISTS character_group_members (
@@ -1728,6 +1743,7 @@ const buildNpcPayload = (row: NpcRow): Partial<Record<string, unknown>> => {
       lowDamage: rowText(row, 'suggested_low_damage'),
       mediumDamage: rowText(row, 'suggested_medium_damage'),
       highDamage: rowText(row, 'suggested_high_damage'),
+      customDamage: rowText(row, 'suggested_custom_damage'),
     },
     hp: row.hp,
     level: row.level,
@@ -1773,6 +1789,7 @@ const buildMonsterPayload = (row: MonsterRow): Partial<Record<string, unknown>> 
       lowDamage: rowText(row, 'suggested_low_damage'),
       mediumDamage: rowText(row, 'suggested_medium_damage'),
       highDamage: rowText(row, 'suggested_high_damage'),
+      customDamage: rowText(row, 'suggested_custom_damage'),
     },
     hp: row.hp,
     level: row.level,
@@ -2430,6 +2447,7 @@ const getNpcBaseParams = <TData>(id: string, payload: TData, createdAt: string, 
     suggested_low_damage: normalizeStoredText(suggested.lowDamage),
     suggested_medium_damage: normalizeStoredText(suggested.mediumDamage),
     suggested_high_damage: normalizeStoredText(suggested.highDamage),
+    suggested_custom_damage: normalizeStoredText(suggested.customDamage),
     created_at: createdAt,
     updated_at: updatedAt,
   }
@@ -2459,6 +2477,7 @@ const getMonsterBaseParams = <TData>(id: string, payload: TData, createdAt: stri
     suggested_low_damage: normalizeStoredText(suggested.lowDamage),
     suggested_medium_damage: normalizeStoredText(suggested.mediumDamage),
     suggested_high_damage: normalizeStoredText(suggested.highDamage),
+    suggested_custom_damage: normalizeStoredText(suggested.customDamage),
     created_at: createdAt,
     updated_at: updatedAt,
   }

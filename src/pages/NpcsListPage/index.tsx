@@ -2,6 +2,7 @@
 import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
 import { useI18n } from '@i18n/index'
 import { CharacterListHeader } from '@pages/CharacterListPage/CharacterListHeader'
+import { useStickySentinel } from '@pages/useStickyStateHooks'
 import { useNpcsListPage } from './npcsListPageHooks'
 import type { CreateNpcGroupDialogProps, NpcGroupCardViewModel, NpcListCardViewModel } from './types'
 import styles from './style.module.scss'
@@ -124,20 +125,35 @@ const CreateNpcGroupDialog = ({
 
 export const NpcsListPage = () => {
   const { t } = useI18n()
-  const { activeTab, cards, creating, creatingGroup, deleteDialogGroupName, deletingId, deleteDialogNpcName, error, groupDeletingId, groupName, groups, groupToDelete, handleCancelCreateGroup, handleChangeGroupName, handleCloseDeleteDialog, handleCloseDeleteGroupDialog, handleConfirmDeleteNpc, handleConfirmDeleteNpcGroup, handleCreateGroupSubmit, handleCreateNpc, handleOpenCreateGroupDialog, loading, loadingGroups, npcToDelete, setActiveTab, showCreateGroupDialog, showEmptyGroupsState, showEmptyState, showGroupList, showNpcGrid } = useNpcsListPage()
+  const { isSticky, sentinelRef } = useStickySentinel()
+  const { activeTab, cards, creating, creatingGroup, deleteDialogGroupName, deletingId, deleteDialogNpcName, error, groupDeletingId, groupName, groupSearch, groups, groupToDelete, handleCancelCreateGroup, handleChangeGroupName, handleChangeGroupSearch, handleChangeListSearch, handleCloseDeleteDialog, handleCloseDeleteGroupDialog, handleConfirmDeleteNpc, handleConfirmDeleteNpcGroup, handleCreateGroupSubmit, handleCreateNpc, handleOpenCreateGroupDialog, listSearch, loading, loadingGroups, npcToDelete, setActiveTab, showCreateGroupDialog, showEmptyGroupsState, showEmptyGroupSearchState, showEmptySearchState, showEmptyState, showGroupList, showNpcGrid } = useNpcsListPage()
 
   return (
     <>
       <CharacterListHeader actionLabel={t('pages.npcList.actions.addNpc')} creating={creating} secondaryActionLabel={t('pages.npcList.actions.addGroup')} secondaryCreating={creatingGroup} onAction={() => void handleCreateNpc()} onSecondaryAction={handleOpenCreateGroupDialog} subtitle={t('pages.main.subtitle')} title={t('pages.main.tabs.npcs')} />
       {error ? <p className={styles.status}>{error}</p> : null}
       <div className={styles.tabsContainer}>
-        <div className={styles.npcTabs} role="tablist" aria-label={t('pages.main.tabs.npcs')}>
-          <button className={`${styles.npcTabButton} ${activeTab === 'groups' ? styles.npcTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'groups'} onClick={() => setActiveTab('groups')}>
-            {t('pages.npcList.tabs.groups')}
-          </button>
-          <button className={`${styles.npcTabButton} ${activeTab === 'list' ? styles.npcTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'list'} onClick={() => setActiveTab('list')}>
-            {t('pages.npcList.tabs.list')}
-          </button>
+        <div ref={sentinelRef} className={styles.stickySentinel} aria-hidden="true" />
+        <div className={`${styles.listToolbar} ${isSticky ? styles.listToolbarSticky : ''}`}>
+          {activeTab === 'groups' && !loadingGroups ? (
+            <label className={styles.tabSearchField} htmlFor="npc-group-search">
+              <span className={styles.visuallyHidden}>{t('pages.npcList.groups.searchLabel')}</span>
+              <input className={styles.groupSearchInput} id="npc-group-search" value={groupSearch} placeholder={t('pages.npcList.groups.searchPlaceholder')} autoComplete="off" onChange={(event) => handleChangeGroupSearch(event.target.value)} />
+            </label>
+          ) : activeTab === 'list' && !loading ? (
+            <label className={styles.tabSearchField} htmlFor="npc-list-search">
+              <span className={styles.visuallyHidden}>{t('pages.npcList.searchLabel')}</span>
+              <input className={styles.groupSearchInput} id="npc-list-search" value={listSearch} placeholder={t('pages.npcList.searchPlaceholder')} autoComplete="off" onChange={(event) => handleChangeListSearch(event.target.value)} />
+            </label>
+          ) : <span aria-hidden="true" />}
+          <div className={styles.npcTabs} role="tablist" aria-label={t('pages.main.tabs.npcs')}>
+            <button className={`${styles.npcTabButton} ${activeTab === 'groups' ? styles.npcTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'groups'} onClick={() => setActiveTab('groups')}>
+              {t('pages.npcList.tabs.groups')}
+            </button>
+            <button className={`${styles.npcTabButton} ${activeTab === 'list' ? styles.npcTabButtonActive : ''}`} type="button" role="tab" aria-selected={activeTab === 'list'} onClick={() => setActiveTab('list')}>
+              {t('pages.npcList.tabs.list')}
+            </button>
+          </div>
         </div>
         {activeTab === 'groups' ? (
           <>
@@ -149,6 +165,11 @@ export const NpcsListPage = () => {
             {showEmptyGroupsState ? (
               <section className={styles.emptyPanel}>
                 <p className={styles.emptyText}>{t('pages.npcList.groups.emptyState')}</p>
+              </section>
+            ) : null}
+            {showEmptyGroupSearchState ? (
+              <section className={styles.emptyPanel}>
+                <p className={styles.emptyText}>{t('pages.npcList.groups.emptySearchState')}</p>
               </section>
             ) : null}
             {showGroupList ? (
@@ -170,6 +191,11 @@ export const NpcsListPage = () => {
             {showEmptyState ? (
               <section className={styles.emptyPanel}>
                 <p className={styles.emptyText}>{t('pages.npcList.emptyState')}</p>
+              </section>
+            ) : null}
+            {showEmptySearchState ? (
+              <section className={styles.emptyPanel}>
+                <p className={styles.emptyText}>{t('pages.npcList.emptySearchState')}</p>
               </section>
             ) : null}
             {showNpcGrid ? (

@@ -33,6 +33,7 @@ const emptyNpcForm: NpcData = {
     lowDamage: '',
     mediumDamage: '',
     highDamage: '',
+    customDamage: '',
   },
   hp: 0,
   level: 1,
@@ -42,7 +43,7 @@ const emptyNpcForm: NpcData = {
 }
 
 const defenseFields = ['kp', 'fortitude', 'reflex', 'will'] as const satisfies readonly (keyof NpcDefenses)[]
-const suggestedFields = ['attackVsKp', 'attackVsOtherDefenses', 'lowDamage', 'mediumDamage', 'highDamage'] as const satisfies readonly (keyof NpcSuggestedStats)[]
+const suggestedFields = ['attackVsKp', 'attackVsOtherDefenses', 'lowDamage', 'mediumDamage', 'highDamage', 'customDamage'] as const satisfies readonly (keyof NpcSuggestedStats)[]
 const numericFields = ['hp', 'level', 'speed'] as const satisfies readonly (keyof Pick<NpcData, 'hp' | 'level' | 'speed'>)[]
 const npcRoles = ['skirmisher', 'brute', 'soldier', 'lurker', 'controller', 'artillery'] as const satisfies readonly NpcRole[]
 const npcTypes = ['minion', 'normal', 'solo', 'elite'] as const satisfies readonly NpcType[]
@@ -127,6 +128,7 @@ const normalizeSuggestedStats = (suggested: Partial<Record<keyof NpcSuggestedSta
     lowDamage: typeof suggested?.lowDamage === 'string' ? normalizeSuggestedInputValue(suggested.lowDamage) : '',
     mediumDamage: typeof suggested?.mediumDamage === 'string' ? normalizeSuggestedInputValue(suggested.mediumDamage) : '',
     highDamage: typeof suggested?.highDamage === 'string' ? normalizeSuggestedInputValue(suggested.highDamage) : '',
+    customDamage: typeof suggested?.customDamage === 'string' ? normalizeSuggestedInputValue(suggested.customDamage) : '',
   }
 }
 
@@ -353,10 +355,17 @@ export const useNpcEditPage = (): NpcEditPageState => {
   }
 
   const handleConfirmGenerateAttributes = () => {
-    setForm((current) => ({
-      ...current,
-      ...generateNpcAttributes(current.level, current.role, current.type),
-    }))
+    setForm((current) => {
+      const generated = generateNpcAttributes(current.level, current.role, current.type)
+      return {
+        ...current,
+        ...generated,
+        suggested: {
+          ...current.suggested,
+          ...generated.suggested,
+        },
+      }
+    })
     setGenerateAttributesDialogOpen(false)
   }
 
@@ -654,6 +663,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
           lowDamage: form.suggested.lowDamage.trim(),
           mediumDamage: form.suggested.mediumDamage.trim(),
           highDamage: form.suggested.highDamage.trim(),
+          customDamage: form.suggested.customDamage.trim(),
         },
         hp: form.hp,
         level: form.level,

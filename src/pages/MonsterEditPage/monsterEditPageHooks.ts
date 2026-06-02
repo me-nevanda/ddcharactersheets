@@ -33,6 +33,7 @@ const emptyMonsterForm: MonsterData = {
     lowDamage: '',
     mediumDamage: '',
     highDamage: '',
+    customDamage: '',
   },
   hp: 0,
   level: 1,
@@ -40,7 +41,7 @@ const emptyMonsterForm: MonsterData = {
 }
 
 const defenseFields = ['kp', 'fortitude', 'reflex', 'will'] as const satisfies readonly (keyof MonsterDefenses)[]
-const suggestedFields = ['attackVsKp', 'attackVsOtherDefenses', 'lowDamage', 'mediumDamage', 'highDamage'] as const satisfies readonly (keyof MonsterSuggestedStats)[]
+const suggestedFields = ['attackVsKp', 'attackVsOtherDefenses', 'lowDamage', 'mediumDamage', 'highDamage', 'customDamage'] as const satisfies readonly (keyof MonsterSuggestedStats)[]
 const numericFields = ['hp', 'level', 'speed'] as const satisfies readonly (keyof Pick<MonsterData, 'hp' | 'level' | 'speed'>)[]
 const monsterRoles = ['skirmisher', 'brute', 'soldier', 'lurker', 'controller', 'artillery'] as const satisfies readonly MonsterRole[]
 const monsterTypes = ['minion', 'normal', 'solo', 'elite'] as const satisfies readonly MonsterType[]
@@ -125,6 +126,7 @@ const normalizeSuggestedStats = (suggested: Partial<Record<keyof MonsterSuggeste
     lowDamage: typeof suggested?.lowDamage === 'string' ? normalizeSuggestedInputValue(suggested.lowDamage) : '',
     mediumDamage: typeof suggested?.mediumDamage === 'string' ? normalizeSuggestedInputValue(suggested.mediumDamage) : '',
     highDamage: typeof suggested?.highDamage === 'string' ? normalizeSuggestedInputValue(suggested.highDamage) : '',
+    customDamage: typeof suggested?.customDamage === 'string' ? normalizeSuggestedInputValue(suggested.customDamage) : '',
   }
 }
 
@@ -349,10 +351,17 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
   }
 
   const handleConfirmGenerateAttributes = () => {
-    setForm((current) => ({
-      ...current,
-      ...generateMonsterAttributes(current.level, current.role, current.type),
-    }))
+    setForm((current) => {
+      const generated = generateMonsterAttributes(current.level, current.role, current.type)
+      return {
+        ...current,
+        ...generated,
+        suggested: {
+          ...current.suggested,
+          ...generated.suggested,
+        },
+      }
+    })
     setGenerateAttributesDialogOpen(false)
   }
 
@@ -634,6 +643,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
           lowDamage: form.suggested.lowDamage.trim(),
           mediumDamage: form.suggested.mediumDamage.trim(),
           highDamage: form.suggested.highDamage.trim(),
+          customDamage: form.suggested.customDamage.trim(),
         },
         hp: form.hp,
         level: form.level,

@@ -24,13 +24,31 @@
 
 .tabsContainer {
   position: relative;
-  margin-top: 2.25rem;
+  margin-top: 0.25rem;
+}
+
+.stickySentinel {
+  height: 1px;
+}
+
+.listToolbar {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.2rem;
+  padding: 0.35rem 0;
+}
+
+.listToolbarSticky {
+  background: linear-gradient(180deg, rgba(28, 17, 12, 0.98), rgba(28, 17, 12, 0.82));
+  backdrop-filter: blur(10px);
 }
 
 .monsterTabs {
-  position: absolute;
-  top: -2.9rem;
-  right: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -62,6 +80,43 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.55rem;
+}
+
+.tabSearchField {
+  min-width: 0;
+}
+
+.groupSearchInput {
+  width: 100%;
+  min-height: 2rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid rgba(255, 248, 235, 0.12);
+  border-radius: 0.75rem;
+  background: rgba(255, 248, 235, 0.05);
+  color: var(--text-strong);
+  font: inherit;
+  outline: 0;
+}
+
+.groupSearchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.groupSearchInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .groupCard {
@@ -524,6 +579,14 @@
 }
 
 @media (max-width: 720px) {
+  .tabsContainer {
+    margin-top: 2.25rem;
+  }
+
+  .listToolbar {
+    grid-template-columns: 1fr;
+  }
+
   .monsterGrid {
     grid-template-columns: 1fr;
   }

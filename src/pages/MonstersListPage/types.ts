@@ -61,9 +61,11 @@ export interface MonstersListPageState {
   deleteDialogGroupName: string
   error: string
   groupName: string
+  groupSearch: string
   groups: MonsterGroupCardViewModel[]
   handleCancelCreateGroup: () => void
   handleChangeGroupName: (value: string) => void
+  handleChangeGroupSearch: (value: string) => void
   handleCloseDeleteDialog: () => void
   handleConfirmDeleteMonster: () => Promise<void>
   handleCloseDeleteGroupDialog: () => void
@@ -71,6 +73,8 @@ export interface MonstersListPageState {
   handleCreateGroupSubmit: FormEventHandler<HTMLFormElement>
   handleCreateMonster: () => Promise<void>
   handleOpenCreateGroupDialog: () => void
+  handleChangeListSearch: (value: string) => void
+  listSearch: string
   loading: boolean
   loadingGroups: boolean
   monsterToDelete: Monster | null
@@ -78,7 +82,9 @@ export interface MonstersListPageState {
   setActiveTab: (tab: MonsterListTabKey) => void
   showCreateGroupDialog: boolean
   showEmptyState: boolean
+  showEmptySearchState: boolean
   showEmptyGroupsState: boolean
+  showEmptyGroupSearchState: boolean
   showGroupList: boolean
   showMonsterGrid: boolean
 }

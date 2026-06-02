@@ -561,6 +561,11 @@ export const saveArea = async (areaId: string, area: AreaData): Promise<Area> =>
     }
     return payload.area;
 };
+export const deleteArea = async (areaId: string): Promise<void> => {
+    await requestJson<null>(`/api/areas/${areaId}`, {
+        method: 'DELETE',
+    });
+};
 export const uploadAreaImage = async (areaId: string, image: File): Promise<Area> => {
     const response = await fetch(`/api/areas/${areaId}/image`, {
         method: 'PUT',

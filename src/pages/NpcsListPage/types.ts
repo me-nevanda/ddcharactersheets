@@ -65,9 +65,11 @@ export interface NpcsListPageState {
   deleteDialogGroupName: string
   error: string
   groupName: string
+  groupSearch: string
   groups: NpcGroupCardViewModel[]
   handleCancelCreateGroup: () => void
   handleChangeGroupName: (value: string) => void
+  handleChangeGroupSearch: (value: string) => void
   handleCloseDeleteDialog: () => void
   handleConfirmDeleteNpc: () => Promise<void>
   handleCloseDeleteGroupDialog: () => void
@@ -75,6 +77,8 @@ export interface NpcsListPageState {
   handleCreateGroupSubmit: FormEventHandler<HTMLFormElement>
   handleCreateNpc: () => Promise<void>
   handleOpenCreateGroupDialog: () => void
+  handleChangeListSearch: (value: string) => void
+  listSearch: string
   loading: boolean
   loadingGroups: boolean
   npcToDelete: Npc | null
@@ -82,7 +86,9 @@ export interface NpcsListPageState {
   setActiveTab: (tab: NpcListTabKey) => void
   showCreateGroupDialog: boolean
   showEmptyState: boolean
+  showEmptySearchState: boolean
   showEmptyGroupsState: boolean
+  showEmptyGroupSearchState: boolean
   showGroupList: boolean
   showNpcGrid: boolean
 }

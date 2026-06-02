@@ -2,6 +2,7 @@ import { AppIcon } from '@components/AppIcon'
 import { DeleteCharacterDialog } from '@components/DeleteCharacterDialog'
 import { useI18n } from '@i18n/index'
 import { CharacterListHeader } from '@pages/CharacterListPage/CharacterListHeader'
+import { useStickySentinel } from '@pages/useStickyStateHooks'
 import { useEventsListPage } from './eventsListPageHooks'
 import type { EventListCardViewModel } from './types'
 import styles from './style.module.scss'
@@ -33,7 +34,8 @@ const EventListCard = ({ card }: { card: EventListCardViewModel }) => {
 
 export const EventsListPage = () => {
   const { t } = useI18n()
-  const { cards, creating, deleteDialogEventName, deletingId, error, eventToDelete, handleCloseDeleteDialog, handleConfirmDeleteEvent, handleCreateEvent, loading, showEmptyState, showEventGrid } = useEventsListPage()
+  const { isSticky, sentinelRef } = useStickySentinel()
+  const { cards, creating, deleteDialogEventName, deletingId, error, eventToDelete, handleChangeListSearch, handleCloseDeleteDialog, handleConfirmDeleteEvent, handleCreateEvent, listSearch, loading, showEmptySearchState, showEmptyState, showEventGrid } = useEventsListPage()
 
   return (
     <>
@@ -41,25 +43,41 @@ export const EventsListPage = () => {
 
       {error ? <p className={styles.status}>{error}</p> : null}
 
-      {loading ? (
-        <section className={styles.emptyState}>
-          <p className={styles.emptyText}>{t('pages.eventList.loading')}</p>
-        </section>
-      ) : null}
+      <div className={styles.listContainer}>
+        <div ref={sentinelRef} className={styles.stickySentinel} aria-hidden="true" />
+        {!loading ? (
+          <label className={`${styles.searchField} ${isSticky ? styles.searchFieldSticky : ''}`} htmlFor="event-list-search">
+            <span className={styles.visuallyHidden}>{t('pages.eventList.searchLabel')}</span>
+            <input className={styles.searchInput} id="event-list-search" value={listSearch} placeholder={t('pages.eventList.searchPlaceholder')} autoComplete="off" onChange={(event) => handleChangeListSearch(event.target.value)} />
+          </label>
+        ) : null}
 
-      {showEmptyState ? (
-        <section className={styles.emptyState}>
-          <p className={styles.emptyText}>{t('pages.eventList.emptyState')}</p>
-        </section>
-      ) : null}
+        {loading ? (
+          <section className={styles.emptyState}>
+            <p className={styles.emptyText}>{t('pages.eventList.loading')}</p>
+          </section>
+        ) : null}
 
-      {showEventGrid ? (
-        <section className={styles.eventGrid}>
-          {cards.map((card) => (
-            <EventListCard key={card.id} card={card} />
-          ))}
-        </section>
-      ) : null}
+        {showEmptyState ? (
+          <section className={styles.emptyState}>
+            <p className={styles.emptyText}>{t('pages.eventList.emptyState')}</p>
+          </section>
+        ) : null}
+
+        {showEmptySearchState ? (
+          <section className={styles.emptyState}>
+            <p className={styles.emptyText}>{t('pages.eventList.emptySearchState')}</p>
+          </section>
+        ) : null}
+
+        {showEventGrid ? (
+          <section className={styles.eventGrid}>
+            {cards.map((card) => (
+              <EventListCard key={card.id} card={card} />
+            ))}
+          </section>
+        ) : null}
+      </div>
 
       <DeleteCharacterDialog bodyKey="pages.eventList.deleteDialog.body" characterName={deleteDialogEventName} deleting={deletingId === eventToDelete?.id} open={Boolean(eventToDelete)} titleKey="pages.eventList.deleteDialog.title" onCancel={handleCloseDeleteDialog} onConfirm={() => void handleConfirmDeleteEvent()} />
     </>

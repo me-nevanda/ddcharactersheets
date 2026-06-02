@@ -16,6 +16,10 @@ const buildTextPreview = (value: string): string => {
     .trim()
 }
 
+const normalizeSearchValue = (value: string): string => {
+  return value.trim().toLocaleLowerCase()
+}
+
 const npcListReturnState: EditReturnState = {
   mainTab: 'npcs',
   npcListTab: 'list',
@@ -40,10 +44,12 @@ export const useNpcsListPage = (): NpcsListPageState => {
   const [creatingGroup, setCreatingGroup] = useState(false)
   const [deletingId, setDeletingId] = useState('')
   const [groupDeletingId, setGroupDeletingId] = useState('')
+  const [listSearch, setListSearch] = useState('')
   const [npcToDelete, setNpcToDelete] = useState<Npc | null>(null)
   const [groupToDelete, setGroupToDelete] = useState<NpcGroup | null>(null)
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false)
   const [groupName, setGroupName] = useState('')
+  const [groupSearch, setGroupSearch] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -192,7 +198,12 @@ export const useNpcsListPage = (): NpcsListPageState => {
     }
   }
 
-  const cards: NpcListCardViewModel[] = npcs.map((npc) => {
+  const normalizedListSearch = normalizeSearchValue(listSearch)
+  const filteredNpcs = normalizedListSearch
+    ? npcs.filter((npc) => normalizeSearchValue(npc.name.trim() || t('pages.npcList.unnamedNpc')).includes(normalizedListSearch))
+    : npcs
+
+  const cards: NpcListCardViewModel[] = filteredNpcs.map((npc) => {
     const isStory = npc.isStory === true
     return {
       deleting: deletingId === npc.id,
@@ -226,7 +237,20 @@ export const useNpcsListPage = (): NpcsListPageState => {
     }
   })
 
-  const groupCards: NpcGroupCardViewModel[] = groups.map((group) => ({
+  const normalizedGroupSearch = normalizeSearchValue(groupSearch)
+  const filteredGroups = normalizedGroupSearch
+    ? groups.filter((group) => {
+      const groupNameMatches = normalizeSearchValue(group.name).includes(normalizedGroupSearch)
+      const npcNameMatches = group.npcIds
+        .map((npcId) => npcs.find((npc) => npc.id === npcId))
+        .filter((npc): npc is Npc => Boolean(npc))
+        .some((npc) => normalizeSearchValue(npc.name.trim() || t('pages.npcList.unnamedNpc')).includes(normalizedGroupSearch))
+
+      return groupNameMatches || npcNameMatches
+    })
+    : groups
+
+  const groupCards: NpcGroupCardViewModel[] = filteredGroups.map((group) => ({
     deleting: groupDeletingId === group.id,
     hasMoreNpcs: group.npcIds.length > 4,
     id: group.id,
@@ -279,10 +303,12 @@ export const useNpcsListPage = (): NpcsListPageState => {
     error,
     groupDeletingId,
     groupName,
+    groupSearch,
     groupToDelete,
     groups: groupCards,
     handleCancelCreateGroup,
     handleChangeGroupName,
+    handleChangeGroupSearch: setGroupSearch,
     handleCloseDeleteDialog,
     handleCloseDeleteGroupDialog,
     handleConfirmDeleteNpc,
@@ -290,13 +316,17 @@ export const useNpcsListPage = (): NpcsListPageState => {
     handleCreateGroupSubmit,
     handleCreateNpc,
     handleOpenCreateGroupDialog,
+    handleChangeListSearch: setListSearch,
+    listSearch,
     loading,
     loadingGroups,
     npcToDelete,
     setActiveTab: handleNpcListTabChange as (tab: NpcListTabKey) => void,
     showCreateGroupDialog,
-    showEmptyState: !loading && cards.length === 0,
-    showEmptyGroupsState: !loadingGroups && groupCards.length === 0,
+    showEmptyState: !loading && npcs.length === 0,
+    showEmptySearchState: !loading && npcs.length > 0 && cards.length === 0,
+    showEmptyGroupsState: !loadingGroups && groups.length === 0,
+    showEmptyGroupSearchState: !loadingGroups && groups.length > 0 && groupCards.length === 0,
     showGroupList: !loadingGroups && groupCards.length > 0,
     showNpcGrid: !loading && cards.length > 0,
   }

@@ -19,11 +19,14 @@ export interface EventsListPageState {
   deletingId: string
   error: string
   eventToDelete: Event | null
+  handleChangeListSearch: (value: string) => void
   handleCloseDeleteDialog: () => void
   handleConfirmDeleteEvent: () => Promise<void>
   handleCreateEvent: () => Promise<void>
   handleOpenDeleteDialog: (event: Event) => void
+  listSearch: string
   loading: boolean
+  showEmptySearchState: boolean
   showEmptyState: boolean
   showEventGrid: boolean
 }

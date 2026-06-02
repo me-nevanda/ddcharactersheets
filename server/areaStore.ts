@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { Area, AreaData, PlaceItem } from '../src/types/area'
-import { assertStoredEntityExists, createStoredArea, listStoredAreas, migrateAreasJsonDirectoryToSqlite, readStoredArea, updateStoredArea } from './sqliteStore'
+import { assertStoredEntityExists, createStoredArea, deleteStoredEntity, listStoredAreas, migrateAreasJsonDirectoryToSqlite, readStoredArea, updateStoredArea } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -140,6 +140,22 @@ export const createArea = async (): Promise<Area> => {
 export const updateArea = async (areaId: string, data: unknown): Promise<Area> => {
   await ensureAreasStore()
   return updateStoredArea<AreaData, Area>(areaId, data, areaStoreOptions)
+}
+
+export const deleteArea = async (areaId: string): Promise<void> => {
+  await ensureAreasStore()
+  await deleteStoredEntity(areaTableName, areaId)
+  await Promise.all(
+    areaImageExtensions.map(async (extension) => {
+      try {
+        await unlink(getAreaImageFilePath(areaId, extension))
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+          throw error
+        }
+      }
+    }),
+  )
 }
 
 export const readAreaImage = async (areaId: string): Promise<AreaImage> => {

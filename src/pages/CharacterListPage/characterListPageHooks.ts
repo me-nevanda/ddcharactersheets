@@ -21,6 +21,10 @@ const getPlainTextDescription = (description: string): string => {
   return (template.content.textContent ?? '').trim()
 }
 
+const normalizeSearchValue = (value: string): string => {
+  return value.trim().toLocaleLowerCase()
+}
+
 const characterListReturnState: EditReturnState = {
   characterListTab: 'list',
   mainTab: 'heroes',
@@ -234,9 +238,14 @@ export const useCharacterListActions = (
   }
 }
 
-export const useCharacterListCards = (characters: Character[], deletingId: string, openCharacter: (characterId: string) => void, handleOpenDeleteDialog: (character: Character) => void): CharacterListCardViewModel[] => {
+export const useCharacterListCards = (characters: Character[], deletingId: string, listSearch: string, openCharacter: (characterId: string) => void, handleOpenDeleteDialog: (character: Character) => void): CharacterListCardViewModel[] => {
   const { getAlignmentLabel, getCharacterClassSrc, getCharacterLabel, getCharacterPortraitSrc, getClassLabel, getGenderLabel, getRaceLabel } = useCharacterPresentation()
-  return characters.map((character) => ({
+  const normalizedListSearch = normalizeSearchValue(listSearch)
+  const filteredCharacters = normalizedListSearch
+    ? characters.filter((character) => normalizeSearchValue(getCharacterLabel(character.name)).includes(normalizedListSearch))
+    : characters
+
+  return filteredCharacters.map((character) => ({
     id: character.id,
     alignmentLabel: getAlignmentLabel(character.alignment),
     classLabel: getClassLabel(character.class),
@@ -269,14 +278,27 @@ export const useCharacterGroupCards = (
   groups: CharacterGroup[],
   characters: Character[],
   groupDeletingId: string,
+  groupSearch: string,
   openCharacter: (characterId: string, returnState?: EditReturnState) => void,
   openGroup: (groupId: string) => void,
   handleOpenDeleteGroupDialog: (group: CharacterGroup) => void,
   handleImageError: (event: SyntheticEvent<HTMLImageElement>) => void,
 ): CharacterGroupCardViewModel[] => {
   const { getCharacterClassSrc, getCharacterLabel, getCharacterPortraitSrc } = useCharacterPresentation()
+  const normalizedGroupSearch = normalizeSearchValue(groupSearch)
+  const filteredGroups = normalizedGroupSearch
+    ? groups.filter((group) => {
+      const groupNameMatches = normalizeSearchValue(group.name).includes(normalizedGroupSearch)
+      const characterNameMatches = group.characterIds
+        .map((characterId) => characters.find((character) => character.id === characterId))
+        .filter((character): character is Character => Boolean(character))
+        .some((character) => normalizeSearchValue(getCharacterLabel(character.name)).includes(normalizedGroupSearch))
 
-  return groups.map((group) => ({
+      return groupNameMatches || characterNameMatches
+    })
+    : groups
+
+  return filteredGroups.map((group) => ({
     characterCount: group.characterIds.length,
     characterThumbnails: group.characterIds
       .map((characterId) => characters.find((character) => character.id === characterId))
