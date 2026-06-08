@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { en } from './locales/en';
 import { pl } from './locales/pl';
 import type { Locale, TranslationDictionary, TranslationVariables } from './types';
@@ -66,16 +66,23 @@ interface I18nProviderProps {
 }
 export const I18nProvider = ({ children }: I18nProviderProps) => {
     const [locale, setLocale] = useState<Locale>(getInitialLocale);
+    const handleSetLocale = useCallback((nextLocale: string) => {
+        setLocale(normalizeLocale(nextLocale));
+    }, []);
+    const t = useCallback((key: string, variables?: TranslationVariables) => {
+        return translate(locale, key, variables);
+    }, [locale]);
+    const value = useMemo<I18nContextValue>(() => ({
+        locale,
+        setLocale: handleSetLocale,
+        t,
+    }), [handleSetLocale, locale, t]);
     useEffect(() => {
         const nextLocale = normalizeLocale(locale);
         window.localStorage.setItem(STORAGE_KEY, nextLocale);
         document.documentElement.lang = nextLocale;
     }, [locale]);
-    return (<I18nContext.Provider value={{
-            locale,
-            setLocale: (nextLocale) => setLocale(normalizeLocale(nextLocale)),
-            t: (key, variables) => translate(locale, key, variables),
-        }}>
+    return (<I18nContext.Provider value={value}>
       {children}
     </I18nContext.Provider>);
 };

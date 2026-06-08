@@ -54,7 +54,18 @@ export interface GeminiUsage {
 export interface ApiError extends Error {
     code: string;
 }
-const requestJson = async <T>(url: string, options: RequestInit = {}): Promise<T | null> => {
+
+const pendingGetRequests = new Map<string, Promise<unknown>>();
+
+const getRequestMethod = (options: RequestInit): string => {
+    return (options.method ?? 'GET').toUpperCase();
+};
+
+const canDedupeRequest = (url: string, options: RequestInit): boolean => {
+    return typeof url === 'string' && getRequestMethod(options) === 'GET' && !options.body;
+};
+
+const fetchJson = async <T>(url: string, options: RequestInit): Promise<T | null> => {
     const response = await fetch(url, {
         ...options,
         headers: {
@@ -69,6 +80,26 @@ const requestJson = async <T>(url: string, options: RequestInit = {}): Promise<T
         throw error;
     }
     return payload as T | null;
+};
+
+const requestJson = async <T>(url: string, options: RequestInit = {}): Promise<T | null> => {
+    if (!canDedupeRequest(url, options)) {
+        return fetchJson<T>(url, options);
+    }
+
+    const requestKey = `${getRequestMethod(options)} ${url}`;
+    const pendingRequest = pendingGetRequests.get(requestKey) as Promise<T | null> | undefined;
+
+    if (pendingRequest) {
+        return pendingRequest;
+    }
+
+    const nextRequest = fetchJson<T>(url, options).finally(() => {
+        pendingGetRequests.delete(requestKey);
+    });
+    pendingGetRequests.set(requestKey, nextRequest);
+
+    return nextRequest;
 };
 export const listCharacters = async (): Promise<Character[]> => {
     const payload = await requestJson<ApiEnvelope<Character>>('/api/characters');
