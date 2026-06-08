@@ -2,13 +2,7 @@ import {
   defaultAbilityType,
   defaultAbilityWeaponArea,
   defaultAbilityWeaponAttackBonusNumber,
-  defaultAbilityWeaponAttackDefense,
-  defaultAbilityWeaponDamageDiceCount,
-  defaultAbilityWeaponDamageDiceType,
-  defaultAbilityWeaponDamageType,
   defaultAbilityWeaponRange,
-  defaultAbilityWeaponRecurringDamageCount,
-  defaultAbilityWeaponRecurringDamageType,
   emptyFeat,
   emptyItems,
 } from './characterEditPageUtils'

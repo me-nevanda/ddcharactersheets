@@ -204,13 +204,13 @@ export const useNpcsListPage = (): NpcsListPageState => {
     : npcs
 
   const cards: NpcListCardViewModel[] = filteredNpcs.map((npc) => {
-    const isStory = npc.isStory === true
+    const isStory = npc.isStory
     return {
       deleting: deletingId === npc.id,
       descriptionPreview: buildTextPreview(npc.description),
       id: npc.id,
       imageSrc: npc.imageUrl || '/favicon.png',
-      isDead: npc.isDead === true,
+      isDead: npc.isDead,
       isElite: !isStory && npc.type === 'elite',
       isMinion: !isStory && npc.type === 'minion',
       isNormal: !isStory && npc.type === 'normal',
@@ -262,7 +262,7 @@ export const useNpcsListPage = (): NpcsListPageState => {
       .map((npc) => ({
         id: npc.id,
         imageSrc: npc.imageUrl || '/favicon.png',
-        isDead: npc.isDead === true,
+        isDead: npc.isDead,
         label: npc.name.trim() || t('pages.npcList.unnamedNpc'),
         onKeyDown: (event) => {
           if (event.key === 'Enter' || event.key === ' ') {

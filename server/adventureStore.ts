@@ -3,11 +3,6 @@ import path from 'node:path';
 import type { Adventure, AdventureData } from '../src/types/adventure';
 import { createStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore';
 
-interface ApiError extends Error {
-    code?: string;
-    statusCode?: number;
-}
-
 const adventuresDirectory = path.resolve(process.cwd(), 'data', 'adventures');
 const safeAdventureIdPattern = /^[a-z0-9-]+$/i;
 

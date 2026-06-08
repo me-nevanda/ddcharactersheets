@@ -1,4 +1,4 @@
-import { mkdir, readFile, stat, unlink, writeFile } from 'node:fs/promises';
+import { readFile, stat, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Context, ContextData } from '../src/types/context';
 import { assertStoredEntityExists, createStoredContext, deleteStoredEntity, listStoredContexts, migrateContextsJsonDirectoryToSqlite, readStoredContext, updateStoredContext } from './sqliteStore';
@@ -160,24 +160,6 @@ const normalizeContext = (data: Partial<Record<keyof ContextData, unknown>> = {}
         monsterGroups: normalizeMonsterGroups(data.monsterGroups),
         areas: normalizeAreas(data.areas),
     };
-};
-
-const parseContext = (rawContext: string): Partial<Record<keyof ContextData, unknown>> => {
-    return JSON.parse(rawContext.replace(/^﻿/, '') || '{}') as Partial<Record<keyof ContextData, unknown>>;
-};
-
-const ensureContextsDirectory = async (): Promise<void> => {
-    await mkdir(contextsDirectory, { recursive: true });
-};
-
-const getContextFilePath = (contextId: string): string => {
-    if (!isSafeContextId(contextId)) {
-        const error = new Error('Invalid context id') as ApiError;
-        error.statusCode = 400;
-        error.code = 'API_INVALID_CONTEXT_ID';
-        throw error;
-    }
-    return path.join(contextsDirectory, `${contextId}.json`);
 };
 
 const getContextImageFilePath = (contextId: string, extension: (typeof contextImageExtensions)[number]): string => {

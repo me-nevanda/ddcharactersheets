@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
+import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
 import type { Monster, MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '../src/types/monster'
@@ -337,25 +337,6 @@ const normalizeMonster = (data: Partial<Record<keyof MonsterData, unknown>> = {}
     level: normalizeLevelValue(data.level),
     speed: normalizeStatValue(data.speed, 6),
   }
-}
-
-const parseMonster = (rawMonster: string): Partial<Record<keyof MonsterData, unknown>> => {
-  return JSON.parse(rawMonster.replace(/^\uFEFF/, '') || '{}') as Partial<Record<keyof MonsterData, unknown>>
-}
-
-const ensureMonstersDirectory = async (): Promise<void> => {
-  await mkdir(monstersDirectory, { recursive: true })
-}
-
-const getMonsterFilePath = (monsterId: string): string => {
-  if (!isSafeMonsterId(monsterId)) {
-    const error = new Error('Invalid monster id') as ApiError
-    error.statusCode = 400
-    error.code = 'API_INVALID_MONSTER_ID'
-    throw error
-  }
-
-  return path.join(monstersDirectory, `${monsterId}.json`)
 }
 
 const getMonsterImageFilePath = (monsterId: string, extension: (typeof monsterImageExtensions)[number]): string => {

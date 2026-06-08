@@ -6,9 +6,8 @@ import styles from './style.module.scss';
 export const CharacterPrintPage = () => {
     const { t } = useI18n();
     const { getCharacterLabel, getClassLabel, getRaceLabel } = useCharacterPresentation();
-    const { character, loading, error, levelBonus, speedValue, hpValue, surgeValue, attributeRows, defenseRows, skillRows } = useCharacterPrintPage();
+    const { character, loading, error, speedValue, hpValue, surgeValue, attributeRows, defenseRows, skillRows } = useCharacterPrintPage();
     const surgeHealingValue = Math.ceil(Math.max(0, hpValue) / 4);
-    const surgeLabel = `${t('pages.characterEdit.fields.surge')} (${surgeHealingValue} HP)`;
     if (loading) {
         return (<main className={styles.pageShell}>
         <p className={styles.status}>{t('pages.characterPrint.loading')}</p>

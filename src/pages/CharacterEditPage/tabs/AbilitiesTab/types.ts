@@ -2,7 +2,6 @@ import type {
   CharacterAbility,
   CharacterAbilityAreaType,
   CharacterAbilityType,
-  CharacterAbilityKind,
   CharacterWeaponDamageType,
   CharacterAttributes,
   CharacterDefenses,

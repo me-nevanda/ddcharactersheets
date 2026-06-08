@@ -1,5 +1,5 @@
 ﻿import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
+import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
 import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcHistoryEntry, NpcRole, NpcSuggestedStats, NpcType } from '../src/types/npc'
@@ -355,25 +355,6 @@ const normalizeNpc = (data: Partial<Record<keyof NpcData, unknown>> = {}): NpcDa
     isDead: data.isDead === true,
     history: normalizeHistoryEntries(data.history),
   }
-}
-
-const parseNpc = (rawNpc: string): Partial<Record<keyof NpcData, unknown>> => {
-  return JSON.parse(rawNpc.replace(/^\uFEFF/, '') || '{}') as Partial<Record<keyof NpcData, unknown>>
-}
-
-const ensureNpcsDirectory = async (): Promise<void> => {
-  await mkdir(npcsDirectory, { recursive: true })
-}
-
-const getNpcFilePath = (npcId: string): string => {
-  if (!isSafeNpcId(npcId)) {
-    const error = new Error('Invalid npc id') as ApiError
-    error.statusCode = 400
-    error.code = 'API_INVALID_NPC_ID'
-    throw error
-  }
-
-  return path.join(npcsDirectory, `${npcId}.json`)
 }
 
 const getNpcImageFilePath = (npcId: string, extension: (typeof npcImageExtensions)[number]): string => {

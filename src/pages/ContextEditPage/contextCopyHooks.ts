@@ -319,7 +319,6 @@ export const useContextCopy = ({
   areas,
   characters,
   events,
-  form,
   monsters,
   npcs,
   onClearError,

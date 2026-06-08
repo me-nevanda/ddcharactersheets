@@ -1,5 +1,5 @@
 ﻿import { randomUUID } from 'node:crypto';
-import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises';
+import { readFile, stat, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { CharacterAbility, CharacterAbilityAreaType, Character, CharacterAbilityAction, CharacterAbilityKind, CharacterAbilityType, CharacterAttributeBonuses, CharacterAttributes, CharacterBonuses, CharacterData, CharacterDefenses, CharacterArmor, CharacterFeat, CharacterWeapon, CharacterOtherItem, CharacterWeaponDamageDiceType, CharacterWeaponDamageType, CharacterSkillBonuses, CharacterTraining, CharacterDefenseBonuses, } from '../src/types/character';
 import { CharacterAlignment, CharacterClass as CharacterClassValue, CharacterGender, CharacterRace as CharacterRaceValue, } from '../src/types/character';
@@ -361,16 +361,6 @@ const normalizeWeaponDamageDiceType = (value: unknown): CharacterWeaponDamageDic
     }
     return 'd4';
 };
-const normalizeWeaponDamageType = (value: unknown): CharacterWeaponDamageType => {
-    if (value === 'normal' ||
-        value === 'poison' ||
-        value === 'radiant' ||
-        value === 'necrotic' ||
-        value === 'psychic') {
-        return value;
-    }
-    return 'normal';
-};
 const normalizeWeaponDamageNumber = (value: unknown): number => {
     if (typeof value === 'number' && Number.isFinite(value)) {
         return Math.min(10, Math.max(0, Math.trunc(value)));
@@ -731,21 +721,6 @@ const normalizeCharacter = (data: Partial<Record<keyof CharacterData, unknown>> 
             : normalizeDefenses(),
         training,
     };
-};
-const parseCharacter = (rawCharacter: string): Partial<Record<keyof CharacterData, unknown>> => {
-    return JSON.parse(rawCharacter.replace(/^\uFEFF/, '') || '{}') as Partial<Record<keyof CharacterData, unknown>>;
-};
-const ensureCharactersDirectory = async (): Promise<void> => {
-    await mkdir(charactersDirectory, { recursive: true });
-};
-const getCharacterFilePath = (characterId: string): string => {
-    if (!isSafeCharacterId(characterId)) {
-        const error = new Error('Invalid character id') as ApiError;
-        error.statusCode = 400;
-        error.code = 'API_INVALID_CHARACTER_ID';
-        throw error;
-    }
-    return path.join(charactersDirectory, `${characterId}.json`);
 };
 const getCharacterImageFilePath = (characterId: string, extension: (typeof characterImageExtensions)[number]): string => {
     if (!isSafeCharacterId(characterId)) {

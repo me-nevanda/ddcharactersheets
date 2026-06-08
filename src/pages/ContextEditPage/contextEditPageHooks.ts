@@ -1049,7 +1049,6 @@ export const useContextEditPage = (): ContextEditPageState => {
         }))
       },
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.characters, charactersById, t])
 
   const characterGroupSections: ContextCharacterGroupSectionViewModel[] = useMemo(() => {
@@ -1072,7 +1071,6 @@ export const useContextEditPage = (): ContextEditPageState => {
       },
     }))
     return legacyCharacterGroupSection ? [legacyCharacterGroupSection, ...sections] : sections
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.characterGroups, legacyCharacterGroupSection, charactersById, t])
 
   const buildCharacterGroupOption = (group: CharacterGroup, selected: boolean): ContextCharacterGroupOptionViewModel => {
@@ -1107,7 +1105,6 @@ export const useContextEditPage = (): ContextEditPageState => {
       })
       : available
     return filtered.map((group) => buildCharacterGroupOption(group, selectedCharacterGroupIdsInDialog.includes(group.id)))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allCharacterGroups, characterGroupSearch, form.characterGroups, selectedCharacterGroupIdsInDialog])
 
   // ----- View models: events -----
@@ -1131,7 +1128,6 @@ export const useContextEditPage = (): ContextEditPageState => {
 
   const eventCards: ContextEventCardViewModel[] = useMemo(() => {
     return form.events.map(buildEventCard)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.events, eventsById, t])
 
   const buildEventOption = (event: Event, selected: boolean): ContextEventOptionViewModel => {
@@ -1166,7 +1162,6 @@ export const useContextEditPage = (): ContextEditPageState => {
       })
       : available
     return filtered.map((event) => buildEventOption(event, selectedEventIdsInDialog.includes(event.id)))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allEvents, eventSearch, form.events, selectedEventIdsInDialog])
 
   // ----- View models: NPC groups -----
@@ -1214,7 +1209,6 @@ export const useContextEditPage = (): ContextEditPageState => {
         handleRemoveNpcGroup(group.id)
       },
     }))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.npcGroups, npcsById, t])
 
   const buildNpcGroupOption = (group: NpcGroup, selected: boolean): ContextNpcGroupOptionViewModel => {
@@ -1279,7 +1273,6 @@ export const useContextEditPage = (): ContextEditPageState => {
         handleRemoveMonsterGroup(group.id)
       },
     }))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.monsterGroups, monstersById, t])
 
   const buildMonsterGroupOption = (group: MonsterGroup, selected: boolean): ContextMonsterGroupOptionViewModel => {
@@ -1314,7 +1307,6 @@ export const useContextEditPage = (): ContextEditPageState => {
       })
       : available
     return filtered.map((group) => buildMonsterGroupOption(group, selectedMonsterGroupIdsInDialog.includes(group.id)))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allMonsterGroups, monsterGroupSearch, form.monsterGroups, selectedMonsterGroupIdsInDialog])
 
   // ----- View models: Areas -----
@@ -1349,7 +1341,6 @@ export const useContextEditPage = (): ContextEditPageState => {
         handleRemoveArea(area.id)
       },
     }))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [areasById, form.areas, placesByAreaId, t])
 
   const buildAreaOption = (area: Area, selected: boolean): ContextAreaOptionViewModel => {
@@ -1385,7 +1376,6 @@ export const useContextEditPage = (): ContextEditPageState => {
       })
       : available
     return filtered.map((area) => buildAreaOption(area, selectedAreaIdsInDialog.includes(area.id)))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allAreas, areaSearch, form.areas, selectedAreaIdsInDialog])
 
   const npcGroupOptions: ContextNpcGroupOptionViewModel[] = useMemo(() => {
@@ -1399,7 +1389,6 @@ export const useContextEditPage = (): ContextEditPageState => {
       })
       : available
     return filtered.map((group) => buildNpcGroupOption(group, selectedNpcGroupIdsInDialog.includes(group.id)))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allNpcGroups, npcGroupSearch, form.npcGroups, selectedNpcGroupIdsInDialog])
 
   // ----- hasChanges -----

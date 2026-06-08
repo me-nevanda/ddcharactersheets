@@ -7,7 +7,6 @@ import type {
   CharacterBonuses,
   CharacterAttributes,
   CharacterArmorBonusFieldName,
-  CharacterDefenses,
   CharacterItemBase,
   CharacterItems,
   CharacterItemBonusFieldName,

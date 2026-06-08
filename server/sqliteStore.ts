@@ -123,50 +123,50 @@ interface MigrationRow {
   entity_type: string
 }
 
-interface StoredEntityOptions<TData, TEntity> {
+interface StoredEntityOptions<TData> {
   tableName: string
   normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
   validate?: (data: TData) => void
   imageUrl?: (id: string) => string
 }
 
-interface StoredAreaOptions<TData, TEntity> {
+interface StoredAreaOptions<TData> {
   normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
   validate?: (data: TData) => void
   imageUrl?: (id: string) => string
 }
 
-interface StoredEventOptions<TData, TEntity> {
+interface StoredEventOptions<TData> {
   normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
   validate?: (data: TData) => void
   imageUrl?: (id: string) => string
 }
 
-interface StoredContextOptions<TData, TEntity> {
+interface StoredContextOptions<TData> {
   normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
   validate?: (data: TData) => void
   imageUrl?: (id: string) => string
 }
 
-interface StoredGroupOptions<TData, TEntity> {
+interface StoredGroupOptions<TData> {
   tableName: string
   normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
   validate?: (data: TData) => void
 }
 
-interface StoredCharacterOptions<TData, TEntity> {
+interface StoredCharacterOptions<TData> {
   normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
   validate?: (data: TData) => void
   imageUrl?: (id: string) => string
 }
 
-interface StoredNpcOptions<TData, TEntity> {
+interface StoredNpcOptions<TData> {
   normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
   validate?: (data: TData) => void
   imageUrl?: (id: string) => string
 }
 
-interface StoredMonsterOptions<TData, TEntity> {
+interface StoredMonsterOptions<TData> {
   normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
   validate?: (data: TData) => void
   imageUrl?: (id: string) => string
@@ -1338,7 +1338,7 @@ const getMemberIds = (value: unknown): string[] => {
 
 const buildEntity = <TData, TEntity>(
   row: EntityRow,
-  options: StoredEntityOptions<TData, TEntity>,
+  options: StoredEntityOptions<TData>,
 ): TEntity => {
   const normalized = options.normalize(parsePayload<TData>(row.payload_json))
   return {
@@ -1365,7 +1365,7 @@ const getAreaPlaces = (areaId: string): PlaceRow[] => {
 
 const buildArea = <TData, TEntity>(
   row: AreaRow,
-  options: StoredAreaOptions<TData, TEntity>,
+  options: StoredAreaOptions<TData>,
 ): TEntity => {
   const normalized = options.normalize({
     name: row.name,
@@ -1382,7 +1382,7 @@ const buildArea = <TData, TEntity>(
 
 const buildEvent = <TData, TEntity>(
   row: EventRow,
-  options: StoredEventOptions<TData, TEntity>,
+  options: StoredEventOptions<TData>,
 ): TEntity => {
   const normalized = options.normalize({
     name: row.name,
@@ -1473,7 +1473,7 @@ const getContextAreas = (contextId: string): Record<string, unknown>[] => {
 
 const buildContext = <TData, TEntity>(
   row: ContextRow,
-  options: StoredContextOptions<TData, TEntity>,
+  options: StoredContextOptions<TData>,
 ): TEntity => {
   const normalized = options.normalize({
     name: row.name,
@@ -1495,7 +1495,7 @@ const buildContext = <TData, TEntity>(
 
 const buildGroup = <TData, TEntity>(
   row: GroupRow,
-  options: StoredGroupOptions<TData, TEntity>,
+  options: StoredGroupOptions<TData>,
 ): TEntity => {
   const normalized = options.normalize({
     name: row.name,
@@ -1847,7 +1847,7 @@ const buildMonsterPayload = (row: MonsterRow): Partial<Record<string, unknown>> 
 
 const buildNpc = <TData, TEntity>(
   row: NpcRow,
-  options: StoredNpcOptions<TData, TEntity>,
+  options: StoredNpcOptions<TData>,
 ): TEntity => {
   const normalized = options.normalize(buildNpcPayload(row) as Partial<Record<keyof TData, unknown>>)
   return {
@@ -1860,7 +1860,7 @@ const buildNpc = <TData, TEntity>(
 
 const buildMonster = <TData, TEntity>(
   row: MonsterRow,
-  options: StoredMonsterOptions<TData, TEntity>,
+  options: StoredMonsterOptions<TData>,
 ): TEntity => {
   const normalized = options.normalize(buildMonsterPayload(row) as Partial<Record<keyof TData, unknown>>)
   return {
@@ -1873,7 +1873,7 @@ const buildMonster = <TData, TEntity>(
 
 const buildCharacter = <TData, TEntity>(
   row: CharacterRow,
-  options: StoredCharacterOptions<TData, TEntity>,
+  options: StoredCharacterOptions<TData>,
 ): TEntity => {
   const normalized = options.normalize(buildCharacterPayload(row) as Partial<Record<keyof TData, unknown>>)
   return {
@@ -3079,7 +3079,7 @@ export const migrateGroupsJsonDirectoryToSqlite = async <TData>(
 }
 
 export const listStoredEntities = async <TData, TEntity>(
-  options: StoredEntityOptions<TData, TEntity>,
+  options: StoredEntityOptions<TData>,
 ): Promise<TEntity[]> => {
   const rows = getDatabase().prepare(`
     SELECT id, payload_json, updated_at
@@ -3091,7 +3091,7 @@ export const listStoredEntities = async <TData, TEntity>(
 }
 
 export const listStoredAreas = async <TData, TEntity>(
-  options: StoredAreaOptions<TData, TEntity>,
+  options: StoredAreaOptions<TData>,
 ): Promise<TEntity[]> => {
   const rows = getDatabase().prepare(`
     SELECT id, name, description, updated_at
@@ -3103,7 +3103,7 @@ export const listStoredAreas = async <TData, TEntity>(
 }
 
 export const listStoredEvents = async <TData, TEntity>(
-  options: StoredEventOptions<TData, TEntity>,
+  options: StoredEventOptions<TData>,
 ): Promise<TEntity[]> => {
   const rows = getDatabase().prepare(`
     SELECT id, name, description, updated_at
@@ -3115,7 +3115,7 @@ export const listStoredEvents = async <TData, TEntity>(
 }
 
 export const listStoredContexts = async <TData, TEntity>(
-  options: StoredContextOptions<TData, TEntity>,
+  options: StoredContextOptions<TData>,
 ): Promise<TEntity[]> => {
   const rows = getDatabase().prepare(`
     SELECT id, name, description, updated_at
@@ -3127,7 +3127,7 @@ export const listStoredContexts = async <TData, TEntity>(
 }
 
 export const listStoredCharacters = async <TData, TEntity>(
-  options: StoredCharacterOptions<TData, TEntity>,
+  options: StoredCharacterOptions<TData>,
 ): Promise<TEntity[]> => {
   const rows = getDatabase().prepare(`
     SELECT *
@@ -3139,7 +3139,7 @@ export const listStoredCharacters = async <TData, TEntity>(
 }
 
 export const listStoredNpcs = async <TData, TEntity>(
-  options: StoredNpcOptions<TData, TEntity>,
+  options: StoredNpcOptions<TData>,
 ): Promise<TEntity[]> => {
   const rows = getDatabase().prepare(`
     SELECT *
@@ -3151,7 +3151,7 @@ export const listStoredNpcs = async <TData, TEntity>(
 }
 
 export const listStoredMonsters = async <TData, TEntity>(
-  options: StoredMonsterOptions<TData, TEntity>,
+  options: StoredMonsterOptions<TData>,
 ): Promise<TEntity[]> => {
   const rows = getDatabase().prepare(`
     SELECT *
@@ -3163,7 +3163,7 @@ export const listStoredMonsters = async <TData, TEntity>(
 }
 
 export const listStoredGroupEntities = async <TData, TEntity>(
-  entityOptions: StoredGroupOptions<TData, TEntity>,
+  entityOptions: StoredGroupOptions<TData>,
   relationOptions: GroupMemberRelationOptions<TData>,
 ): Promise<TEntity[]> => {
   const rows = getDatabase().prepare(`
@@ -3171,13 +3171,13 @@ export const listStoredGroupEntities = async <TData, TEntity>(
     FROM ${quoteName(entityOptions.tableName)}
     ORDER BY updated_at DESC, id DESC
   `).all() as GroupRow[]
-  const entities = rows.map((row) => buildGroup(row, entityOptions))
-  return entities.map((entity) => attachGroupIds(entity, relationOptions))
+  const entities = rows.map((row) => buildGroup<TData, TEntity>(row, entityOptions))
+  return entities.map((entity) => attachGroupIds<TData, TEntity>(entity, relationOptions))
 }
 
 export const readStoredEntity = async <TData, TEntity>(
   id: string,
-  options: StoredEntityOptions<TData, TEntity>,
+  options: StoredEntityOptions<TData>,
 ): Promise<TEntity> => {
   const row = getDatabase().prepare(`
     SELECT id, payload_json, updated_at
@@ -3194,7 +3194,7 @@ export const readStoredEntity = async <TData, TEntity>(
 
 export const readStoredArea = async <TData, TEntity>(
   id: string,
-  options: StoredAreaOptions<TData, TEntity>,
+  options: StoredAreaOptions<TData>,
 ): Promise<TEntity> => {
   const row = getDatabase().prepare(`
     SELECT id, name, description, updated_at
@@ -3211,7 +3211,7 @@ export const readStoredArea = async <TData, TEntity>(
 
 export const readStoredEvent = async <TData, TEntity>(
   id: string,
-  options: StoredEventOptions<TData, TEntity>,
+  options: StoredEventOptions<TData>,
 ): Promise<TEntity> => {
   const row = getDatabase().prepare(`
     SELECT id, name, description, updated_at
@@ -3228,7 +3228,7 @@ export const readStoredEvent = async <TData, TEntity>(
 
 export const readStoredContext = async <TData, TEntity>(
   id: string,
-  options: StoredContextOptions<TData, TEntity>,
+  options: StoredContextOptions<TData>,
 ): Promise<TEntity> => {
   const row = getDatabase().prepare(`
     SELECT id, name, description, updated_at
@@ -3245,7 +3245,7 @@ export const readStoredContext = async <TData, TEntity>(
 
 export const readStoredCharacter = async <TData, TEntity>(
   id: string,
-  options: StoredCharacterOptions<TData, TEntity>,
+  options: StoredCharacterOptions<TData>,
 ): Promise<TEntity> => {
   const row = getDatabase().prepare(`
     SELECT *
@@ -3262,7 +3262,7 @@ export const readStoredCharacter = async <TData, TEntity>(
 
 export const readStoredNpc = async <TData, TEntity>(
   id: string,
-  options: StoredNpcOptions<TData, TEntity>,
+  options: StoredNpcOptions<TData>,
 ): Promise<TEntity> => {
   const row = getDatabase().prepare(`
     SELECT *
@@ -3279,7 +3279,7 @@ export const readStoredNpc = async <TData, TEntity>(
 
 export const readStoredMonster = async <TData, TEntity>(
   id: string,
-  options: StoredMonsterOptions<TData, TEntity>,
+  options: StoredMonsterOptions<TData>,
 ): Promise<TEntity> => {
   const row = getDatabase().prepare(`
     SELECT *
@@ -3296,7 +3296,7 @@ export const readStoredMonster = async <TData, TEntity>(
 
 export const readStoredGroupEntity = async <TData, TEntity>(
   id: string,
-  entityOptions: StoredGroupOptions<TData, TEntity>,
+  entityOptions: StoredGroupOptions<TData>,
   relationOptions: GroupMemberRelationOptions<TData>,
 ): Promise<TEntity> => {
   const row = getDatabase().prepare(`
@@ -3314,7 +3314,7 @@ export const readStoredGroupEntity = async <TData, TEntity>(
 }
 
 export const createStoredEntity = async <TData, TEntity>(
-  options: StoredEntityOptions<TData, TEntity>,
+  options: StoredEntityOptions<TData>,
   data: Partial<Record<keyof TData, unknown>> = {},
 ): Promise<TEntity> => {
   const id = `${Date.now()}-${randomUUID().slice(0, 8)}`
@@ -3329,7 +3329,7 @@ export const createStoredEntity = async <TData, TEntity>(
 }
 
 export const createStoredArea = async <TData, TEntity>(
-  options: StoredAreaOptions<TData, TEntity>,
+  options: StoredAreaOptions<TData>,
   data: Partial<Record<keyof TData, unknown>> = {},
 ): Promise<TEntity> => {
   const id = `${Date.now()}-${randomUUID().slice(0, 8)}`
@@ -3341,7 +3341,7 @@ export const createStoredArea = async <TData, TEntity>(
 }
 
 export const createStoredEvent = async <TData, TEntity>(
-  options: StoredEventOptions<TData, TEntity>,
+  options: StoredEventOptions<TData>,
   data: Partial<Record<keyof TData, unknown>> = {},
 ): Promise<TEntity> => {
   const id = `${Date.now()}-${randomUUID().slice(0, 8)}`
@@ -3353,7 +3353,7 @@ export const createStoredEvent = async <TData, TEntity>(
 }
 
 export const createStoredContext = async <TData, TEntity>(
-  options: StoredContextOptions<TData, TEntity>,
+  options: StoredContextOptions<TData>,
   data: Partial<Record<keyof TData, unknown>> = {},
 ): Promise<TEntity> => {
   const id = `${Date.now()}-${randomUUID().slice(0, 8)}`
@@ -3365,7 +3365,7 @@ export const createStoredContext = async <TData, TEntity>(
 }
 
 export const createStoredCharacter = async <TData, TEntity>(
-  options: StoredCharacterOptions<TData, TEntity>,
+  options: StoredCharacterOptions<TData>,
   data: Partial<Record<keyof TData, unknown>> = {},
 ): Promise<TEntity> => {
   const id = `${Date.now()}-${randomUUID().slice(0, 8)}`
@@ -3377,7 +3377,7 @@ export const createStoredCharacter = async <TData, TEntity>(
 }
 
 export const createStoredNpc = async <TData, TEntity>(
-  options: StoredNpcOptions<TData, TEntity>,
+  options: StoredNpcOptions<TData>,
   data: Partial<Record<keyof TData, unknown>> = {},
 ): Promise<TEntity> => {
   const id = `${Date.now()}-${randomUUID().slice(0, 8)}`
@@ -3389,7 +3389,7 @@ export const createStoredNpc = async <TData, TEntity>(
 }
 
 export const createStoredMonster = async <TData, TEntity>(
-  options: StoredMonsterOptions<TData, TEntity>,
+  options: StoredMonsterOptions<TData>,
   data: Partial<Record<keyof TData, unknown>> = {},
 ): Promise<TEntity> => {
   const id = `${Date.now()}-${randomUUID().slice(0, 8)}`
@@ -3401,7 +3401,7 @@ export const createStoredMonster = async <TData, TEntity>(
 }
 
 export const createStoredGroupEntity = async <TData, TEntity>(
-  entityOptions: StoredGroupOptions<TData, TEntity>,
+  entityOptions: StoredGroupOptions<TData>,
   relationOptions: GroupMemberRelationOptions<TData>,
   data: Partial<Record<keyof TData, unknown>>,
 ): Promise<TEntity> => {
@@ -3418,7 +3418,7 @@ export const createStoredGroupEntity = async <TData, TEntity>(
 export const updateStoredEntity = async <TData, TEntity>(
   id: string,
   data: unknown,
-  options: StoredEntityOptions<TData, TEntity>,
+  options: StoredEntityOptions<TData>,
 ): Promise<TEntity> => {
   const existing = getDatabase().prepare(`
     SELECT id, payload_json, updated_at
@@ -3443,7 +3443,7 @@ export const updateStoredEntity = async <TData, TEntity>(
 export const updateStoredArea = async <TData, TEntity>(
   id: string,
   data: unknown,
-  options: StoredAreaOptions<TData, TEntity>,
+  options: StoredAreaOptions<TData>,
 ): Promise<TEntity> => {
   const existing = getDatabase().prepare(`
     SELECT id, name, description, updated_at
@@ -3470,7 +3470,7 @@ export const updateStoredArea = async <TData, TEntity>(
 export const updateStoredEvent = async <TData, TEntity>(
   id: string,
   data: unknown,
-  options: StoredEventOptions<TData, TEntity>,
+  options: StoredEventOptions<TData>,
 ): Promise<TEntity> => {
   const existing = getDatabase().prepare(`
     SELECT id, name, description, updated_at
@@ -3496,7 +3496,7 @@ export const updateStoredEvent = async <TData, TEntity>(
 export const updateStoredContext = async <TData, TEntity>(
   id: string,
   data: unknown,
-  options: StoredContextOptions<TData, TEntity>,
+  options: StoredContextOptions<TData>,
 ): Promise<TEntity> => {
   const existing = getDatabase().prepare(`
     SELECT id, name, description, updated_at
@@ -3528,7 +3528,7 @@ export const updateStoredContext = async <TData, TEntity>(
 export const updateStoredCharacter = async <TData, TEntity>(
   id: string,
   data: unknown,
-  options: StoredCharacterOptions<TData, TEntity>,
+  options: StoredCharacterOptions<TData>,
 ): Promise<TEntity> => {
   const existing = getDatabase().prepare(`
     SELECT *
@@ -3597,7 +3597,7 @@ export const replaceStoredCharacterHistory = async (characterId: string, entries
 export const updateStoredNpc = async <TData, TEntity>(
   id: string,
   data: unknown,
-  options: StoredNpcOptions<TData, TEntity>,
+  options: StoredNpcOptions<TData>,
 ): Promise<TEntity> => {
   const existing = getDatabase().prepare(`
     SELECT *
@@ -3622,7 +3622,7 @@ export const updateStoredNpc = async <TData, TEntity>(
 export const updateStoredMonster = async <TData, TEntity>(
   id: string,
   data: unknown,
-  options: StoredMonsterOptions<TData, TEntity>,
+  options: StoredMonsterOptions<TData>,
 ): Promise<TEntity> => {
   const existing = getDatabase().prepare(`
     SELECT *
@@ -3647,7 +3647,7 @@ export const updateStoredMonster = async <TData, TEntity>(
 export const updateStoredGroupEntity = async <TData, TEntity>(
   id: string,
   data: unknown,
-  entityOptions: StoredGroupOptions<TData, TEntity>,
+  entityOptions: StoredGroupOptions<TData>,
   relationOptions: GroupMemberRelationOptions<TData>,
 ): Promise<TEntity> => {
   const existing = getDatabase().prepare(`

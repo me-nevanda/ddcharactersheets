@@ -276,8 +276,8 @@ export const useNpcEditPage = (): NpcEditPageState => {
           hp: npc.hp,
           level: npc.level,
           speed: npc.speed,
-          isStory: npc.isStory === true,
-          isDead: npc.isDead === true,
+          isStory: npc.isStory,
+          isDead: npc.isDead,
           history: normalizeNpcHistoryEntries(npc.history),
         }
         if (!cancelled) {
