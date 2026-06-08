@@ -1,14 +1,11 @@
-import path from 'node:path'
 import type { CharacterGroup, CharacterGroupData } from '../src/types/character'
-import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, migrateGroupsJsonDirectoryToSqlite, migrateJsonDirectoryToSqlite, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
+import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
   statusCode?: number
 }
 
-const characterGroupsDirectory = path.resolve(process.cwd(), 'data', 'character-groups')
-const charactersDirectory = path.resolve(process.cwd(), 'data', 'characters')
 const safeCharacterGroupIdPattern = /^[a-z0-9-]+$/i
 
 const normalizeGroupName = (value: unknown): string => {
@@ -50,25 +47,13 @@ const characterGroupStoreOptions = {
 
 const characterGroupRelationOptions = {
   idsKey: 'characterIds',
-  legacyFileNamesKey: 'characterFileNames',
   groupTableName: characterGroupStoreOptions.tableName,
   memberTableName: 'characters',
   relationTableName: 'character_group_members',
   memberColumnName: 'character_id',
 } as const
 
-const ensureCharacterGroupsStore = async (): Promise<void> => {
-  await migrateJsonDirectoryToSqlite({
-    directory: charactersDirectory,
-    tableName: characterGroupRelationOptions.memberTableName,
-    isSafeId: isSafeCharacterGroupId,
-  })
-  await migrateGroupsJsonDirectoryToSqlite({
-    directory: characterGroupsDirectory,
-    isSafeId: isSafeCharacterGroupId,
-    relationOptions: characterGroupRelationOptions,
-  })
-}
+const ensureCharacterGroupsStore = async (): Promise<void> => {}
 
 export const isSafeCharacterGroupId = (groupId: string): boolean => {
   return safeCharacterGroupIdPattern.test(groupId)

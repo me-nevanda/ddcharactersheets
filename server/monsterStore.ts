@@ -3,7 +3,7 @@ import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
 import type { Monster, MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '../src/types/monster'
-import { assertStoredEntityExists, createStoredMonster, deleteStoredEntity, listStoredMonsters, migrateJsonDirectoryToSqlite, readStoredMonster, updateStoredMonster } from './sqliteStore'
+import { assertStoredEntityExists, createStoredMonster, deleteStoredEntity, listStoredMonsters, readStoredMonster, updateStoredMonster } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -392,13 +392,7 @@ const monsterStoreOptions = {
   normalize: normalizeMonster,
 }
 
-const ensureMonstersStore = async (): Promise<void> => {
-  await migrateJsonDirectoryToSqlite({
-    directory: monstersDirectory,
-    tableName: monsterStoreOptions.tableName,
-    isSafeId: isSafeMonsterId,
-  })
-}
+const ensureMonstersStore = async (): Promise<void> => {}
 
 export const isSafeMonsterId = (monsterId: string): boolean => {
   return safeMonsterIdPattern.test(monsterId)

@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
-import { mkdir, readdir, readFile, stat } from 'node:fs/promises'
 import path from 'node:path'
 import Database from 'better-sqlite3'
 
@@ -119,10 +118,6 @@ export interface StoredNpcHistoryEntry {
   content: string
 }
 
-interface MigrationRow {
-  entity_type: string
-}
-
 interface StoredEntityOptions<TData> {
   tableName: string
   normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
@@ -172,31 +167,8 @@ interface StoredMonsterOptions<TData> {
   imageUrl?: (id: string) => string
 }
 
-interface MigrationOptions {
-  directory: string
-  tableName: string
-  isSafeId: (id: string) => boolean
-}
-
-interface AreaMigrationOptions {
-  directory: string
-  isSafeId: (id: string) => boolean
-}
-
-interface ContextMigrationOptions {
-  directory: string
-  isSafeId: (id: string) => boolean
-}
-
-interface GroupMigrationOptions<TData> {
-  directory: string
-  isSafeId: (id: string) => boolean
-  relationOptions: GroupMemberRelationOptions<TData>
-}
-
 interface GroupMemberRelationOptions<TData> {
   idsKey: keyof TData & string
-  legacyFileNamesKey: string
   groupTableName: string
   memberTableName: string
   relationTableName: string
@@ -204,14 +176,10 @@ interface GroupMemberRelationOptions<TData> {
 }
 
 const databasePath = path.resolve(process.cwd(), 'data', 'app.sqlite')
-const migratedTables = new Set<string>()
 let database: Database.Database | null = null
 
-const appTables = [
+const payloadEntityTables = [
   'adventures',
-  'characters',
-  'monsters',
-  'npcs',
 ] as const
 
 const groupTableConfigs = [
@@ -221,7 +189,6 @@ const groupTableConfigs = [
     relationTableName: 'character_group_members',
     memberColumnName: 'character_id',
     idsKey: 'characterIds',
-    legacyFileNamesKey: 'characterFileNames',
   },
   {
     tableName: 'monster_groups',
@@ -229,7 +196,6 @@ const groupTableConfigs = [
     relationTableName: 'monster_group_members',
     memberColumnName: 'monster_id',
     idsKey: 'monsterIds',
-    legacyFileNamesKey: 'monsterFileNames',
   },
   {
     tableName: 'npc_groups',
@@ -237,7 +203,6 @@ const groupTableConfigs = [
     relationTableName: 'npc_group_members',
     memberColumnName: 'npc_id',
     idsKey: 'npcIds',
-    legacyFileNamesKey: 'npcFileNames',
   },
 ] as const
 
@@ -277,7 +242,7 @@ const createEntityTableSql = (tableName: string): string => {
 }
 
 const ensureEntityUniqueIdIndexes = (db: Database.Database): void => {
-  for (const tableName of appTables) {
+  for (const tableName of payloadEntityTables) {
     const columns = db.prepare(`PRAGMA table_info(${quoteName(tableName)})`).all() as { name: string }[]
     if (!columns.some((column) => column.name === 'unique_id')) {
       continue
@@ -304,113 +269,187 @@ const ensureMonsterAndNpcSuggestedColumns = (db: Database.Database): void => {
   ensureColumn(db, 'npcs', 'suggested_custom_damage', "TEXT NOT NULL DEFAULT ''")
 }
 
-const ensureGroupTables = (db: Database.Database): void => {
-  for (const config of groupTableConfigs) {
-    const groupColumns = db.prepare(`PRAGMA table_info(${quoteName(config.tableName)})`).all() as { name: string }[]
-    const hasLegacyPayload = groupColumns.some((column) => column.name === 'payload_json')
-    const hasName = groupColumns.some((column) => column.name === 'name')
-    const existingRelationTable = db.prepare(`
-      SELECT name
-      FROM sqlite_master
-      WHERE type = 'table' AND name = ?
-    `).get(config.relationTableName) as { name: string } | undefined
-    const tempRelationTable = `${config.relationTableName}_next`
+const ensureCharacterTables = (db: Database.Database): void => {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS characters (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL DEFAULT '',
+      short_description TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      level INTEGER NOT NULL DEFAULT 1,
+      race TEXT NOT NULL DEFAULT '',
+      "class" TEXT NOT NULL DEFAULT '',
+      gender TEXT NOT NULL DEFAULT '',
+      alignment TEXT NOT NULL DEFAULT '',
+      hp INTEGER NOT NULL DEFAULT 0,
+      surge INTEGER NOT NULL DEFAULT 0,
+      speed INTEGER NOT NULL DEFAULT 0,
+      bonus_level INTEGER NOT NULL DEFAULT 0,
+      ${characterAttributes.map((attribute) => `bonus_attribute_${attribute} INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      ${characterSkills.map((skill) => `bonus_skill_${skill} INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      ${characterDefences.map((defence) => `bonus_defence_${defence} INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      ${characterDefences.map((defence) => `defence_${defence} INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      ${characterSkills.map((skill) => `training_${skill} INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      ${characterAttributes.map((attribute) => `attribute_${attribute} INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      ${characterAttributes.map((attribute) => `attribute_${attribute}_plus INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
 
-    db.transaction(() => {
-      db.exec(`
-        CREATE TEMP TABLE IF NOT EXISTS ${quoteName(tempRelationTable)} (
-          group_id TEXT NOT NULL,
-          member_id TEXT NOT NULL,
-          position INTEGER NOT NULL,
-          PRIMARY KEY (group_id, member_id)
-        );
+    CREATE INDEX IF NOT EXISTS idx_characters_updated_at ON characters (updated_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_characters_name ON characters (name COLLATE NOCASE);
 
-        DELETE FROM temp.${quoteName(tempRelationTable)};
-      `)
+    CREATE TABLE IF NOT EXISTS characters_abilities (
+      character_id TEXT NOT NULL,
+      id TEXT NOT NULL,
+      position INTEGER NOT NULL,
+      name TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      action TEXT NOT NULL DEFAULT '',
+      type TEXT NOT NULL DEFAULT '',
+      kind TEXT NOT NULL DEFAULT '',
+      weapon_count INTEGER NOT NULL DEFAULT 0,
+      weapon_id TEXT NOT NULL DEFAULT '',
+      weapon_damage_dice_type TEXT NOT NULL DEFAULT '',
+      weapon_damage_dice_count INTEGER NOT NULL DEFAULT 0,
+      weapon_attribute_bonus TEXT NOT NULL DEFAULT '',
+      weapon_attack_bonus_number INTEGER NOT NULL DEFAULT 0,
+      weapon_attack_attribute TEXT NOT NULL DEFAULT '',
+      weapon_attack_defence TEXT NOT NULL DEFAULT '',
+      weapon_damage_type TEXT NOT NULL DEFAULT '',
+      weapon_recurring_damage_count INTEGER NOT NULL DEFAULT 0,
+      weapon_recurring_damage_type TEXT NOT NULL DEFAULT '',
+      weapon_hit TEXT NOT NULL DEFAULT '',
+      weapon_miss TEXT NOT NULL DEFAULT '',
+      weapon_provocation TEXT NOT NULL DEFAULT '',
+      weapon_range INTEGER NOT NULL DEFAULT 0,
+      weapon_area TEXT NOT NULL DEFAULT '',
+      PRIMARY KEY (character_id, id),
+      FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
+    );
 
-      if (existingRelationTable) {
-        db.exec(`
-          INSERT OR REPLACE INTO temp.${quoteName(tempRelationTable)} (group_id, member_id, position)
-          SELECT group_id, ${quoteName(config.memberColumnName)}, position
-          FROM ${quoteName(config.relationTableName)};
-        `)
-      }
+    CREATE TABLE IF NOT EXISTS characters_feats (
+      character_id TEXT NOT NULL,
+      id TEXT NOT NULL,
+      position INTEGER NOT NULL,
+      name TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      visible INTEGER NOT NULL DEFAULT 1,
+      speed_bonus INTEGER NOT NULL DEFAULT 0,
+      hp_bonus INTEGER NOT NULL DEFAULT 0,
+      ${characterDefences.map((defence) => `defence_${defence}_bonus INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      ${characterSkills.map((skill) => `skill_${skill}_bonus INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      PRIMARY KEY (character_id, id),
+      FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
+    );
 
-      if (hasLegacyPayload) {
-        db.exec(`
-          INSERT OR REPLACE INTO temp.${quoteName(tempRelationTable)} (group_id, member_id, position)
-          SELECT
-            ${quoteName(config.tableName)}.id,
-            SUBSTR(file_name.value, 1, LENGTH(file_name.value) - 5),
-            CAST(file_name.key AS INTEGER)
-          FROM ${quoteName(config.tableName)}, json_each(${quoteName(config.tableName)}.payload_json, '$.${config.legacyFileNamesKey}') AS file_name
-          WHERE json_type(file_name.value) = 'text'
-            AND LOWER(file_name.value) LIKE '%.json'
-            AND TRIM(SUBSTR(file_name.value, 1, LENGTH(file_name.value) - 5)) <> '';
-        `)
-      }
+    CREATE TABLE IF NOT EXISTS characters_items (
+      character_id TEXT NOT NULL,
+      id TEXT NOT NULL,
+      position INTEGER NOT NULL,
+      item_type TEXT NOT NULL DEFAULT '',
+      name TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      equipped INTEGER NOT NULL DEFAULT 0,
+      damage_dice_count INTEGER NOT NULL DEFAULT 0,
+      damage_dice_type TEXT NOT NULL DEFAULT '',
+      damage_bonus INTEGER NOT NULL DEFAULT 0,
+      range INTEGER NOT NULL DEFAULT 0,
+      weapon_proficiency_bonus INTEGER NOT NULL DEFAULT 0,
+      ${characterAttributes.map((attribute) => `attribute_${attribute}_bonus INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      speed_bonus INTEGER NOT NULL DEFAULT 0,
+      armor_penalty INTEGER NOT NULL DEFAULT 0,
+      ${characterDefences.map((defence) => `defence_${defence}_bonus INTEGER NOT NULL DEFAULT 0`).join(',\n      ')},
+      PRIMARY KEY (character_id, id),
+      FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
+    );
+  `)
+}
 
-      if (hasLegacyPayload || !hasName) {
-        db.exec(`
-          DROP TABLE IF EXISTS ${quoteName(config.relationTableName)};
+const ensureCombatantTables = (db: Database.Database): void => {
+  for (const tableName of ['npcs', 'monsters'] as const) {
+    const isNpc = tableName === 'npcs'
+    const ownerColumn = isNpc ? 'npc_id' : 'monster_id'
+    const attacksTable = isNpc ? 'npcs_attacks' : 'monsters_attacks'
+    const itemsTable = isNpc ? 'npcs_items' : 'monsters_items'
 
-          CREATE TABLE IF NOT EXISTS ${quoteName(`${config.tableName}_next`)} (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL DEFAULT '',
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-          );
-        `)
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS ${tableName} (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL DEFAULT '',
+        role TEXT NOT NULL DEFAULT '',
+        type TEXT NOT NULL DEFAULT '',
+        description TEXT NOT NULL DEFAULT '',
+        resistances TEXT NOT NULL DEFAULT '',
+        special TEXT NOT NULL DEFAULT '',
+        hp INTEGER NOT NULL DEFAULT 0,
+        level INTEGER NOT NULL DEFAULT 1,
+        speed INTEGER NOT NULL DEFAULT 0,
+        ${isNpc ? 'is_story INTEGER NOT NULL DEFAULT 0,\n        is_dead INTEGER NOT NULL DEFAULT 0,' : ''}
+        ${characterDefences.map((defence) => `defence_${defence} INTEGER NOT NULL DEFAULT 0`).join(',\n        ')},
+        suggested_attack_vs_kp TEXT NOT NULL DEFAULT '',
+        suggested_attack_vs_other_defences TEXT NOT NULL DEFAULT '',
+        suggested_low_damage TEXT NOT NULL DEFAULT '',
+        suggested_medium_damage TEXT NOT NULL DEFAULT '',
+        suggested_high_damage TEXT NOT NULL DEFAULT '',
+        suggested_custom_damage TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
 
-        if (groupColumns.length > 0) {
-          if (hasLegacyPayload) {
-            db.exec(`
-              INSERT OR REPLACE INTO ${quoteName(`${config.tableName}_next`)} (id, name, created_at, updated_at)
-              SELECT
-                id,
-                COALESCE(json_extract(payload_json, '$.name'), ''),
-                created_at,
-                updated_at
-              FROM ${quoteName(config.tableName)};
-            `)
-          } else {
-            db.exec(`
-              INSERT OR REPLACE INTO ${quoteName(`${config.tableName}_next`)} (id, name, created_at, updated_at)
-              SELECT id, COALESCE(name, ''), created_at, updated_at
-              FROM ${quoteName(config.tableName)};
-            `)
-          }
-        }
+      CREATE INDEX IF NOT EXISTS ${quoteName(`idx_${tableName}_updated_at`)} ON ${quoteName(tableName)} (updated_at DESC);
+      CREATE INDEX IF NOT EXISTS ${quoteName(`idx_${tableName}_name`)} ON ${quoteName(tableName)} (name COLLATE NOCASE);
 
-        db.exec(`
-          DROP TABLE IF EXISTS ${quoteName(config.tableName)};
-          ALTER TABLE ${quoteName(`${config.tableName}_next`)} RENAME TO ${quoteName(config.tableName)};
-        `)
-      } else {
-        db.exec(`
-          CREATE TABLE IF NOT EXISTS ${quoteName(config.tableName)} (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL DEFAULT '',
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-          );
-        `)
-      }
-    })()
+      CREATE TABLE IF NOT EXISTS ${attacksTable} (
+        ${ownerColumn} TEXT NOT NULL,
+        id TEXT NOT NULL,
+        position INTEGER NOT NULL,
+        name TEXT NOT NULL DEFAULT '',
+        action TEXT NOT NULL DEFAULT '',
+        type TEXT NOT NULL DEFAULT '',
+        range INTEGER NOT NULL DEFAULT 0,
+        area TEXT NOT NULL DEFAULT '',
+        attack_bonus_number INTEGER NOT NULL DEFAULT 0,
+        attack_defence TEXT NOT NULL DEFAULT '',
+        attack_not_applicable INTEGER NOT NULL DEFAULT 0,
+        description TEXT NOT NULL DEFAULT '',
+        PRIMARY KEY (${ownerColumn}, id),
+        FOREIGN KEY (${ownerColumn}) REFERENCES ${tableName}(id) ON DELETE CASCADE
+      );
+
+      CREATE TABLE IF NOT EXISTS ${itemsTable} (
+        ${ownerColumn} TEXT NOT NULL,
+        id TEXT NOT NULL,
+        position INTEGER NOT NULL,
+        item_type TEXT NOT NULL DEFAULT '',
+        name TEXT NOT NULL DEFAULT '',
+        description TEXT NOT NULL DEFAULT '',
+        equipped INTEGER NOT NULL DEFAULT 0,
+        damage_dice_count INTEGER NOT NULL DEFAULT 0,
+        damage_dice_type TEXT NOT NULL DEFAULT '',
+        damage_bonus INTEGER NOT NULL DEFAULT 0,
+        range INTEGER NOT NULL DEFAULT 0,
+        weapon_proficiency_bonus INTEGER NOT NULL DEFAULT 0,
+        ${characterAttributes.map((attribute) => `attribute_${attribute}_bonus INTEGER NOT NULL DEFAULT 0`).join(',\n        ')},
+        speed_bonus INTEGER NOT NULL DEFAULT 0,
+        armor_penalty INTEGER NOT NULL DEFAULT 0,
+        ${characterDefences.map((defence) => `defence_${defence}_bonus INTEGER NOT NULL DEFAULT 0`).join(',\n        ')},
+        PRIMARY KEY (${ownerColumn}, id),
+        FOREIGN KEY (${ownerColumn}) REFERENCES ${tableName}(id) ON DELETE CASCADE
+      );
+    `)
   }
 }
 
-const restoreGroupRelations = (db: Database.Database): void => {
+const ensureGroupTables = (db: Database.Database): void => {
   for (const config of groupTableConfigs) {
-    const tempRelationTable = `${config.relationTableName}_next`
     db.exec(`
-      INSERT OR IGNORE INTO ${quoteName(config.relationTableName)} (group_id, ${quoteName(config.memberColumnName)}, position)
-      SELECT group_id, member_id, position
-      FROM temp.${quoteName(tempRelationTable)}
-      WHERE EXISTS (SELECT 1 FROM ${quoteName(config.tableName)} WHERE ${quoteName(config.tableName)}.id = group_id)
-        AND EXISTS (SELECT 1 FROM ${quoteName(config.memberTableName)} WHERE ${quoteName(config.memberTableName)}.id = member_id);
-
-      DROP TABLE IF EXISTS temp.${quoteName(tempRelationTable)};
+      CREATE TABLE IF NOT EXISTS ${quoteName(config.tableName)} (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
 
       CREATE INDEX IF NOT EXISTS ${quoteName(`idx_${config.tableName}_updated_at`)}
         ON ${quoteName(config.tableName)} (updated_at DESC);
@@ -422,105 +461,19 @@ const restoreGroupRelations = (db: Database.Database): void => {
 }
 
 const ensureAreaTables = (db: Database.Database): void => {
-  const areaColumns = db.prepare('PRAGMA table_info(areas)').all() as { name: string }[]
-  const hasLegacyPayload = areaColumns.some((column) => column.name === 'payload_json')
-  const hasDescription = areaColumns.some((column) => column.name === 'description')
-
   db.exec(`
     CREATE TABLE IF NOT EXISTS places (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL DEFAULT '',
       description TEXT NOT NULL DEFAULT ''
     );
-  `)
 
-  if (hasLegacyPayload || !hasDescription) {
-    db.transaction(() => {
-      if (hasLegacyPayload) {
-        db.exec('DROP TABLE IF EXISTS area_places;')
-      }
-
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS areas_next (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL DEFAULT '',
-          description TEXT NOT NULL DEFAULT '',
-          created_at TEXT NOT NULL,
-          updated_at TEXT NOT NULL
-        );
-      `)
-
-      if (areaColumns.length > 0) {
-        if (hasLegacyPayload) {
-          db.exec(`
-            CREATE TEMP TABLE IF NOT EXISTS area_places_next (
-              area_id TEXT NOT NULL,
-              place_id TEXT NOT NULL,
-              position INTEGER NOT NULL,
-              PRIMARY KEY (area_id, place_id)
-            );
-
-            DELETE FROM area_places_next;
-
-            INSERT OR REPLACE INTO places (id, name, description)
-            SELECT
-              json_extract(place.value, '$.id'),
-              COALESCE(json_extract(place.value, '$.name'), ''),
-              COALESCE(json_extract(place.value, '$.description'), '')
-            FROM areas AS area, json_each(area.payload_json, '$.places') AS place
-            WHERE json_type(place.value, '$.id') = 'text'
-              AND TRIM(json_extract(place.value, '$.id')) <> '';
-
-            INSERT OR REPLACE INTO area_places_next (area_id, place_id, position)
-            SELECT
-              area.id,
-              json_extract(place.value, '$.id'),
-              CAST(place.key AS INTEGER)
-            FROM areas AS area, json_each(area.payload_json, '$.places') AS place
-            WHERE json_type(place.value, '$.id') = 'text'
-              AND TRIM(json_extract(place.value, '$.id')) <> '';
-
-            INSERT OR REPLACE INTO areas_next (id, name, description, created_at, updated_at)
-            SELECT
-              id,
-              COALESCE(json_extract(payload_json, '$.name'), ''),
-              COALESCE(json_extract(payload_json, '$.description'), ''),
-              created_at,
-              updated_at
-            FROM areas;
-          `)
-        } else {
-          db.exec(`
-            INSERT OR REPLACE INTO areas_next (id, name, description, created_at, updated_at)
-            SELECT id, name, COALESCE(description, ''), created_at, updated_at
-            FROM areas;
-          `)
-        }
-      }
-
-      db.exec(`
-        DROP TABLE IF EXISTS areas;
-        ALTER TABLE areas_next RENAME TO areas;
-      `)
-    })()
-  } else {
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS areas (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL DEFAULT '',
-        description TEXT NOT NULL DEFAULT '',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-      );
-    `)
-  }
-
-  db.exec(`
-    CREATE TEMP TABLE IF NOT EXISTS area_places_next (
-      area_id TEXT NOT NULL,
-      place_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (area_id, place_id)
+    CREATE TABLE IF NOT EXISTS areas (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS area_places (
@@ -532,341 +485,25 @@ const ensureAreaTables = (db: Database.Database): void => {
       FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE
     );
 
-    INSERT OR IGNORE INTO area_places (area_id, place_id, position)
-    SELECT area_id, place_id, position
-    FROM temp.area_places_next
-    WHERE EXISTS (SELECT 1 FROM areas WHERE areas.id = area_places_next.area_id)
-      AND EXISTS (SELECT 1 FROM places WHERE places.id = area_places_next.place_id);
-
-    DROP TABLE IF EXISTS temp.area_places_next;
-
-    CREATE INDEX IF NOT EXISTS idx_area_places_area
-      ON area_places (area_id, position);
-
-    CREATE INDEX IF NOT EXISTS idx_area_places_place
-      ON area_places (place_id);
-
-    CREATE INDEX IF NOT EXISTS idx_areas_updated_at
-      ON areas (updated_at DESC);
-
-    CREATE INDEX IF NOT EXISTS idx_areas_name
-      ON areas (name COLLATE NOCASE);
+    CREATE INDEX IF NOT EXISTS idx_area_places_area ON area_places (area_id, position);
+    CREATE INDEX IF NOT EXISTS idx_area_places_place ON area_places (place_id);
+    CREATE INDEX IF NOT EXISTS idx_areas_updated_at ON areas (updated_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_areas_name ON areas (name COLLATE NOCASE);
   `)
 }
 
 const ensureEventTables = (db: Database.Database): void => {
-  const eventColumns = db.prepare('PRAGMA table_info(events)').all() as { name: string }[]
-  const hasLegacyPayload = eventColumns.some((column) => column.name === 'payload_json')
-  const hasDescription = eventColumns.some((column) => column.name === 'description')
-
-  if (hasLegacyPayload || !hasDescription) {
-    db.transaction(() => {
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS events_next (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL DEFAULT '',
-          description TEXT NOT NULL DEFAULT '',
-          created_at TEXT NOT NULL,
-          updated_at TEXT NOT NULL
-        );
-      `)
-
-      if (eventColumns.length > 0) {
-        if (hasLegacyPayload) {
-          db.exec(`
-            INSERT OR REPLACE INTO events_next (id, name, description, created_at, updated_at)
-            SELECT
-              id,
-              COALESCE(json_extract(payload_json, '$.name'), ''),
-              COALESCE(json_extract(payload_json, '$.description'), ''),
-              created_at,
-              updated_at
-            FROM events;
-          `)
-        } else {
-          db.exec(`
-            INSERT OR REPLACE INTO events_next (id, name, description, created_at, updated_at)
-            SELECT id, name, COALESCE(description, ''), created_at, updated_at
-            FROM events;
-          `)
-        }
-      }
-
-      db.exec(`
-        DROP TABLE IF EXISTS events;
-        ALTER TABLE events_next RENAME TO events;
-      `)
-    })()
-  } else {
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS events (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL DEFAULT '',
-        description TEXT NOT NULL DEFAULT '',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-      );
-    `)
-  }
-
   db.exec(`
-    CREATE INDEX IF NOT EXISTS idx_events_updated_at
-      ON events (updated_at DESC);
-
-    CREATE INDEX IF NOT EXISTS idx_events_name
-      ON events (name COLLATE NOCASE);
-  `)
-}
-
-const createContextRelationTempTables = (db: Database.Database): void => {
-  db.exec(`
-    CREATE TEMP TABLE IF NOT EXISTS context_characters_next (
-      context_id TEXT NOT NULL,
-      character_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (context_id, character_id)
+    CREATE TABLE IF NOT EXISTS events (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
     );
-    DELETE FROM temp.context_characters_next;
 
-    CREATE TEMP TABLE IF NOT EXISTS context_character_groups_next (
-      context_id TEXT NOT NULL,
-      group_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (context_id, group_id)
-    );
-    DELETE FROM temp.context_character_groups_next;
-
-    CREATE TEMP TABLE IF NOT EXISTS context_character_group_members_next (
-      context_id TEXT NOT NULL,
-      group_id TEXT NOT NULL,
-      character_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (context_id, group_id, character_id)
-    );
-    DELETE FROM temp.context_character_group_members_next;
-
-    CREATE TEMP TABLE IF NOT EXISTS context_npc_groups_next (
-      context_id TEXT NOT NULL,
-      group_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (context_id, group_id)
-    );
-    DELETE FROM temp.context_npc_groups_next;
-
-    CREATE TEMP TABLE IF NOT EXISTS context_npc_group_members_next (
-      context_id TEXT NOT NULL,
-      group_id TEXT NOT NULL,
-      npc_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (context_id, group_id, npc_id)
-    );
-    DELETE FROM temp.context_npc_group_members_next;
-
-    CREATE TEMP TABLE IF NOT EXISTS context_monster_groups_next (
-      context_id TEXT NOT NULL,
-      group_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (context_id, group_id)
-    );
-    DELETE FROM temp.context_monster_groups_next;
-
-    CREATE TEMP TABLE IF NOT EXISTS context_monster_group_members_next (
-      context_id TEXT NOT NULL,
-      group_id TEXT NOT NULL,
-      monster_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (context_id, group_id, monster_id)
-    );
-    DELETE FROM temp.context_monster_group_members_next;
-
-    CREATE TEMP TABLE IF NOT EXISTS context_areas_next (
-      context_id TEXT NOT NULL,
-      area_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (context_id, area_id)
-    );
-    DELETE FROM temp.context_areas_next;
-
-    CREATE TEMP TABLE IF NOT EXISTS context_area_places_next (
-      context_id TEXT NOT NULL,
-      area_id TEXT NOT NULL,
-      place_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (context_id, area_id, place_id)
-    );
-    DELETE FROM temp.context_area_places_next;
-
-    CREATE TEMP TABLE IF NOT EXISTS context_events_next (
-      context_id TEXT NOT NULL,
-      event_id TEXT NOT NULL,
-      position INTEGER NOT NULL,
-      PRIMARY KEY (context_id, event_id)
-    );
-    DELETE FROM temp.context_events_next;
-  `)
-}
-
-const copyExistingContextRelationsToTemp = (db: Database.Database): void => {
-  const relationTables = [
-    ['context_characters', 'context_characters_next', 'context_id, character_id, position'],
-    ['context_character_groups', 'context_character_groups_next', 'context_id, group_id, position'],
-    ['context_character_group_members', 'context_character_group_members_next', 'context_id, group_id, character_id, position'],
-    ['context_npc_groups', 'context_npc_groups_next', 'context_id, group_id, position'],
-    ['context_npc_group_members', 'context_npc_group_members_next', 'context_id, group_id, npc_id, position'],
-    ['context_monster_groups', 'context_monster_groups_next', 'context_id, group_id, position'],
-    ['context_monster_group_members', 'context_monster_group_members_next', 'context_id, group_id, monster_id, position'],
-    ['context_areas', 'context_areas_next', 'context_id, area_id, position'],
-    ['context_area_places', 'context_area_places_next', 'context_id, area_id, place_id, position'],
-    ['context_events', 'context_events_next', 'context_id, event_id, position'],
-  ] as const
-
-  for (const [sourceTable, tempTable, columns] of relationTables) {
-    const existing = db.prepare(`
-      SELECT name
-      FROM sqlite_master
-      WHERE type = 'table' AND name = ?
-    `).get(sourceTable) as { name: string } | undefined
-    if (!existing) {
-      continue
-    }
-
-    db.exec(`
-      INSERT OR REPLACE INTO temp.${quoteName(tempTable)} (${columns})
-      SELECT ${columns}
-      FROM ${quoteName(sourceTable)};
-    `)
-  }
-}
-
-const copyLegacyContextPayloadRelationsToTemp = (db: Database.Database): void => {
-  db.exec(`
-    INSERT OR REPLACE INTO temp.context_characters_next (context_id, character_id, position)
-    SELECT
-      context.id,
-      CASE
-        WHEN LOWER(character.value) LIKE '%.json' THEN SUBSTR(character.value, 1, LENGTH(character.value) - 5)
-        ELSE character.value
-      END,
-      CAST(character.key AS INTEGER)
-    FROM contexts AS context, json_each(context.payload_json, '$.characters') AS character
-    WHERE character.type = 'text'
-      AND TRIM(character.value) <> '';
-
-    INSERT OR REPLACE INTO temp.context_character_groups_next (context_id, group_id, position)
-    SELECT
-      context.id,
-      json_extract(group_item.value, '$.id'),
-      CAST(group_item.key AS INTEGER)
-    FROM contexts AS context, json_each(context.payload_json, '$.characterGroups') AS group_item
-    WHERE json_type(group_item.value, '$.id') = 'text'
-      AND TRIM(json_extract(group_item.value, '$.id')) <> '';
-
-    INSERT OR REPLACE INTO temp.context_character_group_members_next (context_id, group_id, character_id, position)
-    SELECT
-      context.id,
-      json_extract(group_item.value, '$.id'),
-      CASE
-        WHEN LOWER(character.value) LIKE '%.json' THEN SUBSTR(character.value, 1, LENGTH(character.value) - 5)
-        ELSE character.value
-      END,
-      CAST(character.key AS INTEGER)
-    FROM contexts AS context,
-      json_each(context.payload_json, '$.characterGroups') AS group_item,
-      json_each(group_item.value, '$.characterIds') AS character
-    WHERE json_type(group_item.value, '$.id') = 'text'
-      AND TRIM(json_extract(group_item.value, '$.id')) <> ''
-      AND character.type = 'text'
-      AND TRIM(character.value) <> '';
-
-    INSERT OR REPLACE INTO temp.context_npc_groups_next (context_id, group_id, position)
-    SELECT
-      context.id,
-      json_extract(group_item.value, '$.id'),
-      CAST(group_item.key AS INTEGER)
-    FROM contexts AS context, json_each(context.payload_json, '$.npcGroups') AS group_item
-    WHERE json_type(group_item.value, '$.id') = 'text'
-      AND TRIM(json_extract(group_item.value, '$.id')) <> '';
-
-    INSERT OR REPLACE INTO temp.context_npc_group_members_next (context_id, group_id, npc_id, position)
-    SELECT
-      context.id,
-      json_extract(group_item.value, '$.id'),
-      CASE
-        WHEN LOWER(npc.value) LIKE '%.json' THEN SUBSTR(npc.value, 1, LENGTH(npc.value) - 5)
-        ELSE npc.value
-      END,
-      CAST(npc.key AS INTEGER)
-    FROM contexts AS context,
-      json_each(context.payload_json, '$.npcGroups') AS group_item,
-      json_each(group_item.value, '$.npcIds') AS npc
-    WHERE json_type(group_item.value, '$.id') = 'text'
-      AND TRIM(json_extract(group_item.value, '$.id')) <> ''
-      AND npc.type = 'text'
-      AND TRIM(npc.value) <> '';
-
-    INSERT OR REPLACE INTO temp.context_monster_groups_next (context_id, group_id, position)
-    SELECT
-      context.id,
-      json_extract(group_item.value, '$.id'),
-      CAST(group_item.key AS INTEGER)
-    FROM contexts AS context, json_each(context.payload_json, '$.monsterGroups') AS group_item
-    WHERE json_type(group_item.value, '$.id') = 'text'
-      AND TRIM(json_extract(group_item.value, '$.id')) <> '';
-
-    INSERT OR REPLACE INTO temp.context_monster_group_members_next (context_id, group_id, monster_id, position)
-    SELECT
-      context.id,
-      json_extract(group_item.value, '$.id'),
-      CASE
-        WHEN LOWER(monster.value) LIKE '%.json' THEN SUBSTR(monster.value, 1, LENGTH(monster.value) - 5)
-        ELSE monster.value
-      END,
-      CAST(monster.key AS INTEGER)
-    FROM contexts AS context,
-      json_each(context.payload_json, '$.monsterGroups') AS group_item,
-      json_each(group_item.value, '$.monsterIds') AS monster
-    WHERE json_type(group_item.value, '$.id') = 'text'
-      AND TRIM(json_extract(group_item.value, '$.id')) <> ''
-      AND monster.type = 'text'
-      AND TRIM(monster.value) <> '';
-
-    INSERT OR REPLACE INTO temp.context_areas_next (context_id, area_id, position)
-    SELECT
-      context.id,
-      json_extract(area.value, '$.id'),
-      CAST(area.key AS INTEGER)
-    FROM contexts AS context, json_each(context.payload_json, '$.areas') AS area
-    WHERE json_type(area.value, '$.id') = 'text'
-      AND TRIM(json_extract(area.value, '$.id')) <> '';
-
-    INSERT OR REPLACE INTO temp.context_area_places_next (context_id, area_id, place_id, position)
-    SELECT
-      context.id,
-      json_extract(area.value, '$.id'),
-      CASE
-        WHEN LOWER(place.value) LIKE '%.json' THEN SUBSTR(place.value, 1, LENGTH(place.value) - 5)
-        ELSE place.value
-      END,
-      CAST(place.key AS INTEGER)
-    FROM contexts AS context,
-      json_each(context.payload_json, '$.areas') AS area,
-      json_each(area.value, '$.placeIds') AS place
-    WHERE json_type(area.value, '$.id') = 'text'
-      AND TRIM(json_extract(area.value, '$.id')) <> ''
-      AND place.type = 'text'
-      AND TRIM(place.value) <> '';
-
-    INSERT OR REPLACE INTO temp.context_events_next (context_id, event_id, position)
-    SELECT
-      context.id,
-      CASE
-        WHEN LOWER(event.value) LIKE '%.json' THEN SUBSTR(event.value, 1, LENGTH(event.value) - 5)
-        ELSE event.value
-      END,
-      CAST(event.key AS INTEGER)
-    FROM contexts AS context, json_each(context.payload_json, '$.events') AS event
-    WHERE event.type = 'text'
-      AND TRIM(event.value) <> '';
+    CREATE INDEX IF NOT EXISTS idx_events_updated_at ON events (updated_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_events_name ON events (name COLLATE NOCASE);
   `)
 }
 
@@ -968,111 +605,20 @@ const createContextRelationTables = (db: Database.Database): void => {
   `)
 }
 
-const restoreContextRelations = (db: Database.Database): void => {
+const ensureContextTables = (db: Database.Database): void => {
   db.exec(`
-    INSERT OR IGNORE INTO context_characters (context_id, character_id, position)
-    SELECT context_id, character_id, position
-    FROM temp.context_characters_next
-    WHERE EXISTS (SELECT 1 FROM contexts WHERE contexts.id = context_id)
-      AND EXISTS (SELECT 1 FROM characters WHERE characters.id = character_id);
+    CREATE TABLE IF NOT EXISTS contexts (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+  `)
 
-    INSERT OR IGNORE INTO context_character_groups (context_id, group_id, position)
-    SELECT context_id, group_id, position
-    FROM temp.context_character_groups_next
-    WHERE EXISTS (SELECT 1 FROM contexts WHERE contexts.id = context_id)
-      AND EXISTS (SELECT 1 FROM character_groups WHERE character_groups.id = group_id);
+  createContextRelationTables(db)
 
-    INSERT OR IGNORE INTO context_character_group_members (context_id, group_id, character_id, position)
-    SELECT context_id, group_id, character_id, position
-    FROM temp.context_character_group_members_next
-    WHERE EXISTS (
-        SELECT 1 FROM context_character_groups
-        WHERE context_character_groups.context_id = context_character_group_members_next.context_id
-          AND context_character_groups.group_id = context_character_group_members_next.group_id
-      )
-      AND EXISTS (
-        SELECT 1 FROM character_group_members
-        WHERE character_group_members.group_id = context_character_group_members_next.group_id
-          AND character_group_members.character_id = context_character_group_members_next.character_id
-      );
-
-    INSERT OR IGNORE INTO context_npc_groups (context_id, group_id, position)
-    SELECT context_id, group_id, position
-    FROM temp.context_npc_groups_next
-    WHERE EXISTS (SELECT 1 FROM contexts WHERE contexts.id = context_id)
-      AND EXISTS (SELECT 1 FROM npc_groups WHERE npc_groups.id = group_id);
-
-    INSERT OR IGNORE INTO context_npc_group_members (context_id, group_id, npc_id, position)
-    SELECT context_id, group_id, npc_id, position
-    FROM temp.context_npc_group_members_next
-    WHERE EXISTS (
-        SELECT 1 FROM context_npc_groups
-        WHERE context_npc_groups.context_id = context_npc_group_members_next.context_id
-          AND context_npc_groups.group_id = context_npc_group_members_next.group_id
-      )
-      AND EXISTS (
-        SELECT 1 FROM npc_group_members
-        WHERE npc_group_members.group_id = context_npc_group_members_next.group_id
-          AND npc_group_members.npc_id = context_npc_group_members_next.npc_id
-      );
-
-    INSERT OR IGNORE INTO context_monster_groups (context_id, group_id, position)
-    SELECT context_id, group_id, position
-    FROM temp.context_monster_groups_next
-    WHERE EXISTS (SELECT 1 FROM contexts WHERE contexts.id = context_id)
-      AND EXISTS (SELECT 1 FROM monster_groups WHERE monster_groups.id = group_id);
-
-    INSERT OR IGNORE INTO context_monster_group_members (context_id, group_id, monster_id, position)
-    SELECT context_id, group_id, monster_id, position
-    FROM temp.context_monster_group_members_next
-    WHERE EXISTS (
-        SELECT 1 FROM context_monster_groups
-        WHERE context_monster_groups.context_id = context_monster_group_members_next.context_id
-          AND context_monster_groups.group_id = context_monster_group_members_next.group_id
-      )
-      AND EXISTS (
-        SELECT 1 FROM monster_group_members
-        WHERE monster_group_members.group_id = context_monster_group_members_next.group_id
-          AND monster_group_members.monster_id = context_monster_group_members_next.monster_id
-      );
-
-    INSERT OR IGNORE INTO context_areas (context_id, area_id, position)
-    SELECT context_id, area_id, position
-    FROM temp.context_areas_next
-    WHERE EXISTS (SELECT 1 FROM contexts WHERE contexts.id = context_id)
-      AND EXISTS (SELECT 1 FROM areas WHERE areas.id = area_id);
-
-    INSERT OR IGNORE INTO context_area_places (context_id, area_id, place_id, position)
-    SELECT context_id, area_id, place_id, position
-    FROM temp.context_area_places_next
-    WHERE EXISTS (
-        SELECT 1 FROM context_areas
-        WHERE context_areas.context_id = context_area_places_next.context_id
-          AND context_areas.area_id = context_area_places_next.area_id
-      )
-      AND EXISTS (
-        SELECT 1 FROM area_places
-        WHERE area_places.area_id = context_area_places_next.area_id
-          AND area_places.place_id = context_area_places_next.place_id
-      );
-
-    INSERT OR IGNORE INTO context_events (context_id, event_id, position)
-    SELECT context_id, event_id, position
-    FROM temp.context_events_next
-    WHERE EXISTS (SELECT 1 FROM contexts WHERE contexts.id = context_id)
-      AND EXISTS (SELECT 1 FROM events WHERE events.id = event_id);
-
-    DROP TABLE IF EXISTS temp.context_characters_next;
-    DROP TABLE IF EXISTS temp.context_character_groups_next;
-    DROP TABLE IF EXISTS temp.context_character_group_members_next;
-    DROP TABLE IF EXISTS temp.context_npc_groups_next;
-    DROP TABLE IF EXISTS temp.context_npc_group_members_next;
-    DROP TABLE IF EXISTS temp.context_monster_groups_next;
-    DROP TABLE IF EXISTS temp.context_monster_group_members_next;
-    DROP TABLE IF EXISTS temp.context_areas_next;
-    DROP TABLE IF EXISTS temp.context_area_places_next;
-    DROP TABLE IF EXISTS temp.context_events_next;
-
+  db.exec(`
     CREATE INDEX IF NOT EXISTS idx_contexts_updated_at ON contexts (updated_at DESC);
     CREATE INDEX IF NOT EXISTS idx_contexts_name ON contexts (name COLLATE NOCASE);
     CREATE INDEX IF NOT EXISTS idx_context_characters_context ON context_characters (context_id, position);
@@ -1087,89 +633,6 @@ const restoreContextRelations = (db: Database.Database): void => {
     CREATE INDEX IF NOT EXISTS idx_context_events_context ON context_events (context_id, position);
   `)
 }
-
-const dropContextRelationTables = (db: Database.Database): void => {
-  db.exec(`
-    DROP TABLE IF EXISTS context_area_places;
-    DROP TABLE IF EXISTS context_areas;
-    DROP TABLE IF EXISTS context_monster_group_members;
-    DROP TABLE IF EXISTS context_monster_groups;
-    DROP TABLE IF EXISTS context_npc_group_members;
-    DROP TABLE IF EXISTS context_npc_groups;
-    DROP TABLE IF EXISTS context_character_group_members;
-    DROP TABLE IF EXISTS context_character_groups;
-    DROP TABLE IF EXISTS context_characters;
-    DROP TABLE IF EXISTS context_events;
-  `)
-}
-
-const ensureContextTables = (db: Database.Database): void => {
-  const contextColumns = db.prepare('PRAGMA table_info(contexts)').all() as { name: string }[]
-  const hasLegacyPayload = contextColumns.some((column) => column.name === 'payload_json')
-  const hasDescription = contextColumns.some((column) => column.name === 'description')
-
-  db.transaction(() => {
-    createContextRelationTempTables(db)
-    copyExistingContextRelationsToTemp(db)
-
-    if (hasLegacyPayload) {
-      copyLegacyContextPayloadRelationsToTemp(db)
-    }
-
-    if (hasLegacyPayload || !hasDescription) {
-      dropContextRelationTables(db)
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS contexts_next (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL DEFAULT '',
-          description TEXT NOT NULL DEFAULT '',
-          created_at TEXT NOT NULL,
-          updated_at TEXT NOT NULL
-        );
-      `)
-
-      if (contextColumns.length > 0) {
-        if (hasLegacyPayload) {
-          db.exec(`
-            INSERT OR REPLACE INTO contexts_next (id, name, description, created_at, updated_at)
-            SELECT
-              id,
-              COALESCE(json_extract(payload_json, '$.name'), ''),
-              COALESCE(json_extract(payload_json, '$.description'), ''),
-              created_at,
-              updated_at
-            FROM contexts;
-          `)
-        } else {
-          db.exec(`
-            INSERT OR REPLACE INTO contexts_next (id, name, description, created_at, updated_at)
-            SELECT id, COALESCE(name, ''), COALESCE(description, ''), created_at, updated_at
-            FROM contexts;
-          `)
-        }
-      }
-
-      db.exec(`
-        DROP TABLE IF EXISTS contexts;
-        ALTER TABLE contexts_next RENAME TO contexts;
-      `)
-    } else {
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS contexts (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL DEFAULT '',
-          description TEXT NOT NULL DEFAULT '',
-          created_at TEXT NOT NULL,
-          updated_at TEXT NOT NULL
-        );
-      `)
-    }
-
-    createContextRelationTables(db)
-    restoreContextRelations(db)
-  })()
-}
-
 const getDatabase = (): Database.Database => {
   if (database) {
     return database
@@ -1182,22 +645,13 @@ const getDatabase = (): Database.Database => {
     PRAGMA synchronous = NORMAL;
     PRAGMA foreign_keys = ON;
 
-    ${appTables.map((tableName) => createEntityTableSql(tableName)).join('\n')}
+    ${payloadEntityTables.map((tableName) => createEntityTableSql(tableName)).join('\n')}
 
-    CREATE TABLE IF NOT EXISTS file_migrations (
-      entity_type TEXT PRIMARY KEY,
-      migrated_at TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS group_member_migrations (
-      group_entity_type TEXT NOT NULL,
-      member_entity_type TEXT NOT NULL,
-      migrated_at TEXT NOT NULL,
-      PRIMARY KEY (group_entity_type, member_entity_type)
-    );
   `)
 
   ensureEntityUniqueIdIndexes(database)
+  ensureCharacterTables(database)
+  ensureCombatantTables(database)
   ensureMonsterAndNpcSuggestedColumns(database)
   ensureGroupTables(database)
   database.exec(`
@@ -1272,7 +726,6 @@ const getDatabase = (): Database.Database => {
     CREATE INDEX IF NOT EXISTS idx_npc_history_entries_npc
       ON npc_history_entries (npc_id, position);
   `)
-  restoreGroupRelations(database)
   ensureAreaTables(database)
   ensureEventTables(database)
   ensureContextTables(database)
@@ -1308,12 +761,7 @@ const getPayloadMetadata = (payload: unknown): { name: string; uniqueId: string 
 }
 
 const getMemberId = (value: unknown): string => {
-  if (typeof value !== 'string') {
-    return ''
-  }
-
-  const trimmed = value.trim()
-  return trimmed.toLowerCase().endsWith('.json') ? trimmed.slice(0, -5) : trimmed
+  return typeof value === 'string' ? value.trim() : ''
 }
 
 const getMemberIds = (value: unknown): string[] => {
@@ -2790,292 +2238,6 @@ const attachGroupIds = <TData, TEntity>(
     ...entity,
     [options.idsKey]: memberIds,
   }
-}
-
-export const migrateJsonDirectoryToSqlite = async (options: MigrationOptions): Promise<void> => {
-  if (migratedTables.has(options.tableName)) {
-    return
-  }
-
-  const db = getDatabase()
-  const migration = db.prepare('SELECT entity_type FROM file_migrations WHERE entity_type = ?').get(options.tableName) as MigrationRow | undefined
-  if (migration) {
-    migratedTables.add(options.tableName)
-    return
-  }
-
-  await mkdir(options.directory, { recursive: true })
-  const entries = await readdir(options.directory, { withFileTypes: true })
-  const files = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const rows = await Promise.all(files.map(async (entry) => {
-    const id = path.basename(entry.name, '.json')
-    if (!options.isSafeId(id)) {
-      return null
-    }
-
-    const filePath = path.join(options.directory, entry.name)
-    const [rawPayload, fileInfo] = await Promise.all([
-      readFile(filePath, 'utf8'),
-      stat(filePath),
-    ])
-
-    return {
-      id,
-      payload: parsePayload(rawPayload),
-      createdAt: fileInfo.birthtime.toISOString(),
-      updatedAt: fileInfo.mtime.toISOString(),
-    }
-  }))
-
-  const migrate = db.transaction(() => {
-    for (const row of rows) {
-      if (!row) {
-        continue
-      }
-
-      const exists = db.prepare(`SELECT id FROM ${quoteName(options.tableName)} WHERE id = ?`).get(row.id) as EntityExistsRow | undefined
-      if (!exists) {
-        executeEntityInsert(options.tableName, row.id, row.payload, row.createdAt, row.updatedAt)
-      }
-    }
-
-    db.prepare('INSERT INTO file_migrations (entity_type, migrated_at) VALUES (?, ?)').run(options.tableName, new Date().toISOString())
-  })
-
-  migrate()
-  migratedTables.add(options.tableName)
-}
-
-export const migrateAreasJsonDirectoryToSqlite = async (options: AreaMigrationOptions): Promise<void> => {
-  if (migratedTables.has('areas')) {
-    return
-  }
-
-  const db = getDatabase()
-  const migration = db.prepare('SELECT entity_type FROM file_migrations WHERE entity_type = ?').get('areas') as MigrationRow | undefined
-  if (migration) {
-    migratedTables.add('areas')
-    return
-  }
-
-  await mkdir(options.directory, { recursive: true })
-  const entries = await readdir(options.directory, { withFileTypes: true })
-  const files = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const rows = await Promise.all(files.map(async (entry) => {
-    const id = path.basename(entry.name, '.json')
-    if (!options.isSafeId(id)) {
-      return null
-    }
-
-    const filePath = path.join(options.directory, entry.name)
-    const [rawPayload, fileInfo] = await Promise.all([
-      readFile(filePath, 'utf8'),
-      stat(filePath),
-    ])
-
-    return {
-      id,
-      payload: parsePayload(rawPayload),
-      createdAt: fileInfo.birthtime.toISOString(),
-      updatedAt: fileInfo.mtime.toISOString(),
-    }
-  }))
-
-  const migrate = db.transaction(() => {
-    for (const row of rows) {
-      if (!row) {
-        continue
-      }
-
-      const exists = db.prepare('SELECT id FROM areas WHERE id = ?').get(row.id) as EntityExistsRow | undefined
-      if (!exists) {
-        executeAreaInsert(row.id, row.payload, row.createdAt, row.updatedAt)
-      }
-    }
-
-    db.prepare('INSERT INTO file_migrations (entity_type, migrated_at) VALUES (?, ?)').run('areas', new Date().toISOString())
-  })
-
-  migrate()
-  migratedTables.add('areas')
-}
-
-export const migrateEventsJsonDirectoryToSqlite = async (options: AreaMigrationOptions): Promise<void> => {
-  if (migratedTables.has('events')) {
-    return
-  }
-
-  const db = getDatabase()
-  const migration = db.prepare('SELECT entity_type FROM file_migrations WHERE entity_type = ?').get('events') as MigrationRow | undefined
-  if (migration) {
-    migratedTables.add('events')
-    return
-  }
-
-  await mkdir(options.directory, { recursive: true })
-  const entries = await readdir(options.directory, { withFileTypes: true })
-  const files = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const rows = await Promise.all(files.map(async (entry) => {
-    const id = path.basename(entry.name, '.json')
-    if (!options.isSafeId(id)) {
-      return null
-    }
-
-    const filePath = path.join(options.directory, entry.name)
-    const [rawPayload, fileInfo] = await Promise.all([
-      readFile(filePath, 'utf8'),
-      stat(filePath),
-    ])
-
-    return {
-      id,
-      payload: parsePayload(rawPayload),
-      createdAt: fileInfo.birthtime.toISOString(),
-      updatedAt: fileInfo.mtime.toISOString(),
-    }
-  }))
-
-  const migrate = db.transaction(() => {
-    for (const row of rows) {
-      if (!row) {
-        continue
-      }
-
-      const exists = db.prepare('SELECT id FROM events WHERE id = ?').get(row.id) as EntityExistsRow | undefined
-      if (!exists) {
-        executeEventInsert(row.id, row.payload, row.createdAt, row.updatedAt)
-      }
-    }
-
-    db.prepare('INSERT INTO file_migrations (entity_type, migrated_at) VALUES (?, ?)').run('events', new Date().toISOString())
-  })
-
-  migrate()
-  migratedTables.add('events')
-}
-
-export const migrateContextsJsonDirectoryToSqlite = async (options: ContextMigrationOptions): Promise<void> => {
-  if (migratedTables.has('contexts')) {
-    return
-  }
-
-  const db = getDatabase()
-  const migration = db.prepare('SELECT entity_type FROM file_migrations WHERE entity_type = ?').get('contexts') as MigrationRow | undefined
-  if (migration) {
-    migratedTables.add('contexts')
-    return
-  }
-
-  await mkdir(options.directory, { recursive: true })
-  const entries = await readdir(options.directory, { withFileTypes: true })
-  const files = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const rows = await Promise.all(files.map(async (entry) => {
-    const id = path.basename(entry.name, '.json')
-    if (!options.isSafeId(id)) {
-      return null
-    }
-
-    const filePath = path.join(options.directory, entry.name)
-    const [rawPayload, fileInfo] = await Promise.all([
-      readFile(filePath, 'utf8'),
-      stat(filePath),
-    ])
-
-    return {
-      id,
-      payload: parsePayload(rawPayload),
-      createdAt: fileInfo.birthtime.toISOString(),
-      updatedAt: fileInfo.mtime.toISOString(),
-    }
-  }))
-
-  const migrate = db.transaction(() => {
-    for (const row of rows) {
-      if (!row) {
-        continue
-      }
-
-      const exists = db.prepare('SELECT id FROM contexts WHERE id = ?').get(row.id) as EntityExistsRow | undefined
-      if (!exists) {
-        executeContextInsert(row.id, row.payload, row.createdAt, row.updatedAt)
-      }
-    }
-
-    db.prepare('INSERT INTO file_migrations (entity_type, migrated_at) VALUES (?, ?)').run('contexts', new Date().toISOString())
-  })
-
-  migrate()
-  migratedTables.add('contexts')
-}
-
-export const migrateGroupsJsonDirectoryToSqlite = async <TData>(
-  options: GroupMigrationOptions<TData>,
-): Promise<void> => {
-  const { relationOptions } = options
-  if (migratedTables.has(relationOptions.groupTableName)) {
-    return
-  }
-
-  const db = getDatabase()
-  const migration = db.prepare('SELECT entity_type FROM file_migrations WHERE entity_type = ?').get(relationOptions.groupTableName) as MigrationRow | undefined
-
-  if (migration) {
-    migratedTables.add(relationOptions.groupTableName)
-    return
-  }
-
-  await mkdir(options.directory, { recursive: true })
-  const entries = await readdir(options.directory, { withFileTypes: true })
-  const files = entries.filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
-  const rows = await Promise.all(files.map(async (entry) => {
-    const id = path.basename(entry.name, '.json')
-    if (!options.isSafeId(id)) {
-      return null
-    }
-
-    const filePath = path.join(options.directory, entry.name)
-    const [rawPayload, fileInfo] = await Promise.all([
-      readFile(filePath, 'utf8'),
-      stat(filePath),
-    ])
-
-    return {
-      id,
-      payload: parsePayload<TData>(rawPayload),
-      createdAt: fileInfo.birthtime.toISOString(),
-      updatedAt: fileInfo.mtime.toISOString(),
-    }
-  }))
-
-  const migrate = db.transaction(() => {
-    for (const row of rows) {
-      if (!row) {
-        continue
-      }
-
-      const exists = db.prepare(`SELECT id FROM ${quoteName(relationOptions.groupTableName)} WHERE id = ?`).get(row.id) as EntityExistsRow | undefined
-      if (!exists) {
-        executeGroupInsert(relationOptions.groupTableName, row.id, row.payload, row.createdAt, row.updatedAt)
-      }
-
-      replaceGroupMembers(
-        row.id,
-        getMemberIds(row.payload[relationOptions.idsKey] ?? row.payload[relationOptions.legacyFileNamesKey as keyof TData]),
-        relationOptions,
-      )
-    }
-
-    db.prepare('INSERT INTO file_migrations (entity_type, migrated_at) VALUES (?, ?)').run(relationOptions.groupTableName, new Date().toISOString())
-    db.prepare(`
-      INSERT INTO group_member_migrations (group_entity_type, member_entity_type, migrated_at)
-      VALUES (?, ?, ?)
-      ON CONFLICT(group_entity_type, member_entity_type) DO UPDATE SET
-        migrated_at = excluded.migrated_at
-    `).run(relationOptions.groupTableName, relationOptions.memberTableName, new Date().toISOString())
-  })
-
-  migrate()
-  migratedTables.add(relationOptions.groupTableName)
 }
 
 export const listStoredEntities = async <TData, TEntity>(

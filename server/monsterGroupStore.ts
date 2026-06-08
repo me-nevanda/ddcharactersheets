@@ -1,14 +1,11 @@
-import path from 'node:path'
 import type { MonsterGroup, MonsterGroupData } from '../src/types/monster'
-import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, migrateGroupsJsonDirectoryToSqlite, migrateJsonDirectoryToSqlite, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
+import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
   statusCode?: number
 }
 
-const monsterGroupsDirectory = path.resolve(process.cwd(), 'data', 'monster-groups')
-const monstersDirectory = path.resolve(process.cwd(), 'data', 'monsters')
 const safeMonsterGroupIdPattern = /^[a-z0-9-]+$/i
 
 const normalizeGroupName = (value: unknown): string => {
@@ -50,25 +47,13 @@ const monsterGroupStoreOptions = {
 
 const monsterGroupRelationOptions = {
   idsKey: 'monsterIds',
-  legacyFileNamesKey: 'monsterFileNames',
   groupTableName: monsterGroupStoreOptions.tableName,
   memberTableName: 'monsters',
   relationTableName: 'monster_group_members',
   memberColumnName: 'monster_id',
 } as const
 
-const ensureMonsterGroupsStore = async (): Promise<void> => {
-  await migrateJsonDirectoryToSqlite({
-    directory: monstersDirectory,
-    tableName: monsterGroupRelationOptions.memberTableName,
-    isSafeId: isSafeMonsterGroupId,
-  })
-  await migrateGroupsJsonDirectoryToSqlite({
-    directory: monsterGroupsDirectory,
-    isSafeId: isSafeMonsterGroupId,
-    relationOptions: monsterGroupRelationOptions,
-  })
-}
+const ensureMonsterGroupsStore = async (): Promise<void> => {}
 
 export const isSafeMonsterGroupId = (groupId: string): boolean => {
   return safeMonsterGroupIdPattern.test(groupId)

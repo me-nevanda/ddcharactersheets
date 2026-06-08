@@ -3,7 +3,7 @@ import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
 import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcHistoryEntry, NpcRole, NpcSuggestedStats, NpcType } from '../src/types/npc'
-import { assertStoredEntityExists, createStoredNpc, deleteStoredEntity, listStoredNpcs, migrateJsonDirectoryToSqlite, readStoredNpc, updateStoredNpc } from './sqliteStore'
+import { assertStoredEntityExists, createStoredNpc, deleteStoredEntity, listStoredNpcs, readStoredNpc, updateStoredNpc } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -410,13 +410,7 @@ const npcStoreOptions = {
   normalize: normalizeNpc,
 }
 
-const ensureNpcsStore = async (): Promise<void> => {
-  await migrateJsonDirectoryToSqlite({
-    directory: npcsDirectory,
-    tableName: npcStoreOptions.tableName,
-    isSafeId: isSafeNpcId,
-  })
-}
+const ensureNpcsStore = async (): Promise<void> => {}
 
 export const isSafeNpcId = (npcId: string): boolean => {
   return safeNpcIdPattern.test(npcId)

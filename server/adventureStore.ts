@@ -1,9 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import path from 'node:path';
 import type { Adventure, AdventureData } from '../src/types/adventure';
-import { createStoredEntity, listStoredEntities, migrateJsonDirectoryToSqlite, readStoredEntity, updateStoredEntity } from './sqliteStore';
+import { createStoredEntity, listStoredEntities, readStoredEntity, updateStoredEntity } from './sqliteStore';
 
-const adventuresDirectory = path.resolve(process.cwd(), 'data', 'adventures');
 const safeAdventureIdPattern = /^[a-z0-9-]+$/i;
 
 const normalizeUniqueId = (value: unknown): string => {
@@ -24,13 +22,7 @@ const adventureStoreOptions = {
     normalize: normalizeAdventure,
 };
 
-const ensureAdventuresStore = async (): Promise<void> => {
-    await migrateJsonDirectoryToSqlite({
-        directory: adventuresDirectory,
-        tableName: adventureStoreOptions.tableName,
-        isSafeId: isSafeAdventureId,
-    });
-};
+const ensureAdventuresStore = async (): Promise<void> => {};
 
 export const isSafeAdventureId = (adventureId: string): boolean => {
     return safeAdventureIdPattern.test(adventureId);

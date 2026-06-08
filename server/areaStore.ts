@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { Area, AreaData, PlaceItem } from '../src/types/area'
-import { assertStoredEntityExists, createStoredArea, deleteStoredEntity, listStoredAreas, migrateAreasJsonDirectoryToSqlite, readStoredArea, updateStoredArea } from './sqliteStore'
+import { assertStoredEntityExists, createStoredArea, deleteStoredEntity, listStoredAreas, readStoredArea, updateStoredArea } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -64,12 +64,7 @@ const areaStoreOptions = {
   normalize: normalizeArea,
 }
 
-const ensureAreasStore = async (): Promise<void> => {
-  await migrateAreasJsonDirectoryToSqlite({
-    directory: areasDirectory,
-    isSafeId: isSafeAreaId,
-  })
-}
+const ensureAreasStore = async (): Promise<void> => {}
 
 const getAreaImageInfo = async (areaId: string): Promise<{ contentType: AreaImage['contentType']; filePath: string; imageUrl: string } | null> => {
   for (const extension of areaImageExtensions) {

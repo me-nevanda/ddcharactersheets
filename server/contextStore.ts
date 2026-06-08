@@ -1,7 +1,7 @@
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Context, ContextData } from '../src/types/context';
-import { assertStoredEntityExists, createStoredContext, deleteStoredEntity, listStoredContexts, migrateContextsJsonDirectoryToSqlite, readStoredContext, updateStoredContext } from './sqliteStore';
+import { assertStoredEntityExists, createStoredContext, deleteStoredEntity, listStoredContexts, readStoredContext, updateStoredContext } from './sqliteStore';
 
 interface ApiError extends Error {
     code?: string;
@@ -211,12 +211,7 @@ const contextStoreOptions = {
     normalize: normalizeContext,
 };
 
-const ensureContextsStore = async (): Promise<void> => {
-    await migrateContextsJsonDirectoryToSqlite({
-        directory: contextsDirectory,
-        isSafeId: isSafeContextId,
-    });
-};
+const ensureContextsStore = async (): Promise<void> => {};
 
 export const isSafeContextId = (contextId: string): boolean => {
     return safeContextIdPattern.test(contextId);

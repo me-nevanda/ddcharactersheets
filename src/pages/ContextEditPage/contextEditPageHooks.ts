@@ -144,13 +144,6 @@ const areAreaSnapshotsEqual = (
   return true
 }
 
-const stripJsonExtension = (fileName: string): string => {
-  if (typeof fileName !== 'string') {
-    return ''
-  }
-  return fileName.endsWith('.json') ? fileName.slice(0, -'.json'.length) : fileName
-}
-
 export const useContextEditPage = (): ContextEditPageState => {
   const { t } = useI18n()
   const { contextId = '' } = useParams()
@@ -583,8 +576,7 @@ export const useContextEditPage = (): ContextEditPageState => {
         }
         const characterIds: string[] = []
         const seenCharacterIds = new Set<string>()
-        for (const rawCharacterId of group.characterIds ?? []) {
-          const characterId = stripJsonExtension(rawCharacterId)
+        for (const characterId of group.characterIds) {
           if (!characterId || seenCharacterIds.has(characterId)) {
             continue
           }
@@ -773,8 +765,7 @@ export const useContextEditPage = (): ContextEditPageState => {
         }
         const monsterIds: string[] = []
         const seenMonsterIds = new Set<string>()
-        for (const rawMonsterId of group.monsterIds ?? []) {
-          const monsterId = stripJsonExtension(rawMonsterId)
+        for (const monsterId of group.monsterIds) {
           if (!monsterId || seenMonsterIds.has(monsterId)) {
             continue
           }
@@ -913,8 +904,7 @@ export const useContextEditPage = (): ContextEditPageState => {
         }
         const npcIds: string[] = []
         const seenNpcIds = new Set<string>()
-        for (const rawNpcId of group.npcIds ?? []) {
-          const npcId = stripJsonExtension(rawNpcId)
+        for (const npcId of group.npcIds) {
           if (!npcId || seenNpcIds.has(npcId)) {
             continue
           }

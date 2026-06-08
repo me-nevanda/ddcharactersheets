@@ -4,7 +4,7 @@ import path from 'node:path';
 import type { CharacterAbility, CharacterAbilityAreaType, Character, CharacterAbilityAction, CharacterAbilityKind, CharacterAbilityType, CharacterAttributeBonuses, CharacterAttributes, CharacterBonuses, CharacterData, CharacterDefenses, CharacterArmor, CharacterFeat, CharacterWeapon, CharacterOtherItem, CharacterWeaponDamageDiceType, CharacterWeaponDamageType, CharacterSkillBonuses, CharacterTraining, CharacterDefenseBonuses, } from '../src/types/character';
 import { CharacterAlignment, CharacterClass as CharacterClassValue, CharacterGender, CharacterRace as CharacterRaceValue, } from '../src/types/character';
 import { CharacterClass, CharacterRace, isCharacterWeaponDamageType } from '../src/types/character';
-import { assertStoredEntityExists, createStoredCharacter, deleteStoredEntity, listStoredCharacterHistory, listStoredCharacters, migrateJsonDirectoryToSqlite, readStoredCharacter, replaceStoredCharacterHistory, updateStoredCharacter } from './sqliteStore';
+import { assertStoredEntityExists, createStoredCharacter, deleteStoredEntity, listStoredCharacterHistory, listStoredCharacters, readStoredCharacter, replaceStoredCharacterHistory, updateStoredCharacter } from './sqliteStore';
 interface ApiError extends Error {
     code?: string;
     statusCode?: number;
@@ -769,13 +769,7 @@ const characterStoreOptions = {
     normalize: normalizeCharacter,
 };
 
-const ensureCharactersStore = async (): Promise<void> => {
-    await migrateJsonDirectoryToSqlite({
-        directory: charactersDirectory,
-        tableName: characterStoreOptions.tableName,
-        isSafeId: isSafeCharacterId,
-    });
-};
+const ensureCharactersStore = async (): Promise<void> => {};
 
 export const isSafeCharacterId = (characterId: string): boolean => {
     return safeCharacterIdPattern.test(characterId);

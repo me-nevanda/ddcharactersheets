@@ -1,14 +1,11 @@
-import path from 'node:path'
 import type { NpcGroup, NpcGroupData } from '../src/types/npc'
-import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, migrateGroupsJsonDirectoryToSqlite, migrateJsonDirectoryToSqlite, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
+import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
   statusCode?: number
 }
 
-const npcGroupsDirectory = path.resolve(process.cwd(), 'data', 'npc-groups')
-const npcsDirectory = path.resolve(process.cwd(), 'data', 'npcs')
 const safeNpcGroupIdPattern = /^[a-z0-9-]+$/i
 
 const normalizeGroupName = (value: unknown): string => {
@@ -50,25 +47,13 @@ const npcGroupStoreOptions = {
 
 const npcGroupRelationOptions = {
   idsKey: 'npcIds',
-  legacyFileNamesKey: 'npcFileNames',
   groupTableName: npcGroupStoreOptions.tableName,
   memberTableName: 'npcs',
   relationTableName: 'npc_group_members',
   memberColumnName: 'npc_id',
 } as const
 
-const ensureNpcGroupsStore = async (): Promise<void> => {
-  await migrateJsonDirectoryToSqlite({
-    directory: npcsDirectory,
-    tableName: npcGroupRelationOptions.memberTableName,
-    isSafeId: isSafeNpcGroupId,
-  })
-  await migrateGroupsJsonDirectoryToSqlite({
-    directory: npcGroupsDirectory,
-    isSafeId: isSafeNpcGroupId,
-    relationOptions: npcGroupRelationOptions,
-  })
-}
+const ensureNpcGroupsStore = async (): Promise<void> => {}
 
 export const isSafeNpcGroupId = (groupId: string): boolean => {
   return safeNpcGroupIdPattern.test(groupId)

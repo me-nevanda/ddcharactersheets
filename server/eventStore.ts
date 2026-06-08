@@ -1,7 +1,7 @@
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { Event, EventData } from '../src/types/event'
-import { assertStoredEntityExists, createStoredEvent, deleteStoredEntity, listStoredEvents, migrateEventsJsonDirectoryToSqlite, readStoredEvent, updateStoredEvent } from './sqliteStore'
+import { assertStoredEntityExists, createStoredEvent, deleteStoredEntity, listStoredEvents, readStoredEvent, updateStoredEvent } from './sqliteStore'
 
 interface ApiError extends Error {
   code?: string
@@ -76,12 +76,7 @@ const eventStoreOptions = {
   normalize: normalizeEvent,
 }
 
-const ensureEventsStore = async (): Promise<void> => {
-  await migrateEventsJsonDirectoryToSqlite({
-    directory: eventsDirectory,
-    isSafeId: isSafeEventId,
-  })
-}
+const ensureEventsStore = async (): Promise<void> => {}
 
 export const isSafeEventId = (eventId: string): boolean => {
   return safeEventIdPattern.test(eventId)
