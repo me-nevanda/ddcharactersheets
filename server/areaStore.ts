@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import type { Area, AreaData, PlaceItem } from '../src/types/area'
+import type { Area, AreaData, PlaceItem } from '@appTypes/area'
 import { assertStoredEntityExists, createStoredArea, deleteStoredEntity, listStoredAreas, readStoredArea, updateStoredArea } from './sqliteStore'
 
 interface ApiError extends Error {

@@ -1,4 +1,4 @@
-import type { CharacterGroup, CharacterGroupData } from '../src/types/character'
+import type { CharacterGroup, CharacterGroupData } from '@appTypes/character'
 import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
 
 interface ApiError extends Error {

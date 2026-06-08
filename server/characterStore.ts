@@ -1,9 +1,7 @@
 ﻿import { randomUUID } from 'node:crypto';
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { CharacterAbility, CharacterAbilityAreaType, Character, CharacterAbilityAction, CharacterAbilityKind, CharacterAbilityType, CharacterAttributeBonuses, CharacterAttributes, CharacterBonuses, CharacterData, CharacterDefenses, CharacterArmor, CharacterFeat, CharacterWeapon, CharacterOtherItem, CharacterWeaponDamageDiceType, CharacterWeaponDamageType, CharacterSkillBonuses, CharacterTraining, CharacterDefenseBonuses, } from '../src/types/character';
-import { CharacterAlignment, CharacterClass as CharacterClassValue, CharacterGender, CharacterRace as CharacterRaceValue, } from '../src/types/character';
-import { CharacterClass, CharacterRace, isCharacterWeaponDamageType } from '../src/types/character';
+import type { CharacterAbility, CharacterAbilityAreaType, Character, CharacterAbilityAction, CharacterAbilityKind, CharacterAbilityType, CharacterAlignment, CharacterAttributeBonuses, CharacterAttributes, CharacterBonuses, CharacterClass, CharacterData, CharacterDefenses, CharacterArmor, CharacterFeat, CharacterGender, CharacterRace, CharacterWeapon, CharacterOtherItem, CharacterWeaponDamageDiceType, CharacterWeaponDamageType, CharacterSkillBonuses, CharacterTraining, CharacterDefenseBonuses, } from '@appTypes/character';
 import { assertStoredEntityExists, createStoredCharacter, deleteStoredEntity, listStoredCharacterHistory, listStoredCharacters, readStoredCharacter, replaceStoredCharacterHistory, updateStoredCharacter } from './sqliteStore';
 interface ApiError extends Error {
     code?: string;
@@ -19,6 +17,11 @@ interface LegacyCharacterBonuses extends CharacterBonuses {
 const charactersDirectory = path.resolve(process.cwd(), 'data', 'characters');
 const safeCharacterIdPattern = /^[a-z0-9-]+$/i;
 const characterImageExtensions = ['jpg', 'png'] as const;
+const characterRaces = ['human', 'tiefling', 'dragonborn', 'eladrin', 'elf', 'dwarf', 'halfling', 'halfElf'] as const;
+const characterClasses = ['warlock', 'wizard', 'warlord', 'bard', 'cleric', 'rogue', 'ranger', 'paladin', 'fighter', 'barbarian'] as const;
+const characterGenders = ['male', 'female', 'unspecified'] as const;
+const characterAlignments = ['lawfulGood', 'lawfulNeutral', 'lawfulEvil', 'neutralGood', 'trueNeutral', 'neutralEvil', 'chaoticGood', 'chaoticNeutral', 'chaoticEvil'] as const;
+const characterWeaponDamageTypes = ['normal', 'acid', 'cold', 'fire', 'force', 'lightning', 'necrotic', 'poison', 'psychic', 'radiant', 'thunder'] as const satisfies readonly CharacterWeaponDamageType[];
 const normalizeAttributeValue = (value: unknown): number => {
     if (typeof value !== 'number' || !Number.isFinite(value)) {
         return 10;
@@ -86,8 +89,8 @@ const normalizeAbilityWeaponDamageDiceType = (value: unknown): CharacterWeaponDa
     return 'd4';
 };
 const normalizeAbilityWeaponDamageType = (value: unknown): CharacterWeaponDamageType => {
-    if (isCharacterWeaponDamageType(value)) {
-        return value;
+    if (typeof value === 'string' && characterWeaponDamageTypes.includes(value as CharacterWeaponDamageType)) {
+        return value as CharacterWeaponDamageType;
     }
     return 'normal';
 };
@@ -633,35 +636,35 @@ const normalizeTraining = (data: Partial<Record<keyof CharacterTraining, unknown
 };
 const normalizeRaceValue = (value: unknown): CharacterRace => {
     if (typeof value === 'string') {
-        if (Object.values(CharacterRace).includes(value as CharacterRace)) {
+        if (characterRaces.includes(value as (typeof characterRaces)[number])) {
             return value as CharacterRace;
         }
     }
-    return CharacterRace.Human;
+    return 'human' as CharacterRace;
 };
 const normalizeClassValue = (value: unknown): CharacterClass => {
     if (typeof value === 'string') {
-        if (Object.values(CharacterClass).includes(value as CharacterClass)) {
+        if (characterClasses.includes(value as (typeof characterClasses)[number])) {
             return value as CharacterClass;
         }
     }
-    return CharacterClass.Warlock;
+    return 'warlock' as CharacterClass;
 };
 const normalizeGenderValue = (value: unknown): CharacterGender => {
     if (typeof value === 'string') {
-        if (Object.values(CharacterGender).includes(value as CharacterGender)) {
+        if (characterGenders.includes(value as (typeof characterGenders)[number])) {
             return value as CharacterGender;
         }
     }
-    return CharacterGender.Unspecified;
+    return 'unspecified' as CharacterGender;
 };
 const normalizeAlignmentValue = (value: unknown): CharacterAlignment => {
     if (typeof value === 'string') {
-        if (Object.values(CharacterAlignment).includes(value as CharacterAlignment)) {
+        if (characterAlignments.includes(value as (typeof characterAlignments)[number])) {
             return value as CharacterAlignment;
         }
     }
-    return CharacterAlignment.TrueNeutral;
+    return 'trueNeutral' as CharacterAlignment;
 };
 const normalizeCharacter = (data: Partial<Record<keyof CharacterData, unknown>> = {}): CharacterData => {
     const level = normalizeLevelValue(data.level);
@@ -677,10 +680,10 @@ const normalizeCharacter = (data: Partial<Record<keyof CharacterData, unknown>> 
     const attributeBonuses = buildAttributeBonuses(attributes);
     const race = typeof data.race === 'string'
         ? normalizeRaceValue(data.race)
-        : CharacterRaceValue.Human;
+        : 'human' as CharacterRace;
     const clazz = typeof data.class === 'string'
         ? normalizeClassValue(data.class)
-        : CharacterClassValue.Warlock;
+        : 'warlock' as CharacterClass;
     const speed = normalizeSpeedValue(data.speed);
     const computedSkillBonuses = buildSkillBonuses(level, attributeBonuses, training);
     const computedAttributeBonuses = buildAttributeBonuses(attributes);

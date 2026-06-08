@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { Adventure, AdventureData } from '../src/types/adventure';
+import type { Adventure, AdventureData } from '@appTypes/adventure';
 import { createStoredEntity, listStoredEntities, readStoredEntity, updateStoredEntity } from './sqliteStore';
 
 const safeAdventureIdPattern = /^[a-z0-9-]+$/i;

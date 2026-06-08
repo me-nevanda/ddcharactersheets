@@ -1,4 +1,4 @@
-import type { MonsterGroup, MonsterGroupData } from '../src/types/monster'
+import type { MonsterGroup, MonsterGroupData } from '@appTypes/monster'
 import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
 
 interface ApiError extends Error {

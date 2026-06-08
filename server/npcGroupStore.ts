@@ -1,4 +1,4 @@
-import type { NpcGroup, NpcGroupData } from '../src/types/npc'
+import type { NpcGroup, NpcGroupData } from '@appTypes/npc'
 import { createStoredGroupEntity, deleteStoredEntity, listStoredGroupEntities, readStoredGroupEntity, updateStoredGroupEntity } from './sqliteStore'
 
 interface ApiError extends Error {

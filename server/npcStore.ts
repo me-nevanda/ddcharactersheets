@@ -1,8 +1,8 @@
 ﻿import { randomUUID } from 'node:crypto'
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
-import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcHistoryEntry, NpcRole, NpcSuggestedStats, NpcType } from '../src/types/npc'
+import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '@appTypes/character'
+import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcHistoryEntry, NpcRole, NpcSuggestedStats, NpcType } from '@appTypes/npc'
 import { assertStoredEntityExists, createStoredNpc, deleteStoredEntity, listStoredNpcs, readStoredNpc, updateStoredNpc } from './sqliteStore'
 
 interface ApiError extends Error {

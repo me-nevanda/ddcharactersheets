@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto'
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
-import type { Monster, MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '../src/types/monster'
+import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '@appTypes/character'
+import type { Monster, MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '@appTypes/monster'
 import { assertStoredEntityExists, createStoredMonster, deleteStoredEntity, listStoredMonsters, readStoredMonster, updateStoredMonster } from './sqliteStore'
 
 interface ApiError extends Error {

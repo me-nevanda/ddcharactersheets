@@ -1,6 +1,6 @@
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import type { Event, EventData } from '../src/types/event'
+import type { Event, EventData } from '@appTypes/event'
 import { assertStoredEntityExists, createStoredEvent, deleteStoredEntity, listStoredEvents, readStoredEvent, updateStoredEvent } from './sqliteStore'
 
 interface ApiError extends Error {

@@ -1,6 +1,6 @@
 import { readFile, stat, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { Context, ContextData } from '../src/types/context';
+import type { Context, ContextData } from '@appTypes/context';
 import { assertStoredEntityExists, createStoredContext, deleteStoredEntity, listStoredContexts, readStoredContext, updateStoredContext } from './sqliteStore';
 
 interface ApiError extends Error {
