@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { Dispatch, FormEventHandler, SetStateAction, SyntheticEvent } from 'react'
+import type { Dispatch, SubmitEventHandler, SetStateAction, SyntheticEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createCharacter, createCharacterGroup, deleteCharacter, deleteCharacterGroup, listCharacterGroups, listCharacters } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
@@ -140,7 +140,7 @@ export const useCharacterListActions = (
     setGroupName(value)
   }
 
-  const handleCreateGroupSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+  const handleCreateGroupSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault()
 
     const nextName = groupName.trim()

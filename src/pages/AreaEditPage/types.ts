@@ -1,4 +1,4 @@
-import type { ChangeEvent, ChangeEventHandler, FormEventHandler } from 'react'
+import type { ChangeEvent, ChangeEventHandler, SubmitEventHandler } from 'react'
 import type { AreaData, PlaceItem } from '@appTypes/area'
 
 export interface AreaEditPageState {
@@ -18,7 +18,7 @@ export interface AreaEditPageState {
   handleCancelImageRemove: () => void
   handleConfirmImageRemove: () => Promise<void>
   handleRequestImageRemove: () => void
-  handleSubmit: FormEventHandler<HTMLFormElement>
+  handleSubmit: SubmitEventHandler<HTMLFormElement>
   hasChanges: boolean
   imageUrl: string
   isImageRemoveDialogOpen: boolean

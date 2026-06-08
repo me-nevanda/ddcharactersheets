@@ -1,4 +1,4 @@
-import type { ChangeEvent, FormEvent, KeyboardEvent, MouseEvent as ReactMouseEvent } from 'react'
+import type { ChangeEvent, SubmitEvent, KeyboardEvent, MouseEvent as ReactMouseEvent } from 'react'
 import type { Area } from '@appTypes/area'
 import type { Character } from '@appTypes/character'
 import type { ContextData } from '@appTypes/context'
@@ -180,7 +180,7 @@ export interface ContextEditPageState {
   handleCancelImageRemove: () => void
   handleConfirmImageRemove: () => Promise<void>
   handleRequestImageRemove: () => void
-  handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
+  handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
   imageUrl: string
   isImageRemoveDialogOpen: boolean

@@ -1,4 +1,4 @@
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent, SubmitEvent } from 'react'
 import type { EventData } from '@appTypes/event'
 
 export interface EventEditPageState {
@@ -9,7 +9,7 @@ export interface EventEditPageState {
   handleCancelImageRemove: () => void
   handleConfirmImageRemove: () => Promise<void>
   handleRequestImageRemove: () => void
-  handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
+  handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
   imageUrl: string
   isImageRemoveDialogOpen: boolean

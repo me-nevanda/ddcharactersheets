@@ -1,4 +1,4 @@
-import type { FormEventHandler, KeyboardEventHandler, MouseEvent, MouseEventHandler, SyntheticEvent } from 'react'
+import type { SubmitEventHandler, KeyboardEventHandler, MouseEvent, MouseEventHandler, SyntheticEvent } from 'react'
 import type { Character, CharacterGroup } from '@appTypes/character'
 import type { MainCharacterListTabKey } from '@pages/main/types'
 
@@ -50,7 +50,7 @@ export interface CreateCharacterGroupDialogProps {
   groupName: string
   onCancel: () => void
   onChangeGroupName: (value: string) => void
-  onSubmit: FormEventHandler<HTMLFormElement>
+  onSubmit: SubmitEventHandler<HTMLFormElement>
 }
 
 export interface CharacterListPageState {
@@ -75,7 +75,7 @@ export interface CharacterListPageState {
   handleCloseDeleteGroupDialog: () => void
   handleConfirmDeleteCharacter: () => Promise<void>
   handleConfirmDeleteCharacterGroup: () => Promise<void>
-  handleCreateGroupSubmit: FormEventHandler<HTMLFormElement>
+  handleCreateGroupSubmit: SubmitEventHandler<HTMLFormElement>
   handleCreateCharacter: () => Promise<void>
   handleOpenCreateGroupDialog: () => void
   handleOpenDeleteDialog: (character: Character) => void

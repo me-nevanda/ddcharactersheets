@@ -1,4 +1,4 @@
-import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
+import type { SubmitEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
 import type { Event } from '@appTypes/event'
 
 export interface EventListCardViewModel {
@@ -31,4 +31,4 @@ export interface EventsListPageState {
   showEventGrid: boolean
 }
 
-export type EventsListPageStateAction = FormEventHandler<HTMLFormElement>
+export type EventsListPageStateAction = SubmitEventHandler<HTMLFormElement>

@@ -1,4 +1,4 @@
-﻿import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent, SubmitEvent } from 'react'
 import type { CharacterArmorBonusFieldName, CharacterItemBonusFieldName, CharacterWeaponDamageDiceType, CharacterWeaponFieldName } from '@appTypes/character'
 import type { NpcAttack, NpcAttackType, NpcData, NpcHistoryEntry } from '@appTypes/npc'
 import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/CharacterEditPage/types'
@@ -46,7 +46,7 @@ export interface NpcEditPageState {
   handleSpecialChange: (value: string) => void
   handleIsStoryToggle: (event: ChangeEvent<HTMLInputElement>) => void
   handleIsDeadToggle: (event: ChangeEvent<HTMLInputElement>) => void
-  handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
+  handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
   imageUrl: string
   isGenerateAttributesDialogOpen: boolean

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type KeyboardEvent, type MouseEvent as ReactMouseEvent } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent, type SubmitEvent, type KeyboardEvent, type MouseEvent as ReactMouseEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { deleteContextImage, getContext, listAreas, listCharacterGroups, listCharacters, listEvents, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext, uploadContextImage } from '@lib/api'
@@ -968,7 +968,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     return nextForm
   }
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSaving(true)
     setError('')

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useState, type ChangeEvent, type SubmitEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { deleteNpcImage, getNpc, saveNpc, uploadNpcImage } from '@lib/api'
@@ -685,7 +685,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
     }))
   }
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSaving(true)
     setError('')

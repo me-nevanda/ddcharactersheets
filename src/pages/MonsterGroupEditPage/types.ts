@@ -1,4 +1,4 @@
-import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
+import type { SubmitEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
 
 export interface MonsterGroupMonsterViewModel {
   descriptionPreview: string
@@ -32,7 +32,7 @@ export interface MonsterGroupEditPageState {
   handleChangeGroupName: (value: string) => void
   handleChangeAssignedMonsterSearch: (value: string) => void
   handleChangeMonsterSearch: (value: string) => void
-  handleSubmit: FormEventHandler<HTMLFormElement>
+  handleSubmit: SubmitEventHandler<HTMLFormElement>
   hasChanges: boolean
   loading: boolean
   monsterOptions: MonsterGroupMonsterOptionViewModel[]

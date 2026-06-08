@@ -1,4 +1,4 @@
-﻿import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
+import type { SubmitEventHandler, KeyboardEventHandler, MouseEventHandler } from 'react'
 
 export interface NpcGroupNpcViewModel {
   descriptionPreview: string
@@ -35,7 +35,7 @@ export interface NpcGroupEditPageState {
   handleChangeGroupName: (value: string) => void
   handleChangeAssignedNpcSearch: (value: string) => void
   handleChangeNpcSearch: (value: string) => void
-  handleSubmit: FormEventHandler<HTMLFormElement>
+  handleSubmit: SubmitEventHandler<HTMLFormElement>
   hasChanges: boolean
   loading: boolean
   npcOptions: NpcGroupNpcOptionViewModel[]

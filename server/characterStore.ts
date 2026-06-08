@@ -22,6 +22,10 @@ const characterClasses = ['warlock', 'wizard', 'warlord', 'bard', 'cleric', 'rog
 const characterGenders = ['male', 'female', 'unspecified'] as const;
 const characterAlignments = ['lawfulGood', 'lawfulNeutral', 'lawfulEvil', 'neutralGood', 'trueNeutral', 'neutralEvil', 'chaoticGood', 'chaoticNeutral', 'chaoticEvil'] as const;
 const characterWeaponDamageTypes = ['normal', 'acid', 'cold', 'fire', 'force', 'lightning', 'necrotic', 'poison', 'psychic', 'radiant', 'thunder'] as const satisfies readonly CharacterWeaponDamageType[];
+const defaultCharacterRace = 'human' as CharacterRace;
+const defaultCharacterClass = 'warlock' as CharacterClass;
+const defaultCharacterGender = 'unspecified' as CharacterGender;
+const defaultCharacterAlignment = 'trueNeutral' as CharacterAlignment;
 const normalizeAttributeValue = (value: unknown): number => {
     if (typeof value !== 'number' || !Number.isFinite(value)) {
         return 10;
@@ -640,7 +644,7 @@ const normalizeRaceValue = (value: unknown): CharacterRace => {
             return value as CharacterRace;
         }
     }
-    return 'human' as CharacterRace;
+    return defaultCharacterRace;
 };
 const normalizeClassValue = (value: unknown): CharacterClass => {
     if (typeof value === 'string') {
@@ -648,7 +652,7 @@ const normalizeClassValue = (value: unknown): CharacterClass => {
             return value as CharacterClass;
         }
     }
-    return 'warlock' as CharacterClass;
+    return defaultCharacterClass;
 };
 const normalizeGenderValue = (value: unknown): CharacterGender => {
     if (typeof value === 'string') {
@@ -656,7 +660,7 @@ const normalizeGenderValue = (value: unknown): CharacterGender => {
             return value as CharacterGender;
         }
     }
-    return 'unspecified' as CharacterGender;
+    return defaultCharacterGender;
 };
 const normalizeAlignmentValue = (value: unknown): CharacterAlignment => {
     if (typeof value === 'string') {
@@ -664,7 +668,7 @@ const normalizeAlignmentValue = (value: unknown): CharacterAlignment => {
             return value as CharacterAlignment;
         }
     }
-    return 'trueNeutral' as CharacterAlignment;
+    return defaultCharacterAlignment;
 };
 const normalizeCharacter = (data: Partial<Record<keyof CharacterData, unknown>> = {}): CharacterData => {
     const level = normalizeLevelValue(data.level);
@@ -680,10 +684,10 @@ const normalizeCharacter = (data: Partial<Record<keyof CharacterData, unknown>> 
     const attributeBonuses = buildAttributeBonuses(attributes);
     const race = typeof data.race === 'string'
         ? normalizeRaceValue(data.race)
-        : 'human' as CharacterRace;
+        : defaultCharacterRace;
     const clazz = typeof data.class === 'string'
         ? normalizeClassValue(data.class)
-        : 'warlock' as CharacterClass;
+        : defaultCharacterClass;
     const speed = normalizeSpeedValue(data.speed);
     const computedSkillBonuses = buildSkillBonuses(level, attributeBonuses, training);
     const computedAttributeBonuses = buildAttributeBonuses(attributes);

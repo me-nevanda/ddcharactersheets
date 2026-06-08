@@ -1,4 +1,4 @@
-﻿import type { FormEventHandler, KeyboardEventHandler, MouseEvent, MouseEventHandler } from 'react'
+import type { SubmitEventHandler, KeyboardEventHandler, MouseEvent, MouseEventHandler } from 'react'
 import type { Npc, NpcGroup } from '@appTypes/npc'
 import type { MainNpcListTabKey } from '@pages/main/types'
 
@@ -51,7 +51,7 @@ export interface CreateNpcGroupDialogProps {
   groupName: string
   onCancel: () => void
   onChangeGroupName: (value: string) => void
-  onSubmit: FormEventHandler<HTMLFormElement>
+  onSubmit: SubmitEventHandler<HTMLFormElement>
 }
 
 export interface NpcsListPageState {
@@ -74,7 +74,7 @@ export interface NpcsListPageState {
   handleConfirmDeleteNpc: () => Promise<void>
   handleCloseDeleteGroupDialog: () => void
   handleConfirmDeleteNpcGroup: () => Promise<void>
-  handleCreateGroupSubmit: FormEventHandler<HTMLFormElement>
+  handleCreateGroupSubmit: SubmitEventHandler<HTMLFormElement>
   handleCreateNpc: () => Promise<void>
   handleOpenCreateGroupDialog: () => void
   handleChangeListSearch: (value: string) => void

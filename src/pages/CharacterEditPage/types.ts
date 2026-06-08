@@ -1,4 +1,4 @@
-import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from 'react'
+import type { ChangeEvent, Dispatch, SubmitEvent, SetStateAction } from 'react'
 import type {
   CharacterAbility,
   CharacterAbilityType,
@@ -98,7 +98,7 @@ export interface CharacterEditPageState {
     value: number | CharacterWeaponDamageDiceType | boolean,
   ) => void
   handleItemRemove: (group: CharacterItemGroupKey, index: number) => void
-  handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
+  handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
   attributeRows: AttributeRow[]
   skillModifiers: SkillModifierMap
   levelBonusLabel: string

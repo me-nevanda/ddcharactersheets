@@ -1,4 +1,4 @@
-import type { ChangeEventHandler, FormEventHandler } from 'react'
+import type { ChangeEventHandler, SubmitEventHandler } from 'react'
 import type { AdventureData } from '@appTypes/adventure'
 
 export interface AdventureEditPageState {
@@ -7,7 +7,7 @@ export interface AdventureEditPageState {
   handleBackToListClick: () => void
   handleFieldChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
   handleSendClick: () => void
-  handleSubmit: FormEventHandler<HTMLFormElement>
+  handleSubmit: SubmitEventHandler<HTMLFormElement>
   hasChanges: boolean
   lastUsageLabel: string
   loading: boolean

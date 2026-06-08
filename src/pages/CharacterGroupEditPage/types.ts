@@ -1,4 +1,4 @@
-import type { FormEventHandler, KeyboardEventHandler, MouseEventHandler, SyntheticEvent } from 'react'
+import type { SubmitEventHandler, KeyboardEventHandler, MouseEventHandler, SyntheticEvent } from 'react'
 
 export interface CharacterGroupCharacterViewModel {
   classLabel: string
@@ -34,7 +34,7 @@ export interface CharacterGroupEditPageState {
   handleChangeAssignedCharacterSearch: (value: string) => void
   handleChangeCharacterSearch: (value: string) => void
   handleChangeGroupName: (value: string) => void
-  handleSubmit: FormEventHandler<HTMLFormElement>
+  handleSubmit: SubmitEventHandler<HTMLFormElement>
   hasChanges: boolean
   loading: boolean
   saving: boolean

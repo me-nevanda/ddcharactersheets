@@ -1,4 +1,4 @@
-import type { FormEventHandler, KeyboardEventHandler, MouseEvent, MouseEventHandler } from 'react'
+import type { SubmitEventHandler, KeyboardEventHandler, MouseEvent, MouseEventHandler } from 'react'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
 import type { MainMonsterListTabKey } from '@pages/main/types'
 
@@ -47,7 +47,7 @@ export interface CreateMonsterGroupDialogProps {
   groupName: string
   onCancel: () => void
   onChangeGroupName: (value: string) => void
-  onSubmit: FormEventHandler<HTMLFormElement>
+  onSubmit: SubmitEventHandler<HTMLFormElement>
 }
 
 export interface MonstersListPageState {
@@ -70,7 +70,7 @@ export interface MonstersListPageState {
   handleConfirmDeleteMonster: () => Promise<void>
   handleCloseDeleteGroupDialog: () => void
   handleConfirmDeleteMonsterGroup: () => Promise<void>
-  handleCreateGroupSubmit: FormEventHandler<HTMLFormElement>
+  handleCreateGroupSubmit: SubmitEventHandler<HTMLFormElement>
   handleCreateMonster: () => Promise<void>
   handleOpenCreateGroupDialog: () => void
   handleChangeListSearch: (value: string) => void

@@ -1,4 +1,4 @@
-import type { FormEvent } from 'react';
+import type { SubmitEvent } from 'react';
 import { saveCharacter, saveCharacterHistory } from '@lib/api';
 import { getErrorMessage } from '@lib/errors';
 import type { TranslationVariables } from '@i18n/types';
@@ -34,7 +34,7 @@ export const useCharacterEditPageSubmitHandler = ({
     setSaving,
     t,
 }: UseCharacterEditPageSubmitHandlerParams) => {
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
         setSaving(true);
         setError('');

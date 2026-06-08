@@ -1,4 +1,4 @@
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent, SubmitEvent } from 'react'
 import type { CharacterArmorBonusFieldName, CharacterItemBonusFieldName, CharacterWeaponDamageDiceType, CharacterWeaponFieldName } from '@appTypes/character'
 import type { MonsterAttack, MonsterAttackType, MonsterData } from '@appTypes/monster'
 import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/CharacterEditPage/types'
@@ -41,7 +41,7 @@ export interface MonsterEditPageState {
   handlePrint: () => void
   handleResistancesChange: (value: string) => void
   handleSpecialChange: (value: string) => void
-  handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
+  handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
   hasChanges: boolean
   imageUrl: string
   isGenerateAttributesDialogOpen: boolean
