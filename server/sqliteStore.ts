@@ -107,6 +107,18 @@ interface GroupMemberRow {
   member_id: string
 }
 
+export interface StoredCharacterHistoryEntry {
+  id: string
+  title: string
+  content: string
+}
+
+export interface StoredNpcHistoryEntry {
+  id: string
+  title: string
+  content: string
+}
+
 interface MigrationRow {
   entity_type: string
 }
@@ -1233,6 +1245,32 @@ const getDatabase = (): Database.Database => {
 
     CREATE INDEX IF NOT EXISTS idx_npc_group_members_npc
       ON npc_group_members (npc_id);
+
+    CREATE TABLE IF NOT EXISTS character_history_entries (
+      character_id TEXT NOT NULL,
+      id TEXT NOT NULL,
+      position INTEGER NOT NULL,
+      title TEXT NOT NULL DEFAULT '',
+      content TEXT NOT NULL DEFAULT '',
+      PRIMARY KEY (character_id, id),
+      FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_character_history_entries_character
+      ON character_history_entries (character_id, position);
+
+    CREATE TABLE IF NOT EXISTS npc_history_entries (
+      npc_id TEXT NOT NULL,
+      id TEXT NOT NULL,
+      position INTEGER NOT NULL,
+      title TEXT NOT NULL DEFAULT '',
+      content TEXT NOT NULL DEFAULT '',
+      PRIMARY KEY (npc_id, id),
+      FOREIGN KEY (npc_id) REFERENCES npcs(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_npc_history_entries_npc
+      ON npc_history_entries (npc_id, position);
   `)
   restoreGroupRelations(database)
   ensureAreaTables(database)
@@ -1661,6 +1699,15 @@ const getNpcItems = (npcId: string): Record<string, unknown>[] => {
   `).all(npcId) as Record<string, unknown>[]
 }
 
+const getNpcHistoryEntries = (npcId: string): StoredNpcHistoryEntry[] => {
+  return getDatabase().prepare(`
+    SELECT id, title, content
+    FROM npc_history_entries
+    WHERE npc_id = ?
+    ORDER BY position ASC, id ASC
+  `).all(npcId) as StoredNpcHistoryEntry[]
+}
+
 const getMonsterAttacks = (monsterId: string): Record<string, unknown>[] => {
   return getDatabase().prepare(`
     SELECT *
@@ -1750,6 +1797,7 @@ const buildNpcPayload = (row: NpcRow): Partial<Record<string, unknown>> => {
     speed: row.speed,
     isStory: row.is_story === 1,
     isDead: row.is_dead === 1,
+    history: getNpcHistoryEntries(row.id),
   }
 }
 
@@ -2523,14 +2571,33 @@ const insertStoredAttacks = (
   })
 }
 
+const insertStoredNpcHistoryEntries = (npcId: string, sourceEntries: unknown): void => {
+  const insertEntry = getDatabase().prepare(`
+    INSERT INTO npc_history_entries (npc_id, id, position, title, content)
+    VALUES (?, ?, ?, ?, ?)
+  `)
+  const entries = Array.isArray(sourceEntries) ? sourceEntries : []
+  entries.forEach((entry, position) => {
+    if (!isRecord(entry)) return
+
+    const title = normalizeStoredText(entry.title)
+    const content = normalizeStoredText(entry.content)
+    if (title.length === 0 && content.length === 0) return
+
+    insertEntry.run(npcId, normalizeStoredText(entry.id) || randomUUID(), position, title, content)
+  })
+}
+
 const replaceNpcRelations = <TData>(npcId: string, payload: TData): void => {
   const source = payload as Record<string, unknown>
   const db = getDatabase()
   db.prepare('DELETE FROM npcs_attacks WHERE npc_id = ?').run(npcId)
   db.prepare('DELETE FROM npcs_items WHERE npc_id = ?').run(npcId)
+  db.prepare('DELETE FROM npc_history_entries WHERE npc_id = ?').run(npcId)
 
   insertStoredAttacks('npc_id', npcId, 'npcs_attacks', source.attacks)
   insertStoredItems('npc_id', npcId, 'npcs_items', source.items)
+  insertStoredNpcHistoryEntries(npcId, source.history)
 }
 
 const replaceMonsterRelations = <TData>(monsterId: string, payload: TData): void => {
@@ -3481,6 +3548,50 @@ export const updateStoredCharacter = async <TData, TEntity>(
 
   executeCharacterUpsert(id, payload, new Date().toISOString())
   return readStoredCharacter(id, options)
+}
+
+const normalizeCharacterHistoryEntries = (entries: unknown): StoredCharacterHistoryEntry[] => {
+  if (!Array.isArray(entries)) {
+    return []
+  }
+
+  return entries
+    .filter(isRecord)
+    .map((entry, index) => ({
+      id: normalizeStoredText(entry.id) || randomUUID(),
+      title: normalizeStoredText(entry.title),
+      content: normalizeStoredText(entry.content),
+      position: index,
+    }))
+    .filter((entry) => entry.title.length > 0 || entry.content.length > 0)
+    .map(({ position: _position, ...entry }) => entry)
+}
+
+export const listStoredCharacterHistory = async (characterId: string): Promise<StoredCharacterHistoryEntry[]> => {
+  await assertStoredEntityExists('characters', characterId)
+  return getDatabase().prepare(`
+    SELECT id, title, content
+    FROM character_history_entries
+    WHERE character_id = ?
+    ORDER BY position ASC, id ASC
+  `).all(characterId) as StoredCharacterHistoryEntry[]
+}
+
+export const replaceStoredCharacterHistory = async (characterId: string, entries: unknown): Promise<StoredCharacterHistoryEntry[]> => {
+  await assertStoredEntityExists('characters', characterId)
+  const normalizedEntries = normalizeCharacterHistoryEntries(entries)
+  const db = getDatabase()
+  db.transaction(() => {
+    db.prepare('DELETE FROM character_history_entries WHERE character_id = ?').run(characterId)
+    const insertEntry = db.prepare(`
+      INSERT INTO character_history_entries (character_id, id, position, title, content)
+      VALUES (?, ?, ?, ?, ?)
+    `)
+    normalizedEntries.forEach((entry, position) => {
+      insertEntry.run(characterId, entry.id, position, entry.title, entry.content)
+    })
+  })()
+  return listStoredCharacterHistory(characterId)
 }
 
 export const updateStoredNpc = async <TData, TEntity>(

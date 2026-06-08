@@ -12,6 +12,7 @@ import type {
   CharacterItems,
   CharacterItemBonusFieldName,
   CharacterFeat,
+  CharacterHistoryEntry,
   CharacterSkillBonuses,
   CharacterWeaponFieldName,
   CharacterWeaponDamageDiceType,
@@ -41,7 +42,7 @@ export type CharacterItemFieldName = Exclude<keyof CharacterItemBase, 'id'> | 'e
 
 export type CharacterItemGroupKey = keyof CharacterItems
 
-export type CharacterEditTabKey = 'general' | 'abilities' | 'feats' | 'items'
+export type CharacterEditTabKey = 'general' | 'abilities' | 'feats' | 'items' | 'history'
 
 export type SkillModifierMap = Record<CharacterSkillFieldName, string>
 
@@ -50,6 +51,7 @@ export interface CharacterEditPageState {
   form: CharacterEditFormData
   loading: boolean
   saving: boolean
+  historyEntries: CharacterHistoryEntry[]
   attributeBonuses: CharacterAttributes
   attributeBonusTooltips: Record<CharacterAttributeFieldName, string>
   handleGeneralChange: (event: CharacterGeneralChangeEvent) => void
@@ -70,6 +72,9 @@ export interface CharacterEditPageState {
     nextFieldName: CharacterFeatBonusFieldName,
   ) => void
   handleFeatRemove: (index: number) => void
+  handleHistoryEntryCreateEmpty: () => void
+  handleHistoryEntryChange: (index: number, fieldName: CharacterHistoryEntryFieldName, value: string) => void
+  handleHistoryEntryRemove: (index: number) => void
   handleItemCreateEmpty: (group: CharacterItemGroupKey) => void
   handleItemChange: (
     group: CharacterItemGroupKey,
@@ -112,6 +117,7 @@ export interface CharacterEditPageState {
 }
 
 export type CharacterEditPageSetForm = Dispatch<SetStateAction<CharacterEditFormData>>
+export type CharacterEditPageSetHistoryEntries = Dispatch<SetStateAction<CharacterHistoryEntry[]>>
 
 export type CharacterEditPageSetBoolean = Dispatch<SetStateAction<boolean>>
 
@@ -158,3 +164,5 @@ export interface CharacterEditPageComputedState {
   speedValue: number
   surgeValue: number
 }
+
+export type CharacterHistoryEntryFieldName = Exclude<keyof CharacterHistoryEntry, 'id'>

@@ -140,7 +140,7 @@ export const AttackCard = ({ attack, attackBonusOptions, areaOptions, defenseOpt
             ))}
           </p>
         ) : null}
-        <SimpleWysiwygEditor ariaLabel={t('pages.characterEdit.abilities.descriptionLabel')} minHeightClassName={styles.attackTextarea} name={`monster-attack-description-${index}`} placeholder={t('pages.monsterEdit.attacks.descriptionPlaceholder')} toolbar={false} value={attack.description} onChange={(value) => onAttackChange(index, 'description', value)} />
+        <SimpleWysiwygEditor ariaLabel={t('pages.characterEdit.abilities.descriptionLabel')} minHeightClassName={styles.attackTextarea} name={`monster-attack-description-${index}`} pasteAsPlainText placeholder={t('pages.monsterEdit.attacks.descriptionPlaceholder')} toolbar={false} value={attack.description} onChange={(value) => onAttackChange(index, 'description', value)} />
       </div>
     </article>
   )

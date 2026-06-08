@@ -1,20 +1,23 @@
 import type { FormEvent } from 'react';
-import { saveCharacter } from '@lib/api';
+import { saveCharacter, saveCharacterHistory } from '@lib/api';
 import { getErrorMessage } from '@lib/errors';
 import type { TranslationVariables } from '@i18n/types';
 import { defaultAbilityWeaponAttackAttribute, defaultAbilityWeaponAttackBonusNumber, defaultAbilityWeaponAttackDefense, defaultAbilityWeaponDamageDiceCount, defaultAbilityWeaponDamageDiceType, defaultAbilityWeaponDamageType, defaultAbilityWeaponHit, defaultAbilityWeaponMiss, defaultAbilityWeaponProvocation, defaultAbilityWeaponRecurringDamageCount, defaultAbilityWeaponRecurringDamageType, zeroDefenses } from '@pages/CharacterEditPage/characterEditPageUtils';
 import { hasFeatContent, normalizeAlignmentValue, normalizeGenderValue } from '../characterEditPageLogic';
 import { normalizeDefenses } from '../sections/DefensesSection/defensesSectionHooks';
 import { buildCharacterSpeed, clampLevelValue } from '../sections/GeneralSection/generalSectionHooks';
-import type { CharacterBonuses } from '@appTypes/character';
-import type { CharacterEditFormData, CharacterEditPageComputedState, CharacterEditPageSetBoolean, CharacterEditPageSetForm, CharacterEditPageSetString } from '../types';
+import type { CharacterBonuses, CharacterHistoryEntry } from '@appTypes/character';
+import type { CharacterEditFormData, CharacterEditPageComputedState, CharacterEditPageSetBoolean, CharacterEditPageSetForm, CharacterEditPageSetHistoryEntries, CharacterEditPageSetString } from '../types';
 
 type UseCharacterEditPageSubmitHandlerParams = {
     characterId: string;
     computedState: CharacterEditPageComputedState;
     form: CharacterEditFormData;
+    historyEntries: CharacterHistoryEntry[];
     setError: CharacterEditPageSetString;
+    setHistoryEntries: CharacterEditPageSetHistoryEntries;
     setInitialForm: CharacterEditPageSetForm;
+    setInitialHistoryEntries: CharacterEditPageSetHistoryEntries;
     setSaving: CharacterEditPageSetBoolean;
     t: (key: string, variables?: TranslationVariables) => string;
 };
@@ -23,8 +26,11 @@ export const useCharacterEditPageSubmitHandler = ({
     characterId,
     computedState,
     form,
+    historyEntries,
     setError,
+    setHistoryEntries,
     setInitialForm,
+    setInitialHistoryEntries,
     setSaving,
     t,
 }: UseCharacterEditPageSubmitHandlerParams) => {
@@ -118,7 +124,14 @@ export const useCharacterEditPageSubmitHandler = ({
                     ...bonuses,
                 },
             });
+            const savedHistoryEntries = await saveCharacterHistory(characterId, historyEntries.map((entry) => ({
+                ...entry,
+                title: entry.title.trim(),
+                content: entry.content.trim(),
+            })));
             setInitialForm(form);
+            setHistoryEntries(savedHistoryEntries);
+            setInitialHistoryEntries(savedHistoryEntries);
             setSaving(false);
         }
         catch (nextError) {

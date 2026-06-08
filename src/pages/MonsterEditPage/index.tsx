@@ -230,7 +230,7 @@ export const MonsterEditPage = () => {
                       </div>
 
                       <div className={styles.descriptionField}>
-                        <SimpleWysiwygEditor ariaLabel={t('pages.monsterEdit.sections.resistances')} minHeightClassName={styles.resistancesTextarea} name="resistances" placeholder={t('pages.monsterEdit.placeholders.resistances')} toolbar={false} value={form.resistances} onChange={handleResistancesChange} />
+                        <SimpleWysiwygEditor ariaLabel={t('pages.monsterEdit.sections.resistances')} minHeightClassName={styles.resistancesTextarea} name="resistances" pasteAsPlainText placeholder={t('pages.monsterEdit.placeholders.resistances')} toolbar={false} value={form.resistances} onChange={handleResistancesChange} />
                       </div>
                     </section>
 
@@ -240,7 +240,7 @@ export const MonsterEditPage = () => {
                       </div>
 
                       <div className={styles.descriptionField}>
-                        <SimpleWysiwygEditor ariaLabel={t('pages.monsterEdit.sections.special')} minHeightClassName={styles.resistancesTextarea} name="special" placeholder={t('pages.monsterEdit.placeholders.special')} toolbar={false} value={form.special} onChange={handleSpecialChange} />
+                        <SimpleWysiwygEditor ariaLabel={t('pages.monsterEdit.sections.special')} minHeightClassName={styles.resistancesTextarea} name="special" pasteAsPlainText placeholder={t('pages.monsterEdit.placeholders.special')} toolbar={false} value={form.special} onChange={handleSpecialChange} />
                       </div>
                     </section>
 
@@ -250,7 +250,7 @@ export const MonsterEditPage = () => {
                       </div>
 
                       <div className={styles.descriptionField}>
-                        <SimpleWysiwygEditor ariaLabel={t('pages.monsterEdit.fields.description')} minHeightClassName={styles.descriptionTextarea} name="description" placeholder={t('pages.monsterEdit.placeholders.description')} toolbar={false} value={form.description} onChange={handleDescriptionChange} />
+                        <SimpleWysiwygEditor ariaLabel={t('pages.monsterEdit.fields.description')} minHeightClassName={styles.descriptionTextarea} name="description" pasteAsPlainText placeholder={t('pages.monsterEdit.placeholders.description')} toolbar={false} value={form.description} onChange={handleDescriptionChange} />
                       </div>
                     </section>
                   </div>

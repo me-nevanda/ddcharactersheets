@@ -186,6 +186,7 @@ export const en: TranslationDictionary = {
         levelLabel: 'level',
         alive: 'alive',
         dead: 'dead',
+        characterHistoryTitle: 'Character history: {name}',
       },
       fields: {
         name: 'Title',
@@ -635,6 +636,7 @@ export const en: TranslationDictionary = {
         general: 'Main',
         attacks: 'Attacks',
         loot: 'Loot',
+        history: 'History',
       },
       sections: {
         defenses: 'Defenses',
@@ -686,6 +688,19 @@ export const en: TranslationDictionary = {
         removeDialog: {
           title: 'Delete this loot?',
           body: 'The loot "{name}" will be deleted permanently.',
+        },
+      },
+      history: {
+        title: 'History',
+        emptyState: 'No history entries have been added yet.',
+        addButton: 'Add history entry',
+        removeButton: 'Remove',
+        titlePlaceholder: 'Entry title',
+        contentLabel: 'Content',
+        contentPlaceholder: 'Describe a part of the NPC history',
+        removeDialog: {
+          title: 'Delete this history entry?',
+          body: 'The entry "{name}" will be deleted permanently.',
         },
       },
       typeOptions: {
@@ -799,6 +814,7 @@ export const en: TranslationDictionary = {
         abilities: 'Abilities',
         feats: 'Feats',
         items: 'Items',
+        history: 'History',
       },
       printMenu: {
         characterSheet: 'Character sheet',
@@ -961,6 +977,19 @@ export const en: TranslationDictionary = {
         unequippedLabel: 'Unequipped',
         namePlaceholder: 'e.g. Healing potion',
         descriptionPlaceholder: 'Short item description',
+      },
+      history: {
+        title: 'History',
+        emptyState: 'No history entries have been added yet.',
+        addButton: 'Add history entry',
+        removeButton: 'Remove',
+        titlePlaceholder: 'e.g. Fall of the house',
+        contentLabel: 'Content',
+        contentPlaceholder: 'Describe a part of the hero history',
+        removeDialog: {
+          title: 'Delete this history entry?',
+          body: 'The entry "{name}" will be deleted permanently.',
+        },
       },
       fields: {
         name: 'Name',

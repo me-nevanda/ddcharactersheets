@@ -185,6 +185,7 @@ export interface TranslationDictionary {
         levelLabel: string
         alive: string
         dead: string
+        characterHistoryTitle: string
       }
       fields: {
         name: string
@@ -636,6 +637,7 @@ export interface TranslationDictionary {
         general: string
         attacks: string
         loot: string
+        history: string
       }
       sections: {
         defenses: string
@@ -684,6 +686,19 @@ export interface TranslationDictionary {
           weapons: string
           others: string
         }
+        removeDialog: {
+          title: string
+          body: string
+        }
+      }
+      history: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeButton: string
+        titlePlaceholder: string
+        contentLabel: string
+        contentPlaceholder: string
         removeDialog: {
           title: string
           body: string
@@ -801,6 +816,7 @@ export interface TranslationDictionary {
         abilities: string
         feats: string
         items: string
+        history: string
       }
       printMenu: {
         characterSheet: string
@@ -963,6 +979,19 @@ export interface TranslationDictionary {
         unequippedLabel: string
         namePlaceholder: string
         descriptionPlaceholder: string
+      }
+      history: {
+        title: string
+        emptyState: string
+        addButton: string
+        removeButton: string
+        titlePlaceholder: string
+        contentLabel: string
+        contentPlaceholder: string
+        removeDialog: {
+          title: string
+          body: string
+        }
       }
       fields: {
         name: string

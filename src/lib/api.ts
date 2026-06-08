@@ -1,5 +1,5 @@
 import type { Adventure, AdventureData } from '@appTypes/adventure';
-import type { Character, CharacterData, CharacterGroup } from '@appTypes/character';
+import type { Character, CharacterData, CharacterGroup, CharacterHistoryEntry } from '@appTypes/character';
 import type { Context, ContextData } from '@appTypes/context';
 import type { Event, EventData } from '@appTypes/event';
 import type { Monster, MonsterData, MonsterGroup } from '@appTypes/monster';
@@ -13,6 +13,7 @@ interface ApiEnvelope<T> {
     character?: T;
     characterGroup?: T;
     characterGroups?: T[];
+    characterHistory?: T;
     characters?: T[];
     context?: T;
     contexts?: T[];
@@ -167,6 +168,20 @@ export const saveCharacter = async (characterId: string, character: CharacterDat
         throw new Error('errors.api.generic');
     }
     return payload.character;
+};
+export const getCharacterHistory = async (characterId: string): Promise<CharacterHistoryEntry[]> => {
+    const payload = await requestJson<ApiEnvelope<CharacterHistoryEntry[]>>(`/api/characters/${characterId}/history`);
+    return payload?.characterHistory ?? [];
+};
+export const saveCharacterHistory = async (characterId: string, characterHistory: CharacterHistoryEntry[]): Promise<CharacterHistoryEntry[]> => {
+    const payload = await requestJson<ApiEnvelope<CharacterHistoryEntry[]>>(`/api/characters/${characterId}/history`, {
+        method: 'PUT',
+        body: JSON.stringify({ characterHistory }),
+    });
+    if (!payload?.characterHistory) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.characterHistory;
 };
 export const deleteCharacter = async (characterId: string): Promise<void> => {
     await requestJson<null>(`/api/characters/${characterId}`, {

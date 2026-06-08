@@ -342,6 +342,12 @@ export interface Character extends CharacterData {
   updatedAt: string
 }
 
+export interface CharacterHistoryEntry {
+  id: string
+  title: string
+  content: string
+}
+
 export interface CharacterGroupData {
   name: string
   characterIds: string[]

@@ -4,7 +4,7 @@ import path from 'node:path';
 import type { CharacterAbility, CharacterAbilityAreaType, Character, CharacterAbilityAction, CharacterAbilityKind, CharacterAbilityType, CharacterAttributeBonuses, CharacterAttributes, CharacterBonuses, CharacterData, CharacterDefenses, CharacterArmor, CharacterFeat, CharacterWeapon, CharacterOtherItem, CharacterWeaponDamageDiceType, CharacterWeaponDamageType, CharacterSkillBonuses, CharacterTraining, CharacterDefenseBonuses, } from '../src/types/character';
 import { CharacterAlignment, CharacterClass as CharacterClassValue, CharacterGender, CharacterRace as CharacterRaceValue, } from '../src/types/character';
 import { CharacterClass, CharacterRace, isCharacterWeaponDamageType } from '../src/types/character';
-import { assertStoredEntityExists, createStoredCharacter, deleteStoredEntity, listStoredCharacters, migrateJsonDirectoryToSqlite, readStoredCharacter, updateStoredCharacter } from './sqliteStore';
+import { assertStoredEntityExists, createStoredCharacter, deleteStoredEntity, listStoredCharacterHistory, listStoredCharacters, migrateJsonDirectoryToSqlite, readStoredCharacter, replaceStoredCharacterHistory, updateStoredCharacter } from './sqliteStore';
 interface ApiError extends Error {
     code?: string;
     statusCode?: number;
@@ -831,6 +831,17 @@ export const createCharacter = async (): Promise<Character> => {
 export const updateCharacter = async (characterId: string, data: unknown): Promise<Character> => {
     await ensureCharactersStore();
     return updateStoredCharacter<CharacterData, Character>(characterId, data, characterStoreOptions);
+};
+export const listCharacterHistory = async (characterId: string) => {
+    await ensureCharactersStore();
+    return listStoredCharacterHistory(characterId);
+};
+export const updateCharacterHistory = async (characterId: string, data: unknown) => {
+    await ensureCharactersStore();
+    const entries = typeof data === 'object' && data !== null && 'characterHistory' in data
+        ? (data as { characterHistory?: unknown }).characterHistory
+        : data;
+    return replaceStoredCharacterHistory(characterId, entries);
 };
 export const deleteCharacter = async (characterId: string): Promise<void> => {
     await ensureCharactersStore();

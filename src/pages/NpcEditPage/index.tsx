@@ -7,6 +7,7 @@ import { useI18n } from '@i18n/index'
 import { useEditReturnNavigation } from '@pages/useEditReturnNavigation'
 import { useNpcEditPage } from './npcEditPageHooks'
 import { AttacksTab } from './tabs/AttacksTab'
+import { HistoryTab } from './tabs/HistoryTab'
 import { LootTab } from './tabs/LootTab'
 import type { NpcEditTabKey } from './types'
 import styles from './style.module.scss'
@@ -18,7 +19,7 @@ export const NpcEditPage = () => {
     npcListTab: 'list',
     returnTo: '/',
   })
-  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleIsDeadToggle, handleIsStoryToggle, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useNpcEditPage()
+  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleDescriptionChange, handleGenerateAttributes, handleHistoryEntryChange, handleHistoryEntryCreateEmpty, handleHistoryEntryRemove, handleImageChange, handleImageRemove, handleIsDeadToggle, handleIsStoryToggle, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useNpcEditPage()
   const [activeTab, setActiveTab] = useState<NpcEditTabKey>('general')
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
   const bloodiedValue = Math.floor(form.hp / 2)
@@ -116,6 +117,9 @@ export const NpcEditPage = () => {
                 ) : null}
                 <button className={`${styles.tabButton} ${activeTab === 'loot' ? styles.tabButtonActive : ''}`} type="button" onClick={() => setActiveTab('loot')}>
                   {t('pages.npcEdit.tabs.loot')}
+                </button>
+                <button className={`${styles.tabButton} ${activeTab === 'history' ? styles.tabButtonActive : ''}`} type="button" onClick={() => setActiveTab('history')}>
+                  {t('pages.npcEdit.tabs.history')}
                 </button>
               </aside>
 
@@ -249,7 +253,7 @@ export const NpcEditPage = () => {
                         </div>
 
                         <div className={styles.descriptionField}>
-                          <SimpleWysiwygEditor ariaLabel={t('pages.npcEdit.sections.resistances')} minHeightClassName={styles.resistancesTextarea} name="resistances" placeholder={t('pages.npcEdit.placeholders.resistances')} toolbar={false} value={form.resistances} onChange={handleResistancesChange} />
+                          <SimpleWysiwygEditor ariaLabel={t('pages.npcEdit.sections.resistances')} minHeightClassName={styles.resistancesTextarea} name="resistances" pasteAsPlainText placeholder={t('pages.npcEdit.placeholders.resistances')} toolbar={false} value={form.resistances} onChange={handleResistancesChange} />
                         </div>
                       </section>
                     ) : null}
@@ -261,7 +265,7 @@ export const NpcEditPage = () => {
                         </div>
 
                         <div className={styles.descriptionField}>
-                          <SimpleWysiwygEditor ariaLabel={t('pages.npcEdit.sections.special')} minHeightClassName={styles.resistancesTextarea} name="special" placeholder={t('pages.npcEdit.placeholders.special')} toolbar={false} value={form.special} onChange={handleSpecialChange} />
+                          <SimpleWysiwygEditor ariaLabel={t('pages.npcEdit.sections.special')} minHeightClassName={styles.resistancesTextarea} name="special" pasteAsPlainText placeholder={t('pages.npcEdit.placeholders.special')} toolbar={false} value={form.special} onChange={handleSpecialChange} />
                         </div>
                       </section>
                     ) : null}
@@ -272,13 +276,14 @@ export const NpcEditPage = () => {
                       </div>
 
                       <div className={styles.descriptionField}>
-                        <SimpleWysiwygEditor ariaLabel={t('pages.npcEdit.fields.description')} minHeightClassName={styles.descriptionTextarea} name="description" placeholder={t('pages.npcEdit.placeholders.description')} toolbar={false} value={form.description} onChange={handleDescriptionChange} />
+                        <SimpleWysiwygEditor ariaLabel={t('pages.npcEdit.fields.description')} minHeightClassName={styles.descriptionTextarea} name="description" pasteAsPlainText placeholder={t('pages.npcEdit.placeholders.description')} toolbar={false} value={form.description} onChange={handleDescriptionChange} />
                       </div>
                     </section>
                   </div>
                 </div> : null}
                 {activeTab === 'attacks' && !form.isStory ? <AttacksTab attacks={form.attacks} suggested={form.suggested} onAttackAdd={handleAttackAdd} onAttackChange={handleAttackChange} onAttackRemove={handleAttackRemove} /> : null}
                 {activeTab === 'loot' ? <LootTab items={form.items} onArmorBonusChange={handleArmorBonusChange} onItemBonusFieldChange={handleItemBonusFieldChange} onItemChange={handleItemChange} onItemCreateEmpty={handleItemCreateEmpty} onItemRemove={handleItemRemove} onWeaponDamageChange={handleWeaponDamageChange} /> : null}
+                {activeTab === 'history' ? <HistoryTab historyEntries={form.history} onHistoryEntryAdd={handleHistoryEntryCreateEmpty} onHistoryEntryChange={handleHistoryEntryChange} onHistoryEntryRemove={handleHistoryEntryRemove} /> : null}
               </div>
             </div>
           </form>

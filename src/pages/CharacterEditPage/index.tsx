@@ -13,6 +13,7 @@ import { AbilitiesTab } from '@pages/CharacterEditPage/tabs/AbilitiesTab';
 import { GeneralTab } from '@pages/CharacterEditPage/tabs/GeneralTab';
 import { FeatsTab } from '@pages/CharacterEditPage/tabs/FeatsTab';
 import { ItemsTab } from '@pages/CharacterEditPage/tabs/ItemsTab';
+import { HistoryTab } from '@pages/CharacterEditPage/tabs/HistoryTab';
 const CharacterEditPageContent = () => {
     const { t } = useI18n();
     const { getCharacterClassSrc, getCharacterPortraitSrc } = useCharacterPresentation();
@@ -166,6 +167,9 @@ const CharacterEditPageContent = () => {
                 <button className={`${styles.tabButton} ${activeTab === 'items' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('items')}>
                   {t('pages.characterEdit.tabs.items')}
                 </button>
+                <button className={`${styles.tabButton} ${activeTab === 'history' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('history')}>
+                  {t('pages.characterEdit.tabs.history')}
+                </button>
               </aside>
 
               <div className={styles.tabPanel}>
@@ -173,6 +177,7 @@ const CharacterEditPageContent = () => {
                 {activeTab === 'abilities' ? <AbilitiesTab /> : null}
                 {activeTab === 'feats' ? <FeatsTab /> : null}
                 {activeTab === 'items' ? <ItemsTab /> : null}
+                {activeTab === 'history' ? <HistoryTab /> : null}
               </div>
             </div>
           </form>)}
@@ -181,7 +186,7 @@ const CharacterEditPageContent = () => {
     </main>);
 };
 const resolveActiveTab = (tab: string | null): CharacterEditTabKey => {
-    if (tab === 'abilities' || tab === 'feats' || tab === 'items') {
+    if (tab === 'abilities' || tab === 'feats' || tab === 'items' || tab === 'history') {
         return tab;
     }
     return 'general';

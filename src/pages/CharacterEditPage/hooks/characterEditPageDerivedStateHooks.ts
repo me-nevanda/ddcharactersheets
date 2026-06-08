@@ -6,12 +6,14 @@ import { buildSkillBonuses, buildSkillModifiers } from '../sections/SkillSection
 import { buildCharacterHp, buildCharacterSpeed, buildCharacterSurge, clampSpeedValue, formatModifier, getLevelBonus } from '../sections/GeneralSection/generalSectionHooks';
 import { buildFeatBonusSources, sumFeatBonus, type CharacterFeatBonusFieldName } from '../featsLogic';
 import { skillDefinitions } from '@dictionaries/characterEditDefinitions';
-import type { CharacterAttributeBonuses, CharacterSkillBonuses } from '@appTypes/character';
+import type { CharacterAttributeBonuses, CharacterHistoryEntry, CharacterSkillBonuses } from '@appTypes/character';
 import type { CharacterEditFormData, CharacterEditPageComputedState } from '../types';
 
 export const useCharacterEditPageDerivedState = (
     form: CharacterEditFormData,
     initialForm: CharacterEditFormData,
+    historyEntries: CharacterHistoryEntry[],
+    initialHistoryEntries: CharacterHistoryEntry[],
     t: (key: string, variables?: TranslationVariables) => string,
     getRaceLabel: (race: CharacterEditFormData['race']) => string,
     getClassLabel: (characterClass: CharacterEditFormData['class']) => string,
@@ -95,7 +97,7 @@ export const useCharacterEditPageDerivedState = (
         thievery: skillBonuses.thievery + featSkillBonuses.thievery,
     };
     const skillModifiers = buildSkillModifiers(skillBonusesWithFeats);
-    const hasChanges = JSON.stringify(form) !== JSON.stringify(initialForm);
+    const hasChanges = JSON.stringify(form) !== JSON.stringify(initialForm) || JSON.stringify(historyEntries) !== JSON.stringify(initialHistoryEntries);
     const raceLabel = getRaceLabel(form.race);
     const classLabel = getClassLabel(form.class);
     const attributeBonusTooltips = {

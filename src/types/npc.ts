@@ -56,6 +56,12 @@ export interface NpcAttack {
   description: string
 }
 
+export interface NpcHistoryEntry {
+  id: string
+  title: string
+  content: string
+}
+
 export interface NpcData {
   uniqueId: string
   name: string
@@ -73,6 +79,7 @@ export interface NpcData {
   speed: number
   isStory: boolean
   isDead: boolean
+  history: NpcHistoryEntry[]
 }
 
 export interface Npc extends NpcData {

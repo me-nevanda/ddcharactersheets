@@ -2,7 +2,7 @@
 import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { CharacterArmor, CharacterItems, CharacterOtherItem, CharacterWeapon, CharacterWeaponDamageDiceType } from '../src/types/character'
-import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcRole, NpcSuggestedStats, NpcType } from '../src/types/npc'
+import type { Npc, NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcHistoryEntry, NpcRole, NpcSuggestedStats, NpcType } from '../src/types/npc'
 import { assertStoredEntityExists, createStoredNpc, deleteStoredEntity, listStoredNpcs, migrateJsonDirectoryToSqlite, readStoredNpc, updateStoredNpc } from './sqliteStore'
 
 interface ApiError extends Error {
@@ -207,6 +207,21 @@ const normalizeAttacks = (attacks: unknown): NpcAttack[] => {
     .map((attack) => normalizeAttack(attack))
 }
 
+const normalizeHistoryEntries = (entries: unknown): NpcHistoryEntry[] => {
+  if (!Array.isArray(entries)) {
+    return []
+  }
+
+  return entries
+    .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
+    .map((entry) => ({
+      id: typeof entry.id === 'string' && entry.id.trim().length > 0 ? entry.id : randomUUID(),
+      title: typeof entry.title === 'string' ? entry.title.trim() : '',
+      content: typeof entry.content === 'string' ? entry.content.trim() : '',
+    }))
+    .filter((entry) => entry.title.length > 0 || entry.content.length > 0)
+}
+
 const normalizeArmorGroup = (group: unknown): CharacterArmor[] => {
   if (!Array.isArray(group)) {
     return []
@@ -338,6 +353,7 @@ const normalizeNpc = (data: Partial<Record<keyof NpcData, unknown>> = {}): NpcDa
     speed: normalizeStatValue(data.speed, 6),
     isStory: data.isStory === true,
     isDead: data.isDead === true,
+    history: normalizeHistoryEntries(data.history),
   }
 }
 

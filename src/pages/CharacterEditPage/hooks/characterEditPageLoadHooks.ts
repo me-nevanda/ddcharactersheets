@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { getCharacter } from '@lib/api';
+import { getCharacter, getCharacterHistory } from '@lib/api';
 import { getErrorMessage } from '@lib/errors';
 import type { TranslationVariables } from '@i18n/types';
 import { emptyAbilities, emptyFeats, emptyForm, defaultAbilityAction, defaultAbilityKind, defaultAbilityWeaponDamageDiceCount, defaultAbilityWeaponDamageDiceType, defaultAbilityWeaponDamageType, defaultAbilityWeaponRecurringDamageCount, defaultAbilityWeaponRecurringDamageType, zeroAttributeBonuses, zeroDefenses, zeroDefenseBonuses, } from '@pages/CharacterEditPage/characterEditPageUtils';
@@ -7,7 +7,7 @@ import { normalizeAbilityType, normalizeAbilityWeaponArea, normalizeAbilityWeapo
 import { buildNormalizedAttributes } from '../sections/AttributesSection/attributesSectionHooks';
 import { buildRaceAttributeBonuses, buildCharacterSpeed, clampLevelValue } from '../sections/GeneralSection/generalSectionHooks';
 import type { Character, CharacterWeapon } from '@appTypes/character';
-import type { CharacterEditFormData, CharacterEditPageSetBoolean, CharacterEditPageSetForm, CharacterEditPageSetString } from '../types';
+import type { CharacterEditFormData, CharacterEditPageSetBoolean, CharacterEditPageSetForm, CharacterEditPageSetHistoryEntries, CharacterEditPageSetString } from '../types';
 
 const resolveAbilityWeaponId = (weaponReference: string, weapons: CharacterWeapon[]): string => {
     if (weaponReference.length === 0) {
@@ -78,6 +78,8 @@ export const useCharacterEditPageLoad = (
     characterId: string,
     setForm: CharacterEditPageSetForm,
     setInitialForm: CharacterEditPageSetForm,
+    setHistoryEntries: CharacterEditPageSetHistoryEntries,
+    setInitialHistoryEntries: CharacterEditPageSetHistoryEntries,
     setError: CharacterEditPageSetString,
     setImageUrl: CharacterEditPageSetString,
     setLoading: CharacterEditPageSetBoolean,
@@ -87,11 +89,16 @@ export const useCharacterEditPageLoad = (
         let cancelled = false;
         const loadCharacter = async () => {
             try {
-                const character = await getCharacter(characterId);
+                const [character, characterHistory] = await Promise.all([
+                    getCharacter(characterId),
+                    getCharacterHistory(characterId),
+                ]);
                 if (!cancelled) {
                     const nextForm = buildCharacterEditFormData(character);
                     setForm(nextForm);
                     setInitialForm(nextForm);
+                    setHistoryEntries(characterHistory);
+                    setInitialHistoryEntries(characterHistory);
                     setImageUrl(character.imageUrl);
                     setError('');
                 }
@@ -111,5 +118,5 @@ export const useCharacterEditPageLoad = (
         return () => {
             cancelled = true;
         };
-    }, [characterId, setError, setForm, setImageUrl, setInitialForm, setLoading, t]);
+    }, [characterId, setError, setForm, setHistoryEntries, setImageUrl, setInitialForm, setInitialHistoryEntries, setLoading, t]);
 };

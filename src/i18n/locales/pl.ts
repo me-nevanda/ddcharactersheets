@@ -186,6 +186,7 @@ export const pl: TranslationDictionary = {
         levelLabel: 'level',
         alive: 'żywy',
         dead: 'martwy',
+        characterHistoryTitle: 'Historia postaci: {name}',
       },
       fields: {
         name: 'Tytuł',
@@ -635,6 +636,7 @@ export const pl: TranslationDictionary = {
         general: 'Główne',
         attacks: 'Ataki',
         loot: 'Ekwipunek',
+        history: 'Historia',
       },
       sections: {
         defenses: 'Obrony',
@@ -686,6 +688,19 @@ export const pl: TranslationDictionary = {
         removeDialog: {
           title: 'Usunąć ekwipunek?',
           body: 'Ekwipunek „{name}” zostanie usunięty na stałe.',
+        },
+      },
+      history: {
+        title: 'Historia',
+        emptyState: 'Nie dodano jeszcze żadnego wpisu historii.',
+        addButton: 'Dodaj wpis historii',
+        removeButton: 'Usuń',
+        titlePlaceholder: 'Tytuł wpisu',
+        contentLabel: 'Treść',
+        contentPlaceholder: 'Opisz fragment historii NPC',
+        removeDialog: {
+          title: 'Usunąć wpis historii?',
+          body: 'Wpis „{name}” zostanie usunięty na stałe.',
         },
       },
       typeOptions: {
@@ -799,6 +814,7 @@ export const pl: TranslationDictionary = {
         abilities: 'Zdolności',
         feats: 'Atuty',
         items: 'Przedmioty',
+        history: 'Historia',
       },
       printMenu: {
         characterSheet: 'Karta postaci',
@@ -961,6 +977,19 @@ export const pl: TranslationDictionary = {
         unequippedLabel: 'Niewyposażone',
         namePlaceholder: 'Np. Mikstura leczenia',
         descriptionPlaceholder: 'Krótki opis przedmiotu',
+      },
+      history: {
+        title: 'Historia',
+        emptyState: 'Nie dodano jeszcze żadnego elementu historii.',
+        addButton: 'Dodaj element historii',
+        removeButton: 'Usuń',
+        titlePlaceholder: 'Np. Upadek rodu',
+        contentLabel: 'Treść',
+        contentPlaceholder: 'Opisz element historii bohatera',
+        removeDialog: {
+          title: 'Usunąć wpis historii?',
+          body: 'Wpis „{name}” zostanie usunięty na stałe.',
+        },
       },
       fields: {
         name: 'Imię',

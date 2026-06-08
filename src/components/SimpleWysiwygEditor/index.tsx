@@ -1,3 +1,4 @@
+import type { ClipboardEvent } from 'react'
 import { BtnBold, BtnBulletList, BtnClearFormatting, BtnItalic, BtnNumberedList, BtnUnderline, Editor, EditorProvider, Separator, Toolbar } from 'react-simple-wysiwyg'
 import { useI18n } from '@i18n/index'
 import type { SimpleWysiwygEditorProps } from './types'
@@ -42,14 +43,54 @@ const sanitizeEditorHtml = (html: string): string => {
   return template.innerHTML
 }
 
-export const SimpleWysiwygEditor = ({ ariaLabel, minHeightClassName, name, onChange, placeholder, toolbar = true, value }: SimpleWysiwygEditorProps) => {
+const insertPlainTextAtSelection = (text: string): void => {
+  const selection = window.getSelection()
+  if (!selection || selection.rangeCount === 0) {
+    return
+  }
+
+  selection.deleteFromDocument()
+
+  const range = selection.getRangeAt(0)
+  const lines = text.replace(/\r\n?/g, '\n').split('\n')
+  const fragment = document.createDocumentFragment()
+
+  lines.forEach((line, index) => {
+    if (index > 0) {
+      fragment.appendChild(document.createElement('br'))
+    }
+    fragment.appendChild(document.createTextNode(line))
+  })
+
+  const lastNode = fragment.lastChild
+  range.insertNode(fragment)
+
+  if (lastNode) {
+    range.setStartAfter(lastNode)
+    range.collapse(true)
+    selection.removeAllRanges()
+    selection.addRange(range)
+  }
+}
+
+export const SimpleWysiwygEditor = ({ ariaLabel, minHeightClassName, name, onChange, pasteAsPlainText = false, placeholder, toolbar = true, value }: SimpleWysiwygEditorProps) => {
   const { t } = useI18n()
 
   const containerClassName = [styles.editor, minHeightClassName].filter(Boolean).join(' ')
+  const handlePaste = (event: ClipboardEvent<HTMLElement>) => {
+    const plainText = event.clipboardData.getData('text/plain')
+    if (!plainText) {
+      return
+    }
+
+    event.preventDefault()
+    insertPlainTextAtSelection(plainText)
+    onChange(sanitizeEditorHtml(event.currentTarget.innerHTML))
+  }
 
   return (
     <EditorProvider>
-      <Editor aria-label={ariaLabel} containerProps={{ className: containerClassName }} name={name} placeholder={placeholder} value={sanitizeEditorHtml(value)} onChange={(event) => onChange(sanitizeEditorHtml(event.target.value))}>
+      <Editor aria-label={ariaLabel} containerProps={{ className: containerClassName }} name={name} placeholder={placeholder} value={sanitizeEditorHtml(value)} onChange={(event) => onChange(sanitizeEditorHtml(event.target.value))} onPaste={pasteAsPlainText ? handlePaste : undefined}>
         {toolbar ? (
         <Toolbar>
           <BtnBold title={t('common.editor.bold')} />

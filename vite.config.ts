@@ -3,7 +3,7 @@ import { defineConfig, type Connect, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { createAdventure, isSafeAdventureId, listAdventures, readAdventure, updateAdventure } from './server/adventureStore';
 import { createCharacterGroup, deleteCharacterGroup, isSafeCharacterGroupId, listCharacterGroups, readCharacterGroup, updateCharacterGroup } from './server/characterGroupStore';
-import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacterId, listCharacters, readCharacter, readCharacterImage, updateCharacter, updateCharacterImage, } from './server/characterStore';
+import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacterId, listCharacterHistory, listCharacters, readCharacter, readCharacterImage, updateCharacter, updateCharacterHistory, updateCharacterImage, } from './server/characterStore';
 import { createContext, deleteContext, deleteContextImage, isSafeContextId, listContexts, readContext, readContextImage, updateContext, updateContextImage } from './server/contextStore';
 import { createEvent, deleteEvent, deleteEventImage, isSafeEventId, listEvents, readEvent, readEventImage, updateEvent, updateEventImage } from './server/eventStore';
 import { countGeminiTokens, createGeminiResponse } from './server/geminiService';
@@ -125,6 +125,23 @@ const createCharactersApiPlugin = (): Plugin => {
                 if (request.method === 'DELETE') {
                     const character = await deleteCharacterImage(characterId);
                     sendJson(response, 200, { character });
+                    return;
+                }
+            }
+            const historyMatch = url.pathname.match(/^\/api\/characters\/([^/]+)\/history$/);
+            if (historyMatch) {
+                const characterId = historyMatch[1];
+                if (!isSafeCharacterId(characterId)) {
+                    sendError(response, 400, 'errors.api.invalidCharacterId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    sendJson(response, 200, { characterHistory: await listCharacterHistory(characterId) });
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const payload = await readJsonBody(request);
+                    sendJson(response, 200, { characterHistory: await updateCharacterHistory(characterId, payload) });
                     return;
                 }
             }

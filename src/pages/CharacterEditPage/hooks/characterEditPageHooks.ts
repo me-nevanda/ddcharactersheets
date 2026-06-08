@@ -9,6 +9,7 @@ import { useCharacterEditPageDerivedState } from './characterEditPageDerivedStat
 import { useCharacterEditPageFormHandlers, useCharacterEditPageClassTrainingRules } from './characterEditPageFormHandlersHooks';
 import { useCharacterEditPageLoad } from './characterEditPageLoadHooks';
 import { useCharacterEditPageSubmitHandler } from './characterEditPageSubmitHooks';
+import type { CharacterHistoryEntry } from '@appTypes/character';
 import type { CharacterEditFormData, CharacterEditPageState } from '../types';
 
 export const useCharacterEditPage = (): CharacterEditPageState => {
@@ -17,6 +18,8 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
     const { characterId = '' } = useParams();
     const [form, setForm] = useState<CharacterEditFormData>(emptyForm);
     const [initialForm, setInitialForm] = useState<CharacterEditFormData>(emptyForm);
+    const [historyEntries, setHistoryEntries] = useState<CharacterHistoryEntry[]>([]);
+    const [initialHistoryEntries, setInitialHistoryEntries] = useState<CharacterHistoryEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -24,20 +27,39 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
     const [removingImage, setRemovingImage] = useState(false);
     const [uploadingImage, setUploadingImage] = useState(false);
 
-    useCharacterEditPageLoad(characterId, setForm, setInitialForm, setError, setImageUrl, setLoading, t);
+    useCharacterEditPageLoad(characterId, setForm, setInitialForm, setHistoryEntries, setInitialHistoryEntries, setError, setImageUrl, setLoading, t);
     useCharacterEditPageClassTrainingRules(form.class, setForm);
 
     const handlers = useCharacterEditPageFormHandlers(setForm);
-    const computedState = useCharacterEditPageDerivedState(form, initialForm, t, getRaceLabel, getClassLabel);
+    const computedState = useCharacterEditPageDerivedState(form, initialForm, historyEntries, initialHistoryEntries, t, getRaceLabel, getClassLabel);
     const handleSubmit = useCharacterEditPageSubmitHandler({
         characterId,
         computedState,
         form,
+        historyEntries,
         setError,
+        setHistoryEntries,
         setInitialForm,
+        setInitialHistoryEntries,
         setSaving,
         t,
     });
+    const handleHistoryEntryCreateEmpty = () => {
+        setHistoryEntries((currentEntries) => [
+            ...currentEntries,
+            {
+                id: globalThis.crypto.randomUUID(),
+                title: '',
+                content: '',
+            },
+        ]);
+    };
+    const handleHistoryEntryChange = (index: number, fieldName: 'title' | 'content', value: string) => {
+        setHistoryEntries((currentEntries) => currentEntries.map((entry, entryIndex) => (entryIndex === index ? { ...entry, [fieldName]: value } : entry)));
+    };
+    const handleHistoryEntryRemove = (index: number) => {
+        setHistoryEntries((currentEntries) => currentEntries.filter((_entry, entryIndex) => entryIndex !== index));
+    };
     const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
         const image = event.target.files?.[0];
         event.target.value = '';
@@ -78,6 +100,7 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
     return {
         error,
         form,
+        historyEntries,
         imageUrl,
         loading,
         removingImage,
@@ -99,6 +122,9 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
         handleFeatChange: handlers.handleFeatChange,
         handleFeatBonusFieldChange: handlers.handleFeatBonusFieldChange,
         handleFeatRemove: handlers.handleFeatRemove,
+        handleHistoryEntryCreateEmpty,
+        handleHistoryEntryChange,
+        handleHistoryEntryRemove,
         handleItemCreateEmpty: handlers.handleItemCreateEmpty,
         handleItemChange: handlers.handleItemChange,
         handleItemBonusFieldChange: handlers.handleItemBonusFieldChange,

@@ -1,9 +1,9 @@
 ﻿import type { ChangeEvent, FormEvent } from 'react'
 import type { CharacterArmorBonusFieldName, CharacterItemBonusFieldName, CharacterWeaponDamageDiceType, CharacterWeaponFieldName } from '@appTypes/character'
-import type { NpcAttack, NpcAttackType, NpcData } from '@appTypes/npc'
+import type { NpcAttack, NpcAttackType, NpcData, NpcHistoryEntry } from '@appTypes/npc'
 import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/CharacterEditPage/types'
 
-export type NpcEditTabKey = 'general' | 'attacks' | 'loot'
+export type NpcEditTabKey = 'general' | 'attacks' | 'loot' | 'history'
 
 export interface NpcEditPageState {
   error: string
@@ -38,6 +38,9 @@ export interface NpcEditPageState {
   handleGenerateAttributes: () => void
   handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
   handleImageRemove: () => Promise<void>
+  handleHistoryEntryChange: (index: number, fieldName: keyof NpcHistoryEntry, value: string) => void
+  handleHistoryEntryCreateEmpty: () => void
+  handleHistoryEntryRemove: (index: number) => void
   handlePrint: () => void
   handleResistancesChange: (value: string) => void
   handleSpecialChange: (value: string) => void

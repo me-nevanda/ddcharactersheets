@@ -6,7 +6,7 @@ import { getErrorMessage } from '@lib/errors'
 import { normalizeItems } from '@pages/CharacterEditPage/characterEditPageLogic'
 import { emptyArmor, emptyItems, emptyOtherItem, emptyWeapon } from '@pages/CharacterEditPage/characterEditPageUtils'
 import type { CharacterArmorBonusFieldName, CharacterItemBonusFieldName, CharacterWeaponDamageDiceType, CharacterWeaponFieldName } from '@appTypes/character'
-import type { NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcRole, NpcSuggestedStats, NpcType } from '@appTypes/npc'
+import type { NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcHistoryEntry, NpcRole, NpcSuggestedStats, NpcType } from '@appTypes/npc'
 import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/CharacterEditPage/types'
 import { useNpcAttributeGeneration } from './npcAttributeGenerationHooks'
 import type { NpcEditPageState } from './types'
@@ -40,6 +40,7 @@ const emptyNpcForm: NpcData = {
   speed: 6,
   isStory: false,
   isDead: false,
+  history: [],
 }
 
 const defenseFields = ['kp', 'fortitude', 'reflex', 'will'] as const satisfies readonly (keyof NpcDefenses)[]
@@ -222,6 +223,24 @@ const normalizeNpcAttacks = (attacks: unknown): NpcAttack[] => {
     .map((attack) => normalizeNpcAttack(attack))
 }
 
+const createNpcHistoryEntryId = (): string => {
+  return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
+const normalizeNpcHistoryEntries = (history: unknown): NpcHistoryEntry[] => {
+  if (!Array.isArray(history)) {
+    return []
+  }
+
+  return history
+    .filter((entry): entry is Partial<Record<keyof NpcHistoryEntry, unknown>> => typeof entry === 'object' && entry !== null)
+    .map((entry) => ({
+      id: typeof entry.id === 'string' && entry.id.trim().length > 0 ? entry.id : createNpcHistoryEntryId(),
+      title: typeof entry.title === 'string' ? entry.title : '',
+      content: typeof entry.content === 'string' ? entry.content : '',
+    }))
+}
+
 export const useNpcEditPage = (): NpcEditPageState => {
   const { t } = useI18n()
   const { generateNpcAttributes } = useNpcAttributeGeneration()
@@ -259,6 +278,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
           speed: npc.speed,
           isStory: npc.isStory === true,
           isDead: npc.isDead === true,
+          history: normalizeNpcHistoryEntries(npc.history),
         }
         if (!cancelled) {
           setForm(nextForm)
@@ -443,6 +463,34 @@ export const useNpcEditPage = (): NpcEditPageState => {
     setForm((current) => ({
       ...current,
       isDead: nextIsDead,
+    }))
+  }
+
+  const handleHistoryEntryCreateEmpty = () => {
+    setForm((current) => ({
+      ...current,
+      history: [
+        ...current.history,
+        {
+          id: createNpcHistoryEntryId(),
+          title: '',
+          content: '',
+        },
+      ],
+    }))
+  }
+
+  const handleHistoryEntryChange = (index: number, fieldName: keyof NpcHistoryEntry, value: string) => {
+    setForm((current) => ({
+      ...current,
+      history: current.history.map((entry, entryIndex) => (entryIndex === index ? { ...entry, [fieldName]: value } : entry)),
+    }))
+  }
+
+  const handleHistoryEntryRemove = (index: number) => {
+    setForm((current) => ({
+      ...current,
+      history: current.history.filter((_entry, entryIndex) => entryIndex !== index),
     }))
   }
 
@@ -670,6 +718,11 @@ export const useNpcEditPage = (): NpcEditPageState => {
         speed: form.speed,
         isStory: form.isStory,
         isDead: form.isDead,
+        history: form.history.map((entry) => ({
+          id: entry.id,
+          title: entry.title.trim(),
+          content: entry.content.trim(),
+        })),
       }
       await saveNpc(npcId, nextForm)
       setForm(nextForm)
@@ -700,6 +753,9 @@ export const useNpcEditPage = (): NpcEditPageState => {
     handleGenerateAttributes,
     handleImageChange,
     handleImageRemove,
+    handleHistoryEntryChange,
+    handleHistoryEntryCreateEmpty,
+    handleHistoryEntryRemove,
     handlePrint,
     handleResistancesChange,
     handleSpecialChange,
