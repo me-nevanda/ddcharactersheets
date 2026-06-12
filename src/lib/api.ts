@@ -62,7 +62,7 @@ const getRequestMethod = (options: RequestInit): string => {
 };
 
 const canDedupeRequest = (url: string, options: RequestInit): boolean => {
-    return typeof url === 'string' && getRequestMethod(options) === 'GET' && !options.body;
+    return getRequestMethod(options) === 'GET' && !options.body;
 };
 
 const fetchJson = async <T>(url: string, options: RequestInit): Promise<T | null> => {

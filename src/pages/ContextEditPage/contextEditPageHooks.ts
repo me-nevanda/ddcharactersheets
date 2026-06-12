@@ -436,7 +436,7 @@ export const useContextEditPage = (): ContextEditPageState => {
     for (const area of allAreas) {
       const placeMap = new Map<string, PlaceItem>()
       for (const place of area.places ?? []) {
-        if (place && typeof place.id === 'string') {
+        if (place) {
           placeMap.set(place.id, place)
         }
       }
@@ -856,7 +856,7 @@ export const useContextEditPage = (): ContextEditPageState => {
         const placeIds: string[] = []
         const seenPlaceIds = new Set<string>()
         for (const place of area.places ?? []) {
-          if (!place || typeof place.id !== 'string') {
+          if (!place) {
             continue
           }
           const placeId = place.id.trim()
