@@ -174,10 +174,19 @@ export const pl: TranslationDictionary = {
     mapEdit: {
       drawModeLabel: 'Sposób rysowania',
       eyebrow: 'MAPA',
+      emptyLayer: 'Ta warstwa jest jeszcze pusta.',
       editorLabel: 'Edytor mapy',
+      layersLabel: 'Warstwy mapy',
       loading: 'Wczytywanie mapy...',
-      paletteLabel: 'Kolory linii mapy',
+      paletteLabel: 'Kolory mapy',
+      toggleGroundCellLabel: 'Przełącz kolor podłoża',
       toggleLineLabel: 'Przełącz linię mapy',
+      layers: {
+        lines: 'Linie',
+        ground: 'Podłoże',
+        elements: 'Elementy',
+        labels: 'Opisy',
+      },
       drawModes: {
         single: 'Pojedyncza',
         range: 'Odcinek',
@@ -191,6 +200,8 @@ export const pl: TranslationDictionary = {
         white: 'Biały',
         gray: 'Szary',
         yellow: 'Żółty',
+        orange: 'Pomarańczowy',
+        purple: 'Fioletowy',
       },
       fields: {
         name: 'Nazwa',

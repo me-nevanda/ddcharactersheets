@@ -1,4 +1,4 @@
-import type { Map, MapData, MapGridData, MapGridLine, MapLineColor } from '@appTypes/map'
+import type { Map, MapData, MapGridData, MapGridGroundCell, MapGridLine, MapLineColor } from '@appTypes/map'
 import { createStoredMap, deleteStoredEntity, listStoredMaps, readStoredMap, updateStoredMap } from './sqliteStore'
 
 const safeMapIdPattern = /^[a-z0-9-]+$/i
@@ -7,10 +7,11 @@ const defaultMapGrid: MapGridData = {
   width: 34,
   height: 22,
   lines: [],
+  ground: [],
 }
 
 const isMapLineColor = (value: unknown): value is MapLineColor => {
-  return value === 'black' || value === 'red' || value === 'green' || value === 'blue' || value === 'white' || value === 'gray' || value === 'yellow'
+  return value === 'black' || value === 'red' || value === 'green' || value === 'blue' || value === 'white' || value === 'gray' || value === 'yellow' || value === 'orange' || value === 'purple'
 }
 
 const normalizeNumber = (value: unknown): number => {
@@ -19,6 +20,10 @@ const normalizeNumber = (value: unknown): number => {
 
 const createLineId = (fromX: number, fromY: number, toX: number, toY: number): string => {
   return `${fromX}:${fromY}-${toX}:${toY}`
+}
+
+const createGroundCellId = (x: number, y: number): string => {
+  return `${x}:${y}`
 }
 
 const normalizeMapLine = (value: unknown): MapGridLine | null => {
@@ -42,6 +47,23 @@ const normalizeMapLine = (value: unknown): MapGridLine | null => {
   }
 }
 
+const normalizeMapGroundCell = (value: unknown): MapGridGroundCell | null => {
+  if (typeof value !== 'object' || value === null) {
+    return null
+  }
+
+  const source = value as Partial<Record<keyof MapGridGroundCell, unknown>>
+  const x = normalizeNumber(source.x)
+  const y = normalizeNumber(source.y)
+
+  return {
+    id: typeof source.id === 'string' && source.id.trim() ? source.id : createGroundCellId(x, y),
+    x,
+    y,
+    color: isMapLineColor(source.color) ? source.color : 'black',
+  }
+}
+
 const normalizeMapGrid = (value: unknown): MapGridData => {
   if (typeof value !== 'object' || value === null) {
     return defaultMapGrid
@@ -51,11 +73,15 @@ const normalizeMapGrid = (value: unknown): MapGridData => {
   const lines = Array.isArray(source.lines)
     ? source.lines.map(normalizeMapLine).filter((line): line is MapGridLine => Boolean(line))
     : []
+  const ground = Array.isArray(source.ground)
+    ? source.ground.map(normalizeMapGroundCell).filter((cell): cell is MapGridGroundCell => Boolean(cell))
+    : []
 
   return {
     width: typeof source.width === 'number' && source.width > 0 ? source.width : defaultMapGrid.width,
     height: typeof source.height === 'number' && source.height > 0 ? source.height : defaultMapGrid.height,
     lines,
+    ground,
   }
 }
 

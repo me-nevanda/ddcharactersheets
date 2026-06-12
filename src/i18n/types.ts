@@ -173,10 +173,19 @@ export interface TranslationDictionary {
     mapEdit: {
       drawModeLabel: string
       eyebrow: string
+      emptyLayer: string
       editorLabel: string
+      layersLabel: string
       loading: string
       paletteLabel: string
+      toggleGroundCellLabel: string
       toggleLineLabel: string
+      layers: {
+        lines: string
+        ground: string
+        elements: string
+        labels: string
+      }
       drawModes: {
         single: string
         range: string
@@ -190,6 +199,8 @@ export interface TranslationDictionary {
         white: string
         gray: string
         yellow: string
+        orange: string
+        purple: string
       }
       fields: {
         name: string

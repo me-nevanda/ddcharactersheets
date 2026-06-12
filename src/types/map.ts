@@ -1,4 +1,4 @@
-export type MapLineColor = 'black' | 'red' | 'green' | 'blue' | 'white' | 'gray' | 'yellow'
+export type MapLineColor = 'black' | 'red' | 'green' | 'blue' | 'white' | 'gray' | 'yellow' | 'orange' | 'purple'
 
 export interface MapGridLine {
   id: string
@@ -9,10 +9,18 @@ export interface MapGridLine {
   color: MapLineColor
 }
 
+export interface MapGridGroundCell {
+  id: string
+  x: number
+  y: number
+  color: MapLineColor
+}
+
 export interface MapGridData {
   width: number
   height: number
   lines: MapGridLine[]
+  ground: MapGridGroundCell[]
 }
 
 export interface MapData {

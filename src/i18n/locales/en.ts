@@ -174,10 +174,19 @@ export const en: TranslationDictionary = {
     mapEdit: {
       drawModeLabel: 'Drawing mode',
       eyebrow: 'MAP',
+      emptyLayer: 'This layer is empty for now.',
       editorLabel: 'Map editor',
+      layersLabel: 'Map layers',
       loading: 'Loading map...',
-      paletteLabel: 'Map line colors',
+      paletteLabel: 'Map colors',
+      toggleGroundCellLabel: 'Toggle ground color',
       toggleLineLabel: 'Toggle map line',
+      layers: {
+        lines: 'Lines',
+        ground: 'Ground',
+        elements: 'Elements',
+        labels: 'Labels',
+      },
       drawModes: {
         single: 'Single',
         range: 'Segment',
@@ -191,6 +200,8 @@ export const en: TranslationDictionary = {
         white: 'White',
         gray: 'Gray',
         yellow: 'Yellow',
+        orange: 'Orange',
+        purple: 'Purple',
       },
       fields: {
         name: 'Name',

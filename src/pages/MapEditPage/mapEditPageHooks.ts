@@ -3,12 +3,11 @@ import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getMap, saveMap } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
-import type { MapData, MapGridLine } from '@appTypes/map'
-import type { MapDrawMode, MapDrawModeOption, MapEditPageState, MapLineOrientation, MapLineViewModel, MapPaletteColor, MapPaletteColorOption } from './types'
+import type { MapData, MapGridGroundCell, MapGridLine } from '@appTypes/map'
+import type { MapDrawMode, MapDrawModeOption, MapEditPageState, MapGroundCellViewModel, MapLayer, MapLayerOption, MapLineOrientation, MapLineViewModel, MapPaletteColor, MapPaletteColorOption, MapPointViewModel } from './types'
 
 const mapGridWidth = 34
 const mapGridHeight = 22
-const gridCells = Array.from({ length: mapGridWidth * mapGridHeight }, (_, index) => index)
 
 const colorOptions: MapPaletteColorOption[] = [
   { key: 'black', labelKey: 'pages.mapEdit.colors.black' },
@@ -18,6 +17,8 @@ const colorOptions: MapPaletteColorOption[] = [
   { key: 'white', labelKey: 'pages.mapEdit.colors.white' },
   { key: 'gray', labelKey: 'pages.mapEdit.colors.gray' },
   { key: 'yellow', labelKey: 'pages.mapEdit.colors.yellow' },
+  { key: 'orange', labelKey: 'pages.mapEdit.colors.orange' },
+  { key: 'purple', labelKey: 'pages.mapEdit.colors.purple' },
 ]
 
 const drawModeOptions: MapDrawModeOption[] = [
@@ -26,8 +27,23 @@ const drawModeOptions: MapDrawModeOption[] = [
   { key: 'rectangle', labelKey: 'pages.mapEdit.drawModes.rectangle' },
 ]
 
+const layerOptions: MapLayerOption[] = [
+  { key: 'lines', labelKey: 'pages.mapEdit.layers.lines' },
+  { key: 'ground', labelKey: 'pages.mapEdit.layers.ground' },
+  { key: 'elements', labelKey: 'pages.mapEdit.layers.elements' },
+  { key: 'labels', labelKey: 'pages.mapEdit.layers.labels' },
+]
+
 const createLineId = (fromX: number, fromY: number, toX: number, toY: number): string => {
   return `${fromX}:${fromY}-${toX}:${toY}`
+}
+
+const createPointId = (x: number, y: number): string => {
+  return `${x}:${y}`
+}
+
+const createGroundCellId = (x: number, y: number): string => {
+  return `${x}:${y}`
 }
 
 const createLine = (orientation: MapLineOrientation, x: number, y: number, color: MapPaletteColor): MapGridLine => {
@@ -45,6 +61,52 @@ const createLine = (orientation: MapLineOrientation, x: number, y: number, color
     toY,
     color,
   }
+}
+
+const createGroundCell = (x: number, y: number, color: MapPaletteColor): MapGridGroundCell => {
+  return {
+    id: createGroundCellId(x, y),
+    x,
+    y,
+    color,
+  }
+}
+
+const buildGroundCells = (ground: MapGridGroundCell[]): MapGroundCellViewModel[] => {
+  const activeCells = new Map(ground.map((cell) => [cell.id, cell]))
+  const cells: MapGroundCellViewModel[] = []
+
+  for (let y = 0; y < mapGridHeight; y += 1) {
+    for (let x = 0; x < mapGridWidth; x += 1) {
+      const id = createGroundCellId(x, y)
+      const activeCell = activeCells.get(id)
+      cells.push({
+        id,
+        active: Boolean(activeCell),
+        color: activeCell?.color ?? 'black',
+        x,
+        y,
+      })
+    }
+  }
+
+  return cells
+}
+
+const buildPointSegments = (): MapPointViewModel[] => {
+  const points: MapPointViewModel[] = []
+
+  for (let y = 0; y <= mapGridHeight; y += 1) {
+    for (let x = 0; x <= mapGridWidth; x += 1) {
+      points.push({
+        id: createPointId(x, y),
+        x,
+        y,
+      })
+    }
+  }
+
+  return points
 }
 
 const buildLineSegments = (lines: MapGridLine[]): MapLineViewModel[] => {
@@ -88,6 +150,14 @@ const getLineById = (lineId: string): MapLineViewModel | null => {
   return buildLineSegments([]).find((line) => line.id === lineId) ?? null
 }
 
+const getPointById = (pointId: string): MapPointViewModel | null => {
+  return buildPointSegments().find((point) => point.id === pointId) ?? null
+}
+
+const getGroundCellById = (cellId: string): MapGroundCellViewModel | null => {
+  return buildGroundCells([]).find((cell) => cell.id === cellId) ?? null
+}
+
 const canDrawRange = (startLine: MapLineViewModel, endLine: MapLineViewModel): boolean => {
   if (startLine.orientation !== endLine.orientation) {
     return false
@@ -125,11 +195,36 @@ const buildRangeLines = (startLine: MapLineViewModel, endLine: MapLineViewModel,
   return lines
 }
 
-const buildRectangleLines = (startLine: MapLineViewModel, endLine: MapLineViewModel, color: MapPaletteColor): MapGridLine[] => {
-  const fromX = Math.min(startLine.x, endLine.x)
-  const toX = Math.max(startLine.x, endLine.x)
-  const fromY = Math.min(startLine.y, endLine.y)
-  const toY = Math.max(startLine.y, endLine.y)
+const buildPointRangeLines = (startPoint: MapPointViewModel, endPoint: MapPointViewModel, color: MapPaletteColor): MapGridLine[] => {
+  const lines: MapGridLine[] = []
+
+  if (startPoint.y === endPoint.y) {
+    const fromX = Math.min(startPoint.x, endPoint.x)
+    const toX = Math.max(startPoint.x, endPoint.x)
+
+    for (let x = fromX; x < toX; x += 1) {
+      lines.push(createLine('horizontal', x, startPoint.y, color))
+    }
+    return lines
+  }
+
+  if (startPoint.x === endPoint.x) {
+    const fromY = Math.min(startPoint.y, endPoint.y)
+    const toY = Math.max(startPoint.y, endPoint.y)
+
+    for (let y = fromY; y < toY; y += 1) {
+      lines.push(createLine('vertical', startPoint.x, y, color))
+    }
+  }
+
+  return lines
+}
+
+const buildRectangleLines = (startPoint: MapPointViewModel, endPoint: MapPointViewModel, color: MapPaletteColor): MapGridLine[] => {
+  const fromX = Math.min(startPoint.x, endPoint.x)
+  const toX = Math.max(startPoint.x, endPoint.x)
+  const fromY = Math.min(startPoint.y, endPoint.y)
+  const toY = Math.max(startPoint.y, endPoint.y)
 
   if (fromX === toX || fromY === toY) {
     return []
@@ -150,6 +245,53 @@ const buildRectangleLines = (startLine: MapLineViewModel, endLine: MapLineViewMo
   return lines
 }
 
+const canDrawGroundRange = (startCell: MapGroundCellViewModel, endCell: MapGroundCellViewModel): boolean => {
+  return startCell.x === endCell.x || startCell.y === endCell.y
+}
+
+const buildGroundRangeCells = (startCell: MapGroundCellViewModel, endCell: MapGroundCellViewModel, color: MapPaletteColor): MapGridGroundCell[] => {
+  if (!canDrawGroundRange(startCell, endCell)) {
+    return []
+  }
+
+  const cells: MapGridGroundCell[] = []
+
+  if (startCell.y === endCell.y) {
+    const fromX = Math.min(startCell.x, endCell.x)
+    const toX = Math.max(startCell.x, endCell.x)
+
+    for (let x = fromX; x <= toX; x += 1) {
+      cells.push(createGroundCell(x, startCell.y, color))
+    }
+    return cells
+  }
+
+  const fromY = Math.min(startCell.y, endCell.y)
+  const toY = Math.max(startCell.y, endCell.y)
+
+  for (let y = fromY; y <= toY; y += 1) {
+    cells.push(createGroundCell(startCell.x, y, color))
+  }
+
+  return cells
+}
+
+const buildGroundRectangleCells = (startCell: MapGroundCellViewModel, endCell: MapGroundCellViewModel, color: MapPaletteColor): MapGridGroundCell[] => {
+  const fromX = Math.min(startCell.x, endCell.x)
+  const toX = Math.max(startCell.x, endCell.x)
+  const fromY = Math.min(startCell.y, endCell.y)
+  const toY = Math.max(startCell.y, endCell.y)
+  const cells: MapGridGroundCell[] = []
+
+  for (let y = fromY; y <= toY; y += 1) {
+    for (let x = fromX; x <= toX; x += 1) {
+      cells.push(createGroundCell(x, y, color))
+    }
+  }
+
+  return cells
+}
+
 const replaceLines = (currentLines: MapGridLine[], nextLines: MapGridLine[]): MapGridLine[] => {
   const nextLineIds = new Set(nextLines.map((line) => line.id))
   return [...currentLines.filter((line) => !nextLineIds.has(line.id)), ...nextLines]
@@ -160,6 +302,16 @@ const removeLines = (currentLines: MapGridLine[], linesToRemove: MapGridLine[]):
   return currentLines.filter((line) => !lineIdsToRemove.has(line.id))
 }
 
+const replaceGroundCells = (currentCells: MapGridGroundCell[], nextCells: MapGridGroundCell[]): MapGridGroundCell[] => {
+  const nextCellIds = new Set(nextCells.map((cell) => cell.id))
+  return [...currentCells.filter((cell) => !nextCellIds.has(cell.id)), ...nextCells]
+}
+
+const removeGroundCells = (currentCells: MapGridGroundCell[], cellsToRemove: MapGridGroundCell[]): MapGridGroundCell[] => {
+  const cellIdsToRemove = new Set(cellsToRemove.map((cell) => cell.id))
+  return currentCells.filter((cell) => !cellIdsToRemove.has(cell.id))
+}
+
 const emptyMapForm: MapData = {
   name: '',
   description: '',
@@ -167,6 +319,7 @@ const emptyMapForm: MapData = {
     width: mapGridWidth,
     height: mapGridHeight,
     lines: [],
+    ground: [],
   },
 }
 
@@ -178,12 +331,25 @@ export const useMapEditPage = (): MapEditPageState => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [activeLayer, setActiveLayer] = useState<MapLayer>('lines')
   const [selectedColor, setSelectedColor] = useState<MapPaletteColor>('black')
   const [selectedDrawMode, setSelectedDrawMode] = useState<MapDrawMode>('single')
   const [selectedRangeStartId, setSelectedRangeStartId] = useState('')
   const [previewRangeEndId, setPreviewRangeEndId] = useState('')
   const [selectedEraseRangeStartId, setSelectedEraseRangeStartId] = useState('')
   const [previewEraseRangeEndId, setPreviewEraseRangeEndId] = useState('')
+  const [selectedRectangleStartId, setSelectedRectangleStartId] = useState('')
+  const [previewRectangleEndId, setPreviewRectangleEndId] = useState('')
+  const [selectedPointRangeStartId, setSelectedPointRangeStartId] = useState('')
+  const [previewPointRangeEndId, setPreviewPointRangeEndId] = useState('')
+  const [selectedPointEraseStartId, setSelectedPointEraseStartId] = useState('')
+  const [previewPointEraseEndId, setPreviewPointEraseEndId] = useState('')
+  const [selectedGroundRangeStartId, setSelectedGroundRangeStartId] = useState('')
+  const [previewGroundRangeEndId, setPreviewGroundRangeEndId] = useState('')
+  const [selectedEraseGroundRangeStartId, setSelectedEraseGroundRangeStartId] = useState('')
+  const [previewEraseGroundRangeEndId, setPreviewEraseGroundRangeEndId] = useState('')
+  const [selectedGroundRectangleStartId, setSelectedGroundRectangleStartId] = useState('')
+  const [previewGroundRectangleEndId, setPreviewGroundRectangleEndId] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -236,43 +402,6 @@ export const useMapEditPage = (): MapEditPageState => {
     }
 
     if (selectedDrawMode === 'range' || selectedDrawMode === 'rectangle') {
-      if (!selectedRangeStartId) {
-        setSelectedRangeStartId(lineId)
-        setSelectedEraseRangeStartId('')
-        setPreviewEraseRangeEndId('')
-        return
-      }
-
-      const startLine = getLineById(selectedRangeStartId)
-
-      if (!startLine) {
-        setSelectedRangeStartId(lineId)
-        return
-      }
-
-      if (selectedDrawMode === 'range' && !canDrawRange(startLine, lineSegment)) {
-        setSelectedRangeStartId(lineId)
-        return
-      }
-
-      const nextRangeLines = selectedDrawMode === 'rectangle'
-        ? buildRectangleLines(startLine, lineSegment, selectedColor)
-        : buildRangeLines(startLine, lineSegment, selectedColor)
-
-      if (nextRangeLines.length === 0) {
-        setSelectedRangeStartId(lineId)
-        return
-      }
-
-      setForm((current) => ({
-        ...current,
-        grid: {
-          ...current.grid,
-          lines: replaceLines(current.grid.lines, nextRangeLines),
-        },
-      }))
-      setSelectedRangeStartId('')
-      setPreviewRangeEndId('')
       return
     }
 
@@ -303,6 +432,8 @@ export const useMapEditPage = (): MapEditPageState => {
         setSelectedEraseRangeStartId(lineId)
         setSelectedRangeStartId('')
         setPreviewRangeEndId('')
+        setSelectedRectangleStartId('')
+        setPreviewRectangleEndId('')
         return
       }
 
@@ -343,11 +474,43 @@ export const useMapEditPage = (): MapEditPageState => {
     setPreviewRangeEndId('')
     setSelectedEraseRangeStartId('')
     setPreviewEraseRangeEndId('')
+    setSelectedRectangleStartId('')
+    setPreviewRectangleEndId('')
+    setSelectedPointRangeStartId('')
+    setPreviewPointRangeEndId('')
+    setSelectedPointEraseStartId('')
+    setPreviewPointEraseEndId('')
+    setSelectedGroundRangeStartId('')
+    setPreviewGroundRangeEndId('')
+    setSelectedEraseGroundRangeStartId('')
+    setPreviewEraseGroundRangeEndId('')
+    setSelectedGroundRectangleStartId('')
+    setPreviewGroundRectangleEndId('')
+  }
+
+  const handleSelectLayer = (layer: MapLayer) => {
+    setActiveLayer(layer)
+    setSelectedRangeStartId('')
+    setPreviewRangeEndId('')
+    setSelectedEraseRangeStartId('')
+    setPreviewEraseRangeEndId('')
+    setSelectedRectangleStartId('')
+    setPreviewRectangleEndId('')
+    setSelectedPointRangeStartId('')
+    setPreviewPointRangeEndId('')
+    setSelectedPointEraseStartId('')
+    setPreviewPointEraseEndId('')
+    setSelectedGroundRangeStartId('')
+    setPreviewGroundRangeEndId('')
+    setSelectedEraseGroundRangeStartId('')
+    setPreviewEraseGroundRangeEndId('')
+    setSelectedGroundRectangleStartId('')
+    setPreviewGroundRectangleEndId('')
   }
 
   const handlePreviewLine = (lineId: string) => {
-    if ((selectedDrawMode !== 'range' && selectedDrawMode !== 'rectangle') || !selectedRangeStartId) {
-      if ((selectedDrawMode === 'range' || selectedDrawMode === 'rectangle') && selectedEraseRangeStartId) {
+    if (selectedDrawMode !== 'range' || !selectedRangeStartId) {
+      if (selectedDrawMode === 'range' && selectedEraseRangeStartId) {
         setPreviewEraseRangeEndId(lineId)
       }
       return
@@ -359,6 +522,302 @@ export const useMapEditPage = (): MapEditPageState => {
   const handleClearLinePreview = () => {
     setPreviewRangeEndId('')
     setPreviewEraseRangeEndId('')
+    setPreviewRectangleEndId('')
+    setPreviewPointRangeEndId('')
+    setPreviewPointEraseEndId('')
+    setPreviewGroundRangeEndId('')
+    setPreviewEraseGroundRangeEndId('')
+    setPreviewGroundRectangleEndId('')
+  }
+
+  const handleSelectPoint = (pointId: string) => {
+    if (selectedDrawMode !== 'range' && selectedDrawMode !== 'rectangle') {
+      return
+    }
+
+    if (selectedDrawMode === 'range') {
+      if (!selectedPointRangeStartId) {
+        setSelectedPointRangeStartId(pointId)
+        setSelectedRangeStartId('')
+        setPreviewRangeEndId('')
+        setSelectedEraseRangeStartId('')
+        setPreviewEraseRangeEndId('')
+        setSelectedPointEraseStartId('')
+        setPreviewPointEraseEndId('')
+        setSelectedRectangleStartId('')
+        setPreviewRectangleEndId('')
+        return
+      }
+
+      const startPoint = getPointById(selectedPointRangeStartId)
+      const endPoint = getPointById(pointId)
+
+      if (!startPoint || !endPoint) {
+        setSelectedPointRangeStartId(pointId)
+        return
+      }
+
+      const nextRangeLines = buildPointRangeLines(startPoint, endPoint, selectedColor)
+
+      if (nextRangeLines.length === 0) {
+        setSelectedPointRangeStartId(pointId)
+        return
+      }
+
+      setForm((current) => ({
+        ...current,
+        grid: {
+          ...current.grid,
+          lines: replaceLines(current.grid.lines, nextRangeLines),
+        },
+      }))
+      setSelectedPointRangeStartId('')
+      setPreviewPointRangeEndId('')
+      setSelectedPointEraseStartId('')
+      setPreviewPointEraseEndId('')
+      return
+    }
+
+    if (!selectedRectangleStartId) {
+      setSelectedRectangleStartId(pointId)
+      setSelectedPointRangeStartId('')
+      setPreviewPointRangeEndId('')
+      setSelectedPointEraseStartId('')
+      setPreviewPointEraseEndId('')
+      setSelectedRangeStartId('')
+      setPreviewRangeEndId('')
+      setSelectedEraseRangeStartId('')
+      setPreviewEraseRangeEndId('')
+      return
+    }
+
+    const startPoint = getPointById(selectedRectangleStartId)
+    const endPoint = getPointById(pointId)
+
+    if (!startPoint || !endPoint) {
+      setSelectedRectangleStartId(pointId)
+      return
+    }
+
+    const nextRectangleLines = buildRectangleLines(startPoint, endPoint, selectedColor)
+
+    if (nextRectangleLines.length === 0) {
+      setSelectedRectangleStartId(pointId)
+      return
+    }
+
+    setForm((current) => ({
+      ...current,
+      grid: {
+        ...current.grid,
+        lines: replaceLines(current.grid.lines, nextRectangleLines),
+      },
+    }))
+    setSelectedRectangleStartId('')
+    setPreviewRectangleEndId('')
+  }
+
+  const handleRemovePoint: MapEditPageState['handleRemovePoint'] = (pointId, event) => {
+    event?.preventDefault()
+
+    if (selectedDrawMode !== 'range') {
+      return
+    }
+
+    if (!selectedPointEraseStartId) {
+      setSelectedPointEraseStartId(pointId)
+      setSelectedPointRangeStartId('')
+      setPreviewPointRangeEndId('')
+      setSelectedRangeStartId('')
+      setPreviewRangeEndId('')
+      setSelectedEraseRangeStartId('')
+      setPreviewEraseRangeEndId('')
+      setSelectedRectangleStartId('')
+      setPreviewRectangleEndId('')
+      return
+    }
+
+    const startPoint = getPointById(selectedPointEraseStartId)
+    const endPoint = getPointById(pointId)
+
+    if (!startPoint || !endPoint) {
+      setSelectedPointEraseStartId(pointId)
+      return
+    }
+
+    const nextRangeLines = buildPointRangeLines(startPoint, endPoint, selectedColor)
+
+    if (nextRangeLines.length === 0) {
+      setSelectedPointEraseStartId(pointId)
+      return
+    }
+
+    setForm((current) => ({
+      ...current,
+      grid: {
+        ...current.grid,
+        lines: removeLines(current.grid.lines, nextRangeLines),
+      },
+    }))
+    setSelectedPointEraseStartId('')
+    setPreviewPointEraseEndId('')
+  }
+
+  const handleToggleGroundCell = (cellId: string) => {
+    const groundCell = getGroundCellById(cellId)
+
+    if (!groundCell) {
+      return
+    }
+
+    if (selectedDrawMode === 'single') {
+      setForm((current) => ({
+        ...current,
+        grid: {
+          ...current.grid,
+          ground: replaceGroundCells(current.grid.ground, [createGroundCell(groundCell.x, groundCell.y, selectedColor)]),
+        },
+      }))
+      return
+    }
+
+    if (selectedDrawMode === 'range') {
+      if (!selectedGroundRangeStartId) {
+        setSelectedGroundRangeStartId(cellId)
+        setSelectedEraseGroundRangeStartId('')
+        setPreviewEraseGroundRangeEndId('')
+        setSelectedGroundRectangleStartId('')
+        setPreviewGroundRectangleEndId('')
+        return
+      }
+
+      const startCell = getGroundCellById(selectedGroundRangeStartId)
+
+      if (!startCell || !canDrawGroundRange(startCell, groundCell)) {
+        setSelectedGroundRangeStartId(cellId)
+        return
+      }
+
+      const nextGroundCells = buildGroundRangeCells(startCell, groundCell, selectedColor)
+      setForm((current) => ({
+        ...current,
+        grid: {
+          ...current.grid,
+          ground: replaceGroundCells(current.grid.ground, nextGroundCells),
+        },
+      }))
+      setSelectedGroundRangeStartId('')
+      setPreviewGroundRangeEndId('')
+      return
+    }
+
+    if (!selectedGroundRectangleStartId) {
+      setSelectedGroundRectangleStartId(cellId)
+      setSelectedGroundRangeStartId('')
+      setPreviewGroundRangeEndId('')
+      setSelectedEraseGroundRangeStartId('')
+      setPreviewEraseGroundRangeEndId('')
+      return
+    }
+
+    const startCell = getGroundCellById(selectedGroundRectangleStartId)
+
+    if (!startCell) {
+      setSelectedGroundRectangleStartId(cellId)
+      return
+    }
+
+    const nextGroundCells = buildGroundRectangleCells(startCell, groundCell, selectedColor)
+    setForm((current) => ({
+      ...current,
+      grid: {
+        ...current.grid,
+        ground: replaceGroundCells(current.grid.ground, nextGroundCells),
+      },
+    }))
+    setSelectedGroundRectangleStartId('')
+    setPreviewGroundRectangleEndId('')
+  }
+
+  const handleRemoveGroundCell: MapEditPageState['handleRemoveGroundCell'] = (cellId, event) => {
+    event?.preventDefault()
+    const groundCell = getGroundCellById(cellId)
+
+    if (!groundCell) {
+      return
+    }
+
+    if (selectedDrawMode === 'range') {
+      if (!selectedEraseGroundRangeStartId) {
+        setSelectedEraseGroundRangeStartId(cellId)
+        setSelectedGroundRangeStartId('')
+        setPreviewGroundRangeEndId('')
+        setSelectedGroundRectangleStartId('')
+        setPreviewGroundRectangleEndId('')
+        return
+      }
+
+      const startCell = getGroundCellById(selectedEraseGroundRangeStartId)
+
+      if (!startCell || !canDrawGroundRange(startCell, groundCell)) {
+        setSelectedEraseGroundRangeStartId(cellId)
+        return
+      }
+
+      const nextGroundCells = buildGroundRangeCells(startCell, groundCell, selectedColor)
+      setForm((current) => ({
+        ...current,
+        grid: {
+          ...current.grid,
+          ground: removeGroundCells(current.grid.ground, nextGroundCells),
+        },
+      }))
+      setSelectedEraseGroundRangeStartId('')
+      setPreviewEraseGroundRangeEndId('')
+      return
+    }
+
+    setSelectedGroundRangeStartId('')
+    setPreviewGroundRangeEndId('')
+    setForm((current) => ({
+      ...current,
+      grid: {
+        ...current.grid,
+        ground: current.grid.ground.filter((cell) => cell.id !== cellId),
+      },
+    }))
+  }
+
+  const handlePreviewPoint = (pointId: string) => {
+    if (selectedDrawMode === 'range' && selectedPointEraseStartId) {
+      setPreviewPointEraseEndId(pointId)
+      return
+    }
+
+    if (selectedDrawMode === 'range' && selectedPointRangeStartId) {
+      setPreviewPointRangeEndId(pointId)
+      return
+    }
+
+    if (selectedDrawMode === 'rectangle' && selectedRectangleStartId) {
+      setPreviewRectangleEndId(pointId)
+    }
+  }
+
+  const handlePreviewGroundCell = (cellId: string) => {
+    if (selectedDrawMode === 'range' && selectedEraseGroundRangeStartId) {
+      setPreviewEraseGroundRangeEndId(cellId)
+      return
+    }
+
+    if (selectedDrawMode === 'range' && selectedGroundRangeStartId) {
+      setPreviewGroundRangeEndId(cellId)
+      return
+    }
+
+    if (selectedDrawMode === 'rectangle' && selectedGroundRectangleStartId) {
+      setPreviewGroundRectangleEndId(cellId)
+    }
   }
 
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
@@ -385,36 +844,86 @@ export const useMapEditPage = (): MapEditPageState => {
   const startPreviewLine = selectedRangeStartId ? getLineById(selectedRangeStartId) : null
   const endPreviewLine = previewRangeEndId ? getLineById(previewRangeEndId) : null
   const previewLineIds = startPreviewLine && endPreviewLine
-    ? (selectedDrawMode === 'rectangle' ? buildRectangleLines(startPreviewLine, endPreviewLine, selectedColor) : buildRangeLines(startPreviewLine, endPreviewLine, selectedColor)).map((line) => line.id)
+    ? buildRangeLines(startPreviewLine, endPreviewLine, selectedColor).map((line) => line.id)
     : []
   const startErasePreviewLine = selectedEraseRangeStartId ? getLineById(selectedEraseRangeStartId) : null
   const endErasePreviewLine = previewEraseRangeEndId ? getLineById(previewEraseRangeEndId) : null
   const previewEraseLineIds = startErasePreviewLine && endErasePreviewLine
     ? buildRangeLines(startErasePreviewLine, endErasePreviewLine, selectedColor).map((line) => line.id)
     : []
+  const startPointRangePreviewPoint = selectedPointRangeStartId ? getPointById(selectedPointRangeStartId) : null
+  const endPointRangePreviewPoint = previewPointRangeEndId ? getPointById(previewPointRangeEndId) : null
+  const previewPointRangeLineIds = startPointRangePreviewPoint && endPointRangePreviewPoint
+    ? buildPointRangeLines(startPointRangePreviewPoint, endPointRangePreviewPoint, selectedColor).map((line) => line.id)
+    : []
+  const startPointErasePreviewPoint = selectedPointEraseStartId ? getPointById(selectedPointEraseStartId) : null
+  const endPointErasePreviewPoint = previewPointEraseEndId ? getPointById(previewPointEraseEndId) : null
+  const previewPointEraseLineIds = startPointErasePreviewPoint && endPointErasePreviewPoint
+    ? buildPointRangeLines(startPointErasePreviewPoint, endPointErasePreviewPoint, selectedColor).map((line) => line.id)
+    : []
+  const startRectanglePreviewPoint = selectedRectangleStartId ? getPointById(selectedRectangleStartId) : null
+  const endRectanglePreviewPoint = previewRectangleEndId ? getPointById(previewRectangleEndId) : null
+  const previewRectangleLineIds = startRectanglePreviewPoint && endRectanglePreviewPoint
+    ? buildRectangleLines(startRectanglePreviewPoint, endRectanglePreviewPoint, selectedColor).map((line) => line.id)
+    : []
+  const startGroundRangePreviewCell = selectedGroundRangeStartId ? getGroundCellById(selectedGroundRangeStartId) : null
+  const endGroundRangePreviewCell = previewGroundRangeEndId ? getGroundCellById(previewGroundRangeEndId) : null
+  const previewGroundCellIds = startGroundRangePreviewCell && endGroundRangePreviewCell
+    ? buildGroundRangeCells(startGroundRangePreviewCell, endGroundRangePreviewCell, selectedColor).map((cell) => cell.id)
+    : []
+  const startGroundErasePreviewCell = selectedEraseGroundRangeStartId ? getGroundCellById(selectedEraseGroundRangeStartId) : null
+  const endGroundErasePreviewCell = previewEraseGroundRangeEndId ? getGroundCellById(previewEraseGroundRangeEndId) : null
+  const previewEraseGroundCellIds = startGroundErasePreviewCell && endGroundErasePreviewCell
+    ? buildGroundRangeCells(startGroundErasePreviewCell, endGroundErasePreviewCell, selectedColor).map((cell) => cell.id)
+    : []
+  const startGroundRectanglePreviewCell = selectedGroundRectangleStartId ? getGroundCellById(selectedGroundRectangleStartId) : null
+  const endGroundRectanglePreviewCell = previewGroundRectangleEndId ? getGroundCellById(previewGroundRectangleEndId) : null
+  const previewRectangleGroundCellIds = startGroundRectanglePreviewCell && endGroundRectanglePreviewCell
+    ? buildGroundRectangleCells(startGroundRectanglePreviewCell, endGroundRectanglePreviewCell, selectedColor).map((cell) => cell.id)
+    : []
 
   return {
+    activeLayer,
     colorOptions,
     drawModeOptions,
     error,
     form,
-    gridCells,
     handleChange,
     handleClearLinePreview,
     handlePreviewLine,
+    handlePreviewPoint,
     handleRemoveLine,
+    handleRemovePoint,
+    handleRemoveGroundCell,
+    handleSelectPoint,
     handleSelectDrawMode,
+    handleSelectLayer,
     handleSelectColor: setSelectedColor,
     handleSubmit,
     handleToggleLine,
+    handleToggleGroundCell,
+    handlePreviewGroundCell,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
+    groundCells: buildGroundCells(form.grid.ground),
+    layerOptions,
     lineSegments: buildLineSegments(form.grid.lines),
     loading,
-    previewEraseLineIds,
-    previewLineIds,
+    pointSegments: buildPointSegments(),
+    previewEraseLineIds: [...previewEraseLineIds, ...previewPointEraseLineIds],
+    previewEraseGroundCellIds,
+    previewGroundCellIds,
+    previewLineIds: [...previewLineIds, ...previewPointRangeLineIds],
+    previewRectangleLineIds,
+    previewRectangleGroundCellIds,
     selectedColor,
     selectedDrawMode,
+    selectedEraseGroundRangeStartId,
+    selectedGroundRangeStartId,
+    selectedGroundRectangleStartId,
     selectedEraseRangeStartId,
+    selectedPointEraseStartId,
+    selectedRectangleStartId,
+    selectedPointRangeStartId,
     selectedRangeStartId,
     saving,
   }
