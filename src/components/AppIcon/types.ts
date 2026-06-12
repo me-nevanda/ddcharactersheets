@@ -10,6 +10,7 @@ export type AppIconName =
   | 'edit'
   | 'event'
   | 'magic'
+  | 'map'
   | 'minion'
   | 'monster'
   | 'area'

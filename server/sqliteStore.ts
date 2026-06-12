@@ -28,6 +28,13 @@ interface EventRow {
   updated_at: string
 }
 
+interface MapRow {
+  id: string
+  name: string
+  description: string
+  updated_at: string
+}
+
 interface ContextRow {
   id: string
   name: string
@@ -135,6 +142,12 @@ interface StoredEventOptions<TData> {
   normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
   validate?: (data: TData) => void
   imageUrl?: (id: string) => string
+}
+
+interface StoredMapOptions<TData> {
+  tableName: string
+  normalize: (data: Partial<Record<keyof TData, unknown>>) => TData
+  validate?: (data: TData) => void
 }
 
 interface StoredContextOptions<TData> {
@@ -507,6 +520,21 @@ const ensureEventTables = (db: Database.Database): void => {
   `)
 }
 
+const ensureMapTables = (db: Database.Database): void => {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS maps (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_maps_updated_at ON maps (updated_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_maps_name ON maps (name COLLATE NOCASE);
+  `)
+}
+
 const createContextRelationTables = (db: Database.Database): void => {
   db.exec(`
     CREATE TABLE IF NOT EXISTS context_characters (
@@ -728,6 +756,7 @@ const getDatabase = (): Database.Database => {
   `)
   ensureAreaTables(database)
   ensureEventTables(database)
+  ensureMapTables(database)
   ensureContextTables(database)
 
   return database
@@ -839,6 +868,21 @@ const buildEvent = <TData, TEntity>(
   return {
     id: row.id,
     ...(options.imageUrl ? { imageUrl: options.imageUrl(row.id) } : {}),
+    ...normalized,
+    updatedAt: row.updated_at,
+  } as TEntity
+}
+
+const buildMap = <TData, TEntity>(
+  row: MapRow,
+  options: StoredMapOptions<TData>,
+): TEntity => {
+  const normalized = options.normalize({
+    name: row.name,
+    description: row.description,
+  } as Partial<Record<keyof TData, unknown>>)
+  return {
+    id: row.id,
     ...normalized,
     updatedAt: row.updated_at,
   } as TEntity
@@ -1450,6 +1494,46 @@ const executeEventUpsert = <TData>(
   const existing = getDatabase().prepare('SELECT created_at FROM events WHERE id = ?').get(id) as { created_at: string } | undefined
   getDatabase().prepare(`
     INSERT INTO events (id, name, description, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      name = excluded.name,
+      description = excluded.description,
+      updated_at = excluded.updated_at
+  `).run(
+    id,
+    normalizeStoredText((payload as { name?: unknown }).name),
+    normalizeStoredText((payload as { description?: unknown }).description),
+    existing?.created_at ?? updatedAt,
+    updatedAt,
+  )
+}
+
+const executeMapInsert = <TData>(
+  id: string,
+  payload: TData,
+  createdAt: string,
+  updatedAt: string,
+): void => {
+  getDatabase().prepare(`
+    INSERT INTO maps (id, name, description, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(
+    id,
+    normalizeStoredText((payload as { name?: unknown }).name),
+    normalizeStoredText((payload as { description?: unknown }).description),
+    createdAt,
+    updatedAt,
+  )
+}
+
+const executeMapUpsert = <TData>(
+  id: string,
+  payload: TData,
+  updatedAt: string,
+): void => {
+  const existing = getDatabase().prepare('SELECT created_at FROM maps WHERE id = ?').get(id) as { created_at: string } | undefined
+  getDatabase().prepare(`
+    INSERT INTO maps (id, name, description, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?)
     ON CONFLICT(id) DO UPDATE SET
       name = excluded.name,
@@ -2276,6 +2360,18 @@ export const listStoredEvents = async <TData, TEntity>(
   return rows.map((row) => buildEvent(row, options))
 }
 
+export const listStoredMaps = async <TData, TEntity>(
+  options: StoredMapOptions<TData>,
+): Promise<TEntity[]> => {
+  const rows = getDatabase().prepare(`
+    SELECT id, name, description, updated_at
+    FROM maps
+    ORDER BY updated_at DESC, id DESC
+  `).all() as MapRow[]
+
+  return rows.map((row) => buildMap(row, options))
+}
+
 export const listStoredContexts = async <TData, TEntity>(
   options: StoredContextOptions<TData>,
 ): Promise<TEntity[]> => {
@@ -2386,6 +2482,23 @@ export const readStoredEvent = async <TData, TEntity>(
   }
 
   return buildEvent(row, options)
+}
+
+export const readStoredMap = async <TData, TEntity>(
+  id: string,
+  options: StoredMapOptions<TData>,
+): Promise<TEntity> => {
+  const row = getDatabase().prepare(`
+    SELECT id, name, description, updated_at
+    FROM maps
+    WHERE id = ?
+  `).get(id) as MapRow | undefined
+
+  if (!row) {
+    throw createNotFoundError()
+  }
+
+  return buildMap(row, options)
 }
 
 export const readStoredContext = async <TData, TEntity>(
@@ -2512,6 +2625,18 @@ export const createStoredEvent = async <TData, TEntity>(
   const now = new Date().toISOString()
   executeEventInsert(id, payload, now, now)
   return readStoredEvent(id, options)
+}
+
+export const createStoredMap = async <TData, TEntity>(
+  options: StoredMapOptions<TData>,
+  data: Partial<Record<keyof TData, unknown>> = {},
+): Promise<TEntity> => {
+  const id = `${Date.now()}-${randomUUID().slice(0, 8)}`
+  const payload = options.normalize(data)
+  options.validate?.(payload)
+  const now = new Date().toISOString()
+  executeMapInsert(id, payload, now, now)
+  return readStoredMap(id, options)
 }
 
 export const createStoredContext = async <TData, TEntity>(
@@ -2653,6 +2778,32 @@ export const updateStoredEvent = async <TData, TEntity>(
 
   executeEventUpsert(id, payload, new Date().toISOString())
   return readStoredEvent(id, options)
+}
+
+export const updateStoredMap = async <TData, TEntity>(
+  id: string,
+  data: unknown,
+  options: StoredMapOptions<TData>,
+): Promise<TEntity> => {
+  const existing = getDatabase().prepare(`
+    SELECT id, name, description, updated_at
+    FROM maps
+    WHERE id = ?
+  `).get(id) as MapRow | undefined
+
+  if (!existing) {
+    throw createNotFoundError()
+  }
+
+  const payload = options.normalize({
+    name: existing.name,
+    description: existing.description,
+    ...(typeof data === 'object' && data !== null ? (data as Partial<Record<keyof TData, unknown>>) : {}),
+  } as Partial<Record<keyof TData, unknown>>)
+  options.validate?.(payload)
+
+  executeMapUpsert(id, payload, new Date().toISOString())
+  return readStoredMap(id, options)
 }
 
 export const updateStoredContext = async <TData, TEntity>(

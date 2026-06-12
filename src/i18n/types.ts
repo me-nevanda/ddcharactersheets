@@ -54,6 +54,7 @@ export interface TranslationDictionary {
       invalidAdventureId: string
       invalidAreaId: string
       invalidEventId: string
+      invalidMapId: string
       invalidContextId: string
       invalidJsonBody: string
       invalidCharacterImage: string
@@ -78,6 +79,7 @@ export interface TranslationDictionary {
       adventureNotFound: string
       areaNotFound: string
       eventNotFound: string
+      mapNotFound: string
       contextNotFound: string
       notFound: string
       unexpectedServerError: string
@@ -94,6 +96,7 @@ export interface TranslationDictionary {
         adventures: string
         areas: string
         events: string
+        maps: string
         contexts: string
       }
     }
@@ -149,6 +152,34 @@ export interface TranslationDictionary {
           title: string
           body: string
         }
+      }
+    }
+    mapList: {
+      actions: {
+        addMap: string
+      }
+      emptyState: string
+      emptySearchState: string
+      loading: string
+      searchLabel: string
+      searchPlaceholder: string
+      unnamedMap: string
+      updatedAt: string
+      deleteDialog: {
+        title: string
+        body: string
+      }
+    }
+    mapEdit: {
+      eyebrow: string
+      loading: string
+      fields: {
+        name: string
+        description: string
+      }
+      placeholders: {
+        titleName: string
+        description: string
       }
     }
     contextList: {

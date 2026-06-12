@@ -15,6 +15,7 @@ const iconMap: Record<AppIconProps['name'], IconSvgElement> = {
     edit: PencilEdit01Icon,
     event: Calendar03Icon,
     magic: MagicWand01Icon,
+    map: MapPinIcon,
     minion: UserIcon,
     monster: AxeIcon,
     area: MapPinIcon,

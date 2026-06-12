@@ -6,6 +6,7 @@ import { CharacterEditPage } from '@pages/CharacterEditPage';
 import { CharacterGroupEditPage } from '@pages/CharacterGroupEditPage';
 import { ContextEditPage } from '@pages/ContextEditPage';
 import { EventEditPage } from '@pages/EventEditPage';
+import { MapEditPage } from '@pages/MapEditPage';
 import { MainPage } from '@pages/main';
 import { MainPageProvider } from '@pages/main/mainPageContext';
 import { MonsterEditPage } from '@pages/MonsterEditPage';
@@ -34,6 +35,7 @@ const App = () => {
           <Route path="/npc-groups/:groupId/edit" element={<NpcGroupEditPage />}/>
           <Route path="/areas/:areaId/edit" element={<AreaEditPage />}/>
           <Route path="/events/:eventId/edit" element={<EventEditPage />}/>
+          <Route path="/maps/:mapId/edit" element={<MapEditPage />}/>
           <Route path="/contexts/:contextId/edit" element={<ContextEditPage />}/>
           <Route path="/characters/:characterId/print/abilities" element={<CharacterAbilitiesPrintPage />}/>
           <Route path="/characters/:characterId/print/items" element={<CharacterItemsPrintPage />}/>

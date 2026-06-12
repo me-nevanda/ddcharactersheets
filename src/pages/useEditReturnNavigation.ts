@@ -12,7 +12,7 @@ export interface EditReturnState {
 }
 
 const isMainTabKey = (value: unknown): value is MainTabKey => {
-  return value === 'heroes' || value === 'monsters' || value === 'npcs' || value === 'adventures' || value === 'areas' || value === 'events' || value === 'contexts'
+  return value === 'heroes' || value === 'monsters' || value === 'npcs' || value === 'adventures' || value === 'areas' || value === 'events' || value === 'maps' || value === 'contexts'
 }
 
 const isListTabKey = (value: unknown): value is MainCharacterListTabKey | MainMonsterListTabKey | MainNpcListTabKey => {

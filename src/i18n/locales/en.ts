@@ -55,6 +55,7 @@ export const en: TranslationDictionary = {
       invalidAdventureId: 'The adventure ID is invalid.',
       invalidAreaId: 'The area ID is invalid.',
       invalidEventId: 'The event ID is invalid.',
+      invalidMapId: 'The map ID is invalid.',
       invalidContextId: 'The context ID is invalid.',
       invalidJsonBody: 'The request payload is invalid.',
       invalidCharacterImage: 'The hero image must be a PNG or JPG file.',
@@ -79,6 +80,7 @@ export const en: TranslationDictionary = {
       adventureNotFound: 'Adventure not found.',
       areaNotFound: 'Area not found.',
       eventNotFound: 'Event not found.',
+      mapNotFound: 'Map not found.',
       contextNotFound: 'Context not found.',
       notFound: 'Resource not found.',
       unexpectedServerError: 'An unexpected server error occurred.',
@@ -95,6 +97,7 @@ export const en: TranslationDictionary = {
         adventures: 'Adventures',
         areas: 'Areas',
         events: 'Events',
+        maps: 'Maps',
         contexts: 'Contexts',
       },
     },
@@ -150,6 +153,34 @@ export const en: TranslationDictionary = {
           title: 'Remove event image?',
           body: 'The "{name}" will be removed from this event.',
         },
+      },
+    },
+    mapList: {
+      actions: {
+        addMap: 'Add map',
+      },
+      emptyState: 'There are no maps yet. Add one to start editing.',
+      emptySearchState: 'No maps match your search.',
+      loading: 'Loading maps...',
+      searchLabel: 'Search maps',
+      searchPlaceholder: 'Search by map name',
+      unnamedMap: 'Unnamed map',
+      updatedAt: 'Last updated:',
+      deleteDialog: {
+        title: 'Delete this map?',
+        body: 'The map "{name}" will be deleted permanently.',
+      },
+    },
+    mapEdit: {
+      eyebrow: 'MAP',
+      loading: 'Loading map...',
+      fields: {
+        name: 'Name',
+        description: 'Description',
+      },
+      placeholders: {
+        titleName: 'Unnamed map',
+        description: 'Map description',
       },
     },
     contextList: {

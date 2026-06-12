@@ -1,4 +1,4 @@
-export type MainTabKey = 'heroes' | 'monsters' | 'npcs' | 'adventures' | 'areas' | 'events' | 'contexts'
+export type MainTabKey = 'heroes' | 'monsters' | 'npcs' | 'adventures' | 'areas' | 'events' | 'maps' | 'contexts'
 export type MainCharacterListTabKey = 'groups' | 'list'
 export type MainMonsterListTabKey = 'groups' | 'list'
 export type MainNpcListTabKey = 'groups' | 'list'

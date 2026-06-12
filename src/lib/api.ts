@@ -2,6 +2,7 @@ import type { Adventure, AdventureData } from '@appTypes/adventure';
 import type { Character, CharacterData, CharacterGroup, CharacterHistoryEntry } from '@appTypes/character';
 import type { Context, ContextData } from '@appTypes/context';
 import type { Event, EventData } from '@appTypes/event';
+import type { Map, MapData } from '@appTypes/map';
 import type { Monster, MonsterData, MonsterGroup } from '@appTypes/monster';
 import type { Npc, NpcData, NpcGroup } from '@appTypes/npc';
 import type { Area, AreaData } from '@appTypes/area';
@@ -19,6 +20,8 @@ interface ApiEnvelope<T> {
     contexts?: T[];
     event?: T;
     events?: T[];
+    map?: T;
+    maps?: T[];
     monster?: T;
     monsters?: T[];
     monsterGroup?: T;
@@ -576,6 +579,41 @@ export const deleteEventImage = async (eventId: string): Promise<Event> => {
         throw new Error('errors.api.generic');
     }
     return payload.event;
+};
+export const listMaps = async (): Promise<Map[]> => {
+    const payload = await requestJson<ApiEnvelope<Map>>('/api/maps');
+    return payload?.maps ?? [];
+};
+export const createMap = async (): Promise<Map> => {
+    const payload = await requestJson<ApiEnvelope<Map>>('/api/maps', {
+        method: 'POST',
+    });
+    if (!payload?.map) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.map;
+};
+export const getMap = async (mapId: string): Promise<Map> => {
+    const payload = await requestJson<ApiEnvelope<Map>>(`/api/maps/${mapId}`);
+    if (!payload?.map) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.map;
+};
+export const saveMap = async (mapId: string, map: MapData): Promise<Map> => {
+    const payload = await requestJson<ApiEnvelope<Map>>(`/api/maps/${mapId}`, {
+        method: 'PUT',
+        body: JSON.stringify(map),
+    });
+    if (!payload?.map) {
+        throw new Error('errors.api.generic');
+    }
+    return payload.map;
+};
+export const deleteMap = async (mapId: string): Promise<void> => {
+    await requestJson<null>(`/api/maps/${mapId}`, {
+        method: 'DELETE',
+    });
 };
 export const listAreas = async (): Promise<Area[]> => {
     const payload = await requestJson<ApiEnvelope<Area>>('/api/areas');

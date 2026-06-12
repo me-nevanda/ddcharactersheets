@@ -55,6 +55,7 @@ export const pl: TranslationDictionary = {
       invalidAdventureId: 'Nieprawidłowy identyfikator przygody.',
       invalidAreaId: 'Nieprawidłowy identyfikator obszaru.',
       invalidEventId: 'Nieprawidłowy identyfikator wydarzenia.',
+      invalidMapId: 'Nieprawidłowy identyfikator mapy.',
       invalidContextId: 'Nieprawidłowy identyfikator kontekstu.',
       invalidJsonBody: 'Nieprawidłowe dane żądania.',
       invalidCharacterImage: 'Obraz bohatera musi być plikiem PNG albo JPG.',
@@ -79,6 +80,7 @@ export const pl: TranslationDictionary = {
       adventureNotFound: 'Nie znaleziono przygody.',
       areaNotFound: 'Nie znaleziono obszaru.',
       eventNotFound: 'Nie znaleziono wydarzenia.',
+      mapNotFound: 'Nie znaleziono mapy.',
       contextNotFound: 'Nie znaleziono kontekstu.',
       notFound: 'Nie znaleziono zasobu.',
       unexpectedServerError: 'Wystąpił nieoczekiwany błąd serwera.',
@@ -95,6 +97,7 @@ export const pl: TranslationDictionary = {
         adventures: 'Przygody',
         areas: 'Obszary',
         events: 'Wydarzenia',
+        maps: 'Mapy',
         contexts: 'Konteksty',
       },
     },
@@ -150,6 +153,34 @@ export const pl: TranslationDictionary = {
           title: 'Usunąć obraz wydarzenia?',
           body: '„{name}” zostanie usunięty z wydarzenia.',
         },
+      },
+    },
+    mapList: {
+      actions: {
+        addMap: 'Dodaj mapę',
+      },
+      emptyState: 'Nie ma jeszcze żadnych map. Dodaj pierwszą i przejdź do edycji.',
+      emptySearchState: 'Brak map pasujących do wyszukiwania.',
+      loading: 'Wczytywanie map...',
+      searchLabel: 'Szukaj map',
+      searchPlaceholder: 'Szukaj po nazwie mapy',
+      unnamedMap: 'Mapa bez nazwy',
+      updatedAt: 'Ostatnia zmiana:',
+      deleteDialog: {
+        title: 'Usunąć mapę?',
+        body: 'Mapa „{name}” zostanie usunięta na stałe.',
+      },
+    },
+    mapEdit: {
+      eyebrow: 'MAPA',
+      loading: 'Wczytywanie mapy...',
+      fields: {
+        name: 'Nazwa',
+        description: 'Opis',
+      },
+      placeholders: {
+        titleName: 'Mapa bez nazwy',
+        description: 'Opis mapy',
       },
     },
     contextList: {

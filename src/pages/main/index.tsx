@@ -3,6 +3,7 @@ import { AdventureListPage } from '@pages/AdventureListPage'
 import { CharacterListPage } from '@pages/CharacterListPage'
 import { ContextsListPage } from '@pages/ContextsListPage'
 import { EventsListPage } from '@pages/EventsListPage'
+import { MapsListPage } from '@pages/MapsListPage'
 import { MonstersListPage } from '@pages/MonstersListPage'
 import { NpcsListPage } from '@pages/NpcsListPage'
 import { AreaListPage } from '@pages/AreaListPage'
@@ -32,6 +33,9 @@ export const MainPage = () => {
           <button className={`${styles.tabButton} ${activeTab === 'events' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('events')}>
             {t('pages.main.tabs.events')}
           </button>
+          <button className={`${styles.tabButton} ${activeTab === 'maps' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('maps')}>
+            {t('pages.main.tabs.maps')}
+          </button>
           <button className={`${styles.tabButton} ${activeTab === 'contexts' ? styles.tabButtonActive : ''}`} type="button" onClick={() => handleTabChange('contexts')}>
             {t('pages.main.tabs.contexts')}
           </button>
@@ -44,6 +48,7 @@ export const MainPage = () => {
           {activeTab === 'adventures' ? <AdventureListPage /> : null}
           {activeTab === 'areas' ? <AreaListPage /> : null}
           {activeTab === 'events' ? <EventsListPage /> : null}
+          {activeTab === 'maps' ? <MapsListPage /> : null}
           {activeTab === 'contexts' ? <ContextsListPage /> : null}
         </div>
       </div>

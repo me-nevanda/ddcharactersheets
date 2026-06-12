@@ -7,6 +7,7 @@ import { createCharacter, deleteCharacter, deleteCharacterImage, isSafeCharacter
 import { createContext, deleteContext, deleteContextImage, isSafeContextId, listContexts, readContext, readContextImage, updateContext, updateContextImage } from './server/contextStore';
 import { createEvent, deleteEvent, deleteEventImage, isSafeEventId, listEvents, readEvent, readEventImage, updateEvent, updateEventImage } from './server/eventStore';
 import { countGeminiTokens, createGeminiResponse } from './server/geminiService';
+import { createMap, deleteMap, isSafeMapId, listMaps, readMap, updateMap } from './server/mapStore';
 import { createMonsterGroup, deleteMonsterGroup, isSafeMonsterGroupId, listMonsterGroups, readMonsterGroup, updateMonsterGroup } from './server/monsterGroupStore';
 import { createMonster, deleteMonster, deleteMonsterImage, isSafeMonsterId, listMonsters, readMonster, readMonsterImage, updateMonster, updateMonsterImage } from './server/monsterStore';
 import { createNpcGroup, deleteNpcGroup, isSafeNpcGroupId, listNpcGroups, readNpcGroup, updateNpcGroup } from './server/npcGroupStore';
@@ -849,6 +850,76 @@ const createEventsApiPlugin = (): Plugin => {
         },
     };
 };
+const createMapsApiPlugin = (): Plugin => {
+    const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
+        const url = new URL(request.url ?? '/', 'http://localhost');
+        if (!url.pathname.startsWith('/api/maps')) {
+            next();
+            return;
+        }
+        try {
+            if (request.method === 'GET' && url.pathname === '/api/maps') {
+                sendJson(response, 200, { maps: await listMaps() });
+                return;
+            }
+            if (request.method === 'POST' && url.pathname === '/api/maps') {
+                sendJson(response, 201, { map: await createMap() });
+                return;
+            }
+            const match = url.pathname.match(/^\/api\/maps\/([^/]+)$/);
+            if (match) {
+                const mapId = match[1];
+                if (!isSafeMapId(mapId)) {
+                    sendError(response, 400, 'errors.api.invalidMapId');
+                    return;
+                }
+                if (request.method === 'GET') {
+                    sendJson(response, 200, { map: await readMap(mapId) });
+                    return;
+                }
+                if (request.method === 'PUT') {
+                    const payload = await readJsonBody(request);
+                    sendJson(response, 200, {
+                        map: await updateMap(mapId, payload),
+                    });
+                    return;
+                }
+                if (request.method === 'DELETE') {
+                    await deleteMap(mapId);
+                    response.statusCode = 204;
+                    response.end();
+                    return;
+                }
+            }
+            sendError(response, 404, 'errors.api.notFound');
+        }
+        catch (error) {
+            const apiError = error as ApiError;
+            if (apiError.code === 'ENOENT') {
+                sendError(response, 404, 'errors.api.mapNotFound');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_JSON_BODY') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidJsonBody');
+                return;
+            }
+            if (apiError.code === 'API_INVALID_MAP_ID') {
+                sendError(response, apiError.statusCode ?? 400, 'errors.api.invalidMapId');
+                return;
+            }
+            sendError(response, apiError.statusCode ?? 500, 'errors.api.unexpectedServerError');
+        }
+    };
+    return {
+        name: 'maps-api',
+        configureServer(server) {
+            server.middlewares.use(handler);
+        },
+        configurePreviewServer(server) {
+            server.middlewares.use(handler);
+        },
+    };
+};
 const createGeminiApiPlugin = (): Plugin => {
     const handler: Connect.NextHandleFunction = async (request: MiddlewareRequest, response: ServerResponse, next: NextFunction) => {
         const url = new URL(request.url ?? '/', 'http://localhost');
@@ -913,7 +984,7 @@ const createGeminiApiPlugin = (): Plugin => {
     };
 };
 export default defineConfig({
-    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createNpcsApiPlugin(), createAreasApiPlugin(), createEventsApiPlugin(), createContextsApiPlugin(), createGeminiApiPlugin()],
+    plugins: [react(), createCharactersApiPlugin(), createAdventuresApiPlugin(), createMonstersApiPlugin(), createNpcsApiPlugin(), createAreasApiPlugin(), createEventsApiPlugin(), createMapsApiPlugin(), createContextsApiPlugin(), createGeminiApiPlugin()],
     resolve: {
         alias: {
             '@pages': '/src/pages',
