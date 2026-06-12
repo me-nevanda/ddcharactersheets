@@ -1,0 +1,4 @@
+interface:
+  display_name: "Map Generator Workflow"
+  short_description: "Guide DID map editor changes"
+  default_prompt: "Use -generator-workflow to modify the DID map editor safely."
