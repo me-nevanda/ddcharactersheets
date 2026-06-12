@@ -172,8 +172,26 @@ export const pl: TranslationDictionary = {
       },
     },
     mapEdit: {
+      drawModeLabel: 'Sposób rysowania',
       eyebrow: 'MAPA',
+      editorLabel: 'Edytor mapy',
       loading: 'Wczytywanie mapy...',
+      paletteLabel: 'Kolory linii mapy',
+      toggleLineLabel: 'Przełącz linię mapy',
+      drawModes: {
+        single: 'Pojedyncza',
+        range: 'Odcinek',
+        rectangle: 'Prostokąt',
+      },
+      colors: {
+        black: 'Czarny',
+        red: 'Czerwony',
+        green: 'Zielony',
+        blue: 'Niebieski',
+        white: 'Biały',
+        gray: 'Szary',
+        yellow: 'Żółty',
+      },
       fields: {
         name: 'Nazwa',
         description: 'Opis',

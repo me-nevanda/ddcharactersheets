@@ -171,8 +171,26 @@ export interface TranslationDictionary {
       }
     }
     mapEdit: {
+      drawModeLabel: string
       eyebrow: string
+      editorLabel: string
       loading: string
+      paletteLabel: string
+      toggleLineLabel: string
+      drawModes: {
+        single: string
+        range: string
+        rectangle: string
+      }
+      colors: {
+        black: string
+        red: string
+        green: string
+        blue: string
+        white: string
+        gray: string
+        yellow: string
+      }
       fields: {
         name: string
         description: string

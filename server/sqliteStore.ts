@@ -32,6 +32,7 @@ interface MapRow {
   id: string
   name: string
   description: string
+  grid_json: string
   updated_at: string
 }
 
@@ -526,6 +527,7 @@ const ensureMapTables = (db: Database.Database): void => {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL DEFAULT '',
       description TEXT NOT NULL DEFAULT '',
+      grid_json TEXT NOT NULL DEFAULT '{"width":34,"height":22,"lines":[]}',
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -533,6 +535,13 @@ const ensureMapTables = (db: Database.Database): void => {
     CREATE INDEX IF NOT EXISTS idx_maps_updated_at ON maps (updated_at DESC);
     CREATE INDEX IF NOT EXISTS idx_maps_name ON maps (name COLLATE NOCASE);
   `)
+
+  const columns = db.prepare('PRAGMA table_info(maps)').all() as { name: string }[]
+  const hasGridJsonColumn = columns.some((column) => column.name === 'grid_json')
+
+  if (!hasGridJsonColumn) {
+    db.exec(`ALTER TABLE maps ADD COLUMN grid_json TEXT NOT NULL DEFAULT '{"width":34,"height":22,"lines":[]}'`)
+  }
 }
 
 const createContextRelationTables = (db: Database.Database): void => {
@@ -778,6 +787,14 @@ const parsePayload = <TData>(payloadJson: string): Partial<Record<keyof TData, u
   return isRecord(parsed) ? (parsed as Partial<Record<keyof TData, unknown>>) : {}
 }
 
+const parseJsonValue = (json: string): unknown => {
+  try {
+    return JSON.parse(json.replace(/^\uFEFF/, '') || '{}') as unknown
+  } catch {
+    return {}
+  }
+}
+
 const getPayloadMetadata = (payload: unknown): { name: string; uniqueId: string } => {
   if (!isRecord(payload)) {
     return { name: '', uniqueId: '' }
@@ -877,9 +894,11 @@ const buildMap = <TData, TEntity>(
   row: MapRow,
   options: StoredMapOptions<TData>,
 ): TEntity => {
+  const grid = parseJsonValue(row.grid_json)
   const normalized = options.normalize({
     name: row.name,
     description: row.description,
+    grid,
   } as Partial<Record<keyof TData, unknown>>)
   return {
     id: row.id,
@@ -1515,12 +1534,13 @@ const executeMapInsert = <TData>(
   updatedAt: string,
 ): void => {
   getDatabase().prepare(`
-    INSERT INTO maps (id, name, description, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO maps (id, name, description, grid_json, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?)
   `).run(
     id,
     normalizeStoredText((payload as { name?: unknown }).name),
     normalizeStoredText((payload as { description?: unknown }).description),
+    JSON.stringify((payload as { grid?: unknown }).grid ?? {}),
     createdAt,
     updatedAt,
   )
@@ -1533,16 +1553,18 @@ const executeMapUpsert = <TData>(
 ): void => {
   const existing = getDatabase().prepare('SELECT created_at FROM maps WHERE id = ?').get(id) as { created_at: string } | undefined
   getDatabase().prepare(`
-    INSERT INTO maps (id, name, description, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO maps (id, name, description, grid_json, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?)
     ON CONFLICT(id) DO UPDATE SET
       name = excluded.name,
       description = excluded.description,
+      grid_json = excluded.grid_json,
       updated_at = excluded.updated_at
   `).run(
     id,
     normalizeStoredText((payload as { name?: unknown }).name),
     normalizeStoredText((payload as { description?: unknown }).description),
+    JSON.stringify((payload as { grid?: unknown }).grid ?? {}),
     existing?.created_at ?? updatedAt,
     updatedAt,
   )
@@ -2364,7 +2386,7 @@ export const listStoredMaps = async <TData, TEntity>(
   options: StoredMapOptions<TData>,
 ): Promise<TEntity[]> => {
   const rows = getDatabase().prepare(`
-    SELECT id, name, description, updated_at
+    SELECT id, name, description, grid_json, updated_at
     FROM maps
     ORDER BY updated_at DESC, id DESC
   `).all() as MapRow[]
@@ -2489,7 +2511,7 @@ export const readStoredMap = async <TData, TEntity>(
   options: StoredMapOptions<TData>,
 ): Promise<TEntity> => {
   const row = getDatabase().prepare(`
-    SELECT id, name, description, updated_at
+    SELECT id, name, description, grid_json, updated_at
     FROM maps
     WHERE id = ?
   `).get(id) as MapRow | undefined
@@ -2786,7 +2808,7 @@ export const updateStoredMap = async <TData, TEntity>(
   options: StoredMapOptions<TData>,
 ): Promise<TEntity> => {
   const existing = getDatabase().prepare(`
-    SELECT id, name, description, updated_at
+    SELECT id, name, description, grid_json, updated_at
     FROM maps
     WHERE id = ?
   `).get(id) as MapRow | undefined
@@ -2798,6 +2820,7 @@ export const updateStoredMap = async <TData, TEntity>(
   const payload = options.normalize({
     name: existing.name,
     description: existing.description,
+    grid: parseJsonValue(existing.grid_json),
     ...(typeof data === 'object' && data !== null ? (data as Partial<Record<keyof TData, unknown>>) : {}),
   } as Partial<Record<keyof TData, unknown>>)
   options.validate?.(payload)

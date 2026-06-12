@@ -172,8 +172,26 @@ export const en: TranslationDictionary = {
       },
     },
     mapEdit: {
+      drawModeLabel: 'Drawing mode',
       eyebrow: 'MAP',
+      editorLabel: 'Map editor',
       loading: 'Loading map...',
+      paletteLabel: 'Map line colors',
+      toggleLineLabel: 'Toggle map line',
+      drawModes: {
+        single: 'Single',
+        range: 'Segment',
+        rectangle: 'Rectangle',
+      },
+      colors: {
+        black: 'Black',
+        red: 'Red',
+        green: 'Green',
+        blue: 'Blue',
+        white: 'White',
+        gray: 'Gray',
+        yellow: 'Yellow',
+      },
       fields: {
         name: 'Name',
         description: 'Description',
