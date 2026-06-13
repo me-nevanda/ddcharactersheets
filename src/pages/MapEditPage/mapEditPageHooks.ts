@@ -3,8 +3,23 @@ import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getMap, saveMap } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
-import type { MapData, MapGridGroundCell, MapGridLine } from '@appTypes/map'
-import type { MapDrawMode, MapDrawModeOption, MapEditPageState, MapGroundCellViewModel, MapLayer, MapLayerOption, MapLineOrientation, MapLineViewModel, MapPaletteColor, MapPaletteColorOption, MapPointViewModel } from './types'
+import type { MapData, MapGridElement, MapGridGroundCell, MapGridLabel, MapGridLine, MapGroundTexture } from '@appTypes/map'
+import groundTexture1 from '../../images/grounds/1.png'
+import groundTexture2 from '../../images/grounds/2.png'
+import groundTexture3 from '../../images/grounds/3.png'
+import groundTexture4 from '../../images/grounds/4.png'
+import groundTexture5 from '../../images/grounds/5.png'
+import groundTexture6 from '../../images/grounds/6.png'
+import groundTexture7 from '../../images/grounds/7.png'
+import groundTexture8 from '../../images/grounds/8.png'
+import groundTexture9 from '../../images/grounds/9.png'
+import groundTexture10 from '../../images/grounds/10.png'
+import groundTexture11 from '../../images/grounds/11.png'
+import groundTexture12 from '../../images/grounds/12.png'
+import groundTexture13 from '../../images/grounds/13.png'
+import groundTexture14 from '../../images/grounds/14.png'
+import groundTexture15 from '../../images/grounds/15.png'
+import type { MapDrawMode, MapDrawModeOption, MapEditPageState, MapElementViewModel, MapGroundCellViewModel, MapGroundTextureOption, MapLabelViewModel, MapLayer, MapLayerOption, MapLineOrientation, MapLineViewModel, MapPaletteColor, MapPaletteColorOption, MapPointViewModel } from './types'
 
 const mapGridWidth = 34
 const mapGridHeight = 22
@@ -19,6 +34,24 @@ const colorOptions: MapPaletteColorOption[] = [
   { key: 'yellow', labelKey: 'pages.mapEdit.colors.yellow' },
   { key: 'orange', labelKey: 'pages.mapEdit.colors.orange' },
   { key: 'purple', labelKey: 'pages.mapEdit.colors.purple' },
+]
+
+const groundTextureOptions: MapGroundTextureOption[] = [
+  { key: '1', imageSrc: groundTexture1 },
+  { key: '2', imageSrc: groundTexture2 },
+  { key: '3', imageSrc: groundTexture3 },
+  { key: '4', imageSrc: groundTexture4 },
+  { key: '5', imageSrc: groundTexture5 },
+  { key: '6', imageSrc: groundTexture6 },
+  { key: '7', imageSrc: groundTexture7 },
+  { key: '8', imageSrc: groundTexture8 },
+  { key: '9', imageSrc: groundTexture9 },
+  { key: '10', imageSrc: groundTexture10 },
+  { key: '11', imageSrc: groundTexture11 },
+  { key: '12', imageSrc: groundTexture12 },
+  { key: '13', imageSrc: groundTexture13 },
+  { key: '14', imageSrc: groundTexture14 },
+  { key: '15', imageSrc: groundTexture15 },
 ]
 
 const drawModeOptions: MapDrawModeOption[] = [
@@ -63,12 +96,30 @@ const createLine = (orientation: MapLineOrientation, x: number, y: number, color
   }
 }
 
-const createGroundCell = (x: number, y: number, color: MapPaletteColor): MapGridGroundCell => {
+const createGroundCell = (x: number, y: number, texture: MapGroundTexture): MapGridGroundCell => {
+  return {
+    id: createGroundCellId(x, y),
+    x,
+    y,
+    texture,
+  }
+}
+
+const createElement = (x: number, y: number, color: MapPaletteColor): MapGridElement => {
   return {
     id: createGroundCellId(x, y),
     x,
     y,
     color,
+  }
+}
+
+const createLabel = (x: number, y: number, name = ''): MapGridLabel => {
+  return {
+    id: createGroundCellId(x, y),
+    x,
+    y,
+    name,
   }
 }
 
@@ -83,7 +134,49 @@ const buildGroundCells = (ground: MapGridGroundCell[]): MapGroundCellViewModel[]
       cells.push({
         id,
         active: Boolean(activeCell),
-        color: activeCell?.color ?? 'black',
+        texture: activeCell?.texture ?? '1',
+        x,
+        y,
+      })
+    }
+  }
+
+  return cells
+}
+
+const buildElements = (elements: MapGridElement[]): MapElementViewModel[] => {
+  const activeElements = new Map(elements.map((element) => [element.id, element]))
+  const cells: MapElementViewModel[] = []
+
+  for (let y = 0; y < mapGridHeight; y += 1) {
+    for (let x = 0; x < mapGridWidth; x += 1) {
+      const id = createGroundCellId(x, y)
+      const activeElement = activeElements.get(id)
+      cells.push({
+        id,
+        active: Boolean(activeElement),
+        color: activeElement?.color ?? 'black',
+        x,
+        y,
+      })
+    }
+  }
+
+  return cells
+}
+
+const buildLabels = (labels: MapGridLabel[]): MapLabelViewModel[] => {
+  const activeLabels = new Map(labels.map((label) => [label.id, label]))
+  const cells: MapLabelViewModel[] = []
+
+  for (let y = 0; y < mapGridHeight; y += 1) {
+    for (let x = 0; x < mapGridWidth; x += 1) {
+      const id = createGroundCellId(x, y)
+      const activeLabel = activeLabels.get(id)
+      cells.push({
+        id,
+        active: Boolean(activeLabel),
+        name: activeLabel?.name ?? '',
         x,
         y,
       })
@@ -156,6 +249,14 @@ const getPointById = (pointId: string): MapPointViewModel | null => {
 
 const getGroundCellById = (cellId: string): MapGroundCellViewModel | null => {
   return buildGroundCells([]).find((cell) => cell.id === cellId) ?? null
+}
+
+const getElementById = (elementId: string): MapElementViewModel | null => {
+  return buildElements([]).find((element) => element.id === elementId) ?? null
+}
+
+const getLabelById = (labelId: string): MapLabelViewModel | null => {
+  return buildLabels([]).find((label) => label.id === labelId) ?? null
 }
 
 const canDrawRange = (startLine: MapLineViewModel, endLine: MapLineViewModel): boolean => {
@@ -249,7 +350,7 @@ const canDrawGroundRange = (startCell: MapGroundCellViewModel, endCell: MapGroun
   return startCell.x === endCell.x || startCell.y === endCell.y
 }
 
-const buildGroundRangeCells = (startCell: MapGroundCellViewModel, endCell: MapGroundCellViewModel, color: MapPaletteColor): MapGridGroundCell[] => {
+const buildGroundRangeCells = (startCell: MapGroundCellViewModel, endCell: MapGroundCellViewModel, texture: MapGroundTexture): MapGridGroundCell[] => {
   if (!canDrawGroundRange(startCell, endCell)) {
     return []
   }
@@ -261,7 +362,7 @@ const buildGroundRangeCells = (startCell: MapGroundCellViewModel, endCell: MapGr
     const toX = Math.max(startCell.x, endCell.x)
 
     for (let x = fromX; x <= toX; x += 1) {
-      cells.push(createGroundCell(x, startCell.y, color))
+      cells.push(createGroundCell(x, startCell.y, texture))
     }
     return cells
   }
@@ -270,13 +371,13 @@ const buildGroundRangeCells = (startCell: MapGroundCellViewModel, endCell: MapGr
   const toY = Math.max(startCell.y, endCell.y)
 
   for (let y = fromY; y <= toY; y += 1) {
-    cells.push(createGroundCell(startCell.x, y, color))
+    cells.push(createGroundCell(startCell.x, y, texture))
   }
 
   return cells
 }
 
-const buildGroundRectangleCells = (startCell: MapGroundCellViewModel, endCell: MapGroundCellViewModel, color: MapPaletteColor): MapGridGroundCell[] => {
+const buildGroundRectangleCells = (startCell: MapGroundCellViewModel, endCell: MapGroundCellViewModel, texture: MapGroundTexture): MapGridGroundCell[] => {
   const fromX = Math.min(startCell.x, endCell.x)
   const toX = Math.max(startCell.x, endCell.x)
   const fromY = Math.min(startCell.y, endCell.y)
@@ -285,7 +386,7 @@ const buildGroundRectangleCells = (startCell: MapGroundCellViewModel, endCell: M
 
   for (let y = fromY; y <= toY; y += 1) {
     for (let x = fromX; x <= toX; x += 1) {
-      cells.push(createGroundCell(x, y, color))
+      cells.push(createGroundCell(x, y, texture))
     }
   }
 
@@ -312,6 +413,16 @@ const removeGroundCells = (currentCells: MapGridGroundCell[], cellsToRemove: Map
   return currentCells.filter((cell) => !cellIdsToRemove.has(cell.id))
 }
 
+const replaceElements = (currentElements: MapGridElement[], nextElements: MapGridElement[]): MapGridElement[] => {
+  const nextElementIds = new Set(nextElements.map((element) => element.id))
+  return [...currentElements.filter((element) => !nextElementIds.has(element.id)), ...nextElements]
+}
+
+const replaceLabels = (currentLabels: MapGridLabel[], nextLabels: MapGridLabel[]): MapGridLabel[] => {
+  const nextLabelIds = new Set(nextLabels.map((label) => label.id))
+  return [...currentLabels.filter((label) => !nextLabelIds.has(label.id)), ...nextLabels]
+}
+
 const emptyMapForm: MapData = {
   name: '',
   description: '',
@@ -320,6 +431,8 @@ const emptyMapForm: MapData = {
     height: mapGridHeight,
     lines: [],
     ground: [],
+    elements: [],
+    labels: [],
   },
 }
 
@@ -333,6 +446,7 @@ export const useMapEditPage = (): MapEditPageState => {
   const [saving, setSaving] = useState(false)
   const [activeLayer, setActiveLayer] = useState<MapLayer>('lines')
   const [selectedColor, setSelectedColor] = useState<MapPaletteColor>('black')
+  const [selectedGroundTexture, setSelectedGroundTexture] = useState<MapGroundTexture>('1')
   const [selectedDrawMode, setSelectedDrawMode] = useState<MapDrawMode>('single')
   const [selectedRangeStartId, setSelectedRangeStartId] = useState('')
   const [previewRangeEndId, setPreviewRangeEndId] = useState('')
@@ -675,7 +789,7 @@ export const useMapEditPage = (): MapEditPageState => {
         ...current,
         grid: {
           ...current.grid,
-          ground: replaceGroundCells(current.grid.ground, [createGroundCell(groundCell.x, groundCell.y, selectedColor)]),
+          ground: replaceGroundCells(current.grid.ground, [createGroundCell(groundCell.x, groundCell.y, selectedGroundTexture)]),
         },
       }))
       return
@@ -698,7 +812,7 @@ export const useMapEditPage = (): MapEditPageState => {
         return
       }
 
-      const nextGroundCells = buildGroundRangeCells(startCell, groundCell, selectedColor)
+      const nextGroundCells = buildGroundRangeCells(startCell, groundCell, selectedGroundTexture)
       setForm((current) => ({
         ...current,
         grid: {
@@ -727,7 +841,7 @@ export const useMapEditPage = (): MapEditPageState => {
       return
     }
 
-    const nextGroundCells = buildGroundRectangleCells(startCell, groundCell, selectedColor)
+    const nextGroundCells = buildGroundRectangleCells(startCell, groundCell, selectedGroundTexture)
     setForm((current) => ({
       ...current,
       grid: {
@@ -764,7 +878,7 @@ export const useMapEditPage = (): MapEditPageState => {
         return
       }
 
-      const nextGroundCells = buildGroundRangeCells(startCell, groundCell, selectedColor)
+      const nextGroundCells = buildGroundRangeCells(startCell, groundCell, selectedGroundTexture)
       setForm((current) => ({
         ...current,
         grid: {
@@ -820,6 +934,78 @@ export const useMapEditPage = (): MapEditPageState => {
     }
   }
 
+  const handleToggleElement = (elementId: string) => {
+    const element = getElementById(elementId)
+
+    if (!element) {
+      return
+    }
+
+    setForm((current) => ({
+      ...current,
+      grid: {
+        ...current.grid,
+        elements: replaceElements(current.grid.elements, [createElement(element.x, element.y, selectedColor)]),
+      },
+    }))
+  }
+
+  const handleRemoveElement: MapEditPageState['handleRemoveElement'] = (elementId, event) => {
+    event?.preventDefault()
+    setForm((current) => ({
+      ...current,
+      grid: {
+        ...current.grid,
+        elements: current.grid.elements.filter((element) => element.id !== elementId),
+      },
+    }))
+  }
+
+  const handleToggleLabel = (labelId: string) => {
+    const label = getLabelById(labelId)
+
+    if (!label) {
+      return
+    }
+
+    setForm((current) => {
+      const existingLabel = current.grid.labels.find((currentLabel) => currentLabel.id === labelId)
+
+      return {
+        ...current,
+        grid: {
+          ...current.grid,
+          labels: replaceLabels(current.grid.labels, [createLabel(label.x, label.y, existingLabel?.name)]),
+        },
+      }
+    })
+  }
+
+  const handleRemoveLabel: MapEditPageState['handleRemoveLabel'] = (labelId, event) => {
+    event?.preventDefault()
+    setForm((current) => ({
+      ...current,
+      grid: {
+        ...current.grid,
+        labels: current.grid.labels.filter((label) => label.id !== labelId),
+      },
+    }))
+  }
+
+  const handleRenameLabel: MapEditPageState['handleRenameLabel'] = (labelId, name) => {
+    setForm((current) => ({
+      ...current,
+      grid: {
+        ...current.grid,
+        labels: current.grid.labels.map((label) => (
+          label.id === labelId
+            ? { ...label, name: name.trim() }
+            : label
+        )),
+      },
+    }))
+  }
+
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSaving(true)
@@ -869,24 +1055,26 @@ export const useMapEditPage = (): MapEditPageState => {
   const startGroundRangePreviewCell = selectedGroundRangeStartId ? getGroundCellById(selectedGroundRangeStartId) : null
   const endGroundRangePreviewCell = previewGroundRangeEndId ? getGroundCellById(previewGroundRangeEndId) : null
   const previewGroundCellIds = startGroundRangePreviewCell && endGroundRangePreviewCell
-    ? buildGroundRangeCells(startGroundRangePreviewCell, endGroundRangePreviewCell, selectedColor).map((cell) => cell.id)
+    ? buildGroundRangeCells(startGroundRangePreviewCell, endGroundRangePreviewCell, selectedGroundTexture).map((cell) => cell.id)
     : []
   const startGroundErasePreviewCell = selectedEraseGroundRangeStartId ? getGroundCellById(selectedEraseGroundRangeStartId) : null
   const endGroundErasePreviewCell = previewEraseGroundRangeEndId ? getGroundCellById(previewEraseGroundRangeEndId) : null
   const previewEraseGroundCellIds = startGroundErasePreviewCell && endGroundErasePreviewCell
-    ? buildGroundRangeCells(startGroundErasePreviewCell, endGroundErasePreviewCell, selectedColor).map((cell) => cell.id)
+    ? buildGroundRangeCells(startGroundErasePreviewCell, endGroundErasePreviewCell, selectedGroundTexture).map((cell) => cell.id)
     : []
   const startGroundRectanglePreviewCell = selectedGroundRectangleStartId ? getGroundCellById(selectedGroundRectangleStartId) : null
   const endGroundRectanglePreviewCell = previewGroundRectangleEndId ? getGroundCellById(previewGroundRectangleEndId) : null
   const previewRectangleGroundCellIds = startGroundRectanglePreviewCell && endGroundRectanglePreviewCell
-    ? buildGroundRectangleCells(startGroundRectanglePreviewCell, endGroundRectanglePreviewCell, selectedColor).map((cell) => cell.id)
+    ? buildGroundRectangleCells(startGroundRectanglePreviewCell, endGroundRectanglePreviewCell, selectedGroundTexture).map((cell) => cell.id)
     : []
 
   return {
     activeLayer,
     colorOptions,
+    groundTextureOptions,
     drawModeOptions,
     error,
+    elements: buildElements(form.grid.elements),
     form,
     handleChange,
     handleClearLinePreview,
@@ -895,16 +1083,23 @@ export const useMapEditPage = (): MapEditPageState => {
     handleRemoveLine,
     handleRemovePoint,
     handleRemoveGroundCell,
+    handleRemoveElement,
+    handleRemoveLabel,
+    handleRenameLabel,
     handleSelectPoint,
     handleSelectDrawMode,
     handleSelectLayer,
     handleSelectColor: setSelectedColor,
+    handleSelectGroundTexture: setSelectedGroundTexture,
     handleSubmit,
     handleToggleLine,
     handleToggleGroundCell,
+    handleToggleElement,
+    handleToggleLabel,
     handlePreviewGroundCell,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
     groundCells: buildGroundCells(form.grid.ground),
+    labels: buildLabels(form.grid.labels),
     layerOptions,
     lineSegments: buildLineSegments(form.grid.lines),
     loading,
@@ -916,6 +1111,7 @@ export const useMapEditPage = (): MapEditPageState => {
     previewRectangleLineIds,
     previewRectangleGroundCellIds,
     selectedColor,
+    selectedGroundTexture,
     selectedDrawMode,
     selectedEraseGroundRangeStartId,
     selectedGroundRangeStartId,

@@ -23,8 +23,13 @@ export const MapEditPage = () => {
     mainTab: 'maps',
     returnTo: '/',
   })
-  const { activeLayer, colorOptions, drawModeOptions, error, form, groundCells, handleChange, handleClearLinePreview, handlePreviewGroundCell, handlePreviewLine, handlePreviewPoint, handleRemoveGroundCell, handleRemoveLine, handleRemovePoint, handleSelectColor, handleSelectDrawMode, handleSelectLayer, handleSelectPoint, handleSubmit, handleToggleGroundCell, handleToggleLine, hasChanges, layerOptions, lineSegments, loading, pointSegments, previewEraseGroundCellIds, previewEraseLineIds, previewGroundCellIds, previewLineIds, previewRectangleGroundCellIds, previewRectangleLineIds, selectedColor, selectedDrawMode, selectedEraseGroundRangeStartId, selectedEraseRangeStartId, selectedGroundRangeStartId, selectedGroundRectangleStartId, selectedPointEraseStartId, selectedPointRangeStartId, selectedRectangleStartId, selectedRangeStartId, saving } = useMapEditPage()
+  const { activeLayer, colorOptions, drawModeOptions, elements, error, form, groundCells, groundTextureOptions, handleChange, handleClearLinePreview, handlePreviewGroundCell, handlePreviewLine, handlePreviewPoint, handleRemoveElement, handleRemoveGroundCell, handleRemoveLabel, handleRemoveLine, handleRemovePoint, handleRenameLabel, handleSelectColor, handleSelectDrawMode, handleSelectGroundTexture, handleSelectLayer, handleSelectPoint, handleSubmit, handleToggleElement, handleToggleGroundCell, handleToggleLabel, handleToggleLine, hasChanges, labels, layerOptions, lineSegments, loading, pointSegments, previewEraseGroundCellIds, previewEraseLineIds, previewGroundCellIds, previewLineIds, previewRectangleGroundCellIds, previewRectangleLineIds, selectedColor, selectedDrawMode, selectedEraseGroundRangeStartId, selectedEraseRangeStartId, selectedGroundRangeStartId, selectedGroundRectangleStartId, selectedGroundTexture, selectedPointEraseStartId, selectedPointRangeStartId, selectedRectangleStartId, selectedRangeStartId, saving } = useMapEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
+  const [editingLabelId, setEditingLabelId] = useState('')
+  const [labelDraftName, setLabelDraftName] = useState('')
+  const getGroundTextureSrc = (texture: string) => {
+    return groundTextureOptions.find((option) => option.key === texture)?.imageSrc ?? groundTextureOptions[0]?.imageSrc ?? ''
+  }
 
   const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
     if (hasChanges) {
@@ -38,6 +43,29 @@ export const MapEditPage = () => {
   const handleConfirmBackToList = () => {
     setUnsavedChangesDialogOpen(false)
     navigateBack()
+  }
+
+  const handleOpenLabelEditor = (labelId: string, name: string) => {
+    setEditingLabelId(labelId)
+    setLabelDraftName(name)
+  }
+
+  const handleConfirmLabelName = () => {
+    setEditingLabelId('')
+    setLabelDraftName('')
+  }
+
+  const handleChangeLabelName = (labelId: string, value: string) => {
+    setLabelDraftName(value)
+    handleRenameLabel(labelId, value)
+  }
+
+  const handleLabelContextMenu = (labelId: string, event: ReactMouseEvent<HTMLElement>) => {
+    handleRemoveLabel(labelId, event)
+    if (editingLabelId === labelId) {
+      setEditingLabelId('')
+      setLabelDraftName('')
+    }
   }
 
   return (
@@ -86,34 +114,38 @@ export const MapEditPage = () => {
             <section className={styles.mapEditorSection} aria-label={t('pages.mapEdit.editorLabel')}>
               <div className={styles.mapWorkspace}>
                 <div className={`${styles.mapGrid} ${activeLayer === 'lines' && selectedDrawMode === 'single' ? styles.mapGridSingleMode : ''}`} aria-label={t('pages.mapEdit.editorLabel')}>
-                  {groundCells.map((cell) => (
-                    <button
-                      key={cell.id}
-                      className={[
-                        styles.mapCell,
-                        activeLayer === 'ground' ? styles.mapCellEditable : '',
-                        cell.active ? styles.mapCellActive : '',
-                        activeLayer === 'ground' && previewGroundCellIds.includes(cell.id) ? styles.mapCellPreview : '',
-                        activeLayer === 'ground' && previewRectangleGroundCellIds.includes(cell.id) ? styles.mapCellPreview : '',
-                        activeLayer === 'ground' && previewEraseGroundCellIds.includes(cell.id) ? styles.mapCellErasePreview : '',
-                        activeLayer === 'ground' && selectedDrawMode === 'range' && selectedGroundRangeStartId === cell.id ? styles.mapCellRangeStart : '',
-                        activeLayer === 'ground' && selectedDrawMode === 'range' && selectedEraseGroundRangeStartId === cell.id ? styles.mapCellEraseRangeStart : '',
-                        activeLayer === 'ground' && selectedDrawMode === 'rectangle' && selectedGroundRectangleStartId === cell.id ? styles.mapCellRangeStart : '',
-                        activeLayer === 'ground' && (previewGroundCellIds.includes(cell.id) || previewRectangleGroundCellIds.includes(cell.id)) ? styles[`mapCell${selectedColor[0].toUpperCase()}${selectedColor.slice(1)}`] : '',
-                        cell.active ? styles[`mapCell${cell.color[0].toUpperCase()}${cell.color.slice(1)}`] : '',
-                      ].filter(Boolean).join(' ')}
-                      type="button"
-                      aria-label={t('pages.mapEdit.toggleGroundCellLabel')}
-                      aria-pressed={cell.active}
-                      disabled={activeLayer !== 'ground'}
-                      onFocus={() => handlePreviewGroundCell(cell.id)}
-                      onBlur={handleClearLinePreview}
-                      onMouseEnter={() => handlePreviewGroundCell(cell.id)}
-                      onMouseLeave={handleClearLinePreview}
-                      onContextMenu={(event) => handleRemoveGroundCell(cell.id, event)}
-                      onClick={() => handleToggleGroundCell(cell.id)}
-                    />
-                  ))}
+                  {groundCells.map((cell) => {
+                    const isGroundPreview = activeLayer === 'ground' && (previewGroundCellIds.includes(cell.id) || previewRectangleGroundCellIds.includes(cell.id))
+                    const groundTextureSrc = isGroundPreview ? getGroundTextureSrc(selectedGroundTexture) : cell.active ? getGroundTextureSrc(cell.texture) : ''
+
+                    return (
+                      <button
+                        key={cell.id}
+                        className={[
+                          styles.mapCell,
+                          activeLayer === 'ground' ? styles.mapCellEditable : '',
+                          groundTextureSrc ? styles.mapCellTextured : '',
+                          activeLayer === 'ground' && previewGroundCellIds.includes(cell.id) ? styles.mapCellPreview : '',
+                          activeLayer === 'ground' && previewRectangleGroundCellIds.includes(cell.id) ? styles.mapCellPreview : '',
+                          activeLayer === 'ground' && previewEraseGroundCellIds.includes(cell.id) ? styles.mapCellErasePreview : '',
+                          activeLayer === 'ground' && selectedDrawMode === 'range' && selectedGroundRangeStartId === cell.id ? styles.mapCellRangeStart : '',
+                          activeLayer === 'ground' && selectedDrawMode === 'range' && selectedEraseGroundRangeStartId === cell.id ? styles.mapCellEraseRangeStart : '',
+                          activeLayer === 'ground' && selectedDrawMode === 'rectangle' && selectedGroundRectangleStartId === cell.id ? styles.mapCellRangeStart : '',
+                        ].filter(Boolean).join(' ')}
+                        type="button"
+                        aria-label={t('pages.mapEdit.toggleGroundCellLabel')}
+                        aria-pressed={cell.active}
+                        disabled={activeLayer !== 'ground'}
+                        style={groundTextureSrc ? { backgroundImage: `url(${groundTextureSrc})` } : undefined}
+                        onFocus={() => handlePreviewGroundCell(cell.id)}
+                        onBlur={handleClearLinePreview}
+                        onMouseEnter={() => handlePreviewGroundCell(cell.id)}
+                        onMouseLeave={handleClearLinePreview}
+                        onContextMenu={(event) => handleRemoveGroundCell(cell.id, event)}
+                        onClick={() => handleToggleGroundCell(cell.id)}
+                      />
+                    )
+                  })}
                   {lineSegments.map((line) => (
                     <button
                       key={line.id}
@@ -151,6 +183,69 @@ export const MapEditPage = () => {
                       <span className={styles.lineSegmentStroke} />
                     </button>
                   ))}
+                  {elements.map((element) => (
+                    <button
+                      key={element.id}
+                      className={[
+                        styles.mapElement,
+                        activeLayer === 'elements' ? styles.mapElementEditable : '',
+                        element.active ? styles.mapElementActive : '',
+                        element.active ? styles[`mapElement${element.color[0].toUpperCase()}${element.color.slice(1)}`] : '',
+                      ].filter(Boolean).join(' ')}
+                      type="button"
+                      aria-label={t('pages.mapEdit.toggleElementLabel')}
+                      aria-pressed={element.active}
+                      disabled={activeLayer !== 'elements'}
+                      style={{
+                        left: `${(element.x / 34) * 100}%`,
+                        top: `${(element.y / 22) * 100}%`,
+                        width: `${100 / 34}%`,
+                        height: `${100 / 22}%`,
+                      }}
+                      onContextMenu={(event) => handleRemoveElement(element.id, event)}
+                      onClick={() => handleToggleElement(element.id)}
+                    >
+                      <span className={styles.mapElementDot} />
+                    </button>
+                  ))}
+                  {labels.map((label) => (
+                    <div
+                      key={label.id}
+                      className={`${styles.mapLabel} ${activeLayer === 'labels' ? styles.mapLabelEditable : styles.mapLabelDimmed} ${label.active ? styles.mapLabelActive : ''} ${label.name.trim() ? styles.mapLabelHasName : ''}`}
+                      style={{
+                        left: `${(label.x / 34) * 100}%`,
+                        top: `${(label.y / 22) * 100}%`,
+                        width: `${100 / 34}%`,
+                        height: `${100 / 22}%`,
+                      }}
+                    >
+                      <button
+                        className={styles.mapLabelButton}
+                        type="button"
+                        aria-label={t('pages.mapEdit.toggleLabelLabel')}
+                        aria-pressed={label.active}
+                        disabled={activeLayer !== 'labels'}
+                        onContextMenu={(event) => handleLabelContextMenu(label.id, event)}
+                        onClick={() => handleToggleLabel(label.id)}
+                        onDoubleClick={() => handleOpenLabelEditor(label.id, label.name)}
+                      >
+                        <span className={styles.mapLabelDot} />
+                      </button>
+                      {activeLayer === 'labels' && editingLabelId === label.id ? (
+                        <div className={styles.mapLabelTooltip}>
+                          <input className={styles.mapLabelInput} type="text" value={labelDraftName} aria-label={t('pages.mapEdit.labelNameInputLabel')} onChange={(event) => handleChangeLabelName(label.id, event.target.value)} onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              event.preventDefault()
+                              handleConfirmLabelName()
+                            }
+                          }} autoFocus />
+                          <button className={styles.mapLabelConfirmButton} type="button" aria-label={t('pages.mapEdit.confirmLabelNameLabel')} onClick={handleConfirmLabelName}>
+                            <AppIcon name="check" />
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                  ))}
                   {activeLayer === 'lines' && (selectedDrawMode === 'range' || selectedDrawMode === 'rectangle') ? pointSegments.map((point) => (
                     <button
                       key={point.id}
@@ -179,8 +274,8 @@ export const MapEditPage = () => {
                     </button>
                   ))}
                 </div>
-                {activeLayer === 'lines' || activeLayer === 'ground' ? <div className={styles.editorMenu}>
-                  <section className={styles.menuSection}>
+                {activeLayer === 'lines' || activeLayer === 'ground' || activeLayer === 'elements' ? <div className={styles.editorMenu}>
+                  {activeLayer !== 'elements' ? <section className={styles.menuSection}>
                     <h2 className={styles.menuTitle}>{t('pages.mapEdit.drawModeLabel')}</h2>
                     <div className={styles.drawModeButtons} role="toolbar" aria-label={t('pages.mapEdit.drawModeLabel')}>
                       {drawModeOptions.map((mode) => (
@@ -189,18 +284,28 @@ export const MapEditPage = () => {
                         </button>
                       ))}
                     </div>
-                  </section>
+                  </section> : null}
                   <section className={styles.menuSection}>
-                    <h2 className={styles.menuTitle}>{t('pages.mapEdit.paletteLabel')}</h2>
-                    <div className={styles.palette} role="toolbar" aria-label={t('pages.mapEdit.paletteLabel')}>
-                      {colorOptions.map((color) => (
-                        <button key={color.key} className={`${styles.paletteButton} ${styles[`paletteButton${color.key[0].toUpperCase()}${color.key.slice(1)}`]} ${selectedColor === color.key ? styles.paletteButtonActive : ''}`} type="button" aria-label={t(color.labelKey)} title={t(color.labelKey)} aria-pressed={selectedColor === color.key} onClick={() => handleSelectColor(color.key)}>
-                          <span className={styles.paletteSwatch} />
-                        </button>
-                      ))}
-                    </div>
+                    <h2 className={styles.menuTitle}>{t(activeLayer === 'ground' ? 'pages.mapEdit.groundPaletteLabel' : 'pages.mapEdit.paletteLabel')}</h2>
+                    {activeLayer === 'ground' ? (
+                      <div className={styles.groundTexturePalette} role="toolbar" aria-label={t('pages.mapEdit.groundPaletteLabel')}>
+                        {groundTextureOptions.map((texture) => (
+                          <button key={texture.key} className={`${styles.groundTextureButton} ${selectedGroundTexture === texture.key ? styles.groundTextureButtonActive : ''}`} type="button" aria-label={t('pages.mapEdit.groundTextureLabel', { number: texture.key })} title={t('pages.mapEdit.groundTextureLabel', { number: texture.key })} aria-pressed={selectedGroundTexture === texture.key} onClick={() => handleSelectGroundTexture(texture.key)}>
+                            <img className={styles.groundTextureImage} src={texture.imageSrc} alt="" aria-hidden="true" />
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className={styles.palette} role="toolbar" aria-label={t('pages.mapEdit.paletteLabel')}>
+                        {colorOptions.map((color) => (
+                          <button key={color.key} className={`${styles.paletteButton} ${styles[`paletteButton${color.key[0].toUpperCase()}${color.key.slice(1)}`]} ${selectedColor === color.key ? styles.paletteButtonActive : ''}`} type="button" aria-label={t(color.labelKey)} title={t(color.labelKey)} aria-pressed={selectedColor === color.key} onClick={() => handleSelectColor(color.key)}>
+                            <span className={`${styles.paletteSwatch} ${activeLayer === 'elements' ? styles.paletteSwatchSquare : ''}`} />
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </section>
-                </div> : (
+                </div> : activeLayer === 'labels' ? null : (
                   <section className={styles.menuSection}>
                     <p className={styles.emptyLayerTools}>{t('pages.mapEdit.emptyLayer')}</p>
                   </section>

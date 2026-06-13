@@ -178,8 +178,14 @@ export interface TranslationDictionary {
       layersLabel: string
       loading: string
       paletteLabel: string
+      groundPaletteLabel: string
+      groundTextureLabel: string
+      toggleElementLabel: string
       toggleGroundCellLabel: string
+      toggleLabelLabel: string
       toggleLineLabel: string
+      labelNameInputLabel: string
+      confirmLabelNameLabel: string
       layers: {
         lines: string
         ground: string

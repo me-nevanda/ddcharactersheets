@@ -277,6 +277,11 @@
   background: rgba(8, 8, 8, 0.72);
 }
 
+.mapCellTextured {
+  background-position: center;
+  background-size: cover;
+}
+
 .mapCellBlack {
   background: rgba(8, 8, 8, 0.72);
 }
@@ -498,6 +503,203 @@
   box-shadow: 0 0 0 3px rgba(243, 165, 165, 0.24);
 }
 
+.mapElement {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.mapElement:disabled {
+  opacity: 1;
+  pointer-events: none;
+}
+
+.mapElementEditable {
+  cursor: pointer;
+}
+
+.mapElementEditable:hover,
+.mapElementEditable:focus-visible {
+  outline: 0;
+}
+
+.mapElementDot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid transparent;
+  pointer-events: none;
+}
+
+.mapElementEditable:hover .mapElementDot,
+.mapElementEditable:focus-visible .mapElementDot {
+  border-color: var(--accent);
+  background: rgba(217, 164, 65, 0.28);
+  box-shadow: 0 0 0 2px rgba(217, 164, 65, 0.12);
+}
+
+.mapElementBlack .mapElementDot {
+  background: #080808;
+}
+
+.mapElementRed .mapElementDot {
+  background: #c43a31;
+}
+
+.mapElementGreen .mapElementDot {
+  background: #2f9a48;
+}
+
+.mapElementBlue .mapElementDot {
+  background: #2f6fed;
+}
+
+.mapElementWhite .mapElementDot {
+  background: #f7f3e8;
+}
+
+.mapElementGray .mapElementDot {
+  background: #8b8f98;
+}
+
+.mapElementYellow .mapElementDot {
+  background: #f0c445;
+}
+
+.mapElementOrange .mapElementDot {
+  background: #f28c28;
+}
+
+.mapElementPurple .mapElementDot {
+  background: #8f5bd8;
+}
+
+.mapLabel {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.mapLabelEditable {
+  pointer-events: auto;
+}
+
+.mapLabelEditable .mapLabelDot {
+  opacity: 0.5;
+}
+
+.mapLabelDimmed .mapLabelDot {
+  opacity: 0.2;
+}
+
+.mapLabelButton {
+  display: grid;
+  align-items: start;
+  justify-items: start;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.mapLabelButton:disabled {
+  opacity: 1;
+}
+
+.mapLabelEditable .mapLabelButton {
+  cursor: pointer;
+}
+
+.mapLabelButton:focus-visible {
+  outline: 0;
+}
+
+.mapLabelDot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  pointer-events: none;
+}
+
+.mapLabelActive .mapLabelDot {
+  border-color: #080808;
+  background: transparent;
+}
+
+.mapLabelHasName .mapLabelDot {
+  background: #f7f3e8;
+}
+
+.mapLabelEditable .mapLabelButton:hover .mapLabelDot,
+.mapLabelEditable .mapLabelButton:focus-visible .mapLabelDot {
+  border-color: #080808;
+  background: rgba(247, 243, 232, 0.72);
+}
+
+.mapLabelTooltip {
+  position: absolute;
+  top: -0.35rem;
+  left: 0;
+  z-index: 8;
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) 2rem;
+  gap: 0.35rem;
+  align-items: center;
+  min-width: 11rem;
+  padding: 0.35rem;
+  border: 1px solid rgba(240, 198, 111, 0.28);
+  border-radius: 0.45rem;
+  background: rgba(29, 18, 14, 0.96);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
+  pointer-events: auto;
+  transform: translateY(-100%);
+}
+
+.mapLabelInput {
+  @include input-field;
+  min-width: 0;
+  height: 2rem;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.86rem;
+}
+
+.mapLabelConfirmButton {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid rgba(255, 248, 235, 0.16);
+  border-radius: 0.35rem;
+  background: rgba(217, 164, 65, 0.16);
+  color: var(--accent-strong);
+  cursor: pointer;
+}
+
+.mapLabelConfirmButton:hover,
+.mapLabelConfirmButton:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(217, 164, 65, 0.14);
+}
+
+.mapLabelConfirmButton svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
 .mapPoint {
   position: absolute;
   z-index: 4;
@@ -675,6 +877,12 @@
   border: 1px solid rgba(255, 248, 235, 0.25);
 }
 
+.paletteSwatchSquare {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 0.18rem;
+}
+
 .paletteButtonBlack .paletteSwatch {
   background: #080808;
 }
@@ -709,6 +917,40 @@
 
 .paletteButtonPurple .paletteSwatch {
   background: #8f5bd8;
+}
+
+.groundTexturePalette {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 0.55rem;
+}
+
+.groundTextureButton {
+  display: grid;
+  place-items: center;
+  width: 2.55rem;
+  height: 2.55rem;
+  padding: 0.2rem;
+  border: 1px solid rgba(255, 248, 235, 0.16);
+  border-radius: 0.55rem;
+  background: rgba(255, 248, 235, 0.04);
+  cursor: pointer;
+}
+
+.groundTextureButton:hover,
+.groundTextureButton:focus-visible,
+.groundTextureButtonActive {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(217, 164, 65, 0.14);
+}
+
+.groundTextureImage {
+  display: block;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 0.16rem;
+  object-fit: cover;
 }
 
 @media (max-width: 1800px) {
@@ -757,7 +999,8 @@
     align-items: start;
   }
 
-  .palette {
+  .palette,
+  .groundTexturePalette {
     grid-template-columns: repeat(3, max-content);
     justify-content: start;
   }
