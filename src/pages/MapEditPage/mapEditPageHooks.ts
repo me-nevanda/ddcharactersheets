@@ -24,17 +24,12 @@ import stairElement3 from '../../images/elements/stairs/3.png'
 import stairElement4 from '../../images/elements/stairs/4.png'
 import stairElement5 from '../../images/elements/stairs/5.png'
 import stairElement6 from '../../images/elements/stairs/6.png'
-import stairElement7 from '../../images/elements/stairs/7.png'
-import stairElement8 from '../../images/elements/stairs/8.png'
 import furnitureElement1 from '../../images/elements/furnitures/1.png'
 import furnitureElement2 from '../../images/elements/furnitures/2.png'
 import furnitureElement3 from '../../images/elements/furnitures/3.png'
 import furnitureElement4 from '../../images/elements/furnitures/4.png'
 import furnitureElement5 from '../../images/elements/furnitures/5.png'
 import furnitureElement6 from '../../images/elements/furnitures/6.png'
-import furnitureElement7 from '../../images/elements/furnitures/7.png'
-import furnitureElement8 from '../../images/elements/furnitures/8.png'
-import furnitureElement9 from '../../images/elements/furnitures/9.png'
 import miscElement1 from '../../images/elements/misc/1.png'
 import miscElement2 from '../../images/elements/misc/2.png'
 import miscElement3 from '../../images/elements/misc/3.png'
@@ -45,6 +40,49 @@ import miscElement7 from '../../images/elements/misc/7.png'
 import miscElement8 from '../../images/elements/misc/8.png'
 import miscElement9 from '../../images/elements/misc/9.png'
 import miscElement10 from '../../images/elements/misc/10.png'
+import miscElement11 from '../../images/elements/misc/11.png'
+import miscElement12 from '../../images/elements/misc/12.png'
+import miscElement13 from '../../images/elements/misc/13.png'
+import miscElement14 from '../../images/elements/misc/14.png'
+import stoneElement1 from '../../images/elements/stones/1.png'
+import stoneElement2 from '../../images/elements/stones/2.png'
+import stoneElement3 from '../../images/elements/stones/3.png'
+import stoneElement4 from '../../images/elements/stones/4.png'
+import stoneElement5 from '../../images/elements/stones/5.png'
+import stoneElement6 from '../../images/elements/stones/6.png'
+import stoneElement7 from '../../images/elements/stones/7.png'
+import stoneElement8 from '../../images/elements/stones/8.png'
+import stoneElement9 from '../../images/elements/stones/9.png'
+import monsterElement1 from '../../images/elements/monsters/1.png'
+import monsterElement2 from '../../images/elements/monsters/2.png'
+import monsterElement3 from '../../images/elements/monsters/3.png'
+import monsterElement4 from '../../images/elements/monsters/4.png'
+import monsterElement5 from '../../images/elements/monsters/5.png'
+import monsterElement6 from '../../images/elements/monsters/6.png'
+import monsterElement7 from '../../images/elements/monsters/7.png'
+import monsterElement8 from '../../images/elements/monsters/8.png'
+import monsterElement9 from '../../images/elements/monsters/9.png'
+import monsterElement10 from '../../images/elements/monsters/10.png'
+import monsterElement11 from '../../images/elements/monsters/11.png'
+import monsterElement12 from '../../images/elements/monsters/12.png'
+import monsterElement13 from '../../images/elements/monsters/13.png'
+import monsterElement14 from '../../images/elements/monsters/14.png'
+import monsterElement15 from '../../images/elements/monsters/15.png'
+import monsterElement16 from '../../images/elements/monsters/16.png'
+import monsterElement17 from '../../images/elements/monsters/17.png'
+import monsterElement18 from '../../images/elements/monsters/18.png'
+import monsterElement19 from '../../images/elements/monsters/19.png'
+import monsterElement20 from '../../images/elements/monsters/20.png'
+import monsterElement21 from '../../images/elements/monsters/21.png'
+import monsterElement22 from '../../images/elements/monsters/22.png'
+import monsterElement23 from '../../images/elements/monsters/23.png'
+import monsterElement24 from '../../images/elements/monsters/24.png'
+import monsterElement25 from '../../images/elements/monsters/25.png'
+import monsterElement26 from '../../images/elements/monsters/26.png'
+import monsterElement27 from '../../images/elements/monsters/27.png'
+import monsterElement28 from '../../images/elements/monsters/28.png'
+import monsterElement29 from '../../images/elements/monsters/29.png'
+import monsterElement30 from '../../images/elements/monsters/30.png'
 import groundTexture1 from '../../images/grounds/1.png'
 import groundTexture2 from '../../images/grounds/2.png'
 import groundTexture3 from '../../images/grounds/3.png'
@@ -119,17 +157,51 @@ const elementAssetOptions: MapElementAssetOption[] = [
   { category: 'stairs', variant: '4', imageSrc: stairElement4 },
   { category: 'stairs', variant: '5', imageSrc: stairElement5 },
   { category: 'stairs', variant: '6', imageSrc: stairElement6 },
-  { category: 'stairs', variant: '7', imageSrc: stairElement7 },
-  { category: 'stairs', variant: '8', imageSrc: stairElement8 },
   { category: 'furnitures', variant: '1', imageSrc: furnitureElement1 },
   { category: 'furnitures', variant: '2', imageSrc: furnitureElement2 },
   { category: 'furnitures', variant: '3', imageSrc: furnitureElement3 },
   { category: 'furnitures', variant: '4', imageSrc: furnitureElement4 },
   { category: 'furnitures', variant: '5', imageSrc: furnitureElement5 },
   { category: 'furnitures', variant: '6', imageSrc: furnitureElement6 },
-  { category: 'furnitures', variant: '7', imageSrc: furnitureElement7 },
-  { category: 'furnitures', variant: '8', imageSrc: furnitureElement8 },
-  { category: 'furnitures', variant: '9', imageSrc: furnitureElement9 },
+  { category: 'stones', variant: '1', imageSrc: stoneElement1 },
+  { category: 'stones', variant: '2', imageSrc: stoneElement2 },
+  { category: 'stones', variant: '3', imageSrc: stoneElement3 },
+  { category: 'stones', variant: '4', imageSrc: stoneElement4 },
+  { category: 'stones', variant: '5', imageSrc: stoneElement5 },
+  { category: 'stones', variant: '6', imageSrc: stoneElement6 },
+  { category: 'stones', variant: '7', imageSrc: stoneElement7 },
+  { category: 'stones', variant: '8', imageSrc: stoneElement8 },
+  { category: 'stones', variant: '9', imageSrc: stoneElement9 },
+  { category: 'monsters', variant: '1', imageSrc: monsterElement1 },
+  { category: 'monsters', variant: '2', imageSrc: monsterElement2 },
+  { category: 'monsters', variant: '3', imageSrc: monsterElement3 },
+  { category: 'monsters', variant: '4', imageSrc: monsterElement4 },
+  { category: 'monsters', variant: '5', imageSrc: monsterElement5 },
+  { category: 'monsters', variant: '6', imageSrc: monsterElement6 },
+  { category: 'monsters', variant: '7', imageSrc: monsterElement7 },
+  { category: 'monsters', variant: '8', imageSrc: monsterElement8 },
+  { category: 'monsters', variant: '9', imageSrc: monsterElement9 },
+  { category: 'monsters', variant: '10', imageSrc: monsterElement10 },
+  { category: 'monsters', variant: '11', imageSrc: monsterElement11 },
+  { category: 'monsters', variant: '12', imageSrc: monsterElement12 },
+  { category: 'monsters', variant: '13', imageSrc: monsterElement13 },
+  { category: 'monsters', variant: '14', imageSrc: monsterElement14 },
+  { category: 'monsters', variant: '15', imageSrc: monsterElement15 },
+  { category: 'monsters', variant: '16', imageSrc: monsterElement16 },
+  { category: 'monsters', variant: '17', imageSrc: monsterElement17 },
+  { category: 'monsters', variant: '18', imageSrc: monsterElement18 },
+  { category: 'monsters', variant: '19', imageSrc: monsterElement19 },
+  { category: 'monsters', variant: '20', imageSrc: monsterElement20 },
+  { category: 'monsters', variant: '21', imageSrc: monsterElement21 },
+  { category: 'monsters', variant: '22', imageSrc: monsterElement22 },
+  { category: 'monsters', variant: '23', imageSrc: monsterElement23 },
+  { category: 'monsters', variant: '24', imageSrc: monsterElement24 },
+  { category: 'monsters', variant: '25', imageSrc: monsterElement25 },
+  { category: 'monsters', variant: '26', imageSrc: monsterElement26 },
+  { category: 'monsters', variant: '27', imageSrc: monsterElement27 },
+  { category: 'monsters', variant: '28', imageSrc: monsterElement28 },
+  { category: 'monsters', variant: '29', imageSrc: monsterElement29 },
+  { category: 'monsters', variant: '30', imageSrc: monsterElement30 },
   { category: 'misc', variant: '1', imageSrc: miscElement1 },
   { category: 'misc', variant: '2', imageSrc: miscElement2 },
   { category: 'misc', variant: '3', imageSrc: miscElement3 },
@@ -140,9 +212,13 @@ const elementAssetOptions: MapElementAssetOption[] = [
   { category: 'misc', variant: '8', imageSrc: miscElement8 },
   { category: 'misc', variant: '9', imageSrc: miscElement9 },
   { category: 'misc', variant: '10', imageSrc: miscElement10 },
+  { category: 'misc', variant: '11', imageSrc: miscElement11 },
+  { category: 'misc', variant: '12', imageSrc: miscElement12 },
+  { category: 'misc', variant: '13', imageSrc: miscElement13 },
+  { category: 'misc', variant: '14', imageSrc: miscElement14 },
 ]
 
-const elementCategories: MapElementCategory[] = ['trees', 'bushes', 'stairs', 'furnitures', 'misc']
+const elementCategories: MapElementCategory[] = ['trees', 'bushes', 'stairs', 'furnitures', 'stones', 'monsters', 'misc']
 
 const getElementAssetSrc = (category: MapElementCategory, variant: MapElementVariant): string => {
   return elementAssetOptions.find((option) => option.category === category && option.variant === variant)?.imageSrc ?? elementAssetOptions.find((option) => option.category === category)?.imageSrc ?? ''
@@ -550,6 +626,8 @@ export const useMapEditPage = (): MapEditPageState => {
     bushes: '1',
     stairs: '1',
     furnitures: '1',
+    stones: '1',
+    monsters: '1',
     misc: '1',
   })
   const [selectedDrawMode, setSelectedDrawMode] = useState<MapDrawMode>('single')
@@ -1182,6 +1260,99 @@ export const useMapEditPage = (): MapEditPageState => {
     : []
   const elementPickerCategories = elementCategories.map((category) => {
     const categoryLabel = t(`pages.mapEdit.elementCategories.${category}`)
+    const treeVariantLabels: Partial<Record<MapElementVariant, string>> = {
+      '1': t('pages.mapEdit.elementTreeVariants.deciduous'),
+      '2': t('pages.mapEdit.elementTreeVariants.coniferous'),
+      '3': t('pages.mapEdit.elementTreeVariants.fantasy'),
+      '4': t('pages.mapEdit.elementTreeVariants.modeled'),
+      '5': t('pages.mapEdit.elementTreeVariants.fallen'),
+      '6': t('pages.mapEdit.elementTreeVariants.stump'),
+    }
+    const bushVariantLabels: Partial<Record<MapElementVariant, string>> = {
+      '1': t('pages.mapEdit.elementBushVariants.regular'),
+      '2': t('pages.mapEdit.elementBushVariants.yellowFlowers'),
+      '3': t('pages.mapEdit.elementBushVariants.whiteFlowers'),
+      '4': t('pages.mapEdit.elementBushVariants.threeSmall'),
+      '5': t('pages.mapEdit.elementBushVariants.hedge'),
+      '6': t('pages.mapEdit.elementBushVariants.plants'),
+      '7': t('pages.mapEdit.elementBushVariants.twoSmall'),
+      '8': t('pages.mapEdit.elementBushVariants.fruit'),
+    }
+    const stairVariantLabels: Partial<Record<MapElementVariant, string>> = {
+      '1': t('pages.mapEdit.elementStairVariants.upDownStairs'),
+      '2': t('pages.mapEdit.elementStairVariants.leftRightStairs'),
+      '3': t('pages.mapEdit.elementStairVariants.ladderUp'),
+      '4': t('pages.mapEdit.elementStairVariants.ladderDown'),
+      '5': t('pages.mapEdit.elementStairVariants.entranceUp'),
+      '6': t('pages.mapEdit.elementStairVariants.descentDown'),
+    }
+    const furnitureVariantLabels: Partial<Record<MapElementVariant, string>> = {
+      '1': t('pages.mapEdit.elementFurnitureVariants.shelf'),
+      '2': t('pages.mapEdit.elementFurnitureVariants.cabinet'),
+      '3': t('pages.mapEdit.elementFurnitureVariants.tableDesk'),
+      '4': t('pages.mapEdit.elementFurnitureVariants.bed'),
+      '5': t('pages.mapEdit.elementFurnitureVariants.couch'),
+      '6': t('pages.mapEdit.elementFurnitureVariants.armchair'),
+    }
+    const stoneVariantLabels: Partial<Record<MapElementVariant, string>> = {
+      '1': t('pages.mapEdit.elementStoneVariants.rubble'),
+      '2': t('pages.mapEdit.elementStoneVariants.rocks'),
+      '3': t('pages.mapEdit.elementStoneVariants.threeStones'),
+      '4': t('pages.mapEdit.elementStoneVariants.menhirs'),
+      '5': t('pages.mapEdit.elementStoneVariants.largeStone'),
+      '6': t('pages.mapEdit.elementStoneVariants.mossyStone'),
+      '7': t('pages.mapEdit.elementStoneVariants.crackedStone'),
+      '8': t('pages.mapEdit.elementStoneVariants.magicStone'),
+      '9': t('pages.mapEdit.elementStoneVariants.stoneWall'),
+    }
+    const monsterVariantLabels: Partial<Record<MapElementVariant, string>> = {
+      '1': t('pages.mapEdit.elementMonsterVariants.guardian'),
+      '2': t('pages.mapEdit.elementMonsterVariants.knight'),
+      '3': t('pages.mapEdit.elementMonsterVariants.wizard'),
+      '4': t('pages.mapEdit.elementMonsterVariants.monk'),
+      '5': t('pages.mapEdit.elementMonsterVariants.bard'),
+      '6': t('pages.mapEdit.elementMonsterVariants.priest'),
+      '7': t('pages.mapEdit.elementMonsterVariants.warlock'),
+      '8': t('pages.mapEdit.elementMonsterVariants.hunter'),
+      '9': t('pages.mapEdit.elementMonsterVariants.rogue'),
+      '10': t('pages.mapEdit.elementMonsterVariants.paladin'),
+      '11': t('pages.mapEdit.elementMonsterVariants.human'),
+      '12': t('pages.mapEdit.elementMonsterVariants.elf'),
+      '13': t('pages.mapEdit.elementMonsterVariants.dwarf'),
+      '14': t('pages.mapEdit.elementMonsterVariants.halfling'),
+      '15': t('pages.mapEdit.elementMonsterVariants.tiefling'),
+      '16': t('pages.mapEdit.elementMonsterVariants.draconian'),
+      '17': t('pages.mapEdit.elementMonsterVariants.zombie'),
+      '18': t('pages.mapEdit.elementMonsterVariants.goblin'),
+      '19': t('pages.mapEdit.elementMonsterVariants.kobold'),
+      '20': t('pages.mapEdit.elementMonsterVariants.thug'),
+      '21': t('pages.mapEdit.elementMonsterVariants.dragon'),
+      '22': t('pages.mapEdit.elementMonsterVariants.wolf'),
+      '23': t('pages.mapEdit.elementMonsterVariants.beast'),
+      '24': t('pages.mapEdit.elementMonsterVariants.demon'),
+      '25': t('pages.mapEdit.elementMonsterVariants.skeleton'),
+      '26': t('pages.mapEdit.elementMonsterVariants.ghost'),
+      '27': t('pages.mapEdit.elementMonsterVariants.insect'),
+      '28': t('pages.mapEdit.elementMonsterVariants.mummy'),
+      '29': t('pages.mapEdit.elementMonsterVariants.orc'),
+      '30': t('pages.mapEdit.elementMonsterVariants.golem'),
+    }
+    const miscVariantLabels: Partial<Record<MapElementVariant, string>> = {
+      '1': t('pages.mapEdit.elementMiscVariants.chest'),
+      '2': t('pages.mapEdit.elementMiscVariants.vase'),
+      '3': t('pages.mapEdit.elementMiscVariants.woodenCrate'),
+      '4': t('pages.mapEdit.elementMiscVariants.campfire'),
+      '5': t('pages.mapEdit.elementMiscVariants.drainGrate'),
+      '6': t('pages.mapEdit.elementMiscVariants.column'),
+      '7': t('pages.mapEdit.elementMiscVariants.brokenColumn'),
+      '8': t('pages.mapEdit.elementMiscVariants.well'),
+      '9': t('pages.mapEdit.elementMiscVariants.fountain'),
+      '10': t('pages.mapEdit.elementMiscVariants.barrel'),
+      '11': t('pages.mapEdit.elementMiscVariants.signpost'),
+      '12': t('pages.mapEdit.elementMiscVariants.stalagmite'),
+      '13': t('pages.mapEdit.elementMiscVariants.stalactite'),
+      '14': t('pages.mapEdit.elementMiscVariants.crystal'),
+    }
 
     return {
       key: category,
@@ -1189,7 +1360,21 @@ export const useMapEditPage = (): MapEditPageState => {
       selectedVariant: selectedElementVariantByCategory[category],
       options: elementAssetOptions.filter((option) => option.category === category).map((option) => ({
         ...option,
-        label: t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant }),
+        label: option.category === 'trees'
+          ? treeVariantLabels[option.variant] ?? t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant })
+          : option.category === 'bushes'
+            ? bushVariantLabels[option.variant] ?? t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant })
+            : option.category === 'stairs'
+              ? stairVariantLabels[option.variant] ?? t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant })
+              : option.category === 'furnitures'
+                ? furnitureVariantLabels[option.variant] ?? t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant })
+                : option.category === 'stones'
+                  ? stoneVariantLabels[option.variant] ?? t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant })
+                  : option.category === 'monsters'
+                    ? monsterVariantLabels[option.variant] ?? t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant })
+                    : option.category === 'misc'
+                      ? miscVariantLabels[option.variant] ?? t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant })
+                      : t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant }),
       })),
     }
   })

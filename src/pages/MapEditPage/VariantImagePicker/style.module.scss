@@ -1,6 +1,6 @@
 .palette {
   display: grid;
-  grid-template-columns: repeat(2, max-content);
+  grid-template-columns: repeat(3, max-content);
   gap: 0.55rem;
 }
 
@@ -48,13 +48,17 @@
   display: grid;
   grid-template-columns: repeat(4, max-content);
   gap: 0.45rem;
-  width: max-content;
-  max-width: 12rem;
+  width: calc((4 * 2.55rem) + (3 * 0.45rem) + (2 * 0.45rem));
   padding: 0.45rem;
   border: 1px solid rgba(240, 198, 111, 0.28);
   border-radius: 0.55rem;
   background: rgba(29, 18, 14, 0.96);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
+}
+
+.variantPopoverLeft {
+  right: calc(100% + 0.5rem);
+  left: auto;
 }
 
 @media (max-width: 720px) {

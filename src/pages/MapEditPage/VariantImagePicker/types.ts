@@ -18,4 +18,5 @@ export interface VariantImagePickerProps<TCategory extends string = string, TVar
   ariaLabel: string
   categories: VariantImagePickerCategory<TCategory, TVariant>[]
   onSelect: (category: TCategory, variant: TVariant) => void
+  popoverPlacement?: 'left' | 'right'
 }

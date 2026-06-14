@@ -26,11 +26,14 @@ export const MapEditPage = () => {
   })
   const { activeLayer, colorOptions, drawModeOptions, elementPickerCategories, elements, error, form, groundCells, groundTextureOptions, handleChange, handleClearLinePreview, handlePreviewGroundCell, handlePreviewLine, handlePreviewPoint, handleRemoveElement, handleRemoveGroundCell, handleRemoveLabel, handleRemoveLine, handleRemovePoint, handleRenameLabel, handleSelectColor, handleSelectDrawMode, handleSelectElementAsset, handleSelectGroundTexture, handleSelectLayer, handleSelectPoint, handleSubmit, handleToggleElement, handleToggleGroundCell, handleToggleLabel, handleToggleLine, hasChanges, labels, layerOptions, lineSegments, loading, pointSegments, previewEraseGroundCellIds, previewEraseLineIds, previewGroundCellIds, previewLineIds, previewRectangleGroundCellIds, previewRectangleLineIds, selectedColor, selectedDrawMode, selectedElementCategory, selectedElementVariant, selectedEraseGroundRangeStartId, selectedEraseRangeStartId, selectedGroundRangeStartId, selectedGroundRectangleStartId, selectedGroundTexture, selectedPointEraseStartId, selectedPointRangeStartId, selectedRectangleStartId, selectedRangeStartId, saving } = useMapEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
+  const [isMapFullscreen, setMapFullscreen] = useState(false)
   const [editingLabelId, setEditingLabelId] = useState('')
   const [labelDraftName, setLabelDraftName] = useState('')
   const getGroundTextureSrc = (texture: string) => {
     return groundTextureOptions.find((option) => option.key === texture)?.imageSrc ?? groundTextureOptions[0]?.imageSrc ?? ''
   }
+  const groundLayerIconSrc = getGroundTextureSrc('6')
+  const elementLayerIconSrc = elementPickerCategories.find((category) => category.key === 'trees')?.options[0]?.imageSrc ?? ''
 
   const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
     if (hasChanges) {
@@ -44,6 +47,10 @@ export const MapEditPage = () => {
   const handleConfirmBackToList = () => {
     setUnsavedChangesDialogOpen(false)
     navigateBack()
+  }
+
+  const handleToggleMapFullscreen = () => {
+    setMapFullscreen((current) => !current)
   }
 
   const handleOpenLabelEditor = (labelId: string, name: string) => {
@@ -112,7 +119,7 @@ export const MapEditPage = () => {
                 <textarea className={styles.descriptionTextarea} id="map-description" name="description" rows={2} value={form.description} onChange={handleChange} placeholder={t('pages.mapEdit.placeholders.description')} />
               </label>
             </section>
-            <section className={styles.mapEditorSection} aria-label={t('pages.mapEdit.editorLabel')}>
+            <section className={`${styles.mapEditorSection} ${isMapFullscreen ? styles.mapEditorSectionFullscreen : ''}`} aria-label={t('pages.mapEdit.editorLabel')}>
               <div className={styles.mapWorkspace}>
                 <div className={`${styles.mapGrid} ${activeLayer === 'lines' && selectedDrawMode === 'single' ? styles.mapGridSingleMode : ''}`} aria-label={t('pages.mapEdit.editorLabel')}>
                   {groundCells.map((cell) => {
@@ -155,6 +162,10 @@ export const MapEditPage = () => {
                         activeLayer !== 'lines' ? styles.lineSegmentDisabled : '',
                         activeLayer === 'lines' && selectedDrawMode !== 'single' ? styles.lineSegmentPointMode : '',
                         line.orientation === 'horizontal' ? styles.lineSegmentHorizontal : styles.lineSegmentVertical,
+                        line.orientation === 'horizontal' && line.y === 0 ? styles.lineSegmentTopEdge : '',
+                        line.orientation === 'horizontal' && line.y === 22 ? styles.lineSegmentBottomEdge : '',
+                        line.orientation === 'vertical' && line.x === 0 ? styles.lineSegmentLeftEdge : '',
+                        line.orientation === 'vertical' && line.x === 34 ? styles.lineSegmentRightEdge : '',
                         line.active ? styles.lineSegmentActive : '',
                         activeLayer === 'lines' && previewLineIds.includes(line.id) ? styles.lineSegmentPreview : '',
                         activeLayer === 'lines' && selectedDrawMode === 'single' && previewEraseLineIds.includes(line.id) ? styles.lineSegmentErasePreview : '',
@@ -212,7 +223,15 @@ export const MapEditPage = () => {
                   {labels.map((label) => (
                     <div
                       key={label.id}
-                      className={`${styles.mapLabel} ${activeLayer === 'labels' ? styles.mapLabelEditable : styles.mapLabelDimmed} ${label.active ? styles.mapLabelActive : ''} ${label.name.trim() ? styles.mapLabelHasName : ''}`}
+                      className={[
+                        styles.mapLabel,
+                        activeLayer === 'labels' ? styles.mapLabelEditable : styles.mapLabelDimmed,
+                        label.active ? styles.mapLabelActive : '',
+                        label.name.trim() ? styles.mapLabelHasName : '',
+                        editingLabelId === label.id ? styles.mapLabelEditing : '',
+                        label.y <= 2 ? styles.mapLabelNearTop : '',
+                        label.x >= 29 ? styles.mapLabelNearRight : '',
+                      ].filter(Boolean).join(' ')}
                       style={{
                         left: `${(label.x / 34) * 100}%`,
                         top: `${(label.y / 22) * 100}%`,
@@ -268,10 +287,29 @@ export const MapEditPage = () => {
                 </div>
               </div>
               <div className={styles.editorSide}>
+                {isMapFullscreen ? (
+                  <button className={`${styles.primaryButton} ${styles.fullscreenSaveButton}`} form="map-edit-form" type="submit" disabled={saving || !hasChanges}>
+                    <span className={styles.buttonContent}>
+                      <AppIcon name="save" />
+                      <span>{saving ? t('common.states.saving') : t('common.actions.save')}</span>
+                    </span>
+                  </button>
+                ) : null}
+                <button className={styles.fullscreenButton} type="button" aria-pressed={isMapFullscreen} onClick={handleToggleMapFullscreen}>
+                  {isMapFullscreen ? t('pages.mapEdit.exitFullscreen') : t('pages.mapEdit.enterFullscreen')}
+                </button>
                 <div className={styles.layerTabs} role="tablist" aria-label={t('pages.mapEdit.layersLabel')}>
                   {layerOptions.map((layer) => (
                     <button key={layer.key} className={`${styles.layerTab} ${activeLayer === layer.key ? styles.layerTabActive : ''}`} type="button" role="tab" aria-selected={activeLayer === layer.key} aria-label={t(layer.labelKey)} title={t(layer.labelKey)} onClick={() => handleSelectLayer(layer.key)}>
-                      <HugeiconsIcon aria-hidden="true" className={styles.layerIcon} color="currentColor" icon={layerIconMap[layer.key]} strokeWidth={1.8} />
+                      {layer.key === 'lines' ? (
+                        <span className={styles.layerLineIcon} aria-hidden="true" />
+                      ) : layer.key === 'ground' && groundLayerIconSrc ? (
+                        <img className={styles.layerImageIcon} src={groundLayerIconSrc} alt="" aria-hidden="true" />
+                      ) : layer.key === 'elements' && elementLayerIconSrc ? (
+                        <img className={styles.layerImageIcon} src={elementLayerIconSrc} alt="" aria-hidden="true" />
+                      ) : (
+                        <HugeiconsIcon aria-hidden="true" className={styles.layerIcon} color="currentColor" icon={layerIconMap[layer.key]} strokeWidth={1.8} />
+                      )}
                     </button>
                   ))}
                 </div>
@@ -297,7 +335,7 @@ export const MapEditPage = () => {
                         ))}
                       </div>
                     ) : activeLayer === 'elements' ? (
-                      <VariantImagePicker activeCategory={selectedElementCategory} activeVariant={selectedElementVariant} ariaLabel={t('pages.mapEdit.elementPaletteLabel')} categories={elementPickerCategories} onSelect={handleSelectElementAsset} />
+                      <VariantImagePicker activeCategory={selectedElementCategory} activeVariant={selectedElementVariant} ariaLabel={t('pages.mapEdit.elementPaletteLabel')} categories={elementPickerCategories} popoverPlacement={isMapFullscreen ? 'left' : 'right'} onSelect={handleSelectElementAsset} />
                     ) : (
                       <div className={styles.palette} role="toolbar" aria-label={t('pages.mapEdit.paletteLabel')}>
                         {colorOptions.map((color) => (
@@ -308,6 +346,11 @@ export const MapEditPage = () => {
                       </div>
                     )}
                   </section>
+                  {activeLayer === 'elements' ? (
+                    <section className={styles.menuSection}>
+                      <p className={styles.elementHintText}>{t('pages.mapEdit.elementVariantHint')}</p>
+                    </section>
+                  ) : null}
                 </div> : activeLayer === 'labels' ? null : (
                   <section className={styles.menuSection}>
                     <p className={styles.emptyLayerTools}>{t('pages.mapEdit.emptyLayer')}</p>

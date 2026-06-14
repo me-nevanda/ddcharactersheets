@@ -21,11 +21,11 @@ const isMapGroundTexture = (value: unknown): value is MapGroundTexture => {
 }
 
 const isMapElementCategory = (value: unknown): value is MapElementCategory => {
-  return value === 'trees' || value === 'bushes' || value === 'stairs' || value === 'furnitures' || value === 'misc'
+  return value === 'trees' || value === 'bushes' || value === 'stairs' || value === 'furnitures' || value === 'stones' || value === 'monsters' || value === 'misc'
 }
 
 const isMapElementVariant = (value: unknown): value is MapElementVariant => {
-  return value === '1' || value === '2' || value === '3' || value === '4' || value === '5' || value === '6' || value === '7' || value === '8' || value === '9' || value === '10' || value === '12' || value === '13' || value === '14' || value === '15'
+  return value === '1' || value === '2' || value === '3' || value === '4' || value === '5' || value === '6' || value === '7' || value === '8' || value === '9' || value === '10' || value === '11' || value === '12' || value === '13' || value === '14' || value === '15' || value === '16' || value === '17' || value === '18' || value === '19' || value === '20' || value === '21' || value === '22' || value === '23' || value === '24' || value === '25' || value === '26' || value === '27' || value === '28' || value === '29' || value === '30'
 }
 
 const isMapElementVariantForCategory = (category: MapElementCategory, variant: MapElementVariant): boolean => {
@@ -38,15 +38,23 @@ const isMapElementVariantForCategory = (category: MapElementCategory, variant: M
   }
 
   if (category === 'stairs') {
-    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8'
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6'
   }
 
   if (category === 'furnitures') {
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6'
+  }
+
+  if (category === 'stones') {
     return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8' || variant === '9'
   }
 
+  if (category === 'monsters') {
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8' || variant === '9' || variant === '10' || variant === '11' || variant === '12' || variant === '13' || variant === '14' || variant === '15' || variant === '16' || variant === '17' || variant === '18' || variant === '19' || variant === '20' || variant === '21' || variant === '22' || variant === '23' || variant === '24' || variant === '25' || variant === '26' || variant === '27' || variant === '28' || variant === '29' || variant === '30'
+  }
+
   if (category === 'misc') {
-    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8' || variant === '9' || variant === '10'
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8' || variant === '9' || variant === '10' || variant === '11' || variant === '12' || variant === '13' || variant === '14'
   }
 
   return true

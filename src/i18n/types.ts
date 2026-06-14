@@ -174,7 +174,9 @@ export interface TranslationDictionary {
       drawModeLabel: string
       eyebrow: string
       emptyLayer: string
+      enterFullscreen: string
       editorLabel: string
+      exitFullscreen: string
       layersLabel: string
       loading: string
       paletteLabel: string
@@ -183,6 +185,7 @@ export interface TranslationDictionary {
       elementPaletteLabel: string
       elementCategoryLabel: string
       elementAssetLabel: string
+      elementVariantHint: string
       toggleElementLabel: string
       toggleGroundCellLabel: string
       toggleLabelLabel: string
@@ -219,7 +222,102 @@ export interface TranslationDictionary {
         bushes: string
         stairs: string
         furnitures: string
+        stones: string
+        monsters: string
         misc: string
+      }
+      elementTreeVariants: {
+        deciduous: string
+        coniferous: string
+        fantasy: string
+        modeled: string
+        fallen: string
+        stump: string
+      }
+      elementBushVariants: {
+        regular: string
+        yellowFlowers: string
+        whiteFlowers: string
+        threeSmall: string
+        hedge: string
+        plants: string
+        twoSmall: string
+        fruit: string
+      }
+      elementStairVariants: {
+        upDownStairs: string
+        leftRightStairs: string
+        ladderUp: string
+        ladderDown: string
+        entranceUp: string
+        descentDown: string
+      }
+      elementFurnitureVariants: {
+        shelf: string
+        cabinet: string
+        tableDesk: string
+        bed: string
+        couch: string
+        armchair: string
+      }
+      elementStoneVariants: {
+        rubble: string
+        rocks: string
+        threeStones: string
+        menhirs: string
+        largeStone: string
+        mossyStone: string
+        crackedStone: string
+        magicStone: string
+        stoneWall: string
+      }
+      elementMonsterVariants: {
+        guardian: string
+        knight: string
+        wizard: string
+        monk: string
+        bard: string
+        priest: string
+        warlock: string
+        hunter: string
+        rogue: string
+        paladin: string
+        human: string
+        elf: string
+        dwarf: string
+        halfling: string
+        tiefling: string
+        draconian: string
+        zombie: string
+        goblin: string
+        kobold: string
+        thug: string
+        dragon: string
+        wolf: string
+        beast: string
+        demon: string
+        skeleton: string
+        ghost: string
+        insect: string
+        mummy: string
+        orc: string
+        golem: string
+      }
+      elementMiscVariants: {
+        chest: string
+        vase: string
+        woodenCrate: string
+        campfire: string
+        drainGrate: string
+        column: string
+        brokenColumn: string
+        well: string
+        fountain: string
+        barrel: string
+        signpost: string
+        stalagmite: string
+        stalactite: string
+        crystal: string
       }
       fields: {
         name: string

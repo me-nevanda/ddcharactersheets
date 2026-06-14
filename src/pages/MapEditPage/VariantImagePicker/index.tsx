@@ -8,6 +8,7 @@ export const VariantImagePicker = <TCategory extends string, TVariant extends st
   ariaLabel,
   categories,
   onSelect,
+  popoverPlacement = 'right',
 }: VariantImagePickerProps<TCategory, TVariant>) => {
   const [openCategory, setOpenCategory] = useState<TCategory | null>(null)
 
@@ -26,7 +27,7 @@ export const VariantImagePicker = <TCategory extends string, TVariant extends st
               {selectedOption ? <img className={styles.assetImage} src={selectedOption.imageSrc} alt="" aria-hidden="true" /> : null}
             </button>
             {openCategory === category.key ? (
-              <div className={styles.variantPopover}>
+              <div className={`${styles.variantPopover} ${popoverPlacement === 'left' ? styles.variantPopoverLeft : ''}`}>
                 {category.options.map((option) => (
                   <button key={`${option.category}-${option.variant}`} className={`${styles.variantButton} ${activeCategory === option.category && activeVariant === option.variant ? styles.variantButtonActive : ''}`} type="button" aria-label={option.label} title={option.label} aria-pressed={activeCategory === option.category && activeVariant === option.variant} onClick={() => {
                     onSelect(option.category, option.variant)
