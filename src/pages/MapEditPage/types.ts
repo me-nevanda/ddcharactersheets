@@ -1,15 +1,22 @@
 import type { ChangeEvent, MouseEvent, SubmitEvent } from 'react'
-import type { MapData, MapGroundTexture, MapLineColor } from '@appTypes/map'
+import type { MapData, MapElementCategory, MapElementVariant, MapGroundTexture, MapLineColor } from '@appTypes/map'
+import type { VariantImagePickerCategory } from './VariantImagePicker/types'
 
 export type MapPaletteColor = MapLineColor
 
 export interface MapPaletteColorOption {
   key: MapPaletteColor
-  labelKey: 'pages.mapEdit.colors.black' | 'pages.mapEdit.colors.red' | 'pages.mapEdit.colors.green' | 'pages.mapEdit.colors.blue' | 'pages.mapEdit.colors.white' | 'pages.mapEdit.colors.gray' | 'pages.mapEdit.colors.yellow' | 'pages.mapEdit.colors.orange' | 'pages.mapEdit.colors.purple'
+  labelKey: 'pages.mapEdit.colors.black' | 'pages.mapEdit.colors.red' | 'pages.mapEdit.colors.green' | 'pages.mapEdit.colors.blue' | 'pages.mapEdit.colors.white' | 'pages.mapEdit.colors.gray' | 'pages.mapEdit.colors.yellow' | 'pages.mapEdit.colors.orange' | 'pages.mapEdit.colors.purple' | 'pages.mapEdit.colors.brown' | 'pages.mapEdit.colors.tortoise' | 'pages.mapEdit.colors.pink'
 }
 
 export interface MapGroundTextureOption {
   key: MapGroundTexture
+  imageSrc: string
+}
+
+export interface MapElementAssetOption {
+  category: MapElementCategory
+  variant: MapElementVariant
   imageSrc: string
 }
 
@@ -55,7 +62,9 @@ export interface MapGroundCellViewModel {
 export interface MapElementViewModel {
   id: string
   active: boolean
-  color: MapPaletteColor
+  category: MapElementCategory
+  imageSrc: string
+  variant: MapElementVariant
   x: number
   y: number
 }
@@ -71,6 +80,7 @@ export interface MapLabelViewModel {
 export interface MapEditPageState {
   colorOptions: MapPaletteColorOption[]
   groundTextureOptions: MapGroundTextureOption[]
+  elementPickerCategories: VariantImagePickerCategory<MapElementCategory, MapElementVariant>[]
   drawModeOptions: MapDrawModeOption[]
   activeLayer: MapLayer
   error: string
@@ -80,6 +90,7 @@ export interface MapEditPageState {
   handleSelectLayer: (layer: MapLayer) => void
   handleSelectColor: (color: MapPaletteColor) => void
   handleSelectGroundTexture: (texture: MapGroundTexture) => void
+  handleSelectElementAsset: (category: MapElementCategory, variant: MapElementVariant) => void
   handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
   handlePreviewLine: (lineId: string) => void
   handleClearLinePreview: () => void
@@ -112,6 +123,8 @@ export interface MapEditPageState {
   previewRectangleGroundCellIds: string[]
   selectedColor: MapPaletteColor
   selectedGroundTexture: MapGroundTexture
+  selectedElementCategory: MapElementCategory
+  selectedElementVariant: MapElementVariant
   selectedDrawMode: MapDrawMode
   selectedEraseGroundRangeStartId: string
   selectedGroundRangeStartId: string

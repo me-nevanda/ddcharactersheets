@@ -1,4 +1,4 @@
-import type { Map, MapData, MapGridData, MapGridElement, MapGridGroundCell, MapGridLabel, MapGridLine, MapGroundTexture, MapLineColor } from '@appTypes/map'
+import type { Map, MapData, MapElementCategory, MapElementVariant, MapGridData, MapGridElement, MapGridGroundCell, MapGridLabel, MapGridLine, MapGroundTexture, MapLineColor } from '@appTypes/map'
 import { createStoredMap, deleteStoredEntity, listStoredMaps, readStoredMap, updateStoredMap } from './sqliteStore'
 
 const safeMapIdPattern = /^[a-z0-9-]+$/i
@@ -13,11 +13,43 @@ const defaultMapGrid: MapGridData = {
 }
 
 const isMapLineColor = (value: unknown): value is MapLineColor => {
-  return value === 'black' || value === 'red' || value === 'green' || value === 'blue' || value === 'white' || value === 'gray' || value === 'yellow' || value === 'orange' || value === 'purple'
+  return value === 'black' || value === 'red' || value === 'green' || value === 'blue' || value === 'white' || value === 'gray' || value === 'yellow' || value === 'orange' || value === 'purple' || value === 'brown' || value === 'tortoise' || value === 'pink'
 }
 
 const isMapGroundTexture = (value: unknown): value is MapGroundTexture => {
   return value === '1' || value === '2' || value === '3' || value === '4' || value === '5' || value === '6' || value === '7' || value === '8' || value === '9' || value === '10' || value === '11' || value === '12' || value === '13' || value === '14' || value === '15'
+}
+
+const isMapElementCategory = (value: unknown): value is MapElementCategory => {
+  return value === 'trees' || value === 'bushes' || value === 'stairs' || value === 'furnitures' || value === 'misc'
+}
+
+const isMapElementVariant = (value: unknown): value is MapElementVariant => {
+  return value === '1' || value === '2' || value === '3' || value === '4' || value === '5' || value === '6' || value === '7' || value === '8' || value === '9' || value === '10' || value === '12' || value === '13' || value === '14' || value === '15'
+}
+
+const isMapElementVariantForCategory = (category: MapElementCategory, variant: MapElementVariant): boolean => {
+  if (category === 'trees') {
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6'
+  }
+
+  if (category === 'bushes') {
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8'
+  }
+
+  if (category === 'stairs') {
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8'
+  }
+
+  if (category === 'furnitures') {
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8' || variant === '9'
+  }
+
+  if (category === 'misc') {
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8' || variant === '9' || variant === '10'
+  }
+
+  return true
 }
 
 const normalizeNumber = (value: unknown): number => {
@@ -78,12 +110,15 @@ const normalizeMapElement = (value: unknown): MapGridElement | null => {
   const source = value as Partial<Record<keyof MapGridElement, unknown>>
   const x = normalizeNumber(source.x)
   const y = normalizeNumber(source.y)
+  const category = isMapElementCategory(source.category) ? source.category : 'trees'
+  const variant = isMapElementVariant(source.variant) && isMapElementVariantForCategory(category, source.variant) ? source.variant : '1'
 
   return {
     id: typeof source.id === 'string' && source.id.trim() ? source.id : createGroundCellId(x, y),
     x,
     y,
-    color: isMapLineColor(source.color) ? source.color : 'black',
+    category,
+    variant,
   }
 }
 

@@ -3,7 +3,48 @@ import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getMap, saveMap } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
-import type { MapData, MapGridElement, MapGridGroundCell, MapGridLabel, MapGridLine, MapGroundTexture } from '@appTypes/map'
+import type { MapData, MapElementCategory, MapElementVariant, MapGridElement, MapGridGroundCell, MapGridLabel, MapGridLine, MapGroundTexture } from '@appTypes/map'
+import bushElement1 from '../../images/elements/bushes/1.png'
+import bushElement2 from '../../images/elements/bushes/2.png'
+import bushElement3 from '../../images/elements/bushes/3.png'
+import bushElement4 from '../../images/elements/bushes/4.png'
+import bushElement5 from '../../images/elements/bushes/5.png'
+import bushElement6 from '../../images/elements/bushes/6.png'
+import bushElement7 from '../../images/elements/bushes/7.png'
+import bushElement8 from '../../images/elements/bushes/8.png'
+import treeElement1 from '../../images/elements/trees/1.png'
+import treeElement2 from '../../images/elements/trees/2.png'
+import treeElement3 from '../../images/elements/trees/3.png'
+import treeElement4 from '../../images/elements/trees/4.png'
+import treeElement5 from '../../images/elements/trees/5.png'
+import treeElement6 from '../../images/elements/trees/6.png'
+import stairElement1 from '../../images/elements/stairs/1.png'
+import stairElement2 from '../../images/elements/stairs/2.png'
+import stairElement3 from '../../images/elements/stairs/3.png'
+import stairElement4 from '../../images/elements/stairs/4.png'
+import stairElement5 from '../../images/elements/stairs/5.png'
+import stairElement6 from '../../images/elements/stairs/6.png'
+import stairElement7 from '../../images/elements/stairs/7.png'
+import stairElement8 from '../../images/elements/stairs/8.png'
+import furnitureElement1 from '../../images/elements/furnitures/1.png'
+import furnitureElement2 from '../../images/elements/furnitures/2.png'
+import furnitureElement3 from '../../images/elements/furnitures/3.png'
+import furnitureElement4 from '../../images/elements/furnitures/4.png'
+import furnitureElement5 from '../../images/elements/furnitures/5.png'
+import furnitureElement6 from '../../images/elements/furnitures/6.png'
+import furnitureElement7 from '../../images/elements/furnitures/7.png'
+import furnitureElement8 from '../../images/elements/furnitures/8.png'
+import furnitureElement9 from '../../images/elements/furnitures/9.png'
+import miscElement1 from '../../images/elements/misc/1.png'
+import miscElement2 from '../../images/elements/misc/2.png'
+import miscElement3 from '../../images/elements/misc/3.png'
+import miscElement4 from '../../images/elements/misc/4.png'
+import miscElement5 from '../../images/elements/misc/5.png'
+import miscElement6 from '../../images/elements/misc/6.png'
+import miscElement7 from '../../images/elements/misc/7.png'
+import miscElement8 from '../../images/elements/misc/8.png'
+import miscElement9 from '../../images/elements/misc/9.png'
+import miscElement10 from '../../images/elements/misc/10.png'
 import groundTexture1 from '../../images/grounds/1.png'
 import groundTexture2 from '../../images/grounds/2.png'
 import groundTexture3 from '../../images/grounds/3.png'
@@ -19,7 +60,7 @@ import groundTexture12 from '../../images/grounds/12.png'
 import groundTexture13 from '../../images/grounds/13.png'
 import groundTexture14 from '../../images/grounds/14.png'
 import groundTexture15 from '../../images/grounds/15.png'
-import type { MapDrawMode, MapDrawModeOption, MapEditPageState, MapElementViewModel, MapGroundCellViewModel, MapGroundTextureOption, MapLabelViewModel, MapLayer, MapLayerOption, MapLineOrientation, MapLineViewModel, MapPaletteColor, MapPaletteColorOption, MapPointViewModel } from './types'
+import type { MapDrawMode, MapDrawModeOption, MapEditPageState, MapElementAssetOption, MapElementViewModel, MapGroundCellViewModel, MapGroundTextureOption, MapLabelViewModel, MapLayer, MapLayerOption, MapLineOrientation, MapLineViewModel, MapPaletteColor, MapPaletteColorOption, MapPointViewModel } from './types'
 
 const mapGridWidth = 34
 const mapGridHeight = 22
@@ -34,6 +75,9 @@ const colorOptions: MapPaletteColorOption[] = [
   { key: 'yellow', labelKey: 'pages.mapEdit.colors.yellow' },
   { key: 'orange', labelKey: 'pages.mapEdit.colors.orange' },
   { key: 'purple', labelKey: 'pages.mapEdit.colors.purple' },
+  { key: 'brown', labelKey: 'pages.mapEdit.colors.brown' },
+  { key: 'tortoise', labelKey: 'pages.mapEdit.colors.tortoise' },
+  { key: 'pink', labelKey: 'pages.mapEdit.colors.pink' },
 ]
 
 const groundTextureOptions: MapGroundTextureOption[] = [
@@ -53,6 +97,56 @@ const groundTextureOptions: MapGroundTextureOption[] = [
   { key: '14', imageSrc: groundTexture14 },
   { key: '15', imageSrc: groundTexture15 },
 ]
+
+const elementAssetOptions: MapElementAssetOption[] = [
+  { category: 'trees', variant: '1', imageSrc: treeElement1 },
+  { category: 'trees', variant: '2', imageSrc: treeElement2 },
+  { category: 'trees', variant: '3', imageSrc: treeElement3 },
+  { category: 'trees', variant: '4', imageSrc: treeElement4 },
+  { category: 'trees', variant: '5', imageSrc: treeElement5 },
+  { category: 'trees', variant: '6', imageSrc: treeElement6 },
+  { category: 'bushes', variant: '1', imageSrc: bushElement1 },
+  { category: 'bushes', variant: '2', imageSrc: bushElement2 },
+  { category: 'bushes', variant: '3', imageSrc: bushElement3 },
+  { category: 'bushes', variant: '4', imageSrc: bushElement4 },
+  { category: 'bushes', variant: '5', imageSrc: bushElement5 },
+  { category: 'bushes', variant: '6', imageSrc: bushElement6 },
+  { category: 'bushes', variant: '7', imageSrc: bushElement7 },
+  { category: 'bushes', variant: '8', imageSrc: bushElement8 },
+  { category: 'stairs', variant: '1', imageSrc: stairElement1 },
+  { category: 'stairs', variant: '2', imageSrc: stairElement2 },
+  { category: 'stairs', variant: '3', imageSrc: stairElement3 },
+  { category: 'stairs', variant: '4', imageSrc: stairElement4 },
+  { category: 'stairs', variant: '5', imageSrc: stairElement5 },
+  { category: 'stairs', variant: '6', imageSrc: stairElement6 },
+  { category: 'stairs', variant: '7', imageSrc: stairElement7 },
+  { category: 'stairs', variant: '8', imageSrc: stairElement8 },
+  { category: 'furnitures', variant: '1', imageSrc: furnitureElement1 },
+  { category: 'furnitures', variant: '2', imageSrc: furnitureElement2 },
+  { category: 'furnitures', variant: '3', imageSrc: furnitureElement3 },
+  { category: 'furnitures', variant: '4', imageSrc: furnitureElement4 },
+  { category: 'furnitures', variant: '5', imageSrc: furnitureElement5 },
+  { category: 'furnitures', variant: '6', imageSrc: furnitureElement6 },
+  { category: 'furnitures', variant: '7', imageSrc: furnitureElement7 },
+  { category: 'furnitures', variant: '8', imageSrc: furnitureElement8 },
+  { category: 'furnitures', variant: '9', imageSrc: furnitureElement9 },
+  { category: 'misc', variant: '1', imageSrc: miscElement1 },
+  { category: 'misc', variant: '2', imageSrc: miscElement2 },
+  { category: 'misc', variant: '3', imageSrc: miscElement3 },
+  { category: 'misc', variant: '4', imageSrc: miscElement4 },
+  { category: 'misc', variant: '5', imageSrc: miscElement5 },
+  { category: 'misc', variant: '6', imageSrc: miscElement6 },
+  { category: 'misc', variant: '7', imageSrc: miscElement7 },
+  { category: 'misc', variant: '8', imageSrc: miscElement8 },
+  { category: 'misc', variant: '9', imageSrc: miscElement9 },
+  { category: 'misc', variant: '10', imageSrc: miscElement10 },
+]
+
+const elementCategories: MapElementCategory[] = ['trees', 'bushes', 'stairs', 'furnitures', 'misc']
+
+const getElementAssetSrc = (category: MapElementCategory, variant: MapElementVariant): string => {
+  return elementAssetOptions.find((option) => option.category === category && option.variant === variant)?.imageSrc ?? elementAssetOptions.find((option) => option.category === category)?.imageSrc ?? ''
+}
 
 const drawModeOptions: MapDrawModeOption[] = [
   { key: 'single', labelKey: 'pages.mapEdit.drawModes.single' },
@@ -105,12 +199,13 @@ const createGroundCell = (x: number, y: number, texture: MapGroundTexture): MapG
   }
 }
 
-const createElement = (x: number, y: number, color: MapPaletteColor): MapGridElement => {
+const createElement = (x: number, y: number, category: MapElementCategory, variant: MapElementVariant): MapGridElement => {
   return {
     id: createGroundCellId(x, y),
     x,
     y,
-    color,
+    category,
+    variant,
   }
 }
 
@@ -155,7 +250,9 @@ const buildElements = (elements: MapGridElement[]): MapElementViewModel[] => {
       cells.push({
         id,
         active: Boolean(activeElement),
-        color: activeElement?.color ?? 'black',
+        category: activeElement?.category ?? 'trees',
+        imageSrc: getElementAssetSrc(activeElement?.category ?? 'trees', activeElement?.variant ?? '1'),
+        variant: activeElement?.variant ?? '1',
         x,
         y,
       })
@@ -447,6 +544,14 @@ export const useMapEditPage = (): MapEditPageState => {
   const [activeLayer, setActiveLayer] = useState<MapLayer>('lines')
   const [selectedColor, setSelectedColor] = useState<MapPaletteColor>('black')
   const [selectedGroundTexture, setSelectedGroundTexture] = useState<MapGroundTexture>('1')
+  const [selectedElementCategory, setSelectedElementCategory] = useState<MapElementCategory>('trees')
+  const [selectedElementVariantByCategory, setSelectedElementVariantByCategory] = useState<Record<MapElementCategory, MapElementVariant>>({
+    trees: '1',
+    bushes: '1',
+    stairs: '1',
+    furnitures: '1',
+    misc: '1',
+  })
   const [selectedDrawMode, setSelectedDrawMode] = useState<MapDrawMode>('single')
   const [selectedRangeStartId, setSelectedRangeStartId] = useState('')
   const [previewRangeEndId, setPreviewRangeEndId] = useState('')
@@ -620,6 +725,14 @@ export const useMapEditPage = (): MapEditPageState => {
     setPreviewEraseGroundRangeEndId('')
     setSelectedGroundRectangleStartId('')
     setPreviewGroundRectangleEndId('')
+  }
+
+  const handleSelectElementAsset = (category: MapElementCategory, variant: MapElementVariant) => {
+    setSelectedElementCategory(category)
+    setSelectedElementVariantByCategory((current) => ({
+      ...current,
+      [category]: variant,
+    }))
   }
 
   const handlePreviewLine = (lineId: string) => {
@@ -942,12 +1055,12 @@ export const useMapEditPage = (): MapEditPageState => {
     }
 
     setForm((current) => ({
-      ...current,
-      grid: {
-        ...current.grid,
-        elements: replaceElements(current.grid.elements, [createElement(element.x, element.y, selectedColor)]),
-      },
-    }))
+        ...current,
+        grid: {
+          ...current.grid,
+          elements: replaceElements(current.grid.elements, [createElement(element.x, element.y, selectedElementCategory, selectedElementVariantByCategory[selectedElementCategory])]),
+        },
+      }))
   }
 
   const handleRemoveElement: MapEditPageState['handleRemoveElement'] = (elementId, event) => {
@@ -1067,11 +1180,25 @@ export const useMapEditPage = (): MapEditPageState => {
   const previewRectangleGroundCellIds = startGroundRectanglePreviewCell && endGroundRectanglePreviewCell
     ? buildGroundRectangleCells(startGroundRectanglePreviewCell, endGroundRectanglePreviewCell, selectedGroundTexture).map((cell) => cell.id)
     : []
+  const elementPickerCategories = elementCategories.map((category) => {
+    const categoryLabel = t(`pages.mapEdit.elementCategories.${category}`)
+
+    return {
+      key: category,
+      label: t('pages.mapEdit.elementCategoryLabel', { category: categoryLabel }),
+      selectedVariant: selectedElementVariantByCategory[category],
+      options: elementAssetOptions.filter((option) => option.category === category).map((option) => ({
+        ...option,
+        label: t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant }),
+      })),
+    }
+  })
 
   return {
     activeLayer,
     colorOptions,
     groundTextureOptions,
+    elementPickerCategories,
     drawModeOptions,
     error,
     elements: buildElements(form.grid.elements),
@@ -1091,6 +1218,7 @@ export const useMapEditPage = (): MapEditPageState => {
     handleSelectLayer,
     handleSelectColor: setSelectedColor,
     handleSelectGroundTexture: setSelectedGroundTexture,
+    handleSelectElementAsset,
     handleSubmit,
     handleToggleLine,
     handleToggleGroundCell,
@@ -1112,6 +1240,8 @@ export const useMapEditPage = (): MapEditPageState => {
     previewRectangleGroundCellIds,
     selectedColor,
     selectedGroundTexture,
+    selectedElementCategory,
+    selectedElementVariant: selectedElementVariantByCategory[selectedElementCategory],
     selectedDrawMode,
     selectedEraseGroundRangeStartId,
     selectedGroundRangeStartId,

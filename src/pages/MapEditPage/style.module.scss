@@ -239,14 +239,26 @@
   background: rgba(255, 248, 235, 0.04);
 }
 
+.mapGrid::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: '';
+  background-image:
+    linear-gradient(to right, rgba(70, 70, 70, 0.64) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(70, 70, 70, 0.64) 1px, transparent 1px);
+  background-size: calc(100% / 34) 100%, 100% calc(100% / 22);
+  pointer-events: none;
+}
+
 .mapCell {
   min-width: 0;
   min-height: 0;
   padding: 0;
-  border-right: 1px solid rgba(255, 248, 235, 0.18);
+  border-right: 1px solid rgba(70, 70, 70, 0.64);
   border-top: 0;
   border-left: 0;
-  border-bottom: 1px solid rgba(255, 248, 235, 0.18);
+  border-bottom: 1px solid rgba(70, 70, 70, 0.64);
   background: transparent;
   cursor: default;
 }
@@ -287,19 +299,19 @@
 }
 
 .mapCellRed {
-  background: rgba(196, 58, 49, 0.72);
+  background: rgba(255, 111, 103, 0.72);
 }
 
 .mapCellGreen {
-  background: rgba(47, 154, 72, 0.72);
+  background: rgba(92, 211, 124, 0.72);
 }
 
 .mapCellBlue {
-  background: rgba(47, 111, 237, 0.72);
+  background: rgba(104, 157, 255, 0.72);
 }
 
 .mapCellWhite {
-  background: rgba(247, 243, 232, 0.72);
+  background: rgba(255, 252, 244, 0.72);
 }
 
 .mapCellGray {
@@ -307,15 +319,27 @@
 }
 
 .mapCellYellow {
-  background: rgba(240, 196, 69, 0.72);
+  background: rgba(255, 222, 92, 0.72);
 }
 
 .mapCellOrange {
-  background: rgba(242, 140, 40, 0.72);
+  background: rgba(255, 177, 82, 0.72);
 }
 
 .mapCellPurple {
-  background: rgba(143, 91, 216, 0.72);
+  background: rgba(184, 137, 255, 0.72);
+}
+
+.mapCellBrown {
+  background: rgba(181, 124, 75, 0.72);
+}
+
+.mapCellTortoise {
+  background: rgba(157, 148, 76, 0.72);
+}
+
+.mapCellPink {
+  background: rgba(255, 150, 199, 0.72);
 }
 
 .mapCellPreview,
@@ -349,7 +373,7 @@
 
 .lineSegment {
   position: absolute;
-  z-index: 2;
+  z-index: 6;
   display: grid;
   place-items: center;
   padding: 0;
@@ -359,6 +383,11 @@
 }
 
 .lineSegmentDisabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.lineSegmentPointMode {
   cursor: default;
   pointer-events: none;
 }
@@ -407,19 +436,19 @@
 }
 
 .lineSegmentRed .lineSegmentStroke {
-  background: #c43a31;
+  background: #ff6f67;
 }
 
 .lineSegmentGreen .lineSegmentStroke {
-  background: #2f9a48;
+  background: #5cd37c;
 }
 
 .lineSegmentBlue .lineSegmentStroke {
-  background: #2f6fed;
+  background: #689dff;
 }
 
 .lineSegmentWhite .lineSegmentStroke {
-  background: #f7f3e8;
+  background: #fffcf4;
 }
 
 .lineSegmentGray .lineSegmentStroke {
@@ -427,15 +456,27 @@
 }
 
 .lineSegmentYellow .lineSegmentStroke {
-  background: #f0c445;
+  background: #ffde5c;
 }
 
 .lineSegmentOrange .lineSegmentStroke {
-  background: #f28c28;
+  background: #ffb152;
 }
 
 .lineSegmentPurple .lineSegmentStroke {
-  background: #8f5bd8;
+  background: #b889ff;
+}
+
+.lineSegmentBrown .lineSegmentStroke {
+  background: #b57c4b;
+}
+
+.lineSegmentTortoise .lineSegmentStroke {
+  background: #9d944c;
+}
+
+.lineSegmentPink .lineSegmentStroke {
+  background: #ff96c7;
 }
 
 .lineSegmentPreview .lineSegmentStroke,
@@ -450,19 +491,19 @@
 }
 
 .lineSegmentPreview.lineSegmentRed .lineSegmentStroke {
-  background: #c43a31;
+  background: #ff6f67;
 }
 
 .lineSegmentPreview.lineSegmentGreen .lineSegmentStroke {
-  background: #2f9a48;
+  background: #5cd37c;
 }
 
 .lineSegmentPreview.lineSegmentBlue .lineSegmentStroke {
-  background: #2f6fed;
+  background: #689dff;
 }
 
 .lineSegmentPreview.lineSegmentWhite .lineSegmentStroke {
-  background: #f7f3e8;
+  background: #fffcf4;
 }
 
 .lineSegmentPreview.lineSegmentGray .lineSegmentStroke {
@@ -470,15 +511,27 @@
 }
 
 .lineSegmentPreview.lineSegmentYellow .lineSegmentStroke {
-  background: #f0c445;
+  background: #ffde5c;
 }
 
 .lineSegmentPreview.lineSegmentOrange .lineSegmentStroke {
-  background: #f28c28;
+  background: #ffb152;
 }
 
 .lineSegmentPreview.lineSegmentPurple .lineSegmentStroke {
-  background: #8f5bd8;
+  background: #b889ff;
+}
+
+.lineSegmentPreview.lineSegmentBrown .lineSegmentStroke {
+  background: #b57c4b;
+}
+
+.lineSegmentPreview.lineSegmentTortoise .lineSegmentStroke {
+  background: #9d944c;
+}
+
+.lineSegmentPreview.lineSegmentPink .lineSegmentStroke {
+  background: #ff96c7;
 }
 
 .lineSegmentRangeStart .lineSegmentStroke,
@@ -508,9 +561,11 @@
   z-index: 5;
   display: grid;
   place-items: center;
-  padding: 4px;
+  padding: 0;
   border: 0;
   background: transparent;
+  background-position: center;
+  background-size: cover;
   cursor: default;
 }
 
@@ -526,64 +581,17 @@
 .mapElementEditable:hover,
 .mapElementEditable:focus-visible {
   outline: 0;
+  box-shadow: inset 0 0 0 2px var(--accent);
 }
 
-.mapElementDot {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 999px;
-  background: transparent;
-  border: 1px solid transparent;
-  pointer-events: none;
-}
-
-.mapElementEditable:hover .mapElementDot,
-.mapElementEditable:focus-visible .mapElementDot {
-  border-color: var(--accent);
-  background: rgba(217, 164, 65, 0.28);
-  box-shadow: 0 0 0 2px rgba(217, 164, 65, 0.12);
-}
-
-.mapElementBlack .mapElementDot {
-  background: #080808;
-}
-
-.mapElementRed .mapElementDot {
-  background: #c43a31;
-}
-
-.mapElementGreen .mapElementDot {
-  background: #2f9a48;
-}
-
-.mapElementBlue .mapElementDot {
-  background: #2f6fed;
-}
-
-.mapElementWhite .mapElementDot {
-  background: #f7f3e8;
-}
-
-.mapElementGray .mapElementDot {
-  background: #8b8f98;
-}
-
-.mapElementYellow .mapElementDot {
-  background: #f0c445;
-}
-
-.mapElementOrange .mapElementDot {
-  background: #f28c28;
-}
-
-.mapElementPurple .mapElementDot {
-  background: #8f5bd8;
+.mapElementTextured {
+  background-position: center;
+  background-size: cover;
 }
 
 .mapLabel {
   position: absolute;
-  z-index: 6;
+  z-index: 7;
   pointer-events: none;
 }
 
@@ -702,7 +710,7 @@
 
 .mapPoint {
   position: absolute;
-  z-index: 4;
+  z-index: 8;
   width: 16px;
   height: 16px;
   padding: 0;
@@ -888,19 +896,19 @@
 }
 
 .paletteButtonRed .paletteSwatch {
-  background: #c43a31;
+  background: #ff6f67;
 }
 
 .paletteButtonGreen .paletteSwatch {
-  background: #2f9a48;
+  background: #5cd37c;
 }
 
 .paletteButtonBlue .paletteSwatch {
-  background: #2f6fed;
+  background: #689dff;
 }
 
 .paletteButtonWhite .paletteSwatch {
-  background: #f7f3e8;
+  background: #fffcf4;
 }
 
 .paletteButtonGray .paletteSwatch {
@@ -908,15 +916,27 @@
 }
 
 .paletteButtonYellow .paletteSwatch {
-  background: #f0c445;
+  background: #ffde5c;
 }
 
 .paletteButtonOrange .paletteSwatch {
-  background: #f28c28;
+  background: #ffb152;
 }
 
 .paletteButtonPurple .paletteSwatch {
-  background: #8f5bd8;
+  background: #b889ff;
+}
+
+.paletteButtonBrown .paletteSwatch {
+  background: #b57c4b;
+}
+
+.paletteButtonTortoise .paletteSwatch {
+  background: #9d944c;
+}
+
+.paletteButtonPink .paletteSwatch {
+  background: #ff96c7;
 }
 
 .groundTexturePalette {

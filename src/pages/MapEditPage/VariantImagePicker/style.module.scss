@@ -1,0 +1,65 @@
+.palette {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 0.55rem;
+}
+
+.picker {
+  position: relative;
+}
+
+.assetButton,
+.variantButton {
+  display: grid;
+  place-items: center;
+  width: 2.55rem;
+  height: 2.55rem;
+  padding: 0.2rem;
+  border: 1px solid rgba(255, 248, 235, 0.16);
+  border-radius: 0.55rem;
+  background: rgba(255, 248, 235, 0.04);
+  cursor: pointer;
+}
+
+.assetButton:hover,
+.assetButton:focus-visible,
+.assetButtonActive,
+.variantButton:hover,
+.variantButton:focus-visible,
+.variantButtonActive {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(217, 164, 65, 0.14);
+}
+
+.assetImage {
+  display: block;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 0.16rem;
+  object-fit: cover;
+}
+
+.variantPopover {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 0.5rem);
+  z-index: 15;
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  gap: 0.45rem;
+  width: max-content;
+  max-width: 12rem;
+  padding: 0.45rem;
+  border: 1px solid rgba(240, 198, 111, 0.28);
+  border-radius: 0.55rem;
+  background: rgba(29, 18, 14, 0.96);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
+}
+
+@media (max-width: 720px) {
+  .palette {
+    grid-template-columns: repeat(3, max-content);
+    justify-content: start;
+  }
+}

@@ -6,6 +6,7 @@ import { AppIcon } from '@components/AppIcon'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
 import { useEditReturnNavigation } from '@pages/useEditReturnNavigation'
+import { VariantImagePicker } from './VariantImagePicker'
 import { useMapEditPage } from './mapEditPageHooks'
 import type { MapLayer } from './types'
 import styles from './style.module.scss'
@@ -23,7 +24,7 @@ export const MapEditPage = () => {
     mainTab: 'maps',
     returnTo: '/',
   })
-  const { activeLayer, colorOptions, drawModeOptions, elements, error, form, groundCells, groundTextureOptions, handleChange, handleClearLinePreview, handlePreviewGroundCell, handlePreviewLine, handlePreviewPoint, handleRemoveElement, handleRemoveGroundCell, handleRemoveLabel, handleRemoveLine, handleRemovePoint, handleRenameLabel, handleSelectColor, handleSelectDrawMode, handleSelectGroundTexture, handleSelectLayer, handleSelectPoint, handleSubmit, handleToggleElement, handleToggleGroundCell, handleToggleLabel, handleToggleLine, hasChanges, labels, layerOptions, lineSegments, loading, pointSegments, previewEraseGroundCellIds, previewEraseLineIds, previewGroundCellIds, previewLineIds, previewRectangleGroundCellIds, previewRectangleLineIds, selectedColor, selectedDrawMode, selectedEraseGroundRangeStartId, selectedEraseRangeStartId, selectedGroundRangeStartId, selectedGroundRectangleStartId, selectedGroundTexture, selectedPointEraseStartId, selectedPointRangeStartId, selectedRectangleStartId, selectedRangeStartId, saving } = useMapEditPage()
+  const { activeLayer, colorOptions, drawModeOptions, elementPickerCategories, elements, error, form, groundCells, groundTextureOptions, handleChange, handleClearLinePreview, handlePreviewGroundCell, handlePreviewLine, handlePreviewPoint, handleRemoveElement, handleRemoveGroundCell, handleRemoveLabel, handleRemoveLine, handleRemovePoint, handleRenameLabel, handleSelectColor, handleSelectDrawMode, handleSelectElementAsset, handleSelectGroundTexture, handleSelectLayer, handleSelectPoint, handleSubmit, handleToggleElement, handleToggleGroundCell, handleToggleLabel, handleToggleLine, hasChanges, labels, layerOptions, lineSegments, loading, pointSegments, previewEraseGroundCellIds, previewEraseLineIds, previewGroundCellIds, previewLineIds, previewRectangleGroundCellIds, previewRectangleLineIds, selectedColor, selectedDrawMode, selectedElementCategory, selectedElementVariant, selectedEraseGroundRangeStartId, selectedEraseRangeStartId, selectedGroundRangeStartId, selectedGroundRectangleStartId, selectedGroundTexture, selectedPointEraseStartId, selectedPointRangeStartId, selectedRectangleStartId, selectedRangeStartId, saving } = useMapEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
   const [editingLabelId, setEditingLabelId] = useState('')
   const [labelDraftName, setLabelDraftName] = useState('')
@@ -152,6 +153,7 @@ export const MapEditPage = () => {
                       className={[
                         styles.lineSegment,
                         activeLayer !== 'lines' ? styles.lineSegmentDisabled : '',
+                        activeLayer === 'lines' && selectedDrawMode !== 'single' ? styles.lineSegmentPointMode : '',
                         line.orientation === 'horizontal' ? styles.lineSegmentHorizontal : styles.lineSegmentVertical,
                         line.active ? styles.lineSegmentActive : '',
                         activeLayer === 'lines' && previewLineIds.includes(line.id) ? styles.lineSegmentPreview : '',
@@ -190,7 +192,7 @@ export const MapEditPage = () => {
                         styles.mapElement,
                         activeLayer === 'elements' ? styles.mapElementEditable : '',
                         element.active ? styles.mapElementActive : '',
-                        element.active ? styles[`mapElement${element.color[0].toUpperCase()}${element.color.slice(1)}`] : '',
+                        element.active ? styles.mapElementTextured : '',
                       ].filter(Boolean).join(' ')}
                       type="button"
                       aria-label={t('pages.mapEdit.toggleElementLabel')}
@@ -201,12 +203,11 @@ export const MapEditPage = () => {
                         top: `${(element.y / 22) * 100}%`,
                         width: `${100 / 34}%`,
                         height: `${100 / 22}%`,
+                        ...(element.active ? { backgroundImage: `url(${element.imageSrc})` } : {}),
                       }}
                       onContextMenu={(event) => handleRemoveElement(element.id, event)}
                       onClick={() => handleToggleElement(element.id)}
-                    >
-                      <span className={styles.mapElementDot} />
-                    </button>
+                    />
                   ))}
                   {labels.map((label) => (
                     <div
@@ -286,7 +287,7 @@ export const MapEditPage = () => {
                     </div>
                   </section> : null}
                   <section className={styles.menuSection}>
-                    <h2 className={styles.menuTitle}>{t(activeLayer === 'ground' ? 'pages.mapEdit.groundPaletteLabel' : 'pages.mapEdit.paletteLabel')}</h2>
+                    <h2 className={styles.menuTitle}>{t(activeLayer === 'ground' ? 'pages.mapEdit.groundPaletteLabel' : activeLayer === 'elements' ? 'pages.mapEdit.elementPaletteLabel' : 'pages.mapEdit.paletteLabel')}</h2>
                     {activeLayer === 'ground' ? (
                       <div className={styles.groundTexturePalette} role="toolbar" aria-label={t('pages.mapEdit.groundPaletteLabel')}>
                         {groundTextureOptions.map((texture) => (
@@ -295,11 +296,13 @@ export const MapEditPage = () => {
                           </button>
                         ))}
                       </div>
+                    ) : activeLayer === 'elements' ? (
+                      <VariantImagePicker activeCategory={selectedElementCategory} activeVariant={selectedElementVariant} ariaLabel={t('pages.mapEdit.elementPaletteLabel')} categories={elementPickerCategories} onSelect={handleSelectElementAsset} />
                     ) : (
                       <div className={styles.palette} role="toolbar" aria-label={t('pages.mapEdit.paletteLabel')}>
                         {colorOptions.map((color) => (
                           <button key={color.key} className={`${styles.paletteButton} ${styles[`paletteButton${color.key[0].toUpperCase()}${color.key.slice(1)}`]} ${selectedColor === color.key ? styles.paletteButtonActive : ''}`} type="button" aria-label={t(color.labelKey)} title={t(color.labelKey)} aria-pressed={selectedColor === color.key} onClick={() => handleSelectColor(color.key)}>
-                            <span className={`${styles.paletteSwatch} ${activeLayer === 'elements' ? styles.paletteSwatchSquare : ''}`} />
+                            <span className={styles.paletteSwatch} />
                           </button>
                         ))}
                       </div>

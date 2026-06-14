@@ -180,6 +180,9 @@ export interface TranslationDictionary {
       paletteLabel: string
       groundPaletteLabel: string
       groundTextureLabel: string
+      elementPaletteLabel: string
+      elementCategoryLabel: string
+      elementAssetLabel: string
       toggleElementLabel: string
       toggleGroundCellLabel: string
       toggleLabelLabel: string
@@ -207,6 +210,16 @@ export interface TranslationDictionary {
         yellow: string
         orange: string
         purple: string
+        brown: string
+        tortoise: string
+        pink: string
+      }
+      elementCategories: {
+        trees: string
+        bushes: string
+        stairs: string
+        furnitures: string
+        misc: string
       }
       fields: {
         name: string
