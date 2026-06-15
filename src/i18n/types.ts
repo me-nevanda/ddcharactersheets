@@ -182,6 +182,23 @@ export interface TranslationDictionary {
       paletteLabel: string
       groundPaletteLabel: string
       groundTextureLabel: string
+      groundTextureVariants: {
+        grass: string
+        water: string
+        sand: string
+        woodenFloor: string
+        gravel: string
+        cobblestone: string
+        ice: string
+        lava: string
+        stoneFloor: string
+        parquet: string
+        stonyGround: string
+        woodenTerrace: string
+        swamp: string
+        crackFissure: string
+        unevenTerrain: string
+      }
       elementPaletteLabel: string
       elementCategoryLabel: string
       elementAssetLabel: string
@@ -259,6 +276,11 @@ export interface TranslationDictionary {
         bed: string
         couch: string
         armchair: string
+        chair: string
+        fireplace: string
+        shopCounter: string
+        smallTable: string
+        altar: string
       }
       elementStoneVariants: {
         rubble: string
@@ -318,6 +340,11 @@ export interface TranslationDictionary {
         stalagmite: string
         stalactite: string
         crystal: string
+        statue: string
+        cart: string
+        camp: string
+        remainsCorpse: string
+        haystack: string
       }
       fields: {
         name: string
@@ -1303,6 +1330,18 @@ export interface TranslationDictionary {
         armors: string
         weapons: string
         others: string
+      }
+    }
+    mapPrint: {
+      title: string
+      loading: string
+      error: string
+      printButtonLabel: string
+      mapLabel: string
+      emptyLegend: string
+      sections: {
+        description: string
+        legend: string
       }
     }
     monsterPrint: {

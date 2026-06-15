@@ -1,7 +1,7 @@
-import { useState, type MouseEvent as ReactMouseEvent } from 'react'
+import { useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { BubbleChatIcon, Coordinate02Icon, FloorPlanIcon, Tree03Icon } from '@hugeicons/core-free-icons'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { AppIcon } from '@components/AppIcon'
 import { UnsavedChangesDialog } from '@components/UnsavedChangesDialog'
 import { useI18n } from '@i18n/index'
@@ -20,6 +20,7 @@ const layerIconMap = {
 
 export const MapEditPage = () => {
   const { t } = useI18n()
+  const { mapId = '' } = useParams()
   const { applyReturnTabs, navigateBack, returnTo } = useEditReturnNavigation({
     mainTab: 'maps',
     returnTo: '/',
@@ -31,6 +32,28 @@ export const MapEditPage = () => {
   const [labelDraftName, setLabelDraftName] = useState('')
   const getGroundTextureSrc = (texture: string) => {
     return groundTextureOptions.find((option) => option.key === texture)?.imageSrc ?? groundTextureOptions[0]?.imageSrc ?? ''
+  }
+  const groundTextureLabelKeys = {
+    '1': 'pages.mapEdit.groundTextureVariants.grass',
+    '2': 'pages.mapEdit.groundTextureVariants.water',
+    '3': 'pages.mapEdit.groundTextureVariants.sand',
+    '4': 'pages.mapEdit.groundTextureVariants.woodenFloor',
+    '5': 'pages.mapEdit.groundTextureVariants.gravel',
+    '6': 'pages.mapEdit.groundTextureVariants.cobblestone',
+    '7': 'pages.mapEdit.groundTextureVariants.ice',
+    '8': 'pages.mapEdit.groundTextureVariants.lava',
+    '9': 'pages.mapEdit.groundTextureVariants.stoneFloor',
+    '10': 'pages.mapEdit.groundTextureVariants.parquet',
+    '11': 'pages.mapEdit.groundTextureVariants.stonyGround',
+    '12': 'pages.mapEdit.groundTextureVariants.woodenTerrace',
+    '13': 'pages.mapEdit.groundTextureVariants.swamp',
+    '14': 'pages.mapEdit.groundTextureVariants.crackFissure',
+    '15': 'pages.mapEdit.groundTextureVariants.unevenTerrain',
+  } as const
+  const getGroundTextureLabel = (texture: string) => {
+    const labelKey = groundTextureLabelKeys[texture as keyof typeof groundTextureLabelKeys]
+
+    return labelKey ? t(labelKey) : t('pages.mapEdit.groundTextureLabel', { number: texture })
   }
   const groundLayerIconSrc = getGroundTextureSrc('6')
   const elementLayerIconSrc = elementPickerCategories.find((category) => category.key === 'trees')?.options[0]?.imageSrc ?? ''
@@ -51,6 +74,14 @@ export const MapEditPage = () => {
 
   const handleToggleMapFullscreen = () => {
     setMapFullscreen((current) => !current)
+  }
+
+  const handlePrintMap = () => {
+    if (!mapId) {
+      return
+    }
+
+    window.open(`/maps/${mapId}/print`, '_blank')
   }
 
   const handleOpenLabelEditor = (labelId: string, name: string) => {
@@ -96,6 +127,12 @@ export const MapEditPage = () => {
             <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to={returnTo} onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
+            <button className={`${styles.ghostLink} ${styles.mapPrintAction}`} type="button" onClick={handlePrintMap}>
+              <span className={styles.buttonContent}>
+                <AppIcon name="print" />
+                <span>{t('common.actions.print')}</span>
+              </span>
+            </button>
             <div className={styles.floatingSaveAction}>
               <button className={styles.primaryButton} form="map-edit-form" type="submit" disabled={saving || !hasChanges}>
                 <span className={styles.buttonContent}>
@@ -124,7 +161,12 @@ export const MapEditPage = () => {
                 <div className={`${styles.mapGrid} ${activeLayer === 'lines' && selectedDrawMode === 'single' ? styles.mapGridSingleMode : ''}`} aria-label={t('pages.mapEdit.editorLabel')}>
                   {groundCells.map((cell) => {
                     const isGroundPreview = activeLayer === 'ground' && (previewGroundCellIds.includes(cell.id) || previewRectangleGroundCellIds.includes(cell.id))
-                    const groundTextureSrc = isGroundPreview ? getGroundTextureSrc(selectedGroundTexture) : cell.active ? getGroundTextureSrc(cell.texture) : ''
+                    const groundTextureSrc = cell.active ? getGroundTextureSrc(cell.texture) : ''
+                    const previewGroundTextureSrc = isGroundPreview ? getGroundTextureSrc(selectedGroundTexture) : ''
+                    const groundCellStyle: CSSProperties & { '--map-cell-preview-texture'?: string } = {
+                      ...(groundTextureSrc ? { backgroundImage: `url(${groundTextureSrc})` } : {}),
+                      ...(previewGroundTextureSrc ? { '--map-cell-preview-texture': `url(${previewGroundTextureSrc})` } : {}),
+                    }
 
                     return (
                       <button
@@ -132,7 +174,7 @@ export const MapEditPage = () => {
                         className={[
                           styles.mapCell,
                           activeLayer === 'ground' ? styles.mapCellEditable : '',
-                          groundTextureSrc ? styles.mapCellTextured : '',
+                          groundTextureSrc || previewGroundTextureSrc ? styles.mapCellTextured : '',
                           activeLayer === 'ground' && previewGroundCellIds.includes(cell.id) ? styles.mapCellPreview : '',
                           activeLayer === 'ground' && previewRectangleGroundCellIds.includes(cell.id) ? styles.mapCellPreview : '',
                           activeLayer === 'ground' && previewEraseGroundCellIds.includes(cell.id) ? styles.mapCellErasePreview : '',
@@ -144,7 +186,7 @@ export const MapEditPage = () => {
                         aria-label={t('pages.mapEdit.toggleGroundCellLabel')}
                         aria-pressed={cell.active}
                         disabled={activeLayer !== 'ground'}
-                        style={groundTextureSrc ? { backgroundImage: `url(${groundTextureSrc})` } : undefined}
+                        style={groundTextureSrc || previewGroundTextureSrc ? groundCellStyle : undefined}
                         onFocus={() => handlePreviewGroundCell(cell.id)}
                         onBlur={handleClearLinePreview}
                         onMouseEnter={() => handlePreviewGroundCell(cell.id)}
@@ -328,11 +370,15 @@ export const MapEditPage = () => {
                     <h2 className={styles.menuTitle}>{t(activeLayer === 'ground' ? 'pages.mapEdit.groundPaletteLabel' : activeLayer === 'elements' ? 'pages.mapEdit.elementPaletteLabel' : 'pages.mapEdit.paletteLabel')}</h2>
                     {activeLayer === 'ground' ? (
                       <div className={styles.groundTexturePalette} role="toolbar" aria-label={t('pages.mapEdit.groundPaletteLabel')}>
-                        {groundTextureOptions.map((texture) => (
-                          <button key={texture.key} className={`${styles.groundTextureButton} ${selectedGroundTexture === texture.key ? styles.groundTextureButtonActive : ''}`} type="button" aria-label={t('pages.mapEdit.groundTextureLabel', { number: texture.key })} title={t('pages.mapEdit.groundTextureLabel', { number: texture.key })} aria-pressed={selectedGroundTexture === texture.key} onClick={() => handleSelectGroundTexture(texture.key)}>
-                            <img className={styles.groundTextureImage} src={texture.imageSrc} alt="" aria-hidden="true" />
-                          </button>
-                        ))}
+                        {groundTextureOptions.map((texture) => {
+                          const textureLabel = getGroundTextureLabel(texture.key)
+
+                          return (
+                            <button key={texture.key} className={`${styles.groundTextureButton} ${selectedGroundTexture === texture.key ? styles.groundTextureButtonActive : ''}`} type="button" aria-label={textureLabel} title={textureLabel} aria-pressed={selectedGroundTexture === texture.key} onClick={() => handleSelectGroundTexture(texture.key)}>
+                              <img className={styles.groundTextureImage} src={texture.imageSrc} alt="" aria-hidden="true" />
+                            </button>
+                          )
+                        })}
                       </div>
                     ) : activeLayer === 'elements' ? (
                       <VariantImagePicker activeCategory={selectedElementCategory} activeVariant={selectedElementVariant} ariaLabel={t('pages.mapEdit.elementPaletteLabel')} categories={elementPickerCategories} popoverPlacement={isMapFullscreen ? 'left' : 'right'} onSelect={handleSelectElementAsset} />

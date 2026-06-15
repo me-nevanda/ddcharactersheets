@@ -30,6 +30,11 @@ import furnitureElement3 from '../../images/elements/furnitures/3.png'
 import furnitureElement4 from '../../images/elements/furnitures/4.png'
 import furnitureElement5 from '../../images/elements/furnitures/5.png'
 import furnitureElement6 from '../../images/elements/furnitures/6.png'
+import furnitureElement7 from '../../images/elements/furnitures/7.png'
+import furnitureElement8 from '../../images/elements/furnitures/8.png'
+import furnitureElement9 from '../../images/elements/furnitures/9.png'
+import furnitureElement10 from '../../images/elements/furnitures/10.png'
+import furnitureElement11 from '../../images/elements/furnitures/11.png'
 import miscElement1 from '../../images/elements/misc/1.png'
 import miscElement2 from '../../images/elements/misc/2.png'
 import miscElement3 from '../../images/elements/misc/3.png'
@@ -44,6 +49,11 @@ import miscElement11 from '../../images/elements/misc/11.png'
 import miscElement12 from '../../images/elements/misc/12.png'
 import miscElement13 from '../../images/elements/misc/13.png'
 import miscElement14 from '../../images/elements/misc/14.png'
+import miscElement15 from '../../images/elements/misc/15.png'
+import miscElement16 from '../../images/elements/misc/16.png'
+import miscElement17 from '../../images/elements/misc/17.png'
+import miscElement18 from '../../images/elements/misc/18.png'
+import miscElement19 from '../../images/elements/misc/19.png'
 import stoneElement1 from '../../images/elements/stones/1.png'
 import stoneElement2 from '../../images/elements/stones/2.png'
 import stoneElement3 from '../../images/elements/stones/3.png'
@@ -136,6 +146,10 @@ const groundTextureOptions: MapGroundTextureOption[] = [
   { key: '15', imageSrc: groundTexture15 },
 ]
 
+export const getMapGroundTextureSrc = (texture: MapGroundTexture): string => {
+  return groundTextureOptions.find((option) => option.key === texture)?.imageSrc ?? groundTextureOptions[0]?.imageSrc ?? ''
+}
+
 const elementAssetOptions: MapElementAssetOption[] = [
   { category: 'trees', variant: '1', imageSrc: treeElement1 },
   { category: 'trees', variant: '2', imageSrc: treeElement2 },
@@ -163,6 +177,11 @@ const elementAssetOptions: MapElementAssetOption[] = [
   { category: 'furnitures', variant: '4', imageSrc: furnitureElement4 },
   { category: 'furnitures', variant: '5', imageSrc: furnitureElement5 },
   { category: 'furnitures', variant: '6', imageSrc: furnitureElement6 },
+  { category: 'furnitures', variant: '7', imageSrc: furnitureElement7 },
+  { category: 'furnitures', variant: '8', imageSrc: furnitureElement8 },
+  { category: 'furnitures', variant: '9', imageSrc: furnitureElement9 },
+  { category: 'furnitures', variant: '10', imageSrc: furnitureElement10 },
+  { category: 'furnitures', variant: '11', imageSrc: furnitureElement11 },
   { category: 'stones', variant: '1', imageSrc: stoneElement1 },
   { category: 'stones', variant: '2', imageSrc: stoneElement2 },
   { category: 'stones', variant: '3', imageSrc: stoneElement3 },
@@ -216,11 +235,16 @@ const elementAssetOptions: MapElementAssetOption[] = [
   { category: 'misc', variant: '12', imageSrc: miscElement12 },
   { category: 'misc', variant: '13', imageSrc: miscElement13 },
   { category: 'misc', variant: '14', imageSrc: miscElement14 },
+  { category: 'misc', variant: '15', imageSrc: miscElement15 },
+  { category: 'misc', variant: '16', imageSrc: miscElement16 },
+  { category: 'misc', variant: '17', imageSrc: miscElement17 },
+  { category: 'misc', variant: '18', imageSrc: miscElement18 },
+  { category: 'misc', variant: '19', imageSrc: miscElement19 },
 ]
 
 const elementCategories: MapElementCategory[] = ['trees', 'bushes', 'stairs', 'furnitures', 'stones', 'monsters', 'misc']
 
-const getElementAssetSrc = (category: MapElementCategory, variant: MapElementVariant): string => {
+export const getElementAssetSrc = (category: MapElementCategory, variant: MapElementVariant): string => {
   return elementAssetOptions.find((option) => option.category === category && option.variant === variant)?.imageSrc ?? elementAssetOptions.find((option) => option.category === category)?.imageSrc ?? ''
 }
 
@@ -642,6 +666,7 @@ export const useMapEditPage = (): MapEditPageState => {
   const [selectedPointEraseStartId, setSelectedPointEraseStartId] = useState('')
   const [previewPointEraseEndId, setPreviewPointEraseEndId] = useState('')
   const [selectedGroundRangeStartId, setSelectedGroundRangeStartId] = useState('')
+  const [previewGroundSingleCellId, setPreviewGroundSingleCellId] = useState('')
   const [previewGroundRangeEndId, setPreviewGroundRangeEndId] = useState('')
   const [selectedEraseGroundRangeStartId, setSelectedEraseGroundRangeStartId] = useState('')
   const [previewEraseGroundRangeEndId, setPreviewEraseGroundRangeEndId] = useState('')
@@ -778,6 +803,7 @@ export const useMapEditPage = (): MapEditPageState => {
     setSelectedPointEraseStartId('')
     setPreviewPointEraseEndId('')
     setSelectedGroundRangeStartId('')
+    setPreviewGroundSingleCellId('')
     setPreviewGroundRangeEndId('')
     setSelectedEraseGroundRangeStartId('')
     setPreviewEraseGroundRangeEndId('')
@@ -798,6 +824,7 @@ export const useMapEditPage = (): MapEditPageState => {
     setSelectedPointEraseStartId('')
     setPreviewPointEraseEndId('')
     setSelectedGroundRangeStartId('')
+    setPreviewGroundSingleCellId('')
     setPreviewGroundRangeEndId('')
     setSelectedEraseGroundRangeStartId('')
     setPreviewEraseGroundRangeEndId('')
@@ -830,6 +857,7 @@ export const useMapEditPage = (): MapEditPageState => {
     setPreviewRectangleEndId('')
     setPreviewPointRangeEndId('')
     setPreviewPointEraseEndId('')
+    setPreviewGroundSingleCellId('')
     setPreviewGroundRangeEndId('')
     setPreviewEraseGroundRangeEndId('')
     setPreviewGroundRectangleEndId('')
@@ -1110,6 +1138,11 @@ export const useMapEditPage = (): MapEditPageState => {
   }
 
   const handlePreviewGroundCell = (cellId: string) => {
+    if (selectedDrawMode === 'single') {
+      setPreviewGroundSingleCellId(cellId)
+      return
+    }
+
     if (selectedDrawMode === 'range' && selectedEraseGroundRangeStartId) {
       setPreviewEraseGroundRangeEndId(cellId)
       return
@@ -1247,7 +1280,9 @@ export const useMapEditPage = (): MapEditPageState => {
   const endGroundRangePreviewCell = previewGroundRangeEndId ? getGroundCellById(previewGroundRangeEndId) : null
   const previewGroundCellIds = startGroundRangePreviewCell && endGroundRangePreviewCell
     ? buildGroundRangeCells(startGroundRangePreviewCell, endGroundRangePreviewCell, selectedGroundTexture).map((cell) => cell.id)
-    : []
+    : previewGroundSingleCellId
+      ? [previewGroundSingleCellId]
+      : []
   const startGroundErasePreviewCell = selectedEraseGroundRangeStartId ? getGroundCellById(selectedEraseGroundRangeStartId) : null
   const endGroundErasePreviewCell = previewEraseGroundRangeEndId ? getGroundCellById(previewEraseGroundRangeEndId) : null
   const previewEraseGroundCellIds = startGroundErasePreviewCell && endGroundErasePreviewCell
@@ -1293,6 +1328,11 @@ export const useMapEditPage = (): MapEditPageState => {
       '4': t('pages.mapEdit.elementFurnitureVariants.bed'),
       '5': t('pages.mapEdit.elementFurnitureVariants.couch'),
       '6': t('pages.mapEdit.elementFurnitureVariants.armchair'),
+      '7': t('pages.mapEdit.elementFurnitureVariants.chair'),
+      '8': t('pages.mapEdit.elementFurnitureVariants.fireplace'),
+      '9': t('pages.mapEdit.elementFurnitureVariants.shopCounter'),
+      '10': t('pages.mapEdit.elementFurnitureVariants.smallTable'),
+      '11': t('pages.mapEdit.elementFurnitureVariants.altar'),
     }
     const stoneVariantLabels: Partial<Record<MapElementVariant, string>> = {
       '1': t('pages.mapEdit.elementStoneVariants.rubble'),
@@ -1352,6 +1392,11 @@ export const useMapEditPage = (): MapEditPageState => {
       '12': t('pages.mapEdit.elementMiscVariants.stalagmite'),
       '13': t('pages.mapEdit.elementMiscVariants.stalactite'),
       '14': t('pages.mapEdit.elementMiscVariants.crystal'),
+      '15': t('pages.mapEdit.elementMiscVariants.statue'),
+      '16': t('pages.mapEdit.elementMiscVariants.cart'),
+      '17': t('pages.mapEdit.elementMiscVariants.camp'),
+      '18': t('pages.mapEdit.elementMiscVariants.remainsCorpse'),
+      '19': t('pages.mapEdit.elementMiscVariants.haystack'),
     }
 
     return {

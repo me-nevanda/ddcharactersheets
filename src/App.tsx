@@ -17,6 +17,7 @@ import { AreaEditPage } from '@pages/AreaEditPage';
 import { CharacterAbilitiesPrintPage } from '@pages/printPages/CharacterAbilitiesPrintPage';
 import { CharacterItemsPrintPage } from '@pages/printPages/CharacterItemsPrintPage';
 import { CharacterPrintPage } from '@pages/printPages/CharacterPrintPage';
+import { MapPrintPage } from '@pages/printPages/MapPrintPage';
 import { MonsterPrintPage } from '@pages/printPages/MonsterPrintPage';
 import { NpcPrintPage } from '@pages/printPages/NpcPrintPage';
 const App = () => {
@@ -40,6 +41,7 @@ const App = () => {
           <Route path="/characters/:characterId/print/abilities" element={<CharacterAbilitiesPrintPage />}/>
           <Route path="/characters/:characterId/print/items" element={<CharacterItemsPrintPage />}/>
           <Route path="/characters/:characterId/print" element={<CharacterPrintPage />}/>
+          <Route path="/maps/:mapId/print" element={<MapPrintPage />}/>
           <Route path="/monsters/:monsterId/print" element={<MonsterPrintPage />}/>
           <Route path="/npcs/:npcId/print" element={<NpcPrintPage />}/>
           <Route path="*" element={<Navigate to="/" replace/>}/>

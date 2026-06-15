@@ -42,7 +42,7 @@ const isMapElementVariantForCategory = (category: MapElementCategory, variant: M
   }
 
   if (category === 'furnitures') {
-    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6'
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8' || variant === '9' || variant === '10' || variant === '11'
   }
 
   if (category === 'stones') {
@@ -54,7 +54,7 @@ const isMapElementVariantForCategory = (category: MapElementCategory, variant: M
   }
 
   if (category === 'misc') {
-    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8' || variant === '9' || variant === '10' || variant === '11' || variant === '12' || variant === '13' || variant === '14'
+    return variant === '1' || variant === '2' || variant === '3' || variant === '4' || variant === '5' || variant === '6' || variant === '7' || variant === '8' || variant === '9' || variant === '10' || variant === '11' || variant === '12' || variant === '13' || variant === '14' || variant === '15' || variant === '16' || variant === '17' || variant === '18' || variant === '19'
   }
 
   return true

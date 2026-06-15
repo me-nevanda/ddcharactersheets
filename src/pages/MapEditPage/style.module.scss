@@ -117,6 +117,10 @@
   z-index: 19;
 }
 
+.mapPrintAction {
+  order: 0;
+}
+
 .ghostLink,
 .primaryButton {
   @include pill-button;
@@ -295,6 +299,7 @@
 }
 
 .mapCell {
+  position: relative;
   min-width: 0;
   min-height: 0;
   padding: 0;
@@ -302,8 +307,30 @@
   border-top: 0;
   border-left: 0;
   border-bottom: 1px solid rgba(70, 70, 70, 0.64);
-  background: transparent;
+  background-color: #ffffff;
   cursor: default;
+}
+
+.mapCell::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: '';
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mapCell::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: '';
+  background-image: var(--map-cell-preview-texture);
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .mapCell:nth-child(34n) {
@@ -325,7 +352,7 @@
 .mapCellEditable:hover,
 .mapCellEditable:focus-visible {
   outline: 0;
-  background: rgba(217, 164, 65, 0.2);
+  background-color: #ffffff;
 }
 
 .mapCellActive {
@@ -388,7 +415,19 @@
 .mapCellPreview,
 .mapCellPreview:hover,
 .mapCellPreview:focus-visible {
-  opacity: 0.86;
+  background-color: #ffffff;
+}
+
+.mapCellPreview::before,
+.mapCellPreview:hover::before,
+.mapCellPreview:focus-visible::before {
+  opacity: 1;
+}
+
+.mapCellPreview::after,
+.mapCellPreview:hover::after,
+.mapCellPreview:focus-visible::after {
+  opacity: 0.5;
 }
 
 .mapCellRangeStart,
@@ -1118,6 +1157,19 @@
 
   .headerActions > * {
     flex: 1 1 auto;
+  }
+
+  .floatingBackAction {
+    order: 1;
+  }
+
+  .floatingSaveAction {
+    order: 2;
+  }
+
+  .mapPrintAction {
+    order: 3;
+    flex-basis: 100%;
   }
 
   .mapEditorSection {
