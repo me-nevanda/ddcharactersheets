@@ -278,6 +278,7 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(34, minmax(0, 1fr));
+  grid-template-rows: repeat(22, minmax(0, 1fr));
   aspect-ratio: 34 / 22;
   width: 100%;
   overflow: hidden;
@@ -303,10 +304,7 @@
   min-width: 0;
   min-height: 0;
   padding: 0;
-  border-right: 1px solid rgba(70, 70, 70, 0.64);
-  border-top: 0;
-  border-left: 0;
-  border-bottom: 1px solid rgba(70, 70, 70, 0.64);
+  border: 0;
   background-color: #ffffff;
   cursor: default;
 }
@@ -331,14 +329,6 @@
   background-size: cover;
   opacity: 0;
   pointer-events: none;
-}
-
-.mapCell:nth-child(34n) {
-  border-right: 0;
-}
-
-.mapCell:nth-child(n + 715) {
-  border-bottom: 0;
 }
 
 .mapCell:disabled {

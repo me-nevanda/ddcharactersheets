@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type MouseEvent, type PointerEvent, type SubmitEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type MouseEvent, type PointerEvent, type SubmitEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getMap, saveMap } from '@lib/api'
@@ -812,6 +812,8 @@ export const useMapEditPage = (): MapEditPageState => {
   const [previewEraseGroundRangeEndId, setPreviewEraseGroundRangeEndId] = useState('')
   const [selectedGroundRectangleStartId, setSelectedGroundRectangleStartId] = useState('')
   const [previewGroundRectangleEndId, setPreviewGroundRectangleEndId] = useState('')
+  const mapDragActionRef = useRef<'paint' | 'erase' | null>(null)
+  const lastPaintedCellIdRef = useRef('')
 
   useEffect(() => {
     let cancelled = false
@@ -1011,6 +1013,17 @@ export const useMapEditPage = (): MapEditPageState => {
 
   const handlePreviewMapPointer = (event: PointerEvent<HTMLElement>) => {
     const position = getPointerGridPosition(event)
+    const cellId = createGroundCellId(position.cellX, position.cellY)
+
+    if (mapDragActionRef.current) {
+      const expectedButton = mapDragActionRef.current === 'paint' ? 1 : 2
+
+      if ((event.buttons & expectedButton) !== expectedButton) {
+        handleMapPointerUp()
+      } else {
+        applyMapDragAction(cellId)
+      }
+    }
 
     if (activeLayer === 'lines') {
       if (selectedDrawMode === 'single') {
@@ -1028,7 +1041,6 @@ export const useMapEditPage = (): MapEditPageState => {
     }
 
     if (activeLayer === 'ground') {
-      const cellId = createGroundCellId(position.cellX, position.cellY)
       handlePreviewGroundCell(cellId)
     }
   }
@@ -1042,12 +1054,145 @@ export const useMapEditPage = (): MapEditPageState => {
   }
 
   const handleMapContextMenu = (event: MouseEvent<HTMLElement>) => {
+    if ((activeLayer === 'ground' && selectedDrawMode === 'single') || activeLayer === 'elements') {
+      event.preventDefault()
+      return
+    }
+
     if (activeLayer !== 'lines' || selectedDrawMode !== 'single') {
       return
     }
 
     event.preventDefault()
     handleRemoveLine(getMouseGridPosition(event).lineId, event)
+  }
+
+  const paintGroundCell = (cellId: string) => {
+    const groundCell = getGroundCellById(cellId)
+
+    if (!groundCell) {
+      return
+    }
+
+    setForm((current) => {
+      const existingCell = current.grid.ground.find((cell) => cell.id === cellId)
+
+      if (existingCell?.texture === selectedGroundTexture) {
+        return current
+      }
+
+      return {
+        ...current,
+        grid: {
+          ...current.grid,
+          ground: replaceGroundCells(current.grid.ground, [createGroundCell(groundCell.x, groundCell.y, selectedGroundTexture)]),
+        },
+      }
+    })
+  }
+
+  const paintElementCell = (cellId: string) => {
+    const element = getElementById(cellId)
+
+    if (!element) {
+      return
+    }
+
+    const selectedElementVariant = selectedElementVariantByCategory[selectedElementCategory]
+
+    setForm((current) => {
+      const existingElement = current.grid.elements.find((currentElement) => currentElement.id === cellId)
+
+      if (existingElement?.category === selectedElementCategory && existingElement.variant === selectedElementVariant) {
+        return current
+      }
+
+      return {
+        ...current,
+        grid: {
+          ...current.grid,
+          elements: replaceElements(current.grid.elements, [createElement(element.x, element.y, selectedElementCategory, selectedElementVariant)]),
+        },
+      }
+    })
+  }
+
+  const eraseGroundCell = (cellId: string) => {
+    setForm((current) => {
+      if (!current.grid.ground.some((cell) => cell.id === cellId)) {
+        return current
+      }
+
+      return {
+        ...current,
+        grid: {
+          ...current.grid,
+          ground: current.grid.ground.filter((cell) => cell.id !== cellId),
+        },
+      }
+    })
+  }
+
+  const eraseElementCell = (cellId: string) => {
+    setForm((current) => {
+      if (!current.grid.elements.some((element) => element.id === cellId)) {
+        return current
+      }
+
+      return {
+        ...current,
+        grid: {
+          ...current.grid,
+          elements: current.grid.elements.filter((element) => element.id !== cellId),
+        },
+      }
+    })
+  }
+
+  const applyMapDragAction = (cellId: string) => {
+    if (lastPaintedCellIdRef.current === cellId) {
+      return
+    }
+
+    if (activeLayer === 'ground' && selectedDrawMode === 'single') {
+      lastPaintedCellIdRef.current = cellId
+      if (mapDragActionRef.current === 'erase') {
+        eraseGroundCell(cellId)
+        return
+      }
+
+      paintGroundCell(cellId)
+      return
+    }
+
+    if (activeLayer === 'elements') {
+      lastPaintedCellIdRef.current = cellId
+      if (mapDragActionRef.current === 'erase') {
+        eraseElementCell(cellId)
+        return
+      }
+
+      paintElementCell(cellId)
+    }
+  }
+
+  const handleMapPointerDown = (event: PointerEvent<HTMLElement>) => {
+    if ((event.button !== 0 && event.button !== 2) || !((activeLayer === 'ground' && selectedDrawMode === 'single') || activeLayer === 'elements')) {
+      return
+    }
+
+    event.preventDefault()
+    const position = getPointerGridPosition(event)
+    const cellId = createGroundCellId(position.cellX, position.cellY)
+    mapDragActionRef.current = event.button === 2 ? 'erase' : 'paint'
+    lastPaintedCellIdRef.current = ''
+    event.currentTarget.setPointerCapture(event.pointerId)
+    applyMapDragAction(cellId)
+  }
+
+  const handleMapPointerUp = () => {
+    mapDragActionRef.current = null
+    lastPaintedCellIdRef.current = ''
   }
 
   const handleSelectPoint = (pointId: string) => {
@@ -1191,13 +1336,7 @@ export const useMapEditPage = (): MapEditPageState => {
     }
 
     if (selectedDrawMode === 'single') {
-      setForm((current) => ({
-        ...current,
-        grid: {
-          ...current.grid,
-          ground: replaceGroundCells(current.grid.ground, [createGroundCell(groundCell.x, groundCell.y, selectedGroundTexture)]),
-        },
-      }))
+      paintGroundCell(cellId)
       return
     }
 
@@ -1352,13 +1491,7 @@ export const useMapEditPage = (): MapEditPageState => {
       return
     }
 
-    setForm((current) => ({
-        ...current,
-        grid: {
-          ...current.grid,
-          elements: replaceElements(current.grid.elements, [createElement(element.x, element.y, selectedElementCategory, selectedElementVariantByCategory[selectedElementCategory])]),
-        },
-      }))
+    paintElementCell(elementId)
   }
 
   const handleRemoveElement: MapEditPageState['handleRemoveElement'] = (elementId, event) => {
@@ -1662,6 +1795,8 @@ export const useMapEditPage = (): MapEditPageState => {
     handleClearLinePreview,
     handleMapClick,
     handleMapContextMenu,
+    handleMapPointerDown,
+    handleMapPointerUp,
     handlePreviewLine,
     handlePreviewMapPointer,
     handlePreviewPoint,

@@ -94,6 +94,8 @@ export interface MapEditPageState {
   handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
   handleMapClick: (event: MouseEvent<HTMLElement>) => void
   handleMapContextMenu: (event: MouseEvent<HTMLElement>) => void
+  handleMapPointerDown: (event: PointerEvent<HTMLElement>) => void
+  handleMapPointerUp: () => void
   handlePreviewLine: (lineId: string) => void
   handlePreviewMapPointer: (event: PointerEvent<HTMLElement>) => void
   handleClearLinePreview: () => void
