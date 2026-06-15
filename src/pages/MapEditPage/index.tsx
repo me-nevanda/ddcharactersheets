@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react'
+import { useMemo, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { BubbleChatIcon, Coordinate02Icon, FloorPlanIcon, Tree03Icon } from '@hugeicons/core-free-icons'
 import { Link, useParams } from 'react-router-dom'
@@ -25,11 +25,30 @@ export const MapEditPage = () => {
     mainTab: 'maps',
     returnTo: '/',
   })
-  const { activeLayer, colorOptions, drawModeOptions, elementPickerCategories, elements, error, form, groundCells, groundTextureOptions, handleChange, handleClearLinePreview, handlePreviewGroundCell, handlePreviewLine, handlePreviewPoint, handleRemoveElement, handleRemoveGroundCell, handleRemoveLabel, handleRemoveLine, handleRemovePoint, handleRenameLabel, handleSelectColor, handleSelectDrawMode, handleSelectElementAsset, handleSelectGroundTexture, handleSelectLayer, handleSelectPoint, handleSubmit, handleToggleElement, handleToggleGroundCell, handleToggleLabel, handleToggleLine, hasChanges, labels, layerOptions, lineSegments, loading, pointSegments, previewEraseGroundCellIds, previewEraseLineIds, previewGroundCellIds, previewLineIds, previewRectangleGroundCellIds, previewRectangleLineIds, selectedColor, selectedDrawMode, selectedElementCategory, selectedElementVariant, selectedEraseGroundRangeStartId, selectedEraseRangeStartId, selectedGroundRangeStartId, selectedGroundRectangleStartId, selectedGroundTexture, selectedPointEraseStartId, selectedPointRangeStartId, selectedRectangleStartId, selectedRangeStartId, saving } = useMapEditPage()
+  const { activeLayer, colorOptions, drawModeOptions, elementPickerCategories, elements, error, form, groundCells, groundTextureOptions, handleChange, handleClearLinePreview, handleMapClick, handleMapContextMenu, handlePreviewGroundCell, handlePreviewLine, handlePreviewMapPointer, handlePreviewPoint, handleRemoveElement, handleRemoveGroundCell, handleRemoveLabel, handleRemoveLine, handleRemovePoint, handleRenameLabel, handleSelectColor, handleSelectDrawMode, handleSelectElementAsset, handleSelectGroundTexture, handleSelectLayer, handleSelectPoint, handleSubmit, handleToggleElement, handleToggleGroundCell, handleToggleLabel, handleToggleLine, hasChanges, labels, layerOptions, lineSegments, loading, pointSegments, previewEraseGroundCellIds, previewEraseLineIds, previewGroundCellIds, previewLineIds, previewRectangleGroundCellIds, previewRectangleLineIds, selectedColor, selectedDrawMode, selectedElementCategory, selectedElementVariant, selectedEraseGroundRangeStartId, selectedEraseRangeStartId, selectedGroundRangeStartId, selectedGroundRectangleStartId, selectedGroundTexture, selectedPointEraseStartId, selectedPointRangeStartId, selectedRectangleStartId, selectedRangeStartId, saving } = useMapEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
   const [isMapFullscreen, setMapFullscreen] = useState(false)
   const [editingLabelId, setEditingLabelId] = useState('')
   const [labelDraftName, setLabelDraftName] = useState('')
+  const previewEraseGroundCellIdSet = useMemo(() => new Set(previewEraseGroundCellIds), [previewEraseGroundCellIds])
+  const previewEraseLineIdSet = useMemo(() => new Set(previewEraseLineIds), [previewEraseLineIds])
+  const previewGroundCellIdSet = useMemo(() => new Set(previewGroundCellIds), [previewGroundCellIds])
+  const previewLineIdSet = useMemo(() => new Set(previewLineIds), [previewLineIds])
+  const previewRectangleGroundCellIdSet = useMemo(() => new Set(previewRectangleGroundCellIds), [previewRectangleGroundCellIds])
+  const previewRectangleLineIdSet = useMemo(() => new Set(previewRectangleLineIds), [previewRectangleLineIds])
+  const visibleElements = useMemo(() => activeLayer === 'elements' ? elements : elements.filter((element) => element.active), [activeLayer, elements])
+  const visibleGroundCells = useMemo(() => activeLayer === 'ground' ? groundCells : groundCells.filter((cell) => cell.active), [activeLayer, groundCells])
+  const visibleLabels = useMemo(() => activeLayer === 'labels' ? labels : labels.filter((label) => label.active), [activeLayer, labels])
+  const visibleLineSegments = useMemo(() => {
+    return lineSegments.filter((line) => (
+      line.active
+      || previewEraseLineIdSet.has(line.id)
+      || previewLineIdSet.has(line.id)
+      || previewRectangleLineIdSet.has(line.id)
+      || selectedEraseRangeStartId === line.id
+      || selectedRangeStartId === line.id
+    ))
+  }, [activeLayer, lineSegments, previewEraseLineIdSet, previewLineIdSet, previewRectangleLineIdSet, selectedDrawMode, selectedEraseRangeStartId, selectedRangeStartId])
   const getGroundTextureSrc = (texture: string) => {
     return groundTextureOptions.find((option) => option.key === texture)?.imageSrc ?? groundTextureOptions[0]?.imageSrc ?? ''
   }
@@ -158,12 +177,14 @@ export const MapEditPage = () => {
             </section>
             <section className={`${styles.mapEditorSection} ${isMapFullscreen ? styles.mapEditorSectionFullscreen : ''}`} aria-label={t('pages.mapEdit.editorLabel')}>
               <div className={styles.mapWorkspace}>
-                <div className={`${styles.mapGrid} ${activeLayer === 'lines' && selectedDrawMode === 'single' ? styles.mapGridSingleMode : ''}`} aria-label={t('pages.mapEdit.editorLabel')}>
-                  {groundCells.map((cell) => {
-                    const isGroundPreview = activeLayer === 'ground' && (previewGroundCellIds.includes(cell.id) || previewRectangleGroundCellIds.includes(cell.id))
+                <div className={`${styles.mapGrid} ${activeLayer === 'lines' && selectedDrawMode === 'single' ? styles.mapGridSingleMode : ''}`} aria-label={t('pages.mapEdit.editorLabel')} onClick={handleMapClick} onContextMenu={handleMapContextMenu} onPointerMove={handlePreviewMapPointer} onPointerLeave={handleClearLinePreview}>
+                  {visibleGroundCells.map((cell) => {
+                    const isGroundPreview = activeLayer === 'ground' && (previewGroundCellIdSet.has(cell.id) || previewRectangleGroundCellIdSet.has(cell.id))
                     const groundTextureSrc = cell.active ? getGroundTextureSrc(cell.texture) : ''
                     const previewGroundTextureSrc = isGroundPreview ? getGroundTextureSrc(selectedGroundTexture) : ''
                     const groundCellStyle: CSSProperties & { '--map-cell-preview-texture'?: string } = {
+                      gridColumn: `${cell.x + 1}`,
+                      gridRow: `${cell.y + 1}`,
                       ...(groundTextureSrc ? { backgroundImage: `url(${groundTextureSrc})` } : {}),
                       ...(previewGroundTextureSrc ? { '--map-cell-preview-texture': `url(${previewGroundTextureSrc})` } : {}),
                     }
@@ -175,9 +196,9 @@ export const MapEditPage = () => {
                           styles.mapCell,
                           activeLayer === 'ground' ? styles.mapCellEditable : '',
                           groundTextureSrc || previewGroundTextureSrc ? styles.mapCellTextured : '',
-                          activeLayer === 'ground' && previewGroundCellIds.includes(cell.id) ? styles.mapCellPreview : '',
-                          activeLayer === 'ground' && previewRectangleGroundCellIds.includes(cell.id) ? styles.mapCellPreview : '',
-                          activeLayer === 'ground' && previewEraseGroundCellIds.includes(cell.id) ? styles.mapCellErasePreview : '',
+                          activeLayer === 'ground' && previewGroundCellIdSet.has(cell.id) ? styles.mapCellPreview : '',
+                          activeLayer === 'ground' && previewRectangleGroundCellIdSet.has(cell.id) ? styles.mapCellPreview : '',
+                          activeLayer === 'ground' && previewEraseGroundCellIdSet.has(cell.id) ? styles.mapCellErasePreview : '',
                           activeLayer === 'ground' && selectedDrawMode === 'range' && selectedGroundRangeStartId === cell.id ? styles.mapCellRangeStart : '',
                           activeLayer === 'ground' && selectedDrawMode === 'range' && selectedEraseGroundRangeStartId === cell.id ? styles.mapCellEraseRangeStart : '',
                           activeLayer === 'ground' && selectedDrawMode === 'rectangle' && selectedGroundRectangleStartId === cell.id ? styles.mapCellRangeStart : '',
@@ -186,17 +207,15 @@ export const MapEditPage = () => {
                         aria-label={t('pages.mapEdit.toggleGroundCellLabel')}
                         aria-pressed={cell.active}
                         disabled={activeLayer !== 'ground'}
-                        style={groundTextureSrc || previewGroundTextureSrc ? groundCellStyle : undefined}
+                        style={groundCellStyle}
                         onFocus={() => handlePreviewGroundCell(cell.id)}
                         onBlur={handleClearLinePreview}
-                        onMouseEnter={() => handlePreviewGroundCell(cell.id)}
-                        onMouseLeave={handleClearLinePreview}
                         onContextMenu={(event) => handleRemoveGroundCell(cell.id, event)}
                         onClick={() => handleToggleGroundCell(cell.id)}
                       />
                     )
                   })}
-                  {lineSegments.map((line) => (
+                  {visibleLineSegments.map((line) => (
                     <button
                       key={line.id}
                       className={[
@@ -209,12 +228,12 @@ export const MapEditPage = () => {
                         line.orientation === 'vertical' && line.x === 0 ? styles.lineSegmentLeftEdge : '',
                         line.orientation === 'vertical' && line.x === 34 ? styles.lineSegmentRightEdge : '',
                         line.active ? styles.lineSegmentActive : '',
-                        activeLayer === 'lines' && previewLineIds.includes(line.id) ? styles.lineSegmentPreview : '',
-                        activeLayer === 'lines' && selectedDrawMode === 'single' && previewEraseLineIds.includes(line.id) ? styles.lineSegmentErasePreview : '',
-                        activeLayer === 'lines' && previewRectangleLineIds.includes(line.id) ? styles.lineSegmentPreview : '',
+                        activeLayer === 'lines' && previewLineIdSet.has(line.id) ? styles.lineSegmentPreview : '',
+                        activeLayer === 'lines' && selectedDrawMode === 'single' && previewEraseLineIdSet.has(line.id) ? styles.lineSegmentErasePreview : '',
+                        activeLayer === 'lines' && previewRectangleLineIdSet.has(line.id) ? styles.lineSegmentPreview : '',
                         activeLayer === 'lines' && selectedDrawMode === 'single' && selectedRangeStartId === line.id ? styles.lineSegmentRangeStart : '',
                         activeLayer === 'lines' && selectedDrawMode === 'single' && selectedEraseRangeStartId === line.id ? styles.lineSegmentEraseRangeStart : '',
-                        activeLayer === 'lines' && (previewLineIds.includes(line.id) || previewRectangleLineIds.includes(line.id)) ? styles[`lineSegment${selectedColor[0].toUpperCase()}${selectedColor.slice(1)}`] : '',
+                        activeLayer === 'lines' && (previewLineIdSet.has(line.id) || previewRectangleLineIdSet.has(line.id)) ? styles[`lineSegment${selectedColor[0].toUpperCase()}${selectedColor.slice(1)}`] : '',
                         line.active ? styles[`lineSegment${line.color[0].toUpperCase()}${line.color.slice(1)}`] : '',
                       ].filter(Boolean).join(' ')}
                       type="button"
@@ -230,15 +249,13 @@ export const MapEditPage = () => {
                       }}
                       onFocus={() => handlePreviewLine(line.id)}
                       onBlur={handleClearLinePreview}
-                      onMouseEnter={() => handlePreviewLine(line.id)}
-                      onMouseLeave={handleClearLinePreview}
                       onContextMenu={(event) => handleRemoveLine(line.id, event)}
                       onClick={() => handleToggleLine(line.id)}
                     >
                       <span className={styles.lineSegmentStroke} />
                     </button>
                   ))}
-                  {elements.map((element) => (
+                  {visibleElements.map((element) => (
                     <button
                       key={element.id}
                       className={[
@@ -262,7 +279,7 @@ export const MapEditPage = () => {
                       onClick={() => handleToggleElement(element.id)}
                     />
                   ))}
-                  {labels.map((label) => (
+                  {visibleLabels.map((label) => (
                     <div
                       key={label.id}
                       className={[
@@ -320,8 +337,6 @@ export const MapEditPage = () => {
                       }}
                       onFocus={() => handlePreviewPoint(point.id)}
                       onBlur={handleClearLinePreview}
-                      onMouseEnter={() => handlePreviewPoint(point.id)}
-                      onMouseLeave={handleClearLinePreview}
                       onContextMenu={(event) => handleRemovePoint(point.id, event)}
                       onClick={() => handleSelectPoint(point.id)}
                     />

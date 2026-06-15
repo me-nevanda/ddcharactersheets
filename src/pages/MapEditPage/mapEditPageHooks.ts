@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type SubmitEvent } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent, type MouseEvent, type PointerEvent, type SubmitEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getMap, saveMap } from '@lib/api'
@@ -436,24 +436,114 @@ const buildLineSegments = (lines: MapGridLine[]): MapLineViewModel[] => {
   return segments
 }
 
+const parseGridPointId = (pointId: string): { x: number, y: number } | null => {
+  const [xValue, yValue] = pointId.split(':')
+  const x = Number(xValue)
+  const y = Number(yValue)
+
+  if (!Number.isInteger(x) || !Number.isInteger(y)) {
+    return null
+  }
+
+  return { x, y }
+}
+
 const getLineById = (lineId: string): MapLineViewModel | null => {
-  return buildLineSegments([]).find((line) => line.id === lineId) ?? null
+  const [from, to] = lineId.split('-')
+  const fromPoint = parseGridPointId(from ?? '')
+  const toPoint = parseGridPointId(to ?? '')
+
+  if (!fromPoint || !toPoint) {
+    return null
+  }
+
+  if (fromPoint.y === toPoint.y && toPoint.x === fromPoint.x + 1) {
+    return {
+      id: lineId,
+      active: false,
+      color: 'black',
+      orientation: 'horizontal',
+      x: fromPoint.x,
+      y: fromPoint.y,
+    }
+  }
+
+  if (fromPoint.x === toPoint.x && toPoint.y === fromPoint.y + 1) {
+    return {
+      id: lineId,
+      active: false,
+      color: 'black',
+      orientation: 'vertical',
+      x: fromPoint.x,
+      y: fromPoint.y,
+    }
+  }
+
+  return null
 }
 
 const getPointById = (pointId: string): MapPointViewModel | null => {
-  return buildPointSegments().find((point) => point.id === pointId) ?? null
+  const point = parseGridPointId(pointId)
+
+  if (!point || point.x < 0 || point.x > mapGridWidth || point.y < 0 || point.y > mapGridHeight) {
+    return null
+  }
+
+  return {
+    id: pointId,
+    x: point.x,
+    y: point.y,
+  }
 }
 
 const getGroundCellById = (cellId: string): MapGroundCellViewModel | null => {
-  return buildGroundCells([]).find((cell) => cell.id === cellId) ?? null
+  const point = parseGridPointId(cellId)
+
+  if (!point || point.x < 0 || point.x >= mapGridWidth || point.y < 0 || point.y >= mapGridHeight) {
+    return null
+  }
+
+  return {
+    id: cellId,
+    active: false,
+    texture: '1',
+    x: point.x,
+    y: point.y,
+  }
 }
 
 const getElementById = (elementId: string): MapElementViewModel | null => {
-  return buildElements([]).find((element) => element.id === elementId) ?? null
+  const point = parseGridPointId(elementId)
+
+  if (!point || point.x < 0 || point.x >= mapGridWidth || point.y < 0 || point.y >= mapGridHeight) {
+    return null
+  }
+
+  return {
+    id: elementId,
+    active: false,
+    category: 'trees',
+    imageSrc: getElementAssetSrc('trees', '1'),
+    variant: '1',
+    x: point.x,
+    y: point.y,
+  }
 }
 
 const getLabelById = (labelId: string): MapLabelViewModel | null => {
-  return buildLabels([]).find((label) => label.id === labelId) ?? null
+  const point = parseGridPointId(labelId)
+
+  if (!point || point.x < 0 || point.x >= mapGridWidth || point.y < 0 || point.y >= mapGridHeight) {
+    return null
+  }
+
+  return {
+    id: labelId,
+    active: false,
+    name: '',
+    x: point.x,
+    y: point.y,
+  }
 }
 
 const canDrawRange = (startLine: MapLineViewModel, endLine: MapLineViewModel): boolean => {
@@ -633,6 +723,55 @@ const emptyMapForm: MapData = {
   },
 }
 
+const clampGridCoordinate = (value: number, max: number): number => {
+  return Math.min(max, Math.max(0, value))
+}
+
+const getPointerGridPosition = (event: PointerEvent<HTMLElement>) => {
+  const rect = event.currentTarget.getBoundingClientRect()
+  const relativeX = rect.width > 0 ? (event.clientX - rect.left) / rect.width : 0
+  const relativeY = rect.height > 0 ? (event.clientY - rect.top) / rect.height : 0
+  const gridX = relativeX * mapGridWidth
+  const gridY = relativeY * mapGridHeight
+  const horizontalX = clampGridCoordinate(Math.floor(gridX), mapGridWidth - 1)
+  const horizontalY = clampGridCoordinate(Math.round(gridY), mapGridHeight)
+  const verticalX = clampGridCoordinate(Math.round(gridX), mapGridWidth)
+  const verticalY = clampGridCoordinate(Math.floor(gridY), mapGridHeight - 1)
+  const horizontalDistance = Math.abs(gridY - horizontalY)
+  const verticalDistance = Math.abs(gridX - verticalX)
+  const nearestLineId = horizontalDistance <= verticalDistance
+    ? createLineId(horizontalX, horizontalY, horizontalX + 1, horizontalY)
+    : createLineId(verticalX, verticalY, verticalX, verticalY + 1)
+
+  return {
+    cellX: clampGridCoordinate(Math.floor(gridX), mapGridWidth - 1),
+    cellY: clampGridCoordinate(Math.floor(gridY), mapGridHeight - 1),
+    lineId: nearestLineId,
+    pointX: clampGridCoordinate(Math.round(gridX), mapGridWidth),
+    pointY: clampGridCoordinate(Math.round(gridY), mapGridHeight),
+  }
+}
+
+const getMouseGridPosition = (event: MouseEvent<HTMLElement>) => {
+  const rect = event.currentTarget.getBoundingClientRect()
+  const relativeX = rect.width > 0 ? (event.clientX - rect.left) / rect.width : 0
+  const relativeY = rect.height > 0 ? (event.clientY - rect.top) / rect.height : 0
+  const gridX = relativeX * mapGridWidth
+  const gridY = relativeY * mapGridHeight
+  const horizontalX = clampGridCoordinate(Math.floor(gridX), mapGridWidth - 1)
+  const horizontalY = clampGridCoordinate(Math.round(gridY), mapGridHeight)
+  const verticalX = clampGridCoordinate(Math.round(gridX), mapGridWidth)
+  const verticalY = clampGridCoordinate(Math.floor(gridY), mapGridHeight - 1)
+  const horizontalDistance = Math.abs(gridY - horizontalY)
+  const verticalDistance = Math.abs(gridX - verticalX)
+
+  return {
+    lineId: horizontalDistance <= verticalDistance
+      ? createLineId(horizontalX, horizontalY, horizontalX + 1, horizontalY)
+      : createLineId(verticalX, verticalY, verticalX, verticalY + 1),
+  }
+}
+
 export const useMapEditPage = (): MapEditPageState => {
   const { t } = useI18n()
   const { mapId = '' } = useParams()
@@ -656,6 +795,7 @@ export const useMapEditPage = (): MapEditPageState => {
   })
   const [selectedDrawMode, setSelectedDrawMode] = useState<MapDrawMode>('single')
   const [selectedRangeStartId, setSelectedRangeStartId] = useState('')
+  const [previewSingleLineId, setPreviewSingleLineId] = useState('')
   const [previewRangeEndId, setPreviewRangeEndId] = useState('')
   const [selectedEraseRangeStartId, setSelectedEraseRangeStartId] = useState('')
   const [previewEraseRangeEndId, setPreviewEraseRangeEndId] = useState('')
@@ -841,26 +981,73 @@ export const useMapEditPage = (): MapEditPageState => {
   }
 
   const handlePreviewLine = (lineId: string) => {
+    if (selectedDrawMode === 'single') {
+      setPreviewSingleLineId((current) => current === lineId ? current : lineId)
+      return
+    }
+
     if (selectedDrawMode !== 'range' || !selectedRangeStartId) {
       if (selectedDrawMode === 'range' && selectedEraseRangeStartId) {
-        setPreviewEraseRangeEndId(lineId)
+        setPreviewEraseRangeEndId((current) => current === lineId ? current : lineId)
       }
       return
     }
 
-    setPreviewRangeEndId(lineId)
+    setPreviewRangeEndId((current) => current === lineId ? current : lineId)
   }
 
   const handleClearLinePreview = () => {
-    setPreviewRangeEndId('')
-    setPreviewEraseRangeEndId('')
-    setPreviewRectangleEndId('')
-    setPreviewPointRangeEndId('')
-    setPreviewPointEraseEndId('')
-    setPreviewGroundSingleCellId('')
-    setPreviewGroundRangeEndId('')
-    setPreviewEraseGroundRangeEndId('')
-    setPreviewGroundRectangleEndId('')
+    setPreviewSingleLineId((current) => current ? '' : current)
+    setPreviewRangeEndId((current) => current ? '' : current)
+    setPreviewEraseRangeEndId((current) => current ? '' : current)
+    setPreviewRectangleEndId((current) => current ? '' : current)
+    setPreviewPointRangeEndId((current) => current ? '' : current)
+    setPreviewPointEraseEndId((current) => current ? '' : current)
+    setPreviewGroundSingleCellId((current) => current ? '' : current)
+    setPreviewGroundRangeEndId((current) => current ? '' : current)
+    setPreviewEraseGroundRangeEndId((current) => current ? '' : current)
+    setPreviewGroundRectangleEndId((current) => current ? '' : current)
+  }
+
+  const handlePreviewMapPointer = (event: PointerEvent<HTMLElement>) => {
+    const position = getPointerGridPosition(event)
+
+    if (activeLayer === 'lines') {
+      if (selectedDrawMode === 'single') {
+        handlePreviewLine(position.lineId)
+        return
+      }
+
+      if (selectedDrawMode !== 'range' && selectedDrawMode !== 'rectangle') {
+        return
+      }
+
+      const pointId = createPointId(position.pointX, position.pointY)
+      handlePreviewPoint(pointId)
+      return
+    }
+
+    if (activeLayer === 'ground') {
+      const cellId = createGroundCellId(position.cellX, position.cellY)
+      handlePreviewGroundCell(cellId)
+    }
+  }
+
+  const handleMapClick = (event: MouseEvent<HTMLElement>) => {
+    if (activeLayer !== 'lines' || selectedDrawMode !== 'single') {
+      return
+    }
+
+    handleToggleLine(getMouseGridPosition(event).lineId)
+  }
+
+  const handleMapContextMenu = (event: MouseEvent<HTMLElement>) => {
+    if (activeLayer !== 'lines' || selectedDrawMode !== 'single') {
+      return
+    }
+
+    event.preventDefault()
+    handleRemoveLine(getMouseGridPosition(event).lineId, event)
   }
 
   const handleSelectPoint = (pointId: string) => {
@@ -1123,38 +1310,38 @@ export const useMapEditPage = (): MapEditPageState => {
 
   const handlePreviewPoint = (pointId: string) => {
     if (selectedDrawMode === 'range' && selectedPointEraseStartId) {
-      setPreviewPointEraseEndId(pointId)
+      setPreviewPointEraseEndId((current) => current === pointId ? current : pointId)
       return
     }
 
     if (selectedDrawMode === 'range' && selectedPointRangeStartId) {
-      setPreviewPointRangeEndId(pointId)
+      setPreviewPointRangeEndId((current) => current === pointId ? current : pointId)
       return
     }
 
     if (selectedDrawMode === 'rectangle' && selectedRectangleStartId) {
-      setPreviewRectangleEndId(pointId)
+      setPreviewRectangleEndId((current) => current === pointId ? current : pointId)
     }
   }
 
   const handlePreviewGroundCell = (cellId: string) => {
     if (selectedDrawMode === 'single') {
-      setPreviewGroundSingleCellId(cellId)
+      setPreviewGroundSingleCellId((current) => current === cellId ? current : cellId)
       return
     }
 
     if (selectedDrawMode === 'range' && selectedEraseGroundRangeStartId) {
-      setPreviewEraseGroundRangeEndId(cellId)
+      setPreviewEraseGroundRangeEndId((current) => current === cellId ? current : cellId)
       return
     }
 
     if (selectedDrawMode === 'range' && selectedGroundRangeStartId) {
-      setPreviewGroundRangeEndId(cellId)
+      setPreviewGroundRangeEndId((current) => current === cellId ? current : cellId)
       return
     }
 
     if (selectedDrawMode === 'rectangle' && selectedGroundRectangleStartId) {
-      setPreviewGroundRectangleEndId(cellId)
+      setPreviewGroundRectangleEndId((current) => current === cellId ? current : cellId)
     }
   }
 
@@ -1251,49 +1438,84 @@ export const useMapEditPage = (): MapEditPageState => {
     }
   }
 
-  const startPreviewLine = selectedRangeStartId ? getLineById(selectedRangeStartId) : null
-  const endPreviewLine = previewRangeEndId ? getLineById(previewRangeEndId) : null
-  const previewLineIds = startPreviewLine && endPreviewLine
-    ? buildRangeLines(startPreviewLine, endPreviewLine, selectedColor).map((line) => line.id)
-    : []
-  const startErasePreviewLine = selectedEraseRangeStartId ? getLineById(selectedEraseRangeStartId) : null
-  const endErasePreviewLine = previewEraseRangeEndId ? getLineById(previewEraseRangeEndId) : null
-  const previewEraseLineIds = startErasePreviewLine && endErasePreviewLine
-    ? buildRangeLines(startErasePreviewLine, endErasePreviewLine, selectedColor).map((line) => line.id)
-    : []
-  const startPointRangePreviewPoint = selectedPointRangeStartId ? getPointById(selectedPointRangeStartId) : null
-  const endPointRangePreviewPoint = previewPointRangeEndId ? getPointById(previewPointRangeEndId) : null
-  const previewPointRangeLineIds = startPointRangePreviewPoint && endPointRangePreviewPoint
-    ? buildPointRangeLines(startPointRangePreviewPoint, endPointRangePreviewPoint, selectedColor).map((line) => line.id)
-    : []
-  const startPointErasePreviewPoint = selectedPointEraseStartId ? getPointById(selectedPointEraseStartId) : null
-  const endPointErasePreviewPoint = previewPointEraseEndId ? getPointById(previewPointEraseEndId) : null
-  const previewPointEraseLineIds = startPointErasePreviewPoint && endPointErasePreviewPoint
-    ? buildPointRangeLines(startPointErasePreviewPoint, endPointErasePreviewPoint, selectedColor).map((line) => line.id)
-    : []
-  const startRectanglePreviewPoint = selectedRectangleStartId ? getPointById(selectedRectangleStartId) : null
-  const endRectanglePreviewPoint = previewRectangleEndId ? getPointById(previewRectangleEndId) : null
-  const previewRectangleLineIds = startRectanglePreviewPoint && endRectanglePreviewPoint
-    ? buildRectangleLines(startRectanglePreviewPoint, endRectanglePreviewPoint, selectedColor).map((line) => line.id)
-    : []
-  const startGroundRangePreviewCell = selectedGroundRangeStartId ? getGroundCellById(selectedGroundRangeStartId) : null
-  const endGroundRangePreviewCell = previewGroundRangeEndId ? getGroundCellById(previewGroundRangeEndId) : null
-  const previewGroundCellIds = startGroundRangePreviewCell && endGroundRangePreviewCell
-    ? buildGroundRangeCells(startGroundRangePreviewCell, endGroundRangePreviewCell, selectedGroundTexture).map((cell) => cell.id)
-    : previewGroundSingleCellId
-      ? [previewGroundSingleCellId]
+  const elements = useMemo(() => buildElements(form.grid.elements), [form.grid.elements])
+  const groundCells = useMemo(() => buildGroundCells(form.grid.ground), [form.grid.ground])
+  const labels = useMemo(() => buildLabels(form.grid.labels), [form.grid.labels])
+  const lineSegments = useMemo(() => buildLineSegments(form.grid.lines), [form.grid.lines])
+  const pointSegments = useMemo(() => buildPointSegments(), [])
+  const hasChanges = useMemo(() => JSON.stringify(form) !== JSON.stringify(initialForm), [form, initialForm])
+
+  const previewLineIds = useMemo(() => {
+    if (selectedDrawMode === 'single') {
+      return previewSingleLineId ? [previewSingleLineId] : []
+    }
+
+    const startPreviewLine = selectedRangeStartId ? getLineById(selectedRangeStartId) : null
+    const endPreviewLine = previewRangeEndId ? getLineById(previewRangeEndId) : null
+
+    return startPreviewLine && endPreviewLine
+      ? buildRangeLines(startPreviewLine, endPreviewLine, selectedColor).map((line) => line.id)
       : []
-  const startGroundErasePreviewCell = selectedEraseGroundRangeStartId ? getGroundCellById(selectedEraseGroundRangeStartId) : null
-  const endGroundErasePreviewCell = previewEraseGroundRangeEndId ? getGroundCellById(previewEraseGroundRangeEndId) : null
-  const previewEraseGroundCellIds = startGroundErasePreviewCell && endGroundErasePreviewCell
-    ? buildGroundRangeCells(startGroundErasePreviewCell, endGroundErasePreviewCell, selectedGroundTexture).map((cell) => cell.id)
-    : []
-  const startGroundRectanglePreviewCell = selectedGroundRectangleStartId ? getGroundCellById(selectedGroundRectangleStartId) : null
-  const endGroundRectanglePreviewCell = previewGroundRectangleEndId ? getGroundCellById(previewGroundRectangleEndId) : null
-  const previewRectangleGroundCellIds = startGroundRectanglePreviewCell && endGroundRectanglePreviewCell
-    ? buildGroundRectangleCells(startGroundRectanglePreviewCell, endGroundRectanglePreviewCell, selectedGroundTexture).map((cell) => cell.id)
-    : []
-  const elementPickerCategories = elementCategories.map((category) => {
+  }, [previewRangeEndId, previewSingleLineId, selectedColor, selectedDrawMode, selectedRangeStartId])
+  const previewEraseLineIds = useMemo(() => {
+    const startErasePreviewLine = selectedEraseRangeStartId ? getLineById(selectedEraseRangeStartId) : null
+    const endErasePreviewLine = previewEraseRangeEndId ? getLineById(previewEraseRangeEndId) : null
+
+    return startErasePreviewLine && endErasePreviewLine
+      ? buildRangeLines(startErasePreviewLine, endErasePreviewLine, selectedColor).map((line) => line.id)
+      : []
+  }, [previewEraseRangeEndId, selectedColor, selectedEraseRangeStartId])
+  const previewPointRangeLineIds = useMemo(() => {
+    const startPointRangePreviewPoint = selectedPointRangeStartId ? getPointById(selectedPointRangeStartId) : null
+    const endPointRangePreviewPoint = previewPointRangeEndId ? getPointById(previewPointRangeEndId) : null
+
+    return startPointRangePreviewPoint && endPointRangePreviewPoint
+      ? buildPointRangeLines(startPointRangePreviewPoint, endPointRangePreviewPoint, selectedColor).map((line) => line.id)
+      : []
+  }, [previewPointRangeEndId, selectedColor, selectedPointRangeStartId])
+  const previewPointEraseLineIds = useMemo(() => {
+    const startPointErasePreviewPoint = selectedPointEraseStartId ? getPointById(selectedPointEraseStartId) : null
+    const endPointErasePreviewPoint = previewPointEraseEndId ? getPointById(previewPointEraseEndId) : null
+
+    return startPointErasePreviewPoint && endPointErasePreviewPoint
+      ? buildPointRangeLines(startPointErasePreviewPoint, endPointErasePreviewPoint, selectedColor).map((line) => line.id)
+      : []
+  }, [previewPointEraseEndId, selectedColor, selectedPointEraseStartId])
+  const previewRectangleLineIds = useMemo(() => {
+    const startRectanglePreviewPoint = selectedRectangleStartId ? getPointById(selectedRectangleStartId) : null
+    const endRectanglePreviewPoint = previewRectangleEndId ? getPointById(previewRectangleEndId) : null
+
+    return startRectanglePreviewPoint && endRectanglePreviewPoint
+      ? buildRectangleLines(startRectanglePreviewPoint, endRectanglePreviewPoint, selectedColor).map((line) => line.id)
+      : []
+  }, [previewRectangleEndId, selectedColor, selectedRectangleStartId])
+  const previewGroundCellIds = useMemo(() => {
+    const startGroundRangePreviewCell = selectedGroundRangeStartId ? getGroundCellById(selectedGroundRangeStartId) : null
+    const endGroundRangePreviewCell = previewGroundRangeEndId ? getGroundCellById(previewGroundRangeEndId) : null
+
+    return startGroundRangePreviewCell && endGroundRangePreviewCell
+      ? buildGroundRangeCells(startGroundRangePreviewCell, endGroundRangePreviewCell, selectedGroundTexture).map((cell) => cell.id)
+      : previewGroundSingleCellId
+        ? [previewGroundSingleCellId]
+        : []
+  }, [previewGroundRangeEndId, previewGroundSingleCellId, selectedGroundRangeStartId, selectedGroundTexture])
+  const previewEraseGroundCellIds = useMemo(() => {
+    const startGroundErasePreviewCell = selectedEraseGroundRangeStartId ? getGroundCellById(selectedEraseGroundRangeStartId) : null
+    const endGroundErasePreviewCell = previewEraseGroundRangeEndId ? getGroundCellById(previewEraseGroundRangeEndId) : null
+
+    return startGroundErasePreviewCell && endGroundErasePreviewCell
+      ? buildGroundRangeCells(startGroundErasePreviewCell, endGroundErasePreviewCell, selectedGroundTexture).map((cell) => cell.id)
+      : []
+  }, [previewEraseGroundRangeEndId, selectedEraseGroundRangeStartId, selectedGroundTexture])
+  const previewRectangleGroundCellIds = useMemo(() => {
+    const startGroundRectanglePreviewCell = selectedGroundRectangleStartId ? getGroundCellById(selectedGroundRectangleStartId) : null
+    const endGroundRectanglePreviewCell = previewGroundRectangleEndId ? getGroundCellById(previewGroundRectangleEndId) : null
+
+    return startGroundRectanglePreviewCell && endGroundRectanglePreviewCell
+      ? buildGroundRectangleCells(startGroundRectanglePreviewCell, endGroundRectanglePreviewCell, selectedGroundTexture).map((cell) => cell.id)
+      : []
+  }, [previewGroundRectangleEndId, selectedGroundRectangleStartId, selectedGroundTexture])
+  const elementPickerCategories = useMemo(() => elementCategories.map((category) => {
     const categoryLabel = t(`pages.mapEdit.elementCategories.${category}`)
     const treeVariantLabels: Partial<Record<MapElementVariant, string>> = {
       '1': t('pages.mapEdit.elementTreeVariants.deciduous'),
@@ -1422,7 +1644,10 @@ export const useMapEditPage = (): MapEditPageState => {
                       : t('pages.mapEdit.elementAssetLabel', { category: categoryLabel, number: option.variant }),
       })),
     }
-  })
+  }), [selectedElementVariantByCategory, t])
+
+  const combinedPreviewEraseLineIds = useMemo(() => [...previewEraseLineIds, ...previewPointEraseLineIds], [previewEraseLineIds, previewPointEraseLineIds])
+  const combinedPreviewLineIds = useMemo(() => [...previewLineIds, ...previewPointRangeLineIds], [previewLineIds, previewPointRangeLineIds])
 
   return {
     activeLayer,
@@ -1431,11 +1656,14 @@ export const useMapEditPage = (): MapEditPageState => {
     elementPickerCategories,
     drawModeOptions,
     error,
-    elements: buildElements(form.grid.elements),
+    elements,
     form,
     handleChange,
     handleClearLinePreview,
+    handleMapClick,
+    handleMapContextMenu,
     handlePreviewLine,
+    handlePreviewMapPointer,
     handlePreviewPoint,
     handleRemoveLine,
     handleRemovePoint,
@@ -1455,17 +1683,17 @@ export const useMapEditPage = (): MapEditPageState => {
     handleToggleElement,
     handleToggleLabel,
     handlePreviewGroundCell,
-    hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
-    groundCells: buildGroundCells(form.grid.ground),
-    labels: buildLabels(form.grid.labels),
+    hasChanges,
+    groundCells,
+    labels,
     layerOptions,
-    lineSegments: buildLineSegments(form.grid.lines),
+    lineSegments,
     loading,
-    pointSegments: buildPointSegments(),
-    previewEraseLineIds: [...previewEraseLineIds, ...previewPointEraseLineIds],
+    pointSegments,
+    previewEraseLineIds: combinedPreviewEraseLineIds,
     previewEraseGroundCellIds,
     previewGroundCellIds,
-    previewLineIds: [...previewLineIds, ...previewPointRangeLineIds],
+    previewLineIds: combinedPreviewLineIds,
     previewRectangleLineIds,
     previewRectangleGroundCellIds,
     selectedColor,

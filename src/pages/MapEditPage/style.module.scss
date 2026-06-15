@@ -283,7 +283,7 @@
   overflow: hidden;
   border: 1px solid rgba(240, 198, 111, 0.28);
   border-radius: 0.35rem;
-  background: rgba(255, 248, 235, 0.04);
+  background: #ffffff;
 }
 
 .mapGrid::after {
@@ -343,6 +343,7 @@
 
 .mapCell:disabled {
   opacity: 1;
+  pointer-events: none;
 }
 
 .mapCellEditable {

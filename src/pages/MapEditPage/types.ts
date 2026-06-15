@@ -1,4 +1,4 @@
-import type { ChangeEvent, MouseEvent, SubmitEvent } from 'react'
+import type { ChangeEvent, MouseEvent, PointerEvent, SubmitEvent } from 'react'
 import type { MapData, MapElementCategory, MapElementVariant, MapGroundTexture, MapLineColor } from '@appTypes/map'
 import type { VariantImagePickerCategory } from './VariantImagePicker/types'
 
@@ -92,7 +92,10 @@ export interface MapEditPageState {
   handleSelectGroundTexture: (texture: MapGroundTexture) => void
   handleSelectElementAsset: (category: MapElementCategory, variant: MapElementVariant) => void
   handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
+  handleMapClick: (event: MouseEvent<HTMLElement>) => void
+  handleMapContextMenu: (event: MouseEvent<HTMLElement>) => void
   handlePreviewLine: (lineId: string) => void
+  handlePreviewMapPointer: (event: PointerEvent<HTMLElement>) => void
   handleClearLinePreview: () => void
   handleRemoveLine: (lineId: string, event?: MouseEvent<HTMLElement>) => void
   handleRemovePoint: (pointId: string, event?: MouseEvent<HTMLElement>) => void
