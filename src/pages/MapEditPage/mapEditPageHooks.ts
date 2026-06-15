@@ -546,6 +546,11 @@ const getLabelById = (labelId: string): MapLabelViewModel | null => {
   }
 }
 
+interface MapLineDragAxis {
+  orientation: MapLineOrientation
+  axis: number
+}
+
 const canDrawRange = (startLine: MapLineViewModel, endLine: MapLineViewModel): boolean => {
   if (startLine.orientation !== endLine.orientation) {
     return false
@@ -848,6 +853,9 @@ export const useMapEditPage = (): MapEditPageState => {
   const [previewGroundRectangleEndId, setPreviewGroundRectangleEndId] = useState('')
   const mapDragActionRef = useRef<'paint' | 'erase' | null>(null)
   const lastPaintedCellIdRef = useRef('')
+  const lastPaintedLineIdRef = useRef('')
+  const lineDragAxisRef = useRef<MapLineDragAxis | null>(null)
+  const suppressNextLineClickRef = useRef(false)
   const undoStackRef = useRef<MapGridData[]>([])
   const undoMapChangeRef = useRef<() => void>(() => undefined)
 
@@ -936,6 +944,9 @@ export const useMapEditPage = (): MapEditPageState => {
     setPreviewGroundRectangleEndId('')
     mapDragActionRef.current = null
     lastPaintedCellIdRef.current = ''
+    lastPaintedLineIdRef.current = ''
+    lineDragAxisRef.current = null
+    suppressNextLineClickRef.current = false
   }
 
   const handleUndoMapChange = () => {
@@ -1004,6 +1015,57 @@ export const useMapEditPage = (): MapEditPageState => {
         lines: nextLines,
       }
     })
+  }
+
+  const paintLineSegment = (lineId: string) => {
+    const lineSegment = getLineById(lineId)
+
+    if (!lineSegment) {
+      return
+    }
+
+    updateGrid((currentGrid) => {
+      const existingLine = currentGrid.lines.find((line) => line.id === lineId)
+
+      if (existingLine?.color === selectedColor) {
+        return currentGrid
+      }
+
+      const nextLine = createLine(lineSegment.orientation, lineSegment.x, lineSegment.y, selectedColor)
+      const nextLines = replaceLines(currentGrid.lines, [nextLine])
+
+      return {
+        ...currentGrid,
+        lines: nextLines,
+      }
+    })
+  }
+
+  const eraseLineSegment = (lineId: string) => {
+    updateGrid((currentGrid) => {
+      if (!currentGrid.lines.some((line) => line.id === lineId)) {
+        return currentGrid
+      }
+
+      return {
+        ...currentGrid,
+        lines: currentGrid.lines.filter((line) => line.id !== lineId),
+      }
+    })
+  }
+
+  const canApplyLineDragAction = (lineSegment: MapLineViewModel): boolean => {
+    const axis = lineSegment.orientation === 'horizontal' ? lineSegment.y : lineSegment.x
+
+    if (!lineDragAxisRef.current) {
+      lineDragAxisRef.current = {
+        orientation: lineSegment.orientation,
+        axis,
+      }
+      return true
+    }
+
+    return lineDragAxisRef.current.orientation === lineSegment.orientation && lineDragAxisRef.current.axis === axis
   }
 
   const handleRemoveLine: MapEditPageState['handleRemoveLine'] = (lineId, event) => {
@@ -1137,6 +1199,8 @@ export const useMapEditPage = (): MapEditPageState => {
 
       if ((event.buttons & expectedButton) !== expectedButton) {
         handleMapPointerUp()
+      } else if (activeLayer === 'lines' && selectedDrawMode === 'single') {
+        applyLineDragAction(position.lineId)
       } else {
         applyMapDragAction(cellId)
       }
@@ -1164,6 +1228,11 @@ export const useMapEditPage = (): MapEditPageState => {
 
   const handleMapClick = (event: MouseEvent<HTMLElement>) => {
     if (activeLayer !== 'lines' || selectedDrawMode !== 'single') {
+      return
+    }
+
+    if (suppressNextLineClickRef.current) {
+      suppressNextLineClickRef.current = false
       return
     }
 
@@ -1281,8 +1350,29 @@ export const useMapEditPage = (): MapEditPageState => {
     }
   }
 
+  const applyLineDragAction = (lineId: string) => {
+    if (lastPaintedLineIdRef.current === lineId) {
+      return
+    }
+
+    const lineSegment = getLineById(lineId)
+
+    if (!lineSegment || !canApplyLineDragAction(lineSegment)) {
+      return
+    }
+
+    lastPaintedLineIdRef.current = lineId
+
+    if (mapDragActionRef.current === 'erase') {
+      eraseLineSegment(lineId)
+      return
+    }
+
+    paintLineSegment(lineId)
+  }
+
   const handleMapPointerDown = (event: PointerEvent<HTMLElement>) => {
-    if ((event.button !== 0 && event.button !== 2) || !((activeLayer === 'ground' && selectedDrawMode === 'single') || activeLayer === 'elements')) {
+    if ((event.button !== 0 && event.button !== 2) || !((activeLayer === 'lines' && selectedDrawMode === 'single') || (activeLayer === 'ground' && selectedDrawMode === 'single') || activeLayer === 'elements')) {
       return
     }
 
@@ -1291,13 +1381,24 @@ export const useMapEditPage = (): MapEditPageState => {
     const cellId = createGroundCellId(position.cellX, position.cellY)
     mapDragActionRef.current = event.button === 2 ? 'erase' : 'paint'
     lastPaintedCellIdRef.current = ''
+    lastPaintedLineIdRef.current = ''
+    lineDragAxisRef.current = null
     event.currentTarget.setPointerCapture(event.pointerId)
+
+    if (activeLayer === 'lines') {
+      suppressNextLineClickRef.current = event.button === 0
+      applyLineDragAction(position.lineId)
+      return
+    }
+
     applyMapDragAction(cellId)
   }
 
   const handleMapPointerUp = () => {
     mapDragActionRef.current = null
     lastPaintedCellIdRef.current = ''
+    lastPaintedLineIdRef.current = ''
+    lineDragAxisRef.current = null
   }
 
   const handleSelectPoint = (pointId: string) => {

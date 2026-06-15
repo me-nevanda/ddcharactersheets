@@ -112,17 +112,21 @@
 
 .floatingSaveAction {
   position: fixed;
-  top: calc(4rem + 20px);
+  top: calc(4rem + 20px + 3.25rem + 0.65rem);
   right: 1rem;
   z-index: 19;
 }
 
-.mapPrintAction {
-  order: 0;
+.printAction {
+  position: fixed;
+  top: calc(4rem + 20px);
+  right: 1rem;
+  z-index: 30;
 }
 
 .ghostLink,
-.primaryButton {
+.primaryButton,
+.printPrimaryButton {
   @include pill-button;
 }
 
@@ -140,13 +144,23 @@
   box-shadow: 0 12px 30px rgba(166, 74, 46, 0.3);
 }
 
+.printPrimaryButton {
+  background: linear-gradient(135deg, #714232 0%, #a27748 100%);
+  border-color: rgba(240, 198, 111, 0.3);
+  color: #f8ead7;
+  font-weight: 700;
+  box-shadow: 0 12px 26px rgba(84, 49, 37, 0.3);
+}
+
 .ghostLink:hover,
-.primaryButton:hover {
+.primaryButton:hover,
+.printPrimaryButton:hover {
   transform: translateY(-1px);
   border-color: var(--border-strong);
 }
 
-.primaryButton:disabled {
+.primaryButton:disabled,
+.printPrimaryButton:disabled {
   cursor: default;
   opacity: 0.72;
   transform: none;
@@ -1126,8 +1140,7 @@
     width: auto;
   }
 
-  .floatingBackAction,
-  .floatingSaveAction {
+  .floatingBackAction {
     position: static;
     top: auto;
     right: auto;
@@ -1159,11 +1172,19 @@
   }
 
   .floatingSaveAction {
-    order: 2;
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+    order: 3;
   }
 
-  .mapPrintAction {
-    order: 3;
+  .printAction {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+    order: 2;
     flex-basis: 100%;
   }
 

@@ -146,12 +146,14 @@ export const MapEditPage = () => {
             <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to={returnTo} onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
-            <button className={`${styles.ghostLink} ${styles.mapPrintAction}`} type="button" onClick={handlePrintMap}>
-              <span className={styles.buttonContent}>
-                <AppIcon name="print" />
-                <span>{t('common.actions.print')}</span>
-              </span>
-            </button>
+            <div className={styles.printAction}>
+              <button className={styles.printPrimaryButton} type="button" onClick={handlePrintMap}>
+                <span className={styles.buttonContent}>
+                  <AppIcon name="print" />
+                  <span>{t('common.actions.print')}</span>
+                </span>
+              </button>
+            </div>
             <div className={styles.floatingSaveAction}>
               <button className={styles.primaryButton} form="map-edit-form" type="submit" disabled={saving || !hasChanges}>
                 <span className={styles.buttonContent}>
