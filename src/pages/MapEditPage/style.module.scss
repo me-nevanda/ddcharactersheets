@@ -516,6 +516,10 @@
   background: rgba(217, 164, 65, 0.45);
 }
 
+.mapGridSingleMode .lineSegment {
+  pointer-events: none;
+}
+
 .lineSegment:focus-visible {
   outline: 0;
 }

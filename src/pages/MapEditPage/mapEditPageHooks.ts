@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getMap, saveMap } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
-import type { MapData, MapElementCategory, MapElementVariant, MapGridElement, MapGridGroundCell, MapGridLabel, MapGridLine, MapGroundTexture } from '@appTypes/map'
+import type { MapData, MapElementCategory, MapElementVariant, MapGridData, MapGridElement, MapGridGroundCell, MapGridLabel, MapGridLine, MapGroundTexture } from '@appTypes/map'
 import bushElement1 from '../../images/elements/bushes/1.png'
 import bushElement2 from '../../images/elements/bushes/2.png'
 import bushElement3 from '../../images/elements/bushes/3.png'
@@ -723,6 +723,40 @@ const emptyMapForm: MapData = {
   },
 }
 
+const undoStackLimit = 50
+
+const createMapUndoStorageKey = (mapId: string): string => {
+  return `did:map-edit:${mapId || 'new'}:undo`
+}
+
+const areMapGridsEqual = (firstGrid: MapGridData, secondGrid: MapGridData): boolean => {
+  return JSON.stringify(firstGrid) === JSON.stringify(secondGrid)
+}
+
+const loadMapUndoStack = (mapId: string): MapGridData[] => {
+  try {
+    const rawStack = window.localStorage.getItem(createMapUndoStorageKey(mapId))
+
+    if (!rawStack) {
+      return []
+    }
+
+    const parsedStack = JSON.parse(rawStack)
+
+    return Array.isArray(parsedStack) ? parsedStack.slice(-undoStackLimit) as MapGridData[] : []
+  } catch {
+    return []
+  }
+}
+
+const saveMapUndoStack = (mapId: string, undoStack: MapGridData[]) => {
+  try {
+    window.localStorage.setItem(createMapUndoStorageKey(mapId), JSON.stringify(undoStack.slice(-undoStackLimit)))
+  } catch {
+    // Undo is a local convenience feature; storage failures should not block editing.
+  }
+}
+
 const clampGridCoordinate = (value: number, max: number): number => {
   return Math.min(max, Math.max(0, value))
 }
@@ -814,9 +848,12 @@ export const useMapEditPage = (): MapEditPageState => {
   const [previewGroundRectangleEndId, setPreviewGroundRectangleEndId] = useState('')
   const mapDragActionRef = useRef<'paint' | 'erase' | null>(null)
   const lastPaintedCellIdRef = useRef('')
+  const undoStackRef = useRef<MapGridData[]>([])
+  const undoMapChangeRef = useRef<() => void>(() => undefined)
 
   useEffect(() => {
     let cancelled = false
+    undoStackRef.current = loadMapUndoStack(mapId)
 
     const loadMap = async () => {
       try {
@@ -850,6 +887,95 @@ export const useMapEditPage = (): MapEditPageState => {
     }
   }, [mapId, t])
 
+  const pushUndoGridSnapshot = (grid: MapGridData) => {
+    const previousGrid = undoStackRef.current[undoStackRef.current.length - 1]
+
+    if (previousGrid && areMapGridsEqual(previousGrid, grid)) {
+      return
+    }
+
+    undoStackRef.current = [...undoStackRef.current, grid].slice(-undoStackLimit)
+    saveMapUndoStack(mapId, undoStackRef.current)
+  }
+
+  const updateGrid = (getNextGrid: (grid: MapGridData) => MapGridData) => {
+    setForm((current) => {
+      const nextGrid = getNextGrid(current.grid)
+
+      if (areMapGridsEqual(current.grid, nextGrid)) {
+        return current
+      }
+
+      pushUndoGridSnapshot(current.grid)
+
+      return {
+        ...current,
+        grid: nextGrid,
+      }
+    })
+  }
+
+  const clearMapInteractionState = () => {
+    setSelectedRangeStartId('')
+    setPreviewSingleLineId('')
+    setPreviewRangeEndId('')
+    setSelectedEraseRangeStartId('')
+    setPreviewEraseRangeEndId('')
+    setSelectedRectangleStartId('')
+    setPreviewRectangleEndId('')
+    setSelectedPointRangeStartId('')
+    setPreviewPointRangeEndId('')
+    setSelectedPointEraseStartId('')
+    setPreviewPointEraseEndId('')
+    setSelectedGroundRangeStartId('')
+    setPreviewGroundSingleCellId('')
+    setPreviewGroundRangeEndId('')
+    setSelectedEraseGroundRangeStartId('')
+    setPreviewEraseGroundRangeEndId('')
+    setSelectedGroundRectangleStartId('')
+    setPreviewGroundRectangleEndId('')
+    mapDragActionRef.current = null
+    lastPaintedCellIdRef.current = ''
+  }
+
+  const handleUndoMapChange = () => {
+    const previousGrid = undoStackRef.current[undoStackRef.current.length - 1]
+
+    if (!previousGrid) {
+      return
+    }
+
+    clearMapInteractionState()
+    undoStackRef.current = undoStackRef.current.slice(0, -1)
+    saveMapUndoStack(mapId, undoStackRef.current)
+    setForm((current) => ({
+      ...current,
+      grid: previousGrid,
+    }))
+  }
+
+  undoMapChangeRef.current = handleUndoMapChange
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null
+      const isTextEditingTarget = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target?.isContentEditable
+
+      if (isTextEditingTarget || !event.ctrlKey || event.shiftKey || event.altKey || event.metaKey || event.key.toLowerCase() !== 'z') {
+        return
+      }
+
+      event.preventDefault()
+      undoMapChangeRef.current()
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target
     setForm((current) => ({
@@ -869,16 +995,13 @@ export const useMapEditPage = (): MapEditPageState => {
       return
     }
 
-    setForm((current) => {
+    updateGrid((currentGrid) => {
       const nextLine = createLine(lineSegment.orientation, lineSegment.x, lineSegment.y, selectedColor)
-      const nextLines = replaceLines(current.grid.lines, [nextLine])
+      const nextLines = replaceLines(currentGrid.lines, [nextLine])
 
       return {
-        ...current,
-        grid: {
-          ...current.grid,
-          lines: nextLines,
-        },
+        ...currentGrid,
+        lines: nextLines,
       }
     })
   }
@@ -909,12 +1032,9 @@ export const useMapEditPage = (): MapEditPageState => {
       }
 
       const nextRangeLines = buildRangeLines(startLine, lineSegment, selectedColor)
-      setForm((current) => ({
-        ...current,
-        grid: {
-          ...current.grid,
-          lines: removeLines(current.grid.lines, nextRangeLines),
-        },
+      updateGrid((currentGrid) => ({
+        ...currentGrid,
+        lines: removeLines(currentGrid.lines, nextRangeLines),
       }))
       setSelectedEraseRangeStartId('')
       setPreviewEraseRangeEndId('')
@@ -923,12 +1043,9 @@ export const useMapEditPage = (): MapEditPageState => {
 
     setSelectedRangeStartId('')
     setPreviewRangeEndId('')
-    setForm((current) => ({
-      ...current,
-      grid: {
-        ...current.grid,
-        lines: current.grid.lines.filter((line) => line.id !== lineId),
-      },
+    updateGrid((currentGrid) => ({
+      ...currentGrid,
+      lines: currentGrid.lines.filter((line) => line.id !== lineId),
     }))
   }
 
@@ -1074,19 +1191,16 @@ export const useMapEditPage = (): MapEditPageState => {
       return
     }
 
-    setForm((current) => {
-      const existingCell = current.grid.ground.find((cell) => cell.id === cellId)
+    updateGrid((currentGrid) => {
+      const existingCell = currentGrid.ground.find((cell) => cell.id === cellId)
 
       if (existingCell?.texture === selectedGroundTexture) {
-        return current
+        return currentGrid
       }
 
       return {
-        ...current,
-        grid: {
-          ...current.grid,
-          ground: replaceGroundCells(current.grid.ground, [createGroundCell(groundCell.x, groundCell.y, selectedGroundTexture)]),
-        },
+        ...currentGrid,
+        ground: replaceGroundCells(currentGrid.ground, [createGroundCell(groundCell.x, groundCell.y, selectedGroundTexture)]),
       }
     })
   }
@@ -1100,51 +1214,42 @@ export const useMapEditPage = (): MapEditPageState => {
 
     const selectedElementVariant = selectedElementVariantByCategory[selectedElementCategory]
 
-    setForm((current) => {
-      const existingElement = current.grid.elements.find((currentElement) => currentElement.id === cellId)
+    updateGrid((currentGrid) => {
+      const existingElement = currentGrid.elements.find((currentElement) => currentElement.id === cellId)
 
       if (existingElement?.category === selectedElementCategory && existingElement.variant === selectedElementVariant) {
-        return current
+        return currentGrid
       }
 
       return {
-        ...current,
-        grid: {
-          ...current.grid,
-          elements: replaceElements(current.grid.elements, [createElement(element.x, element.y, selectedElementCategory, selectedElementVariant)]),
-        },
+        ...currentGrid,
+        elements: replaceElements(currentGrid.elements, [createElement(element.x, element.y, selectedElementCategory, selectedElementVariant)]),
       }
     })
   }
 
   const eraseGroundCell = (cellId: string) => {
-    setForm((current) => {
-      if (!current.grid.ground.some((cell) => cell.id === cellId)) {
-        return current
+    updateGrid((currentGrid) => {
+      if (!currentGrid.ground.some((cell) => cell.id === cellId)) {
+        return currentGrid
       }
 
       return {
-        ...current,
-        grid: {
-          ...current.grid,
-          ground: current.grid.ground.filter((cell) => cell.id !== cellId),
-        },
+        ...currentGrid,
+        ground: currentGrid.ground.filter((cell) => cell.id !== cellId),
       }
     })
   }
 
   const eraseElementCell = (cellId: string) => {
-    setForm((current) => {
-      if (!current.grid.elements.some((element) => element.id === cellId)) {
-        return current
+    updateGrid((currentGrid) => {
+      if (!currentGrid.elements.some((element) => element.id === cellId)) {
+        return currentGrid
       }
 
       return {
-        ...current,
-        grid: {
-          ...current.grid,
-          elements: current.grid.elements.filter((element) => element.id !== cellId),
-        },
+        ...currentGrid,
+        elements: currentGrid.elements.filter((element) => element.id !== cellId),
       }
     })
   }
@@ -1229,12 +1334,9 @@ export const useMapEditPage = (): MapEditPageState => {
         return
       }
 
-      setForm((current) => ({
-        ...current,
-        grid: {
-          ...current.grid,
-          lines: replaceLines(current.grid.lines, nextRangeLines),
-        },
+      updateGrid((currentGrid) => ({
+        ...currentGrid,
+        lines: replaceLines(currentGrid.lines, nextRangeLines),
       }))
       setSelectedPointRangeStartId('')
       setPreviewPointRangeEndId('')
@@ -1271,12 +1373,9 @@ export const useMapEditPage = (): MapEditPageState => {
       return
     }
 
-    setForm((current) => ({
-      ...current,
-      grid: {
-        ...current.grid,
-        lines: replaceLines(current.grid.lines, nextRectangleLines),
-      },
+    updateGrid((currentGrid) => ({
+      ...currentGrid,
+      lines: replaceLines(currentGrid.lines, nextRectangleLines),
     }))
     setSelectedRectangleStartId('')
     setPreviewRectangleEndId('')
@@ -1317,12 +1416,9 @@ export const useMapEditPage = (): MapEditPageState => {
       return
     }
 
-    setForm((current) => ({
-      ...current,
-      grid: {
-        ...current.grid,
-        lines: removeLines(current.grid.lines, nextRangeLines),
-      },
+    updateGrid((currentGrid) => ({
+      ...currentGrid,
+      lines: removeLines(currentGrid.lines, nextRangeLines),
     }))
     setSelectedPointEraseStartId('')
     setPreviewPointEraseEndId('')
@@ -1358,12 +1454,9 @@ export const useMapEditPage = (): MapEditPageState => {
       }
 
       const nextGroundCells = buildGroundRangeCells(startCell, groundCell, selectedGroundTexture)
-      setForm((current) => ({
-        ...current,
-        grid: {
-          ...current.grid,
-          ground: replaceGroundCells(current.grid.ground, nextGroundCells),
-        },
+      updateGrid((currentGrid) => ({
+        ...currentGrid,
+        ground: replaceGroundCells(currentGrid.ground, nextGroundCells),
       }))
       setSelectedGroundRangeStartId('')
       setPreviewGroundRangeEndId('')
@@ -1387,12 +1480,9 @@ export const useMapEditPage = (): MapEditPageState => {
     }
 
     const nextGroundCells = buildGroundRectangleCells(startCell, groundCell, selectedGroundTexture)
-    setForm((current) => ({
-      ...current,
-      grid: {
-        ...current.grid,
-        ground: replaceGroundCells(current.grid.ground, nextGroundCells),
-      },
+    updateGrid((currentGrid) => ({
+      ...currentGrid,
+      ground: replaceGroundCells(currentGrid.ground, nextGroundCells),
     }))
     setSelectedGroundRectangleStartId('')
     setPreviewGroundRectangleEndId('')
@@ -1424,12 +1514,9 @@ export const useMapEditPage = (): MapEditPageState => {
       }
 
       const nextGroundCells = buildGroundRangeCells(startCell, groundCell, selectedGroundTexture)
-      setForm((current) => ({
-        ...current,
-        grid: {
-          ...current.grid,
-          ground: removeGroundCells(current.grid.ground, nextGroundCells),
-        },
+      updateGrid((currentGrid) => ({
+        ...currentGrid,
+        ground: removeGroundCells(currentGrid.ground, nextGroundCells),
       }))
       setSelectedEraseGroundRangeStartId('')
       setPreviewEraseGroundRangeEndId('')
@@ -1438,12 +1525,9 @@ export const useMapEditPage = (): MapEditPageState => {
 
     setSelectedGroundRangeStartId('')
     setPreviewGroundRangeEndId('')
-    setForm((current) => ({
-      ...current,
-      grid: {
-        ...current.grid,
-        ground: current.grid.ground.filter((cell) => cell.id !== cellId),
-      },
+    updateGrid((currentGrid) => ({
+      ...currentGrid,
+      ground: currentGrid.ground.filter((cell) => cell.id !== cellId),
     }))
   }
 
@@ -1496,12 +1580,9 @@ export const useMapEditPage = (): MapEditPageState => {
 
   const handleRemoveElement: MapEditPageState['handleRemoveElement'] = (elementId, event) => {
     event?.preventDefault()
-    setForm((current) => ({
-      ...current,
-      grid: {
-        ...current.grid,
-        elements: current.grid.elements.filter((element) => element.id !== elementId),
-      },
+    updateGrid((currentGrid) => ({
+      ...currentGrid,
+      elements: currentGrid.elements.filter((element) => element.id !== elementId),
     }))
   }
 
@@ -1512,41 +1593,32 @@ export const useMapEditPage = (): MapEditPageState => {
       return
     }
 
-    setForm((current) => {
-      const existingLabel = current.grid.labels.find((currentLabel) => currentLabel.id === labelId)
+    updateGrid((currentGrid) => {
+      const existingLabel = currentGrid.labels.find((currentLabel) => currentLabel.id === labelId)
 
       return {
-        ...current,
-        grid: {
-          ...current.grid,
-          labels: replaceLabels(current.grid.labels, [createLabel(label.x, label.y, existingLabel?.name)]),
-        },
+        ...currentGrid,
+        labels: replaceLabels(currentGrid.labels, [createLabel(label.x, label.y, existingLabel?.name)]),
       }
     })
   }
 
   const handleRemoveLabel: MapEditPageState['handleRemoveLabel'] = (labelId, event) => {
     event?.preventDefault()
-    setForm((current) => ({
-      ...current,
-      grid: {
-        ...current.grid,
-        labels: current.grid.labels.filter((label) => label.id !== labelId),
-      },
+    updateGrid((currentGrid) => ({
+      ...currentGrid,
+      labels: currentGrid.labels.filter((label) => label.id !== labelId),
     }))
   }
 
   const handleRenameLabel: MapEditPageState['handleRenameLabel'] = (labelId, name) => {
-    setForm((current) => ({
-      ...current,
-      grid: {
-        ...current.grid,
-        labels: current.grid.labels.map((label) => (
-          label.id === labelId
-            ? { ...label, name: name.trim() }
-            : label
-        )),
-      },
+    updateGrid((currentGrid) => ({
+      ...currentGrid,
+      labels: currentGrid.labels.map((label) => (
+        label.id === labelId
+          ? { ...label, name: name.trim() }
+          : label
+      )),
     }))
   }
 

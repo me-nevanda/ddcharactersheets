@@ -48,7 +48,7 @@ export const MapEditPage = () => {
       || selectedEraseRangeStartId === line.id
       || selectedRangeStartId === line.id
     ))
-  }, [activeLayer, lineSegments, previewEraseLineIdSet, previewLineIdSet, previewRectangleLineIdSet, selectedDrawMode, selectedEraseRangeStartId, selectedRangeStartId])
+  }, [lineSegments, previewEraseLineIdSet, previewLineIdSet, previewRectangleLineIdSet, selectedEraseRangeStartId, selectedRangeStartId])
   const getGroundTextureSrc = (texture: string) => {
     return groundTextureOptions.find((option) => option.key === texture)?.imageSrc ?? groundTextureOptions[0]?.imageSrc ?? ''
   }
