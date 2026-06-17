@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type SubmitEvent, type KeyboardEvent, type MouseEvent as ReactMouseEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { deleteContextImage, getContext, listAreas, listCharacterGroups, listCharacters, listEvents, listMonsterGroups, listMonsters, listNpcGroups, listNpcs, saveContext, uploadContextImage } from '@lib/api'
+import { deleteContextImage, getContext, saveContext, uploadContextImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import { useContextCopy } from './contextCopyHooks'
-import type { Area, PlaceItem } from '@appTypes/area'
+import { useContextDataSources } from './contextDataHooks'
+import { areAreaSnapshotsEqual, areCharacterGroupSnapshotsEqual, areMonsterGroupSnapshotsEqual, areNpcGroupSnapshotsEqual, areStringArraysEqual, buildPlainTextPreview, emptyContextForm } from './contextEditPageLogic'
+import type { Area } from '@appTypes/area'
 import type { Character, CharacterGroup } from '@appTypes/character'
 import type { ContextAreaSnapshot, ContextCharacterGroupSnapshot, ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
 import type { Event } from '@appTypes/event'
@@ -29,121 +31,6 @@ import type {
   ContextPlaceCardViewModel,
 } from './types'
 
-const emptyContextForm: ContextData = {
-  name: '',
-  description: '',
-  characters: [],
-  characterGroups: [],
-  events: [],
-  npcGroups: [],
-  monsterGroups: [],
-  areas: [],
-}
-
-const buildPlainTextPreview = (value: string): string => {
-  if (!value) {
-    return ''
-  }
-  if (typeof document === 'undefined') {
-    return value.replace(/\s+/g, ' ').trim()
-  }
-  const template = document.createElement('template')
-  template.innerHTML = value
-  return (template.content.textContent ?? '').replace(/\s+/g, ' ').trim()
-}
-
-const areStringArraysEqual = (left: string[], right: string[]): boolean => {
-  if (left.length !== right.length) {
-    return false
-  }
-  for (let index = 0; index < left.length; index += 1) {
-    if (left[index] !== right[index]) {
-      return false
-    }
-  }
-  return true
-}
-
-const areNpcGroupSnapshotsEqual = (
-  left: ContextNpcGroupSnapshot[],
-  right: ContextNpcGroupSnapshot[],
-): boolean => {
-  if (left.length !== right.length) {
-    return false
-  }
-  for (let index = 0; index < left.length; index += 1) {
-    const a = left[index]
-    const b = right[index]
-    if (a.id !== b.id || a.name !== b.name) {
-      return false
-    }
-    if (!areStringArraysEqual(a.npcIds, b.npcIds)) {
-      return false
-    }
-  }
-  return true
-}
-
-const areCharacterGroupSnapshotsEqual = (
-  left: ContextCharacterGroupSnapshot[],
-  right: ContextCharacterGroupSnapshot[],
-): boolean => {
-  if (left.length !== right.length) {
-    return false
-  }
-  for (let index = 0; index < left.length; index += 1) {
-    const a = left[index]
-    const b = right[index]
-    if (a.id !== b.id || a.name !== b.name) {
-      return false
-    }
-    if (!areStringArraysEqual(a.characterIds, b.characterIds)) {
-      return false
-    }
-  }
-  return true
-}
-
-const areMonsterGroupSnapshotsEqual = (
-  left: ContextMonsterGroupSnapshot[],
-  right: ContextMonsterGroupSnapshot[],
-): boolean => {
-  if (left.length !== right.length) {
-    return false
-  }
-  for (let index = 0; index < left.length; index += 1) {
-    const a = left[index]
-    const b = right[index]
-    if (a.id !== b.id || a.name !== b.name) {
-      return false
-    }
-    if (!areStringArraysEqual(a.monsterIds, b.monsterIds)) {
-      return false
-    }
-  }
-  return true
-}
-
-const areAreaSnapshotsEqual = (
-  left: ContextAreaSnapshot[],
-  right: ContextAreaSnapshot[],
-): boolean => {
-  if (left.length !== right.length) {
-    return false
-  }
-  for (let index = 0; index < left.length; index += 1) {
-    const a = left[index]
-    const b = right[index]
-    if (a.id !== b.id || a.name !== b.name) {
-      return false
-    }
-    if (!areStringArraysEqual(a.placeIds, b.placeIds)) {
-      return false
-    }
-  }
-  return true
-}
-
 export const useContextEditPage = (): ContextEditPageState => {
   const { t } = useI18n()
   const { contextId = '' } = useParams()
@@ -158,33 +45,40 @@ export const useContextEditPage = (): ContextEditPageState => {
   const [saving, setSaving] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
 
-  const [allCharacters, setAllCharacters] = useState<Character[]>([])
-  const [allCharacterGroups, setAllCharacterGroups] = useState<CharacterGroup[]>([])
   const [isAddCharacterGroupDialogOpen, setIsAddCharacterGroupDialogOpen] = useState(false)
   const [characterGroupSearch, setCharacterGroupSearch] = useState('')
   const [selectedCharacterGroupIdsInDialog, setSelectedCharacterGroupIdsInDialog] = useState<string[]>([])
-
-  const [allEvents, setAllEvents] = useState<Event[]>([])
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = useState(false)
   const [eventSearch, setEventSearch] = useState('')
   const [selectedEventIdsInDialog, setSelectedEventIdsInDialog] = useState<string[]>([])
-
-  const [allNpcs, setAllNpcs] = useState<Npc[]>([])
-  const [allNpcGroups, setAllNpcGroups] = useState<NpcGroup[]>([])
   const [isAddNpcGroupDialogOpen, setIsAddNpcGroupDialogOpen] = useState(false)
   const [npcGroupSearch, setNpcGroupSearch] = useState('')
   const [selectedNpcGroupIdsInDialog, setSelectedNpcGroupIdsInDialog] = useState<string[]>([])
-
-  const [allMonsters, setAllMonsters] = useState<Monster[]>([])
-  const [allMonsterGroups, setAllMonsterGroups] = useState<MonsterGroup[]>([])
   const [isAddMonsterGroupDialogOpen, setIsAddMonsterGroupDialogOpen] = useState(false)
   const [monsterGroupSearch, setMonsterGroupSearch] = useState('')
   const [selectedMonsterGroupIdsInDialog, setSelectedMonsterGroupIdsInDialog] = useState<string[]>([])
-
-  const [allAreas, setAllAreas] = useState<Area[]>([])
   const [isAddAreaDialogOpen, setIsAddAreaDialogOpen] = useState(false)
   const [areaSearch, setAreaSearch] = useState('')
   const [selectedAreaIdsInDialog, setSelectedAreaIdsInDialog] = useState<string[]>([])
+  const {
+    allAreas,
+    allCharacterGroups,
+    allCharacters,
+    allEvents,
+    allMonsterGroups,
+    allMonsters,
+    allNpcGroups,
+    allNpcs,
+    areasById,
+    characterGroupsById,
+    charactersById,
+    eventsById,
+    monsterGroupsById,
+    monstersById,
+    npcGroupsById,
+    npcsById,
+    placesByAreaId,
+  } = useContextDataSources({ setError, t })
 
   useEffect(() => {
     let cancelled = false
@@ -227,223 +121,6 @@ export const useContextEditPage = (): ContextEditPageState => {
     }
   }, [contextId, t])
 
-  useEffect(() => {
-    let cancelled = false
-
-    const loadCharacters = async () => {
-      try {
-        const characters = await listCharacters()
-        if (!cancelled) {
-          setAllCharacters(characters)
-        }
-      } catch (nextError) {
-        if (!cancelled) {
-          setError((current) => current || getErrorMessage(t, nextError))
-        }
-      }
-    }
-
-    void loadCharacters()
-
-    return () => {
-      cancelled = true
-    }
-  }, [t])
-
-  useEffect(() => {
-    let cancelled = false
-
-    const loadCharacterGroups = async () => {
-      try {
-        const characterGroups = await listCharacterGroups()
-        if (!cancelled) {
-          setAllCharacterGroups(characterGroups)
-        }
-      } catch (nextError) {
-        if (!cancelled) {
-          setError((current) => current || getErrorMessage(t, nextError))
-        }
-      }
-    }
-
-    void loadCharacterGroups()
-
-    return () => {
-      cancelled = true
-    }
-  }, [t])
-
-  useEffect(() => {
-    let cancelled = false
-
-    const loadEvents = async () => {
-      try {
-        const events = await listEvents()
-        if (!cancelled) {
-          setAllEvents(events)
-        }
-      } catch (nextError) {
-        if (!cancelled) {
-          setError((current) => current || getErrorMessage(t, nextError))
-        }
-      }
-    }
-
-    void loadEvents()
-
-    return () => {
-      cancelled = true
-    }
-  }, [t])
-
-  useEffect(() => {
-    let cancelled = false
-
-    const loadNpcData = async () => {
-      try {
-        const [npcGroups, npcs] = await Promise.all([listNpcGroups(), listNpcs()])
-        if (!cancelled) {
-          setAllNpcGroups(npcGroups)
-          setAllNpcs(npcs)
-        }
-      } catch (nextError) {
-        if (!cancelled) {
-          setError((current) => current || getErrorMessage(t, nextError))
-        }
-      }
-    }
-
-    void loadNpcData()
-
-    return () => {
-      cancelled = true
-    }
-  }, [t])
-
-  useEffect(() => {
-    let cancelled = false
-
-    const loadMonsterData = async () => {
-      try {
-        const [monsterGroups, monsters] = await Promise.all([listMonsterGroups(), listMonsters()])
-        if (!cancelled) {
-          setAllMonsterGroups(monsterGroups)
-          setAllMonsters(monsters)
-        }
-      } catch (nextError) {
-        if (!cancelled) {
-          setError((current) => current || getErrorMessage(t, nextError))
-        }
-      }
-    }
-
-    void loadMonsterData()
-
-    return () => {
-      cancelled = true
-    }
-  }, [t])
-
-  useEffect(() => {
-    let cancelled = false
-
-    const loadAreas = async () => {
-      try {
-        const areas = await listAreas()
-        if (!cancelled) {
-          setAllAreas(areas)
-        }
-      } catch (nextError) {
-        if (!cancelled) {
-          setError((current) => current || getErrorMessage(t, nextError))
-        }
-      }
-    }
-
-    void loadAreas()
-
-    return () => {
-      cancelled = true
-    }
-  }, [t])
-
-  const charactersById = useMemo(() => {
-    const map = new Map<string, Character>()
-    for (const character of allCharacters) {
-      map.set(character.id, character)
-    }
-    return map
-  }, [allCharacters])
-
-  const characterGroupsById = useMemo(() => {
-    const map = new Map<string, CharacterGroup>()
-    for (const group of allCharacterGroups) {
-      map.set(group.id, group)
-    }
-    return map
-  }, [allCharacterGroups])
-
-  const eventsById = useMemo(() => {
-    const map = new Map<string, Event>()
-    for (const event of allEvents) {
-      map.set(event.id, event)
-    }
-    return map
-  }, [allEvents])
-
-  const npcsById = useMemo(() => {
-    const map = new Map<string, Npc>()
-    for (const npc of allNpcs) {
-      map.set(npc.id, npc)
-    }
-    return map
-  }, [allNpcs])
-
-  const npcGroupsById = useMemo(() => {
-    const map = new Map<string, NpcGroup>()
-    for (const group of allNpcGroups) {
-      map.set(group.id, group)
-    }
-    return map
-  }, [allNpcGroups])
-
-  const monstersById = useMemo(() => {
-    const map = new Map<string, Monster>()
-    for (const monster of allMonsters) {
-      map.set(monster.id, monster)
-    }
-    return map
-  }, [allMonsters])
-
-  const monsterGroupsById = useMemo(() => {
-    const map = new Map<string, MonsterGroup>()
-    for (const group of allMonsterGroups) {
-      map.set(group.id, group)
-    }
-    return map
-  }, [allMonsterGroups])
-
-  const areasById = useMemo(() => {
-    const map = new Map<string, Area>()
-    for (const area of allAreas) {
-      map.set(area.id, area)
-    }
-    return map
-  }, [allAreas])
-
-  const placesByAreaId = useMemo(() => {
-    const map = new Map<string, Map<string, PlaceItem>>()
-    for (const area of allAreas) {
-      const placeMap = new Map<string, PlaceItem>()
-      for (const place of area.places ?? []) {
-        if (place) {
-          placeMap.set(place.id, place)
-        }
-      }
-      map.set(area.id, placeMap)
-    }
-    return map
-  }, [allAreas])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target
@@ -1482,3 +1159,4 @@ export const useContextEditPage = (): ContextEditPageState => {
     hasSelectedAreasInDialog: selectedAreaIdsInDialog.length > 0,
   }
 }
+
