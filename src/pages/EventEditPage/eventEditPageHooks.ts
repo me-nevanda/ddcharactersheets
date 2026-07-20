@@ -1,8 +1,10 @@
 import { useEffect, useState, type ChangeEvent, type SubmitEvent } from 'react'
+import toast from 'react-hot-toast'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { deleteEventImage, getEvent, saveEvent, uploadEventImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
+import { buildSingleEventContextCopyText, copyTextToClipboard } from '@pages/ContextEditPage/contextCopyHooks'
 import type { EventData } from '@appTypes/event'
 import type { EventEditPageState } from './types'
 
@@ -20,6 +22,7 @@ export const useEventEditPage = (): EventEditPageState => {
   const [imageUrl, setImageUrl] = useState('')
   const [isImageRemoveDialogOpen, setIsImageRemoveDialogOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [copyingContext, setCopyingContext] = useState(false)
   const [removingImage, setRemovingImage] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
@@ -140,12 +143,33 @@ export const useEventEditPage = (): EventEditPageState => {
     }
   }
 
+  const handleCopyEventContext = async () => {
+    setCopyingContext(true)
+    setError('')
+
+    try {
+      const text = buildSingleEventContextCopyText(form, t)
+      await copyTextToClipboard(text)
+      toast.success(t('pages.eventEdit.contextCopySuccess'))
+    } catch (nextError) {
+      const message = nextError instanceof Error && nextError.message === 'errors.api.generic'
+        ? t('pages.eventEdit.contextCopyError')
+        : getErrorMessage(t, nextError)
+      setError(message)
+      toast.error(message)
+    } finally {
+      setCopyingContext(false)
+    }
+  }
+
   return {
+    copyingContext,
     error,
     form,
     handleChange,
     handleCancelImageRemove,
     handleConfirmImageRemove,
+    handleCopyEventContext,
     handleImageChange,
     handleRequestImageRemove,
     handleSubmit,

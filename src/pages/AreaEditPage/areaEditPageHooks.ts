@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { deleteAreaImage, getArea, saveArea, uploadAreaImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
+import { buildSingleAreaContextCopyText, copyTextToClipboard } from '@pages/ContextEditPage/contextCopyHooks'
 import { useEditReturnNavigation } from '@pages/useEditReturnNavigation'
 import type { AreaData, PlaceItem } from '@appTypes/area'
 import type { AreaEditPageState } from './types'
@@ -49,6 +51,7 @@ export const useAreaEditPage = (): AreaEditPageState => {
   const [savedArea, setSavedArea] = useState<AreaData>(emptyArea)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [copyingContext, setCopyingContext] = useState(false)
   const [error, setError] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [isImageRemoveDialogOpen, setIsImageRemoveDialogOpen] = useState(false)
@@ -232,11 +235,31 @@ export const useAreaEditPage = (): AreaEditPageState => {
     }
   }
 
+  const handleCopyAreaContext: AreaEditPageState['handleCopyAreaContext'] = async () => {
+    setCopyingContext(true)
+    setError('')
+
+    try {
+      const text = buildSingleAreaContextCopyText(form, t)
+      await copyTextToClipboard(text)
+      toast.success(t('pages.areaEdit.contextCopySuccess'))
+    } catch (nextError) {
+      const message = nextError instanceof Error && nextError.message === 'errors.api.generic'
+        ? t('pages.areaEdit.contextCopyError')
+        : getErrorMessage(t, nextError)
+      setError(message)
+      toast.error(message)
+    } finally {
+      setCopyingContext(false)
+    }
+  }
+
   const handleBackToListClick = () => {
     navigateBack()
   }
 
   return {
+    copyingContext,
     error,
     form,
     handleBackToListClick,
@@ -251,6 +274,7 @@ export const useAreaEditPage = (): AreaEditPageState => {
     handlePlaceItemDescriptionChange,
     handleCancelImageRemove,
     handleConfirmImageRemove,
+    handleCopyAreaContext,
     handleImageChange,
     handleRequestImageRemove,
     handleSubmit,

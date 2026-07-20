@@ -9,6 +9,7 @@ export type AppIconName =
   | 'document'
   | 'edit'
   | 'event'
+  | 'group'
   | 'magic'
   | 'map'
   | 'minion'

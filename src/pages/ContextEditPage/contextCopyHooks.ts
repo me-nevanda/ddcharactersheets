@@ -31,7 +31,7 @@ const normalizeText = (value: string | number | undefined | null): string => {
   return stripHtml(value ?? '')
 }
 
-const copyTextToClipboard = async (text: string): Promise<void> => {
+export const copyTextToClipboard = async (text: string): Promise<void> => {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text)
     return
@@ -140,6 +140,55 @@ const buildCharacterGroupLines = (
   })
 }
 
+export const buildSingleCharacterContextCopyText = (
+  character: Pick<Character, 'class' | 'level' | 'name' | 'race' | 'shortDescription'>,
+  historyEntries: ContextHistoryEntry[],
+  getCharacterRaceLabel: (value: Character['race']) => string,
+  getCharacterClassLabel: (value: Character['class']) => string,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string => {
+  const characterName = normalizeText(character.name)
+  const lines = [
+    t('pages.contextEdit.copy.singleCharacterIntro', { name: characterName }),
+    '',
+    `- ${[
+      characterName,
+      `${normalizeText(character.level)} ${getCharacterRaceLabel(character.race)}`,
+      getCharacterClassLabel(character.class),
+      normalizeText(character.shortDescription),
+    ].join(' | ')}`,
+    ...buildCharacterHistoryLines(characterName, historyEntries, t),
+  ]
+
+  return lines.join('\n')
+}
+
+export const buildSingleNpcContextCopyText = (
+  npc: Pick<Npc, 'description' | 'history' | 'isDead' | 'isStory' | 'level' | 'name'>,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string => {
+  const npcName = normalizeText(npc.name)
+  const parts = [
+    npcName,
+    normalizeText(npc.description),
+  ]
+
+  if (!npc.isStory) {
+    parts.push(`${t('pages.contextEdit.copy.levelLabel')} ${normalizeText(npc.level)}`)
+  }
+
+  parts.push(npc.isDead ? t('pages.contextEdit.copy.dead') : t('pages.contextEdit.copy.alive'))
+
+  const lines = [
+    t('pages.contextEdit.copy.singleNpcIntro', { name: npcName }),
+    '',
+    `- ${parts.join(' | ')}`,
+    ...buildCharacterHistoryLines(npcName, npc.history, t),
+  ]
+
+  return lines.join('\n')
+}
+
 const buildNpcGroupLines = (
   groups: ContextNpcGroupSnapshot[],
   npcsById: Map<string, Npc>,
@@ -223,6 +272,31 @@ const buildAreaLines = (
   })
 }
 
+export const buildSingleAreaContextCopyText = (
+  area: Pick<Area, 'description' | 'name' | 'places'>,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string => {
+  const areaName = normalizeText(area.name)
+  const placeLines = (area.places ?? []).flatMap((place) => {
+    const placeName = normalizeText(place.name)
+    const placeDescription = normalizeText(place.description)
+
+    if (!placeName && !placeDescription) {
+      return []
+    }
+
+    return [`- ${placeName} | ${placeDescription}`]
+  })
+  const lines = [
+    t('pages.contextEdit.copy.singleAreaIntro', { name: areaName }),
+    '',
+    `${areaName} | ${normalizeText(area.description)}`,
+    ...placeLines,
+  ]
+
+  return lines.join('\n')
+}
+
 const buildEventLines = (eventIds: string[], eventsById: Map<string, Event>): string[] => {
   return eventIds.flatMap((eventId) => {
     const event = eventsById.get(eventId)
@@ -231,6 +305,20 @@ const buildEventLines = (eventIds: string[], eventsById: Map<string, Event>): st
     }
     return [`${normalizeText(event.name)} | ${normalizeText(event.description)}`]
   })
+}
+
+export const buildSingleEventContextCopyText = (
+  event: Pick<Event, 'description' | 'name'>,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string => {
+  const eventName = normalizeText(event.name)
+  const lines = [
+    t('pages.contextEdit.copy.singleEventIntro', { name: eventName }),
+    '',
+    `${eventName} | ${normalizeText(event.description)}`,
+  ]
+
+  return lines.join('\n')
 }
 
 const buildContextCopyText = ({

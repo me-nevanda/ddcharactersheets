@@ -78,6 +78,12 @@ h2 {
   font-weight: 700;
 }
 
+@media (max-width: 1800px) {
+  .language-switcher {
+    display: none !important;
+  }
+}
+
 @media print {
   html {
     font-size: 90%;

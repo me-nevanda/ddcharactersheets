@@ -2,9 +2,11 @@ import type { ChangeEvent, SubmitEvent } from 'react'
 import type { EventData } from '@appTypes/event'
 
 export interface EventEditPageState {
+  copyingContext: boolean
   error: string
   form: EventData
   handleChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  handleCopyEventContext: () => Promise<void>
   handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
   handleCancelImageRemove: () => void
   handleConfirmImageRemove: () => Promise<void>

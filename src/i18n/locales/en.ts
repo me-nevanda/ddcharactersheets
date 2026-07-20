@@ -134,6 +134,10 @@ export const en: TranslationDictionary = {
       },
     },
     eventEdit: {
+      contextCopyError: 'Could not copy event context.',
+      contextCopySuccess: 'Event context copied.',
+      copyingContextButton: 'Copying...',
+      copyContextButton: 'Context',
       eyebrow: 'EVENT',
       loading: 'Loading event...',
       fields: {
@@ -381,6 +385,10 @@ export const en: TranslationDictionary = {
       copyError: 'The context could not be copied to the clipboard.',
       copy: {
         intro: 'I am presenting the situational context. Read it and wait for further instructions.',
+        singleCharacterIntro: 'I am presenting the description of hero {name}. Read it and wait for further instructions.',
+        singleNpcIntro: 'I am presenting the description of NPC {name}. Read it and wait for further instructions.',
+        singleAreaIntro: 'I am presenting the description of area {name}. Read it and wait for further instructions.',
+        singleEventIntro: 'I am presenting the description of event {name}. Read it and wait for further instructions.',
         heroesTitle: 'Hero party',
         npcGroupsTitle: 'NPC groups',
         monsterGroupsTitle: 'Monster groups',
@@ -488,6 +496,10 @@ export const en: TranslationDictionary = {
       },
     },
     areaEdit: {
+      contextCopyError: 'Could not copy area context.',
+      contextCopySuccess: 'Area context copied.',
+      copyingContextButton: 'Copying...',
+      copyContextButton: 'Context',
       eyebrow: 'AREA',
       loading: 'Loading area...',
       fields: {
@@ -834,6 +846,10 @@ export const en: TranslationDictionary = {
       },
     },
     npcEdit: {
+      contextCopyError: 'Could not copy NPC context.',
+      contextCopySuccess: 'NPC context copied.',
+      copyingContextButton: 'Copying...',
+      copyContextButton: 'Context',
       eyebrow: 'NPC',
       title: 'NPC',
       loading: 'Loading NPC data...',
@@ -1014,6 +1030,10 @@ export const en: TranslationDictionary = {
       },
     },
     characterEdit: {
+      contextCopyError: 'Could not copy hero context.',
+      contextCopySuccess: 'Hero context copied.',
+      copyingContextButton: 'Copying...',
+      copyContextButton: 'Context',
       eyebrow: 'CHARACTER SHEET',
       title: 'Hero',
       tabs: {

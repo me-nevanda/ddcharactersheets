@@ -133,6 +133,10 @@ export interface TranslationDictionary {
       }
     }
     eventEdit: {
+      contextCopyError: string
+      contextCopySuccess: string
+      copyingContextButton: string
+      copyContextButton: string
       eyebrow: string
       loading: string
       fields: {
@@ -380,6 +384,10 @@ export interface TranslationDictionary {
       copyError: string
       copy: {
         intro: string
+        singleCharacterIntro: string
+        singleNpcIntro: string
+        singleAreaIntro: string
+        singleEventIntro: string
         heroesTitle: string
         npcGroupsTitle: string
         monsterGroupsTitle: string
@@ -487,6 +495,10 @@ export interface TranslationDictionary {
       }
     }
     areaEdit: {
+      contextCopyError: string
+      contextCopySuccess: string
+      copyingContextButton: string
+      copyContextButton: string
       eyebrow: string
       loading: string
       fields: {
@@ -835,6 +847,10 @@ export interface TranslationDictionary {
     }
 
     npcEdit: {
+      contextCopyError: string
+      contextCopySuccess: string
+      copyingContextButton: string
+      copyContextButton: string
       eyebrow: string
       title: string
       loading: string
@@ -1016,6 +1032,10 @@ export interface TranslationDictionary {
       }
     }
     characterEdit: {
+      contextCopyError: string
+      contextCopySuccess: string
+      copyingContextButton: string
+      copyContextButton: string
       eyebrow: string
       title: string
       tabs: {

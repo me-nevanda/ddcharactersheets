@@ -86,7 +86,7 @@ export const NpcGroupEditPage = () => {
         <div className={styles.editorHeader}>
           <div className={styles.headerBrand}>
             <div className={styles.headerIcon} aria-hidden="true">
-              <AppIcon name="monster" />
+              <AppIcon name="group" />
             </div>
             <div className={styles.headerCopy}>
               <p className={styles.eyebrow}>{t('pages.npcGroupEdit.eyebrow')}</p>

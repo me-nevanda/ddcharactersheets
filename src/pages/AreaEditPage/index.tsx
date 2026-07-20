@@ -7,7 +7,7 @@ import styles from './style.module.scss'
 
 export const AreaEditPage = () => {
   const { t } = useI18n()
-  const { error, form, handleAddPlaceItem, handleBackToListClick, handleCancelImageRemove, handleCancelRemovePlaceItem, handleConfirmImageRemove, handleConfirmRemovePlaceItem, handleDescriptionChange, handleImageChange, handleNameChange, handlePlaceItemDescriptionChange, handlePlaceItemNameChange, handleRequestImageRemove, handleRequestRemovePlaceItem, handleSubmit, hasChanges, imageUrl, isImageRemoveDialogOpen, loading, placeItemToRemove, removingImage, saving, uploadingImage } = useAreaEditPage()
+  const { copyingContext, error, form, handleAddPlaceItem, handleBackToListClick, handleCancelImageRemove, handleCancelRemovePlaceItem, handleConfirmImageRemove, handleConfirmRemovePlaceItem, handleCopyAreaContext, handleDescriptionChange, handleImageChange, handleNameChange, handlePlaceItemDescriptionChange, handlePlaceItemNameChange, handleRequestImageRemove, handleRequestRemovePlaceItem, handleSubmit, hasChanges, imageUrl, isImageRemoveDialogOpen, loading, placeItemToRemove, removingImage, saving, uploadingImage } = useAreaEditPage()
 
   const placeItemRemoveName = placeItemToRemove ? (placeItemToRemove.name.trim() || t('pages.areaEdit.places.unnamedItem')) : ''
 
@@ -49,6 +49,20 @@ export const AreaEditPage = () => {
           <div className={styles.headerActions}>
             <button className={`${styles.floatingBackAction} ${styles.ghostButton}`} type="button" onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
+            </button>
+            <div className={`${styles.floatingCopyAction} ${styles.desktopOnlyAction}`}>
+              <button className={styles.secondaryButton} type="button" onClick={() => void handleCopyAreaContext()} disabled={loading || saving || copyingContext}>
+                <span className={styles.buttonContent}>
+                  <AppIcon name="context" />
+                  <span>{copyingContext ? t('pages.areaEdit.copyingContextButton') : t('pages.areaEdit.copyContextButton')}</span>
+                </span>
+              </button>
+            </div>
+            <button className={`${styles.secondaryButton} ${styles.responsiveOnlyAction}`} type="button" onClick={() => void handleCopyAreaContext()} disabled={loading || saving || copyingContext}>
+              <span className={styles.buttonContent}>
+                <AppIcon name="context" />
+                <span>{copyingContext ? t('pages.areaEdit.copyingContextButton') : t('pages.areaEdit.copyContextButton')}</span>
+              </span>
             </button>
             <div className={styles.floatingSaveAction}>
               <button className={styles.primaryButton} form="area-edit-form" type="submit" disabled={saving || !hasChanges}>

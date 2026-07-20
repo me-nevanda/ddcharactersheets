@@ -14,7 +14,7 @@ export const EventEditPage = () => {
     mainTab: 'events',
     returnTo: '/',
   })
-  const { error, form, handleCancelImageRemove, handleChange, handleConfirmImageRemove, handleImageChange, handleRequestImageRemove, handleSubmit, hasChanges, imageUrl, isImageRemoveDialogOpen, loading, removingImage, saving, uploadingImage } = useEventEditPage()
+  const { copyingContext, error, form, handleCancelImageRemove, handleChange, handleConfirmImageRemove, handleCopyEventContext, handleImageChange, handleRequestImageRemove, handleSubmit, hasChanges, imageUrl, isImageRemoveDialogOpen, loading, removingImage, saving, uploadingImage } = useEventEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
   const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
@@ -70,6 +70,20 @@ export const EventEditPage = () => {
             <Link className={`${styles.floatingBackAction} ${styles.ghostLink}`} to={returnTo} onClick={handleBackToListClick}>
               {t('common.actions.backToList')}
             </Link>
+            <div className={`${styles.floatingCopyAction} ${styles.desktopOnlyAction}`}>
+              <button className={styles.secondaryButton} type="button" onClick={() => void handleCopyEventContext()} disabled={loading || saving || copyingContext}>
+                <span className={styles.buttonContent}>
+                  <AppIcon name="context" />
+                  <span>{copyingContext ? t('pages.eventEdit.copyingContextButton') : t('pages.eventEdit.copyContextButton')}</span>
+                </span>
+              </button>
+            </div>
+            <button className={`${styles.secondaryButton} ${styles.responsiveOnlyAction}`} type="button" onClick={() => void handleCopyEventContext()} disabled={loading || saving || copyingContext}>
+              <span className={styles.buttonContent}>
+                <AppIcon name="context" />
+                <span>{copyingContext ? t('pages.eventEdit.copyingContextButton') : t('pages.eventEdit.copyContextButton')}</span>
+              </span>
+            </button>
             <div className={styles.floatingSaveAction}>
               <button className={styles.primaryButton} form="event-edit-form" type="submit" disabled={saving || !hasChanges}>
                 <span className={styles.buttonContent}>

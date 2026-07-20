@@ -46,6 +46,7 @@ export type CharacterEditTabKey = 'general' | 'abilities' | 'feats' | 'items' | 
 export type SkillModifierMap = Record<CharacterSkillFieldName, string>
 
 export interface CharacterEditPageState {
+  copyingContext: boolean
   error: string
   form: CharacterEditFormData
   loading: boolean
@@ -56,6 +57,7 @@ export interface CharacterEditPageState {
   handleGeneralChange: (event: CharacterGeneralChangeEvent) => void
   handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
   handleImageRemove: () => Promise<void>
+  handleCopyCharacterContext: () => Promise<void>
   handleGeneralFieldChange: (fieldName: CharacterGeneralFieldName, value: string) => void
   handleAttributeChange: (event: ChangeEvent<HTMLInputElement>) => void
   handleTrainingChange: (event: ChangeEvent<HTMLInputElement>) => void

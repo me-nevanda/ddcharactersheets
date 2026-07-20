@@ -1,10 +1,12 @@
 import { useEffect, useState, type ChangeEvent, type SubmitEvent } from 'react'
+import toast from 'react-hot-toast'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { deleteNpcImage, getNpc, saveNpc, uploadNpcImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { normalizeItems } from '@pages/CharacterEditPage/characterEditPageLogic'
 import { emptyArmor, emptyItems, emptyOtherItem, emptyWeapon } from '@pages/CharacterEditPage/characterEditPageUtils'
+import { buildSingleNpcContextCopyText, copyTextToClipboard } from '@pages/ContextEditPage/contextCopyHooks'
 import type { CharacterArmorBonusFieldName, CharacterItemBonusFieldName, CharacterWeaponDamageDiceType, CharacterWeaponFieldName } from '@appTypes/character'
 import type { NpcAttack, NpcAttackAction, NpcAttackAreaType, NpcAttackType, NpcData, NpcDefenses, NpcHistoryEntry, NpcRole, NpcSuggestedStats, NpcType } from '@appTypes/npc'
 import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/CharacterEditPage/types'
@@ -251,6 +253,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
   const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [copyingContext, setCopyingContext] = useState(false)
   const [removingImage, setRemovingImage] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [isGenerateAttributesDialogOpen, setGenerateAttributesDialogOpen] = useState(false)
@@ -441,6 +444,25 @@ export const useNpcEditPage = (): NpcEditPageState => {
     }
 
     window.open(`/npcs/${npcId}/print`, '_blank')
+  }
+
+  const handleCopyNpcContext = async () => {
+    setCopyingContext(true)
+    setError('')
+
+    try {
+      const text = buildSingleNpcContextCopyText(form, t)
+      await copyTextToClipboard(text)
+      toast.success(t('pages.npcEdit.contextCopySuccess'))
+    } catch (nextError) {
+      const message = nextError instanceof Error && nextError.message === 'errors.api.generic'
+        ? t('pages.npcEdit.contextCopyError')
+        : getErrorMessage(t, nextError)
+      setError(message)
+      toast.error(message)
+    } finally {
+      setCopyingContext(false)
+    }
   }
 
   const handleSpecialChange = (value: string) => {
@@ -735,6 +757,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
   }
 
   return {
+    copyingContext,
     error,
     form,
     handleAttackAdd,
@@ -756,6 +779,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
     handleHistoryEntryChange,
     handleHistoryEntryCreateEmpty,
     handleHistoryEntryRemove,
+    handleCopyNpcContext,
     handlePrint,
     handleResistancesChange,
     handleSpecialChange,

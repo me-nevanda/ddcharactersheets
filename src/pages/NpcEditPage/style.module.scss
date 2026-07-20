@@ -191,9 +191,16 @@
 
 .floatingSaveAction {
   position: fixed;
-  top: calc(4.15rem + 16px + 3.25rem + 0.65rem);
+  top: calc(4.15rem + 16px + (3.25rem + 0.65rem) * 2);
   right: 1rem;
   z-index: 19;
+}
+
+.floatingCopyAction {
+  position: fixed;
+  top: calc(4.15rem + 16px + 3.25rem + 0.65rem);
+  right: 1rem;
+  z-index: 20;
 }
 
 .printAction {
@@ -253,6 +260,7 @@
 }
 
 .ghostLink,
+.secondaryButton,
 .primaryButton,
 .printPrimaryButton {
   @include pill-button;
@@ -263,6 +271,12 @@
   border-color: rgba(255, 248, 235, 0.08);
   color: var(--text-strong);
   text-decoration: none;
+}
+
+.secondaryButton {
+  background: rgba(255, 248, 235, 0.04);
+  border-color: var(--border-soft);
+  color: var(--text-strong);
 }
 
 .primaryButton {
@@ -282,16 +296,22 @@
 
 .primaryButton:hover,
 .ghostLink:hover,
+.secondaryButton:hover,
 .printPrimaryButton:hover {
   transform: translateY(-1px);
   border-color: var(--border-strong);
 }
 
 .primaryButton:disabled,
+.secondaryButton:disabled,
 .printPrimaryButton:disabled {
   cursor: not-allowed;
   opacity: 0.6;
   transform: none;
+}
+
+.secondaryButton.responsiveOnlyAction {
+  display: none;
 }
 
 .buttonContent {
@@ -982,6 +1002,46 @@
 
 .roleInput {
   width: 10rem;
+}
+
+@media (max-width: 1800px) {
+  .headerActions {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .headerActions > * {
+    width: auto;
+  }
+
+  .floatingBackAction,
+  .floatingCopyAction,
+  .floatingSaveAction {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+  }
+
+  .printAction {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+    z-index: 30;
+  }
+
+  .desktopOnlyAction {
+    display: none;
+  }
+
+  .secondaryButton.responsiveOnlyAction {
+    display: inline-flex;
+  }
+
+  .editorCard {
+    padding: 1rem;
+  }
 }
 
 @media (max-width: 720px) {

@@ -134,6 +134,10 @@ export const pl: TranslationDictionary = {
       },
     },
     eventEdit: {
+      contextCopyError: 'Nie udało się skopiować kontekstu wydarzenia.',
+      contextCopySuccess: 'Skopiowano kontekst wydarzenia.',
+      copyingContextButton: 'Kopiowanie...',
+      copyContextButton: 'Kontekst',
       eyebrow: 'WYDARZENIE',
       loading: 'Wczytywanie wydarzenia...',
       fields: {
@@ -381,6 +385,10 @@ export const pl: TranslationDictionary = {
       copyError: 'Nie udało się skopiować kontekstu do schowka.',
       copy: {
         intro: 'Przedstawiam ci kontekst sytuacji. Przeczytaj go i czekaj na dalsze instrukcje.',
+        singleCharacterIntro: 'Przedstawiam ci opis bohatera {name}. Przeczytaj go i czekaj na dalsze instrukcje.',
+        singleNpcIntro: 'Przedstawiam ci opis NPC {name}. Przeczytaj go i czekaj na dalsze instrukcje.',
+        singleAreaIntro: 'Przedstawiam ci opis obszaru {name}. Przeczytaj go i czekaj na dalsze instrukcje.',
+        singleEventIntro: 'Przedstawiam ci opis wydarzenia {name}. Przeczytaj go i czekaj na dalsze instrukcje.',
         heroesTitle: 'Drużyna bohaterów',
         npcGroupsTitle: 'Grupy NPC',
         monsterGroupsTitle: 'Grupy potworów',
@@ -488,6 +496,10 @@ export const pl: TranslationDictionary = {
       },
     },
     areaEdit: {
+      contextCopyError: 'Nie udało się skopiować kontekstu obszaru.',
+      contextCopySuccess: 'Skopiowano kontekst obszaru.',
+      copyingContextButton: 'Kopiowanie...',
+      copyContextButton: 'Kontekst',
       eyebrow: 'OBSZAR',
       loading: 'Wczytywanie obszaru...',
       fields: {
@@ -834,6 +846,10 @@ export const pl: TranslationDictionary = {
       },
     },
     npcEdit: {
+      contextCopyError: 'Nie udało się skopiować kontekstu NPC.',
+      contextCopySuccess: 'Skopiowano kontekst NPC.',
+      copyingContextButton: 'Kopiowanie...',
+      copyContextButton: 'Kontekst',
       eyebrow: 'NPC',
       title: 'NPC',
       loading: 'Wczytywanie danych NPC...',
@@ -1014,6 +1030,10 @@ export const pl: TranslationDictionary = {
       },
     },
     characterEdit: {
+      contextCopyError: 'Nie udało się skopiować kontekstu bohatera.',
+      contextCopySuccess: 'Skopiowano kontekst bohatera.',
+      copyingContextButton: 'Kopiowanie...',
+      copyContextButton: 'Kontekst',
       eyebrow: 'KARTA POSTACI',
       title: 'Bohater',
       tabs: {

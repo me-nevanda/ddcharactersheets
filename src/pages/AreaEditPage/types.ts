@@ -2,6 +2,7 @@ import type { ChangeEvent, ChangeEventHandler, SubmitEventHandler } from 'react'
 import type { AreaData, PlaceItem } from '@appTypes/area'
 
 export interface AreaEditPageState {
+  copyingContext: boolean
   error: string
   form: AreaData
   handleBackToListClick: () => void
@@ -17,6 +18,7 @@ export interface AreaEditPageState {
   handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
   handleCancelImageRemove: () => void
   handleConfirmImageRemove: () => Promise<void>
+  handleCopyAreaContext: () => Promise<void>
   handleRequestImageRemove: () => void
   handleSubmit: SubmitEventHandler<HTMLFormElement>
   hasChanges: boolean

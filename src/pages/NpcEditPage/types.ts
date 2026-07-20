@@ -6,6 +6,7 @@ import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/Chara
 export type NpcEditTabKey = 'general' | 'attacks' | 'loot' | 'history'
 
 export interface NpcEditPageState {
+  copyingContext: boolean
   error: string
   form: NpcData
   handleAttackAdd: (type: NpcAttackType) => void
@@ -41,6 +42,7 @@ export interface NpcEditPageState {
   handleHistoryEntryChange: (index: number, fieldName: keyof NpcHistoryEntry, value: string) => void
   handleHistoryEntryCreateEmpty: () => void
   handleHistoryEntryRemove: (index: number) => void
+  handleCopyNpcContext: () => Promise<void>
   handlePrint: () => void
   handleResistancesChange: (value: string) => void
   handleSpecialChange: (value: string) => void

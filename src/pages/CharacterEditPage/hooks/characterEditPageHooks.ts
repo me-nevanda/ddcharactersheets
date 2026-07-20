@@ -1,10 +1,12 @@
 import { useState, type ChangeEvent } from 'react';
+import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
 import { useI18n } from '@i18n/index';
 import { deleteCharacterImage, uploadCharacterImage } from '@lib/api';
 import { getErrorMessage } from '@lib/errors';
 import { useCharacterPresentation } from '@pages/characterPresentationHooks';
 import { emptyForm } from '@pages/CharacterEditPage/characterEditPageUtils';
+import { buildSingleCharacterContextCopyText, copyTextToClipboard } from '@pages/ContextEditPage/contextCopyHooks';
 import { useCharacterEditPageDerivedState } from './characterEditPageDerivedStateHooks';
 import { useCharacterEditPageFormHandlers, useCharacterEditPageClassTrainingRules } from './characterEditPageFormHandlersHooks';
 import { useCharacterEditPageLoad } from './characterEditPageLoadHooks';
@@ -22,6 +24,7 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
     const [initialHistoryEntries, setInitialHistoryEntries] = useState<CharacterHistoryEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [copyingContext, setCopyingContext] = useState(false);
     const [error, setError] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [removingImage, setRemovingImage] = useState(false);
@@ -96,8 +99,34 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
             setRemovingImage(false);
         }
     };
+    const handleCopyCharacterContext = async () => {
+        setCopyingContext(true);
+        setError('');
+        try {
+            const text = buildSingleCharacterContextCopyText(
+                form,
+                historyEntries,
+                getRaceLabel,
+                getClassLabel,
+                t,
+            );
+            await copyTextToClipboard(text);
+            toast.success(t('pages.characterEdit.contextCopySuccess'));
+        }
+        catch (nextError) {
+            const message = nextError instanceof Error && nextError.message === 'errors.api.generic'
+                ? t('pages.characterEdit.contextCopyError')
+                : getErrorMessage(t, nextError);
+            setError(message);
+            toast.error(message);
+        }
+        finally {
+            setCopyingContext(false);
+        }
+    };
 
     return {
+        copyingContext,
         error,
         form,
         historyEntries,
@@ -111,6 +140,7 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
         handleGeneralChange: handlers.handleGeneralChange,
         handleImageChange,
         handleImageRemove,
+        handleCopyCharacterContext,
         handleGeneralFieldChange: handlers.handleGeneralFieldChange,
         handleAttributeChange: handlers.handleAttributeChange,
         handleTrainingChange: handlers.handleTrainingChange,
