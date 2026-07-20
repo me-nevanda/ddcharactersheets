@@ -29,11 +29,13 @@ export interface CharacterGroupEditPageState {
   assignedCharacterSearch: string
   characterOptions: CharacterGroupCharacterOptionViewModel[]
   characterSearch: string
+  creatingCharacter: boolean
   error: string
   groupName: string
   handleChangeAssignedCharacterSearch: (value: string) => void
   handleChangeCharacterSearch: (value: string) => void
   handleChangeGroupName: (value: string) => void
+  handleCreateCharacterInGroup: () => Promise<void>
   handleSubmit: SubmitEventHandler<HTMLFormElement>
   hasChanges: boolean
   loading: boolean

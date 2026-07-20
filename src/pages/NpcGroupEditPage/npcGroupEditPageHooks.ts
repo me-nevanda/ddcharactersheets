@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { getNpcGroup, listNpcs, saveNpcGroup } from '@lib/api'
+import { createNpc, getNpcGroup, listNpcs, saveNpcGroup } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { getCurrentEditReturnState } from '@pages/useEditReturnNavigation'
 import type { Npc, NpcGroup } from '@appTypes/npc'
@@ -66,6 +66,7 @@ export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
   const [npcs, setNpcs] = useState<Npc[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [creatingNpc, setCreatingNpc] = useState(false)
   const [error, setError] = useState('')
   const [npcSearch, setNpcSearch] = useState('')
   const [assignedNpcSearch, setAssignedNpcSearch] = useState('')
@@ -167,6 +168,27 @@ export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
     })
   }
 
+  const handleCreateNpcInGroup = async () => {
+    setCreatingNpc(true)
+    setError('')
+
+    try {
+      const nextNpc = await createNpc()
+      const nextGroup: NpcGroup = {
+        ...form,
+        name: form.name.trim(),
+        npcIds: form.npcIds.includes(nextNpc.id) ? form.npcIds : [...form.npcIds, nextNpc.id],
+      }
+      const savedGroup = await saveNpcGroup(groupId, nextGroup)
+      setForm(savedGroup)
+      setInitialForm(savedGroup)
+      openNpc(nextNpc.id)
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+      setCreatingNpc(false)
+    }
+  }
+
   const assignedNpcIds = new Set(form.npcIds)
   const normalizedAssignedNpcSearch = assignedNpcSearch.trim().toLocaleLowerCase()
   const allAssignedNpcs: AssignedNpcGroupNpcViewModel[] = form.npcIds
@@ -199,11 +221,13 @@ export const useNpcGroupEditPage = (): NpcGroupEditPageState => {
   return {
     assignedNpcs,
     assignedNpcSearch,
+    creatingNpc,
     error,
     groupName: form.name,
     handleChangeAssignedNpcSearch,
     handleChangeGroupName,
     handleChangeNpcSearch,
+    handleCreateNpcInGroup,
     handleSubmit,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
     loading,

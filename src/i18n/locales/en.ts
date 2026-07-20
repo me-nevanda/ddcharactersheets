@@ -609,6 +609,7 @@ export const en: TranslationDictionary = {
       emptyState: 'No heroes have been added to this group yet.',
       actions: {
         addCharacter: 'Add hero',
+        createCharacterInGroup: 'Create hero in this group',
         removeCharacter: 'Remove from group',
       },
       fields: {
@@ -966,6 +967,7 @@ export const en: TranslationDictionary = {
       emptyState: 'No monsters have been added to this group yet.',
       actions: {
         addMonster: 'Add monster',
+        createMonsterInGroup: 'Create monster in this group',
         removeMonster: 'Remove from group',
       },
       fields: {
@@ -991,6 +993,7 @@ export const en: TranslationDictionary = {
       emptyState: 'No NPC have been added to this group yet.',
       actions: {
         addNpc: 'Add NPC',
+        createNpcInGroup: 'Create NPC in this group',
         removeNpc: 'Remove from group',
       },
       fields: {

@@ -608,6 +608,7 @@ export interface TranslationDictionary {
       emptyState: string
       actions: {
         addCharacter: string
+        createCharacterInGroup: string
         removeCharacter: string
       }
       fields: {
@@ -967,6 +968,7 @@ export interface TranslationDictionary {
       emptyState: string
       actions: {
         addMonster: string
+        createMonsterInGroup: string
         removeMonster: string
       }
       fields: {
@@ -993,6 +995,7 @@ export interface TranslationDictionary {
       emptyState: string
       actions: {
         addNpc: string
+        createNpcInGroup: string
         removeNpc: string
       }
       fields: {

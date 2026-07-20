@@ -30,11 +30,13 @@ export interface AssignedNpcGroupNpcViewModel extends NpcGroupNpcViewModel {
 
 export interface NpcGroupEditPageState {
   assignedNpcs: AssignedNpcGroupNpcViewModel[]
+  creatingNpc: boolean
   error: string
   groupName: string
   handleChangeGroupName: (value: string) => void
   handleChangeAssignedNpcSearch: (value: string) => void
   handleChangeNpcSearch: (value: string) => void
+  handleCreateNpcInGroup: () => Promise<void>
   handleSubmit: SubmitEventHandler<HTMLFormElement>
   hasChanges: boolean
   loading: boolean

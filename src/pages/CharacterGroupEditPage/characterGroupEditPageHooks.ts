@@ -1,6 +1,6 @@
 import { useEffect, useState, type SyntheticEvent } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { getCharacterGroup, listCharacters, saveCharacterGroup } from '@lib/api'
+import { createCharacter, getCharacterGroup, listCharacters, saveCharacterGroup } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import { getCurrentEditReturnState } from '@pages/useEditReturnNavigation'
@@ -64,6 +64,7 @@ export const useCharacterGroupEditPage = (): CharacterGroupEditPageState => {
   const [characters, setCharacters] = useState<Character[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [creatingCharacter, setCreatingCharacter] = useState(false)
   const [error, setError] = useState('')
   const [characterSearch, setCharacterSearch] = useState('')
   const [assignedCharacterSearch, setAssignedCharacterSearch] = useState('')
@@ -169,6 +170,27 @@ export const useCharacterGroupEditPage = (): CharacterGroupEditPageState => {
     })
   }
 
+  const handleCreateCharacterInGroup = async () => {
+    setCreatingCharacter(true)
+    setError('')
+
+    try {
+      const nextCharacter = await createCharacter()
+      const nextGroup: CharacterGroup = {
+        ...form,
+        name: form.name.trim(),
+        characterIds: form.characterIds.includes(nextCharacter.id) ? form.characterIds : [...form.characterIds, nextCharacter.id],
+      }
+      const savedGroup = await saveCharacterGroup(groupId, nextGroup)
+      setForm(savedGroup)
+      setInitialForm(savedGroup)
+      openCharacter(nextCharacter.id)
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+      setCreatingCharacter(false)
+    }
+  }
+
   const assignedCharacterIds = new Set(form.characterIds)
   const normalizedAssignedCharacterSearch = assignedCharacterSearch.trim().toLocaleLowerCase()
   const allAssignedCharacters: AssignedCharacterGroupCharacterViewModel[] = form.characterIds
@@ -203,11 +225,13 @@ export const useCharacterGroupEditPage = (): CharacterGroupEditPageState => {
     assignedCharacterSearch,
     characterOptions,
     characterSearch,
+    creatingCharacter,
     error,
     groupName: form.name,
     handleChangeAssignedCharacterSearch,
     handleChangeCharacterSearch,
     handleChangeGroupName,
+    handleCreateCharacterInGroup,
     handleSubmit,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
     loading,

@@ -62,7 +62,7 @@ export const NpcGroupEditPage = () => {
     npcListTab: 'groups',
     returnTo: '/',
   })
-  const { assignedNpcs, assignedNpcSearch, error, groupName, handleChangeAssignedNpcSearch, handleChangeGroupName, handleChangeNpcSearch, handleSubmit, hasChanges, loading, npcOptions, npcSearch, saving } = useNpcGroupEditPage()
+  const { assignedNpcs, assignedNpcSearch, creatingNpc, error, groupName, handleChangeAssignedNpcSearch, handleChangeGroupName, handleChangeNpcSearch, handleCreateNpcInGroup, handleSubmit, hasChanges, loading, npcOptions, npcSearch, saving } = useNpcGroupEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
   const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
@@ -137,7 +137,12 @@ export const NpcGroupEditPage = () => {
               </section>
               <section className={styles.section}>
                 <div className={styles.sectionHeader}>
-                  <h2 className={styles.sectionTitle}>{t('pages.npcGroupEdit.sections.npcs')}</h2>
+                  <div className={styles.sectionTitleActions}>
+                    <h2 className={styles.sectionTitle}>{t('pages.npcGroupEdit.sections.npcs')}</h2>
+                    <button className={`${styles.iconButton} ${styles.createNpcButton}`} type="button" aria-label={t('pages.npcGroupEdit.actions.createNpcInGroup')} title={t('pages.npcGroupEdit.actions.createNpcInGroup')} disabled={creatingNpc || saving || !groupName.trim()} onClick={handleCreateNpcInGroup}>
+                      <AppIcon name="plus" />
+                    </button>
+                  </div>
                   <input className={styles.headerSearchInput} id="npc-group-assigned-npc-search" value={assignedNpcSearch} placeholder={t('pages.npcGroupEdit.addNpcDialog.searchPlaceholder')} aria-label={t('pages.npcGroupEdit.addNpcDialog.searchLabel')} onChange={(event) => handleChangeAssignedNpcSearch(event.target.value)} />
                 </div>
                 {assignedNpcs.length > 0 ? (

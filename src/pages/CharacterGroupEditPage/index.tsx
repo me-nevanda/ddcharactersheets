@@ -54,7 +54,7 @@ export const CharacterGroupEditPage = () => {
     mainTab: 'heroes',
     returnTo: '/',
   })
-  const { assignedCharacters, assignedCharacterSearch, characterOptions, characterSearch, error, groupName, handleChangeAssignedCharacterSearch, handleChangeCharacterSearch, handleChangeGroupName, handleSubmit, hasChanges, loading, saving } = useCharacterGroupEditPage()
+  const { assignedCharacters, assignedCharacterSearch, characterOptions, characterSearch, creatingCharacter, error, groupName, handleChangeAssignedCharacterSearch, handleChangeCharacterSearch, handleChangeGroupName, handleCreateCharacterInGroup, handleSubmit, hasChanges, loading, saving } = useCharacterGroupEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
   const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
@@ -129,7 +129,12 @@ export const CharacterGroupEditPage = () => {
               </section>
               <section className={styles.section}>
                 <div className={styles.sectionHeader}>
-                  <h2 className={styles.sectionTitle}>{t('pages.characterGroupEdit.sections.characters')}</h2>
+                  <div className={styles.sectionTitleActions}>
+                    <h2 className={styles.sectionTitle}>{t('pages.characterGroupEdit.sections.characters')}</h2>
+                    <button className={`${styles.iconButton} ${styles.createEntityButton}`} type="button" aria-label={t('pages.characterGroupEdit.actions.createCharacterInGroup')} title={t('pages.characterGroupEdit.actions.createCharacterInGroup')} disabled={creatingCharacter || saving || !groupName.trim()} onClick={handleCreateCharacterInGroup}>
+                      <AppIcon name="plus" />
+                    </button>
+                  </div>
                   <input className={styles.headerSearchInput} id="character-group-assigned-character-search" value={assignedCharacterSearch} placeholder={t('pages.characterGroupEdit.addCharacterDialog.searchPlaceholder')} aria-label={t('pages.characterGroupEdit.addCharacterDialog.searchLabel')} onChange={(event) => handleChangeAssignedCharacterSearch(event.target.value)} />
                 </div>
                 {assignedCharacters.length > 0 ? (

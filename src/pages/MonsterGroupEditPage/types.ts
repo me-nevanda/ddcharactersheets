@@ -28,10 +28,12 @@ export interface AssignedMonsterGroupMonsterViewModel extends MonsterGroupMonste
 export interface MonsterGroupEditPageState {
   assignedMonsters: AssignedMonsterGroupMonsterViewModel[]
   error: string
+  creatingMonster: boolean
   groupName: string
   handleChangeGroupName: (value: string) => void
   handleChangeAssignedMonsterSearch: (value: string) => void
   handleChangeMonsterSearch: (value: string) => void
+  handleCreateMonsterInGroup: () => Promise<void>
   handleSubmit: SubmitEventHandler<HTMLFormElement>
   hasChanges: boolean
   loading: boolean

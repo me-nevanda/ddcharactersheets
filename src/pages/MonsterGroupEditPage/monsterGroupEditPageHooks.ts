@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
-import { getMonsterGroup, listMonsters, saveMonsterGroup } from '@lib/api'
+import { createMonster, getMonsterGroup, listMonsters, saveMonsterGroup } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { getCurrentEditReturnState } from '@pages/useEditReturnNavigation'
 import type { Monster, MonsterGroup } from '@appTypes/monster'
@@ -62,6 +62,7 @@ export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
   const [monsters, setMonsters] = useState<Monster[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [creatingMonster, setCreatingMonster] = useState(false)
   const [error, setError] = useState('')
   const [monsterSearch, setMonsterSearch] = useState('')
   const [assignedMonsterSearch, setAssignedMonsterSearch] = useState('')
@@ -163,6 +164,27 @@ export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
     })
   }
 
+  const handleCreateMonsterInGroup = async () => {
+    setCreatingMonster(true)
+    setError('')
+
+    try {
+      const nextMonster = await createMonster()
+      const nextGroup: MonsterGroup = {
+        ...form,
+        name: form.name.trim(),
+        monsterIds: form.monsterIds.includes(nextMonster.id) ? form.monsterIds : [...form.monsterIds, nextMonster.id],
+      }
+      const savedGroup = await saveMonsterGroup(groupId, nextGroup)
+      setForm(savedGroup)
+      setInitialForm(savedGroup)
+      openMonster(nextMonster.id)
+    } catch (nextError) {
+      setError(getErrorMessage(t, nextError))
+      setCreatingMonster(false)
+    }
+  }
+
   const assignedMonsterIds = new Set(form.monsterIds)
   const normalizedAssignedMonsterSearch = assignedMonsterSearch.trim().toLocaleLowerCase()
   const allAssignedMonsters: AssignedMonsterGroupMonsterViewModel[] = form.monsterIds
@@ -195,11 +217,13 @@ export const useMonsterGroupEditPage = (): MonsterGroupEditPageState => {
   return {
     assignedMonsters,
     assignedMonsterSearch,
+    creatingMonster,
     error,
     groupName: form.name,
     handleChangeAssignedMonsterSearch,
     handleChangeGroupName,
     handleChangeMonsterSearch,
+    handleCreateMonsterInGroup,
     handleSubmit,
     hasChanges: JSON.stringify(form) !== JSON.stringify(initialForm),
     loading,

@@ -58,7 +58,7 @@ export const MonsterGroupEditPage = () => {
     monsterListTab: 'groups',
     returnTo: '/',
   })
-  const { assignedMonsters, assignedMonsterSearch, error, groupName, handleChangeAssignedMonsterSearch, handleChangeGroupName, handleChangeMonsterSearch, handleSubmit, hasChanges, loading, monsterOptions, monsterSearch, saving } = useMonsterGroupEditPage()
+  const { assignedMonsters, assignedMonsterSearch, creatingMonster, error, groupName, handleChangeAssignedMonsterSearch, handleChangeGroupName, handleChangeMonsterSearch, handleCreateMonsterInGroup, handleSubmit, hasChanges, loading, monsterOptions, monsterSearch, saving } = useMonsterGroupEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
 
   const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
@@ -133,7 +133,12 @@ export const MonsterGroupEditPage = () => {
               </section>
               <section className={styles.section}>
                 <div className={styles.sectionHeader}>
-                  <h2 className={styles.sectionTitle}>{t('pages.monsterGroupEdit.sections.monsters')}</h2>
+                  <div className={styles.sectionTitleActions}>
+                    <h2 className={styles.sectionTitle}>{t('pages.monsterGroupEdit.sections.monsters')}</h2>
+                    <button className={`${styles.iconButton} ${styles.createEntityButton}`} type="button" aria-label={t('pages.monsterGroupEdit.actions.createMonsterInGroup')} title={t('pages.monsterGroupEdit.actions.createMonsterInGroup')} disabled={creatingMonster || saving || !groupName.trim()} onClick={handleCreateMonsterInGroup}>
+                      <AppIcon name="plus" />
+                    </button>
+                  </div>
                   <input className={styles.headerSearchInput} id="monster-group-assigned-monster-search" value={assignedMonsterSearch} placeholder={t('pages.monsterGroupEdit.addMonsterDialog.searchPlaceholder')} aria-label={t('pages.monsterGroupEdit.addMonsterDialog.searchLabel')} onChange={(event) => handleChangeAssignedMonsterSearch(event.target.value)} />
                 </div>
                 {assignedMonsters.length > 0 ? (

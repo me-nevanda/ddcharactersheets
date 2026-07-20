@@ -609,6 +609,7 @@ export const pl: TranslationDictionary = {
       emptyState: 'Nie dodano jeszcze żadnych bohaterów do tej grupy.',
       actions: {
         addCharacter: 'Dodaj bohatera',
+        createCharacterInGroup: 'Utwórz bohatera w tej grupie',
         removeCharacter: 'Usuń z grupy',
       },
       fields: {
@@ -966,6 +967,7 @@ export const pl: TranslationDictionary = {
       emptyState: 'Nie dodano jeszcze żadnych potworów do tej grupy.',
       actions: {
         addMonster: 'Dodaj potwora',
+        createMonsterInGroup: 'Utwórz potwora w tej grupie',
         removeMonster: 'Usuń z grupy',
       },
       fields: {
@@ -991,6 +993,7 @@ export const pl: TranslationDictionary = {
       emptyState: 'Nie dodano jeszcze żadnych NPC do tej grupy.',
       actions: {
         addNpc: 'Dodaj NPC',
+        createNpcInGroup: 'Utwórz NPC w tej grupie',
         removeNpc: 'Usuń z grupy',
       },
       fields: {
