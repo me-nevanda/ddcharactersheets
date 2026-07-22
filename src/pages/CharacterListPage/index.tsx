@@ -34,6 +34,17 @@ const CharacterGroupCard = ({ group }: { group: CharacterGroupCardViewModel }) =
                       <img className={styles.groupClass} src={character.classSrc} alt={character.label} title={character.label} onError={character.onImageError} />
                     </>
                   )}
+                  <div className={`${styles.groupPortraitPreview} ${character.imageSrc ? styles.groupPortraitPreviewCustomImage : styles.groupPortraitPreviewDefaultImage}`} aria-hidden="true">
+                    <p className={styles.previewTitle}>{character.label}</p>
+                    {character.imageSrc ? (
+                      <img className={styles.groupPortraitPreviewCustom} src={character.imageSrc} alt="" onError={character.onImageError} />
+                    ) : (
+                      <>
+                        <img className={styles.groupPortraitPreviewLayer} src={character.portraitSrc} alt="" onError={character.onImageError} />
+                        <img className={styles.groupPortraitPreviewLayer} src={character.classSrc} alt="" onError={character.onImageError} />
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

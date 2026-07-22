@@ -1,4 +1,4 @@
-﻿@use '../../styles/mixins' as *;
+@use '../../styles/mixins' as *;
 
 .status {
   margin: 0 0 0.75rem;
@@ -121,6 +121,7 @@
 
 .groupCard {
   @include surface-card;
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
@@ -132,12 +133,14 @@
 
 .groupCard:hover {
   border-color: var(--border-strong);
+  z-index: 10;
 }
 
 .groupCard:focus-visible {
   outline: 0;
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+  z-index: 10;
 }
 
 .groupSummary {
@@ -177,10 +180,11 @@
   gap: 0.45rem;
   align-items: stretch;
   margin-top: 0.35rem;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .groupThumbnailItem {
+  position: relative;
   display: grid;
   justify-items: center;
   gap: 0.2rem;
@@ -196,12 +200,14 @@
 
 .groupThumbnailItem:hover {
   border-color: var(--border-strong);
+  z-index: 30;
 }
 
 .groupThumbnailItem:focus-visible {
   outline: 0;
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+  z-index: 30;
 }
 
 .groupThumbnailItemDead {
@@ -231,6 +237,63 @@
   max-height: 80px;
   width: auto;
   height: auto;
+  object-fit: contain;
+}
+
+.groupThumbnailFrame {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.groupImagePreview {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.55rem);
+  z-index: 25;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: min(300px, calc(100vw - 2rem));
+  max-height: min(430px, calc(100vh - 2rem));
+  min-height: 4rem;
+  padding: 0.45rem;
+  border: 1px solid rgba(29, 18, 14, 0.14);
+  border-radius: 0.75rem;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translate(-50%, 0.35rem);
+  transition:
+    opacity 140ms ease 500ms,
+    transform 140ms ease 500ms;
+}
+
+.groupThumbnailFrame:hover .groupImagePreview {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.previewTitle {
+  width: 100%;
+  margin: 0 0 0.45rem;
+  overflow: hidden;
+  color: #1d120e;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.groupImagePreviewImage {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  max-height: min(360px, calc(100vh - 5.5rem));
   object-fit: contain;
 }
 
@@ -405,6 +468,7 @@
 
 .npcCard {
   @include surface-card;
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -416,12 +480,14 @@
 
 .npcCard:hover {
   border-color: var(--border-strong);
+  z-index: 10;
 }
 
 .npcCard:focus-visible {
   outline: 0;
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+  z-index: 10;
 }
 
 .npcCardDead {
@@ -473,6 +539,44 @@
   height: auto;
   object-fit: contain;
   z-index: 1;
+}
+
+.imagePreview {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.65rem);
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: min(300px, calc(100vw - 2rem));
+  max-height: min(430px, calc(100vh - 2rem));
+  min-height: 4rem;
+  padding: 0.45rem;
+  border: 1px solid rgba(29, 18, 14, 0.14);
+  border-radius: 0.75rem;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translate(-50%, 0.35rem);
+  transition:
+    opacity 140ms ease 500ms,
+    transform 140ms ease 500ms;
+}
+
+.npcImageFrame:hover .imagePreview {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.imagePreviewImage {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  max-height: min(360px, calc(100vh - 5.5rem));
+  object-fit: contain;
 }
 
 .npcSummary {

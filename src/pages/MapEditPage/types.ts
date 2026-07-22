@@ -82,10 +82,12 @@ export interface MapEditPageState {
   groundTextureOptions: MapGroundTextureOption[]
   elementPickerCategories: VariantImagePickerCategory<MapElementCategory, MapElementVariant>[]
   drawModeOptions: MapDrawModeOption[]
+  copyingContext: boolean
   activeLayer: MapLayer
   error: string
   form: MapData
   handleChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  handleCopyMapContext: () => Promise<void>
   handleSelectDrawMode: (mode: MapDrawMode) => void
   handleSelectLayer: (layer: MapLayer) => void
   handleSelectColor: (color: MapPaletteColor) => void

@@ -22,6 +22,10 @@ const NpcListCard = ({ card }: { card: NpcListCardViewModel }) => {
       <div className={styles.cardBody}>
         <div className={styles.npcImageFrame}>
           <img className={styles.npcImage} src={card.imageSrc} alt="" aria-hidden="true" />
+          <div className={styles.imagePreview} aria-hidden="true">
+            <p className={styles.previewTitle}>{card.label}</p>
+            <img className={styles.imagePreviewImage} src={card.imageSrc} alt="" />
+          </div>
         </div>
         <div className={styles.npcSummary}>
           <h2 className={nameClassName}>
@@ -75,7 +79,13 @@ const NpcGroupCard = ({ group }: { group: NpcGroupCardViewModel }) => {
             {group.npcThumbnails.map((npc) => (
               <div className={`${styles.groupThumbnailItem} ${npc.isDead ? styles.groupThumbnailItemDead : ''}`} key={`${group.id}-${npc.id}`} role="link" tabIndex={0} onClick={npc.onOpen} onKeyDown={npc.onKeyDown}>
                 <span className={styles.groupThumbnailName} title={npc.label}>{npc.label}</span>
-                <img className={styles.groupThumbnail} src={npc.imageSrc} alt={npc.label} title={npc.label} />
+                <div className={styles.groupThumbnailFrame}>
+                  <img className={styles.groupThumbnail} src={npc.imageSrc} alt={npc.label} title={npc.label} />
+                  <div className={styles.groupImagePreview} aria-hidden="true">
+                    <p className={styles.previewTitle}>{npc.label}</p>
+                    <img className={styles.groupImagePreviewImage} src={npc.imageSrc} alt="" />
+                  </div>
+                </div>
               </div>
             ))}
             {group.hasMoreNpcs ? <span className={styles.groupThumbnailMore} aria-label={t('pages.npcList.groups.moreNpcs')}>...</span> : null}

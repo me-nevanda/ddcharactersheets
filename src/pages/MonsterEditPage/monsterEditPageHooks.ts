@@ -1,10 +1,12 @@
 import { useEffect, useState, type ChangeEvent, type SubmitEvent } from 'react'
+import toast from 'react-hot-toast'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { deleteMonsterImage, getMonster, saveMonster, uploadMonsterImage } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { normalizeItems } from '@pages/CharacterEditPage/characterEditPageLogic'
 import { emptyArmor, emptyItems, emptyOtherItem, emptyWeapon } from '@pages/CharacterEditPage/characterEditPageUtils'
+import { buildSingleMonsterContextCopyText, copyTextToClipboard } from '@pages/ContextEditPage/contextCopyHooks'
 import type { CharacterArmorBonusFieldName, CharacterItemBonusFieldName, CharacterWeaponDamageDiceType, CharacterWeaponFieldName } from '@appTypes/character'
 import type { MonsterAttack, MonsterAttackAction, MonsterAttackAreaType, MonsterAttackType, MonsterData, MonsterDefenses, MonsterRole, MonsterSuggestedStats, MonsterType } from '@appTypes/monster'
 import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/CharacterEditPage/types'
@@ -230,6 +232,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
   const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [copyingContext, setCopyingContext] = useState(false)
   const [removingImage, setRemovingImage] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [isGenerateAttributesDialogOpen, setGenerateAttributesDialogOpen] = useState(false)
@@ -417,6 +420,25 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     }
 
     window.open(`/monsters/${monsterId}/print`, '_blank')
+  }
+
+  const handleCopyMonsterContext = async () => {
+    setCopyingContext(true)
+    setError('')
+
+    try {
+      const text = buildSingleMonsterContextCopyText(form, t)
+      await copyTextToClipboard(text)
+      toast.success(t('pages.monsterEdit.contextCopySuccess'))
+    } catch (nextError) {
+      const message = nextError instanceof Error && nextError.message === 'errors.api.generic'
+        ? t('pages.monsterEdit.contextCopyError')
+        : getErrorMessage(t, nextError)
+      setError(message)
+      toast.error(message)
+    } finally {
+      setCopyingContext(false)
+    }
   }
 
   const handleSpecialChange = (value: string) => {
@@ -660,6 +682,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
   }
 
   return {
+    copyingContext,
     error,
     form,
     handleAttackAdd,
@@ -678,6 +701,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     handleGenerateAttributes,
     handleImageChange,
     handleImageRemove,
+    handleCopyMonsterContext,
     handlePrint,
     handleResistancesChange,
     handleSpecialChange,

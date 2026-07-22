@@ -8,6 +8,7 @@ import type { Area, PlaceItem } from '@appTypes/area'
 import type { Character, CharacterHistoryEntry } from '@appTypes/character'
 import type { ContextAreaSnapshot, ContextCharacterGroupSnapshot, ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
 import type { Event } from '@appTypes/event'
+import type { MapData as AppMapData, MapElementCategory, MapElementVariant, MapGroundTexture } from '@appTypes/map'
 import type { Monster } from '@appTypes/monster'
 import type { Npc } from '@appTypes/npc'
 import type { ContextCopyState, UseContextCopyParams } from './types'
@@ -189,6 +190,26 @@ export const buildSingleNpcContextCopyText = (
   return lines.join('\n')
 }
 
+export const buildSingleMonsterContextCopyText = (
+  monster: Pick<Monster, 'description' | 'level' | 'name' | 'role' | 'type'>,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string => {
+  const monsterName = normalizeText(monster.name)
+  const lines = [
+    t('pages.contextEdit.copy.singleMonsterIntro', { name: monsterName }),
+    '',
+    `- ${[
+      monsterName,
+      t(`pages.monsterEdit.typeOptions.${monster.type}`),
+      `${t('pages.contextEdit.copy.levelLabel')} ${normalizeText(monster.level)}`,
+      t(`pages.monsterEdit.roleOptions.${monster.role}`),
+      normalizeText(monster.description),
+    ].join(' | ')}`,
+  ]
+
+  return lines.join('\n')
+}
+
 const buildNpcGroupLines = (
   groups: ContextNpcGroupSnapshot[],
   npcsById: Map<string, Npc>,
@@ -316,6 +337,40 @@ export const buildSingleEventContextCopyText = (
     t('pages.contextEdit.copy.singleEventIntro', { name: eventName }),
     '',
     `${eventName} | ${normalizeText(event.description)}`,
+  ]
+
+  return lines.join('\n')
+}
+
+export const buildSingleMapContextCopyText = (
+  map: Pick<AppMapData, 'description' | 'grid' | 'name'>,
+  getElementVariantName: (category: MapElementCategory, variant: MapElementVariant) => string,
+  getGroundTextureName: (texture: MapGroundTexture) => string,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string => {
+  const mapName = normalizeText(map.name)
+  const copyMap = {
+    name: mapName,
+    description: normalizeText(map.description),
+    grid: {
+      ...map.grid,
+      ground: map.grid.ground.map((cell) => ({
+        ...cell,
+        variantName: getGroundTextureName(cell.texture),
+      })),
+      elements: map.grid.elements.map((element) => ({
+        ...element,
+        variantName: getElementVariantName(element.category, element.variant),
+      })),
+    },
+  }
+  const lines = [
+    t('pages.contextEdit.copy.singleMapIntro', { name: mapName }),
+    '',
+    `${mapName} | ${normalizeText(map.description)}`,
+    '',
+    t('pages.contextEdit.copy.singleMapTitle'),
+    JSON.stringify(copyMap, null, 2),
   ]
 
   return lines.join('\n')

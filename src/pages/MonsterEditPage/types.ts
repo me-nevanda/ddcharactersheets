@@ -6,6 +6,7 @@ import type { CharacterItemFieldName, CharacterItemGroupKey } from '@pages/Chara
 export type MonsterEditTabKey = 'general' | 'attacks' | 'loot'
 
 export interface MonsterEditPageState {
+  copyingContext: boolean
   error: string
   form: MonsterData
   handleAttackAdd: (type: MonsterAttackType) => void
@@ -38,6 +39,7 @@ export interface MonsterEditPageState {
   handleGenerateAttributes: () => void
   handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
   handleImageRemove: () => Promise<void>
+  handleCopyMonsterContext: () => Promise<void>
   handlePrint: () => void
   handleResistancesChange: (value: string) => void
   handleSpecialChange: (value: string) => void

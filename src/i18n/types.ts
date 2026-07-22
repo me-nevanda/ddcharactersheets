@@ -175,6 +175,10 @@ export interface TranslationDictionary {
       }
     }
     mapEdit: {
+      contextCopyError: string
+      contextCopySuccess: string
+      copyingContextButton: string
+      copyContextButton: string
       drawModeLabel: string
       eyebrow: string
       emptyLayer: string
@@ -386,8 +390,11 @@ export interface TranslationDictionary {
         intro: string
         singleCharacterIntro: string
         singleNpcIntro: string
+        singleMonsterIntro: string
         singleAreaIntro: string
         singleEventIntro: string
+        singleMapIntro: string
+        singleMapTitle: string
         heroesTitle: string
         npcGroupsTitle: string
         monsterGroupsTitle: string
@@ -734,6 +741,10 @@ export interface TranslationDictionary {
       }
     }
     monsterEdit: {
+      contextCopyError: string
+      contextCopySuccess: string
+      copyingContextButton: string
+      copyContextButton: string
       eyebrow: string
       title: string
       loading: string

@@ -11,6 +11,13 @@ export const CharacterListCard = ({ card, onImageError, }: CharacterListCardProp
               <img className={styles.cardPortrait} src={card.portraitSrc} alt="" aria-hidden="true" onError={onImageError}/>
               <img className={styles.cardClass} src={card.classSrc} alt="" aria-hidden="true" onError={onImageError}/>
             </>)}
+          <div className={`${styles.portraitPreview} ${card.imageSrc ? styles.portraitPreviewCustomImage : styles.portraitPreviewDefaultImage}`} aria-hidden="true">
+            <p className={styles.previewTitle}>{card.label}</p>
+            {card.imageSrc ? (<img className={styles.portraitPreviewCustom} src={card.imageSrc} alt="" onError={onImageError}/>) : (<>
+                <img className={styles.portraitPreviewLayer} src={card.portraitSrc} alt="" onError={onImageError}/>
+                <img className={styles.portraitPreviewLayer} src={card.classSrc} alt="" onError={onImageError}/>
+              </>)}
+          </div>
         </div>
 
         <div className={styles.characterSummary}>

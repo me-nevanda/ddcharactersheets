@@ -257,6 +257,7 @@
 }
 
 .monsterPickerItem {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -270,18 +271,80 @@
 
 .monsterPickerItem:hover {
   border-color: var(--border-strong);
+  z-index: 10;
 }
 
 .monsterPickerItem:focus-visible {
   outline: 0;
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.12);
+  z-index: 10;
+}
+
+.monsterImageFrame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
 }
 
 .monsterPickerImage {
   display: block;
   max-width: 64px;
   max-height: 64px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.imagePreview {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.55rem);
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: min(300px, calc(100vw - 2rem));
+  max-height: min(430px, calc(100vh - 2rem));
+  padding: 0.55rem;
+  border: 1px solid rgba(29, 18, 14, 0.14);
+  border-radius: 0.75rem;
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translate(-50%, -0.25rem);
+  transition:
+    opacity 160ms ease 500ms,
+    transform 160ms ease 500ms;
+}
+
+.monsterImageFrame:hover .imagePreview,
+.monsterPickerItem:focus-visible .imagePreview {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.previewTitle {
+  width: 100%;
+  margin: 0 0 0.45rem;
+  overflow: hidden;
+  color: #1d120e;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imagePreviewImage {
+  display: block;
+  max-width: 100%;
+  max-height: min(360px, calc(100vh - 5.5rem));
   width: auto;
   height: auto;
   object-fit: contain;

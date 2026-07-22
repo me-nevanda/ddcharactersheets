@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type MouseEvent, type PointerEvent, type SubmitEvent } from 'react'
+import toast from 'react-hot-toast'
 import { useParams } from 'react-router-dom'
 import { useI18n } from '@i18n/index'
 import { getMap, saveMap } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
+import { buildSingleMapContextCopyText, copyTextToClipboard } from '@pages/ContextEditPage/contextCopyHooks'
 import type { MapData, MapElementCategory, MapElementVariant, MapGridData, MapGroundTexture } from '@appTypes/map'
 import { colorOptions, drawModeOptions, groundTextureOptions, layerOptions } from './mapEditPageOptions'
-import { useMapElementPickerCategories } from './mapElementPickerHooks'
+import { getMapElementVariantLabel, useMapElementPickerCategories } from './mapElementPickerHooks'
 import { areMapGridsEqual, buildElements, buildGroundCells, buildGroundRangeCells, buildGroundRectangleCells, buildLabels, buildLineSegments, buildPointRangeLines, buildPointSegments, buildRangeLines, buildRectangleLines, canDrawGroundRange, canDrawRange, createElement, createGroundCell, createGroundCellId, createLabel, createLine, createPointId, emptyMapForm, getElementById, getGroundCellById, getLabelById, getLineById, getMouseGridPosition, getPointById, getPointerGridPosition, loadMapUndoStack, removeGroundCells, removeLines, replaceElements, replaceGroundCells, replaceLabels, replaceLines, saveMapUndoStack, undoStackLimit, type MapLineDragAxis } from './mapEditPageLogic'
 import type { MapDrawMode, MapEditPageState, MapLayer, MapLineViewModel, MapPaletteColor } from './types'
 
@@ -19,6 +21,7 @@ export const useMapEditPage = (): MapEditPageState => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [copyingContext, setCopyingContext] = useState(false)
   const [activeLayer, setActiveLayer] = useState<MapLayer>('lines')
   const [selectedColor, setSelectedColor] = useState<MapPaletteColor>('black')
   const [selectedGroundTexture, setSelectedGroundTexture] = useState<MapGroundTexture>('1')
@@ -944,6 +947,52 @@ export const useMapEditPage = (): MapEditPageState => {
     }
   }
 
+  const getGroundTextureLabel = (texture: MapGroundTexture): string => {
+    const labelKeys: Record<MapGroundTexture, string> = {
+      '1': 'pages.mapEdit.groundTextureVariants.grass',
+      '2': 'pages.mapEdit.groundTextureVariants.water',
+      '3': 'pages.mapEdit.groundTextureVariants.sand',
+      '4': 'pages.mapEdit.groundTextureVariants.woodenFloor',
+      '5': 'pages.mapEdit.groundTextureVariants.gravel',
+      '6': 'pages.mapEdit.groundTextureVariants.cobblestone',
+      '7': 'pages.mapEdit.groundTextureVariants.ice',
+      '8': 'pages.mapEdit.groundTextureVariants.lava',
+      '9': 'pages.mapEdit.groundTextureVariants.stoneFloor',
+      '10': 'pages.mapEdit.groundTextureVariants.parquet',
+      '11': 'pages.mapEdit.groundTextureVariants.stonyGround',
+      '12': 'pages.mapEdit.groundTextureVariants.woodenTerrace',
+      '13': 'pages.mapEdit.groundTextureVariants.swamp',
+      '14': 'pages.mapEdit.groundTextureVariants.crackFissure',
+      '15': 'pages.mapEdit.groundTextureVariants.unevenTerrain',
+    }
+
+    return t(labelKeys[texture])
+  }
+
+  const handleCopyMapContext = async () => {
+    setCopyingContext(true)
+    setError('')
+
+    try {
+      const text = buildSingleMapContextCopyText(
+        form,
+        (category, variant) => getMapElementVariantLabel(category, variant, t),
+        getGroundTextureLabel,
+        t,
+      )
+      await copyTextToClipboard(text)
+      toast.success(t('pages.mapEdit.contextCopySuccess'))
+    } catch (nextError) {
+      const message = nextError instanceof Error && nextError.message === 'errors.api.generic'
+        ? t('pages.mapEdit.contextCopyError')
+        : getErrorMessage(t, nextError)
+      setError(message)
+      toast.error(message)
+    } finally {
+      setCopyingContext(false)
+    }
+  }
+
   const elements = useMemo(() => buildElements(form.grid.elements), [form.grid.elements])
   const groundCells = useMemo(() => buildGroundCells(form.grid.ground), [form.grid.ground])
   const labels = useMemo(() => buildLabels(form.grid.labels), [form.grid.labels])
@@ -1029,6 +1078,7 @@ export const useMapEditPage = (): MapEditPageState => {
   return {
     activeLayer,
     colorOptions,
+    copyingContext,
     groundTextureOptions,
     elementPickerCategories,
     drawModeOptions,
@@ -1036,6 +1086,7 @@ export const useMapEditPage = (): MapEditPageState => {
     elements,
     form,
     handleChange,
+    handleCopyMapContext,
     handleClearLinePreview,
     handleMapClick,
     handleMapContextMenu,

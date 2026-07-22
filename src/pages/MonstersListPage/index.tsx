@@ -22,6 +22,10 @@ const MonsterListCard = ({ card }: { card: MonsterListCardViewModel }) => {
       <div className={styles.cardBody}>
         <div className={styles.monsterImageFrame}>
           <img className={styles.monsterImage} src={card.imageSrc} alt="" aria-hidden="true" />
+          <div className={styles.imagePreview} aria-hidden="true">
+            <p className={styles.previewTitle}>{card.label}</p>
+            <img className={styles.imagePreviewImage} src={card.imageSrc} alt="" />
+          </div>
         </div>
         <div className={styles.monsterSummary}>
           <h2 className={nameClassName}>
@@ -69,7 +73,13 @@ const MonsterGroupCard = ({ group }: { group: MonsterGroupCardViewModel }) => {
             {group.monsterThumbnails.map((monster) => (
               <div className={styles.groupThumbnailItem} key={`${group.id}-${monster.id}`} role="link" tabIndex={0} onClick={monster.onOpen} onKeyDown={monster.onKeyDown}>
                 <span className={styles.groupThumbnailName} title={monster.label}>{monster.label}</span>
-                <img className={styles.groupThumbnail} src={monster.imageSrc} alt={monster.label} title={monster.label} />
+                <div className={styles.groupThumbnailFrame}>
+                  <img className={styles.groupThumbnail} src={monster.imageSrc} alt={monster.label} title={monster.label} />
+                  <div className={styles.groupImagePreview} aria-hidden="true">
+                    <p className={styles.previewTitle}>{monster.label}</p>
+                    <img className={styles.groupImagePreviewImage} src={monster.imageSrc} alt="" />
+                  </div>
+                </div>
               </div>
             ))}
             {group.hasMoreMonsters ? <span className={styles.groupThumbnailMore} aria-label={t('pages.monsterList.groups.moreMonsters')}>...</span> : null}

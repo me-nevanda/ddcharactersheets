@@ -18,7 +18,7 @@ export const MonsterEditPage = () => {
     monsterListTab: 'list',
     returnTo: '/',
   })
-  const { error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useMonsterEditPage()
+  const { copyingContext, error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleCopyMonsterContext, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useMonsterEditPage()
   const [activeTab, setActiveTab] = useState<MonsterEditTabKey>('general')
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
   const bloodiedValue = Math.floor(form.hp / 2)
@@ -82,6 +82,20 @@ export const MonsterEditPage = () => {
                 </span>
               </button>
             </div>
+            <div className={`${styles.floatingCopyAction} ${styles.desktopOnlyAction}`}>
+              <button className={styles.secondaryButton} type="button" onClick={() => void handleCopyMonsterContext()} disabled={loading || saving || copyingContext}>
+                <span className={styles.buttonContent}>
+                  <AppIcon name="context" />
+                  <span>{copyingContext ? t('pages.monsterEdit.copyingContextButton') : t('pages.monsterEdit.copyContextButton')}</span>
+                </span>
+              </button>
+            </div>
+            <button className={`${styles.secondaryButton} ${styles.responsiveOnlyAction}`} type="button" onClick={() => void handleCopyMonsterContext()} disabled={loading || saving || copyingContext}>
+              <span className={styles.buttonContent}>
+                <AppIcon name="context" />
+                <span>{copyingContext ? t('pages.monsterEdit.copyingContextButton') : t('pages.monsterEdit.copyContextButton')}</span>
+              </span>
+            </button>
             <div className={styles.floatingSaveAction}>
               <button className={styles.primaryButton} form="monster-edit-form" type="submit" disabled={saving || !hasChanges}>
                 <span className={styles.buttonContent}>

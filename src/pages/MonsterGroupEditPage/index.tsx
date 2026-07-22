@@ -28,7 +28,13 @@ const MonsterRow = ({
 
   return (
     <article className={styles.monsterPickerItem} role="link" tabIndex={0} onClick={monster.onOpen} onKeyDown={monster.onKeyDown}>
-      <img className={styles.monsterPickerImage} src={monster.imageSrc} alt="" aria-hidden="true" />
+      <div className={styles.monsterImageFrame}>
+        <img className={styles.monsterPickerImage} src={monster.imageSrc} alt="" aria-hidden="true" />
+        <div className={styles.imagePreview} aria-hidden="true">
+          <p className={styles.previewTitle}>{monster.label}</p>
+          <img className={styles.imagePreviewImage} src={monster.imageSrc} alt="" />
+        </div>
+      </div>
       <div className={styles.monsterPickerSummary}>
         <h3 className={nameClassName}>
           {monster.isElite ? <AppIcon className={styles.eliteIcon} name="crown" /> : null}

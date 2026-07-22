@@ -23,11 +23,22 @@ const CharacterRow = ({
     <article className={styles.characterPickerItem} role="link" tabIndex={0} onClick={character.onOpen} onKeyDown={character.onKeyDown}>
       <div className={`${styles.characterPortraitStack} ${character.imageSrc ? styles.characterPortraitStackCustomImage : styles.characterPortraitStackDefaultImage}`}>
         {character.imageSrc ? (
-          <img className={styles.characterCustomPortrait} src={character.imageSrc} alt="" aria-hidden="true" onError={character.onImageError} />
+          <>
+            <img className={styles.characterCustomPortrait} src={character.imageSrc} alt="" aria-hidden="true" onError={character.onImageError} />
+            <div className={styles.portraitPreview} aria-hidden="true">
+              <p className={styles.previewTitle}>{character.label}</p>
+              <img className={styles.portraitPreviewImage} src={character.imageSrc} alt="" />
+            </div>
+          </>
         ) : (
           <>
             <img className={styles.characterPortrait} src={character.portraitSrc} alt="" aria-hidden="true" onError={character.onImageError} />
             <img className={styles.characterClass} src={character.classSrc} alt="" aria-hidden="true" onError={character.onImageError} />
+            <div className={`${styles.portraitPreview} ${styles.portraitPreviewDefault}`} aria-hidden="true">
+              <p className={styles.previewTitle}>{character.label}</p>
+              <img className={styles.portraitPreviewPortrait} src={character.portraitSrc} alt="" />
+              <img className={styles.portraitPreviewClass} src={character.classSrc} alt="" />
+            </div>
           </>
         )}
       </div>

@@ -8,6 +8,7 @@ import { useI18n } from '@i18n/index'
 import { useEditReturnNavigation } from '@pages/useEditReturnNavigation'
 import { VariantImagePicker } from './VariantImagePicker'
 import { useMapEditPage } from './mapEditPageHooks'
+import { mapGridHeight, mapGridWidth } from './mapEditPageLogic'
 import type { MapLayer } from './types'
 import styles from './style.module.scss'
 
@@ -25,7 +26,7 @@ export const MapEditPage = () => {
     mainTab: 'maps',
     returnTo: '/',
   })
-  const { activeLayer, colorOptions, drawModeOptions, elementPickerCategories, elements, error, form, groundCells, groundTextureOptions, handleChange, handleClearLinePreview, handleMapClick, handleMapContextMenu, handleMapPointerDown, handleMapPointerUp, handlePreviewGroundCell, handlePreviewLine, handlePreviewMapPointer, handlePreviewPoint, handleRemoveElement, handleRemoveGroundCell, handleRemoveLabel, handleRemoveLine, handleRemovePoint, handleRenameLabel, handleSelectColor, handleSelectDrawMode, handleSelectElementAsset, handleSelectGroundTexture, handleSelectLayer, handleSelectPoint, handleSubmit, handleToggleElement, handleToggleGroundCell, handleToggleLabel, handleToggleLine, hasChanges, labels, layerOptions, lineSegments, loading, pointSegments, previewEraseGroundCellIds, previewEraseLineIds, previewGroundCellIds, previewLineIds, previewRectangleGroundCellIds, previewRectangleLineIds, selectedColor, selectedDrawMode, selectedElementCategory, selectedElementVariant, selectedEraseGroundRangeStartId, selectedEraseRangeStartId, selectedGroundRangeStartId, selectedGroundRectangleStartId, selectedGroundTexture, selectedPointEraseStartId, selectedPointRangeStartId, selectedRectangleStartId, selectedRangeStartId, saving } = useMapEditPage()
+  const { activeLayer, colorOptions, copyingContext, drawModeOptions, elementPickerCategories, elements, error, form, groundCells, groundTextureOptions, handleChange, handleClearLinePreview, handleCopyMapContext, handleMapClick, handleMapContextMenu, handleMapPointerDown, handleMapPointerUp, handlePreviewGroundCell, handlePreviewLine, handlePreviewMapPointer, handlePreviewPoint, handleRemoveElement, handleRemoveGroundCell, handleRemoveLabel, handleRemoveLine, handleRemovePoint, handleRenameLabel, handleSelectColor, handleSelectDrawMode, handleSelectElementAsset, handleSelectGroundTexture, handleSelectLayer, handleSelectPoint, handleSubmit, handleToggleElement, handleToggleGroundCell, handleToggleLabel, handleToggleLine, hasChanges, labels, layerOptions, lineSegments, loading, pointSegments, previewEraseGroundCellIds, previewEraseLineIds, previewGroundCellIds, previewLineIds, previewRectangleGroundCellIds, previewRectangleLineIds, selectedColor, selectedDrawMode, selectedElementCategory, selectedElementVariant, selectedEraseGroundRangeStartId, selectedEraseRangeStartId, selectedGroundRangeStartId, selectedGroundRectangleStartId, selectedGroundTexture, selectedPointEraseStartId, selectedPointRangeStartId, selectedRectangleStartId, selectedRangeStartId, saving } = useMapEditPage()
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
   const [isMapFullscreen, setMapFullscreen] = useState(false)
   const [editingLabelId, setEditingLabelId] = useState('')
@@ -76,6 +77,13 @@ export const MapEditPage = () => {
   }
   const groundLayerIconSrc = getGroundTextureSrc('6')
   const elementLayerIconSrc = elementPickerCategories.find((category) => category.key === 'trees')?.options[0]?.imageSrc ?? ''
+  const getIntersectionPosition = (coordinate: number, size: number): string => {
+    const ratio = coordinate / size
+    const percentage = Number((ratio * 100).toFixed(4))
+    const borderOffset = Number((1 - (2 * ratio)).toFixed(4))
+
+    return `calc(${percentage}% + ${borderOffset}px)`
+  }
 
   const handleBackToListClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
     if (hasChanges) {
@@ -154,6 +162,20 @@ export const MapEditPage = () => {
                 </span>
               </button>
             </div>
+            <div className={`${styles.floatingCopyAction} ${styles.desktopOnlyAction}`}>
+              <button className={styles.secondaryButton} type="button" onClick={() => void handleCopyMapContext()} disabled={loading || saving || copyingContext}>
+                <span className={styles.buttonContent}>
+                  <AppIcon name="context" />
+                  <span>{copyingContext ? t('pages.mapEdit.copyingContextButton') : t('pages.mapEdit.copyContextButton')}</span>
+                </span>
+              </button>
+            </div>
+            <button className={`${styles.secondaryButton} ${styles.responsiveOnlyAction}`} type="button" onClick={() => void handleCopyMapContext()} disabled={loading || saving || copyingContext}>
+              <span className={styles.buttonContent}>
+                <AppIcon name="context" />
+                <span>{copyingContext ? t('pages.mapEdit.copyingContextButton') : t('pages.mapEdit.copyContextButton')}</span>
+              </span>
+            </button>
             <div className={styles.floatingSaveAction}>
               <button className={styles.primaryButton} form="map-edit-form" type="submit" disabled={saving || !hasChanges}>
                 <span className={styles.buttonContent}>
@@ -334,8 +356,8 @@ export const MapEditPage = () => {
                       type="button"
                       aria-label={t('pages.mapEdit.toggleLineLabel')}
                       style={{
-                        left: `${(point.x / 34) * 100}%`,
-                        top: `${(point.y / 22) * 100}%`,
+                        left: getIntersectionPosition(point.x, mapGridWidth),
+                        top: getIntersectionPosition(point.y, mapGridHeight),
                       }}
                       onFocus={() => handlePreviewPoint(point.id)}
                       onBlur={handleClearLinePreview}

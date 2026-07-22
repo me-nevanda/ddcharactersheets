@@ -112,9 +112,16 @@
 
 .floatingSaveAction {
   position: fixed;
-  top: calc(4rem + 20px + 3.25rem + 0.65rem);
+  top: calc(4rem + 20px + (3.25rem + 0.65rem) * 2);
   right: 1rem;
   z-index: 19;
+}
+
+.floatingCopyAction {
+  position: fixed;
+  top: calc(4rem + 20px + 3.25rem + 0.65rem);
+  right: 1rem;
+  z-index: 20;
 }
 
 .printAction {
@@ -125,15 +132,20 @@
 }
 
 .ghostLink,
+.secondaryButton,
 .primaryButton,
 .printPrimaryButton {
   @include pill-button;
 }
 
-.ghostLink {
+.ghostLink,
+.secondaryButton {
   background: rgba(255, 248, 235, 0.04);
   border-color: var(--border-soft);
   color: var(--text-strong);
+}
+
+.ghostLink {
   text-decoration: none;
 }
 
@@ -153,6 +165,7 @@
 }
 
 .ghostLink:hover,
+.secondaryButton:hover,
 .primaryButton:hover,
 .printPrimaryButton:hover {
   transform: translateY(-1px);
@@ -160,10 +173,15 @@
 }
 
 .primaryButton:disabled,
+.secondaryButton:disabled,
 .printPrimaryButton:disabled {
   cursor: default;
   opacity: 0.72;
   transform: none;
+}
+
+.secondaryButton.responsiveOnlyAction {
+  display: none;
 }
 
 .fullscreenSaveButton {
@@ -1148,11 +1166,20 @@
     width: auto;
   }
 
-  .floatingBackAction {
+  .floatingBackAction,
+  .floatingCopyAction {
     position: static;
     top: auto;
     right: auto;
     left: auto;
+  }
+
+  .desktopOnlyAction {
+    display: none;
+  }
+
+  .secondaryButton.responsiveOnlyAction {
+    display: inline-flex;
   }
 }
 

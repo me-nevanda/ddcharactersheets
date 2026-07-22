@@ -28,7 +28,13 @@ const NpcRow = ({
 
   return (
     <article className={`${styles.npcPickerItem} ${npc.isDead ? styles.npcPickerItemDead : ''}`} role="link" tabIndex={0} onClick={npc.onOpen} onKeyDown={npc.onKeyDown}>
-      <img className={styles.npcPickerImage} src={npc.imageSrc} alt="" aria-hidden="true" />
+      <div className={styles.npcImageFrame}>
+        <img className={styles.npcPickerImage} src={npc.imageSrc} alt="" aria-hidden="true" />
+        <div className={styles.imagePreview} aria-hidden="true">
+          <p className={styles.previewTitle}>{npc.label}</p>
+          <img className={styles.imagePreviewImage} src={npc.imageSrc} alt="" />
+        </div>
+      </div>
       <div className={styles.npcPickerSummary}>
         <h3 className={nameClassName}>
           {npc.isElite ? <AppIcon className={styles.eliteIcon} name="crown" /> : null}
