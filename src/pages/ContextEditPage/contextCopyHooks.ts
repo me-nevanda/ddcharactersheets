@@ -5,12 +5,12 @@ import { getCharacterHistory } from '@lib/api'
 import { getErrorMessage } from '@lib/errors'
 import { useCharacterPresentation } from '@pages/characterPresentationHooks'
 import type { Area, PlaceItem } from '@appTypes/area'
-import type { Character, CharacterHistoryEntry } from '@appTypes/character'
+import type { Character, CharacterAbility, CharacterAbilityAreaType, CharacterDefenses, CharacterHistoryEntry } from '@appTypes/character'
 import type { ContextAreaSnapshot, ContextCharacterGroupSnapshot, ContextData, ContextMonsterGroupSnapshot, ContextNpcGroupSnapshot } from '@appTypes/context'
 import type { Event } from '@appTypes/event'
 import type { MapData as AppMapData, MapElementCategory, MapElementVariant, MapGroundTexture } from '@appTypes/map'
-import type { Monster } from '@appTypes/monster'
-import type { Npc } from '@appTypes/npc'
+import type { Monster, MonsterAttack, MonsterAttackAreaType } from '@appTypes/monster'
+import type { Npc, NpcAttack, NpcAttackAreaType } from '@appTypes/npc'
 import type { ContextCopyState, UseContextCopyParams } from './types'
 
 const stripHtml = (value: string): string => {
@@ -64,9 +64,23 @@ interface BuildContextCopyTextParams {
   t: (key: string, variables?: Record<string, string | number>) => string
 }
 
+interface BuildSingleCharacterContextCopyTextOptions {
+  defenseValues?: CharacterDefenses
+  hpValue?: number
+  includeAbilities?: boolean
+}
+
 interface ContextHistoryEntry {
   title: string
   content: string
+}
+
+interface BuildSingleMonsterContextCopyTextOptions {
+  includeAttacks?: boolean
+}
+
+interface BuildSingleNpcContextCopyTextOptions {
+  includeAttacks?: boolean
 }
 
 const appendBlock = (lines: string[], title: string, blockLines: string[]) => {
@@ -142,11 +156,12 @@ const buildCharacterGroupLines = (
 }
 
 export const buildSingleCharacterContextCopyText = (
-  character: Pick<Character, 'class' | 'level' | 'name' | 'race' | 'shortDescription'>,
+  character: Pick<Character, 'abilities' | 'class' | 'defenses' | 'hp' | 'level' | 'name' | 'race' | 'shortDescription'>,
   historyEntries: ContextHistoryEntry[],
   getCharacterRaceLabel: (value: Character['race']) => string,
   getCharacterClassLabel: (value: Character['class']) => string,
   t: (key: string, variables?: Record<string, string | number>) => string,
+  options: BuildSingleCharacterContextCopyTextOptions = {},
 ): string => {
   const characterName = normalizeText(character.name)
   const lines = [
@@ -161,12 +176,101 @@ export const buildSingleCharacterContextCopyText = (
     ...buildCharacterHistoryLines(characterName, historyEntries, t),
   ]
 
+  if (options.includeAbilities) {
+    lines.push(
+      '',
+      ...buildCharacterStatsLines(
+        options.hpValue ?? character.hp,
+        options.defenseValues ?? character.defenses,
+        t,
+      ),
+      '',
+      ...buildCharacterAbilityLines(character.abilities, t),
+    )
+  }
+
   return lines.join('\n')
 }
 
-export const buildSingleNpcContextCopyText = (
-  npc: Pick<Npc, 'description' | 'history' | 'isDead' | 'isStory' | 'level' | 'name'>,
+const buildCharacterAbilityAreaLabel = (
+  area: CharacterAbilityAreaType,
   t: (key: string, variables?: Record<string, string | number>) => string,
+): string => {
+  if (area === 'point') {
+    return t('pages.characterEdit.abilities.weaponAreaOptions.point')
+  }
+
+  const areaMatch = area.match(/^(burst|blast)(\d+)$/)
+  if (!areaMatch) {
+    return area
+  }
+
+  return `${t(`pages.characterEdit.abilities.weaponAreaOptions.${areaMatch[1]}`)} ${areaMatch[2]}`
+}
+
+const buildCharacterStatsLines = (
+  hpValue: number,
+  defenseValues: CharacterDefenses,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string[] => {
+  return [
+    t('pages.contextEdit.copy.characterStatsTitle'),
+    `- ${[
+      `${t('pages.characterEdit.fields.hp')} ${normalizeText(hpValue)}`,
+      `${t('pages.characterEdit.fields.kp')} ${normalizeText(defenseValues.kp)}`,
+      `${t('pages.characterEdit.fields.fortitude')} ${normalizeText(defenseValues.fortitude)}`,
+      `${t('pages.characterEdit.fields.reflex')} ${normalizeText(defenseValues.reflex)}`,
+      `${t('pages.characterEdit.fields.will')} ${normalizeText(defenseValues.will)}`,
+    ].join(' | ')}`,
+  ]
+}
+
+const buildCharacterAbilityLines = (
+  abilities: CharacterAbility[],
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string[] => {
+  if (abilities.length === 0) {
+    return []
+  }
+
+  return [
+    t('pages.contextEdit.copy.characterAbilitiesTitle'),
+    ...abilities.map((ability) => {
+      const abilityName = normalizeText(ability.name) || t('pages.characterEdit.abilities.title')
+      const abilityDetails = [
+        abilityName,
+        t(`pages.characterEdit.abilities.typeOptions.${ability.type}`),
+        t(`pages.characterEdit.abilities.kindOptions.${ability.kind}`),
+        t(`pages.characterEdit.abilities.actionOptions.${ability.action}`),
+        `${t('pages.contextEdit.copy.attackRangeLabel')} ${normalizeText(ability.weaponRange)}`,
+        `${t('pages.contextEdit.copy.attackAreaLabel')} ${buildCharacterAbilityAreaLabel(ability.weaponArea, t)}`,
+      ]
+
+      if (ability.kind === 'offensive') {
+        abilityDetails.push(
+          `${t('pages.characterEdit.abilities.attackLabel')}: +${normalizeText(ability.weaponAttackBonusNumber)} ${t('pages.characterEdit.abilities.weaponAgainstLabel')} ${ability.weaponAttackDefense ? t(`pages.characterEdit.fields.${ability.weaponAttackDefense}`) : t('pages.characterEdit.abilities.weaponOptions.none')}`,
+        )
+      }
+
+      abilityDetails.push(normalizeText(ability.description))
+
+      if (ability.kind === 'offensive') {
+        abilityDetails.push(
+          `${t('pages.characterEdit.abilities.weaponHitLabel')}: ${normalizeText(ability.weaponHit)}`,
+          `${t('pages.characterEdit.abilities.weaponMissLabel')}: ${normalizeText(ability.weaponMiss)}`,
+          `${t('pages.characterEdit.abilities.weaponProvocationLabel')}: ${normalizeText(ability.weaponProvocation)}`,
+        )
+      }
+
+      return `- ${abilityDetails.join(' | ')}`
+    }),
+  ]
+}
+
+export const buildSingleNpcContextCopyText = (
+  npc: Pick<Npc, 'attacks' | 'defenses' | 'description' | 'history' | 'hp' | 'isDead' | 'isStory' | 'level' | 'name' | 'suggested'>,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+  options: BuildSingleNpcContextCopyTextOptions = {},
 ): string => {
   const npcName = normalizeText(npc.name)
   const parts = [
@@ -187,12 +291,156 @@ export const buildSingleNpcContextCopyText = (
     ...buildCharacterHistoryLines(npcName, npc.history, t),
   ]
 
+  if (options.includeAttacks && !npc.isStory) {
+    lines.push(
+      '',
+      ...buildNpcStatsLines(npc, t),
+      '',
+      t('pages.contextEdit.copy.monsterDamageLegendTitle'),
+      t('pages.contextEdit.copy.monsterDamageLegend', {
+        low: t('pages.npcEdit.fields.low'),
+        medium: t('pages.npcEdit.fields.medium'),
+        high: t('pages.npcEdit.fields.high'),
+        custom: t('pages.npcEdit.fields.custom'),
+        lowDamage: normalizeText(npc.suggested.lowDamage),
+        mediumDamage: normalizeText(npc.suggested.mediumDamage),
+        highDamage: normalizeText(npc.suggested.highDamage),
+        customDamage: normalizeText(npc.suggested.customDamage),
+      }),
+      '',
+      ...buildNpcAttackLines(npc.attacks, t),
+    )
+  }
+
   return lines.join('\n')
 }
 
-export const buildSingleMonsterContextCopyText = (
-  monster: Pick<Monster, 'description' | 'level' | 'name' | 'role' | 'type'>,
+const buildNpcAttackAreaLabel = (
+  area: NpcAttackAreaType,
   t: (key: string, variables?: Record<string, string | number>) => string,
+): string => {
+  if (area === 'point') {
+    return t('pages.characterEdit.abilities.weaponAreaOptions.point')
+  }
+
+  const areaMatch = area.match(/^(burst|blast)(\d+)$/)
+  if (!areaMatch) {
+    return area
+  }
+
+  return `${t(`pages.characterEdit.abilities.weaponAreaOptions.${areaMatch[1]}`)} ${areaMatch[2]}`
+}
+
+const buildNpcStatsLines = (
+  npc: Pick<Npc, 'defenses' | 'hp'>,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string[] => {
+  return [
+    t('pages.contextEdit.copy.npcStatsTitle'),
+    `- ${[
+      `${t('pages.npcEdit.fields.hp')} ${normalizeText(npc.hp)}`,
+      `${t('pages.npcEdit.fields.kp')} ${normalizeText(npc.defenses.kp)}`,
+      `${t('pages.npcEdit.fields.fortitude')} ${normalizeText(npc.defenses.fortitude)}`,
+      `${t('pages.npcEdit.fields.reflex')} ${normalizeText(npc.defenses.reflex)}`,
+      `${t('pages.npcEdit.fields.will')} ${normalizeText(npc.defenses.will)}`,
+    ].join(' | ')}`,
+  ]
+}
+
+const buildNpcAttackLines = (
+  attacks: NpcAttack[],
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string[] => {
+  if (attacks.length === 0) {
+    return []
+  }
+
+  return [
+    t('pages.contextEdit.copy.npcAttacksTitle'),
+    ...attacks.map((attack) => {
+      const attackName = normalizeText(attack.name) || t('pages.npcPrint.unnamedAttack')
+      const attackTarget = attack.attackNotApplicable
+        ? t('pages.npcEdit.attacks.notApplicable')
+        : `+${normalizeText(attack.attackBonusNumber)} vs ${t(`pages.npcEdit.fields.${attack.attackDefense}`)}`
+
+      return `- ${[
+        attackName,
+        t(`pages.npcEdit.attacks.typeOptions.${attack.type}`),
+        t(`pages.characterEdit.abilities.actionOptions.${attack.action}`),
+        `${t('pages.contextEdit.copy.attackRangeLabel')} ${normalizeText(attack.range)}`,
+        `${t('pages.contextEdit.copy.attackAreaLabel')} ${buildNpcAttackAreaLabel(attack.area, t)}`,
+        `${t('pages.npcEdit.attacks.attackLabel')}: ${attackTarget}`,
+        normalizeText(attack.description),
+      ].join(' | ')}`
+    }),
+  ]
+}
+
+const buildMonsterAttackAreaLabel = (
+  area: MonsterAttackAreaType,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string => {
+  if (area === 'point') {
+    return t('pages.characterEdit.abilities.weaponAreaOptions.point')
+  }
+
+  const areaMatch = area.match(/^(burst|blast)(\d+)$/)
+  if (!areaMatch) {
+    return area
+  }
+
+  return `${t(`pages.characterEdit.abilities.weaponAreaOptions.${areaMatch[1]}`)} ${areaMatch[2]}`
+}
+
+const buildMonsterStatsLines = (
+  monster: Pick<Monster, 'defenses' | 'hp'>,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string[] => {
+  return [
+    t('pages.contextEdit.copy.monsterStatsTitle'),
+    `- ${[
+      `${t('pages.monsterEdit.fields.hp')} ${normalizeText(monster.hp)}`,
+      `${t('pages.monsterEdit.fields.kp')} ${normalizeText(monster.defenses.kp)}`,
+      `${t('pages.monsterEdit.fields.fortitude')} ${normalizeText(monster.defenses.fortitude)}`,
+      `${t('pages.monsterEdit.fields.reflex')} ${normalizeText(monster.defenses.reflex)}`,
+      `${t('pages.monsterEdit.fields.will')} ${normalizeText(monster.defenses.will)}`,
+    ].join(' | ')}`,
+  ]
+}
+
+const buildMonsterAttackLines = (
+  attacks: MonsterAttack[],
+  t: (key: string, variables?: Record<string, string | number>) => string,
+): string[] => {
+  if (attacks.length === 0) {
+    return []
+  }
+
+  return [
+    t('pages.contextEdit.copy.monsterAttacksTitle'),
+    ...attacks.map((attack) => {
+      const attackName = normalizeText(attack.name) || t('pages.monsterPrint.unnamedAttack')
+      const attackTarget = attack.attackNotApplicable
+        ? t('pages.monsterEdit.attacks.notApplicable')
+        : `+${normalizeText(attack.attackBonusNumber)} vs ${t(`pages.monsterEdit.fields.${attack.attackDefense}`)}`
+
+      return `- ${[
+        attackName,
+        t(`pages.monsterEdit.attacks.typeOptions.${attack.type}`),
+        t(`pages.characterEdit.abilities.actionOptions.${attack.action}`),
+        `${t('pages.contextEdit.copy.attackRangeLabel')} ${normalizeText(attack.range)}`,
+        `${t('pages.contextEdit.copy.attackAreaLabel')} ${buildMonsterAttackAreaLabel(attack.area, t)}`,
+        `${t('pages.monsterEdit.attacks.attackLabel')}: ${attackTarget}`,
+        normalizeText(attack.description),
+      ].join(' | ')}`
+    }),
+  ]
+}
+
+export const buildSingleMonsterContextCopyText = (
+  monster: Pick<Monster, 'attacks' | 'defenses' | 'description' | 'hp' | 'level' | 'name' | 'role' | 'suggested' | 'type'>,
+  t: (key: string, variables?: Record<string, string | number>) => string,
+  options: BuildSingleMonsterContextCopyTextOptions = {},
 ): string => {
   const monsterName = normalizeText(monster.name)
   const lines = [
@@ -206,6 +454,27 @@ export const buildSingleMonsterContextCopyText = (
       normalizeText(monster.description),
     ].join(' | ')}`,
   ]
+
+  if (options.includeAttacks) {
+    lines.push(
+      '',
+      ...buildMonsterStatsLines(monster, t),
+      '',
+      t('pages.contextEdit.copy.monsterDamageLegendTitle'),
+      t('pages.contextEdit.copy.monsterDamageLegend', {
+        low: t('pages.monsterEdit.fields.low'),
+        medium: t('pages.monsterEdit.fields.medium'),
+        high: t('pages.monsterEdit.fields.high'),
+        custom: t('pages.monsterEdit.fields.custom'),
+        lowDamage: normalizeText(monster.suggested.lowDamage),
+        mediumDamage: normalizeText(monster.suggested.mediumDamage),
+        highDamage: normalizeText(monster.suggested.highDamage),
+        customDamage: normalizeText(monster.suggested.customDamage),
+      }),
+      '',
+      ...buildMonsterAttackLines(monster.attacks, t),
+    )
+  }
 
   return lines.join('\n')
 }

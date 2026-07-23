@@ -43,6 +43,7 @@ export interface NpcEditPageState {
   handleHistoryEntryCreateEmpty: () => void
   handleHistoryEntryRemove: (index: number) => void
   handleCopyNpcContext: () => Promise<void>
+  handleCopyNpcContextWithAttacks: () => Promise<void>
   handlePrint: () => void
   handleResistancesChange: (value: string) => void
   handleSpecialChange: (value: string) => void

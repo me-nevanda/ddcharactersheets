@@ -277,6 +277,71 @@
   color: var(--text-strong);
 }
 
+.splitContextButton {
+  display: inline-flex;
+  align-items: stretch;
+  overflow: hidden;
+  min-height: 2.7rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: rgba(255, 248, 235, 0.04);
+  color: var(--text-strong);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.splitContextButton:hover,
+.splitContextButton:focus-within {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.13);
+}
+
+.splitContextMainButton,
+.splitContextAddonButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.7rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.splitContextMainButton {
+  padding: 0.6rem 0.9rem;
+}
+
+.splitContextAddonButton {
+  min-width: 3.3rem;
+  padding: 0.6rem 0.72rem;
+  border-left: 1px solid rgba(255, 248, 235, 0.16);
+}
+
+.splitContextMainButton:hover,
+.splitContextMainButton:focus-visible,
+.splitContextAddonButton:hover,
+.splitContextAddonButton:focus-visible {
+  background: rgba(255, 248, 235, 0.07);
+  outline: none;
+}
+
+.splitContextMainButton:disabled,
+.splitContextAddonButton:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.splitContextAddonButton svg {
+  width: 1.08rem;
+  height: 1.08rem;
+  flex-shrink: 0;
+}
+
 .primaryButton {
   background: linear-gradient(135deg, #a64a2e 0%, #d9a441 100%);
   color: #1d120e;
@@ -314,7 +379,7 @@
   transform: none;
 }
 
-.secondaryButton.responsiveOnlyAction {
+.responsiveOnlyAction {
   display: none;
 }
 
@@ -1415,7 +1480,7 @@
     display: none;
   }
 
-  .secondaryButton.responsiveOnlyAction {
+  .responsiveOnlyAction {
     display: inline-flex;
   }
 

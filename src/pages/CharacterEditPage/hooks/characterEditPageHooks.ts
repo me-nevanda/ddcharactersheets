@@ -99,7 +99,7 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
             setRemovingImage(false);
         }
     };
-    const handleCopyCharacterContext = async () => {
+    const copyCharacterContext = async (includeAbilities = false) => {
         setCopyingContext(true);
         setError('');
         try {
@@ -109,6 +109,11 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
                 getRaceLabel,
                 getClassLabel,
                 t,
+                {
+                    defenseValues: computedState.defenseValues,
+                    hpValue: computedState.hpValue,
+                    includeAbilities,
+                },
             );
             await copyTextToClipboard(text);
             toast.success(t('pages.characterEdit.contextCopySuccess'));
@@ -123,6 +128,12 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
         finally {
             setCopyingContext(false);
         }
+    };
+    const handleCopyCharacterContext = async () => {
+        await copyCharacterContext();
+    };
+    const handleCopyCharacterContextWithAbilities = async () => {
+        await copyCharacterContext(true);
     };
 
     return {
@@ -141,6 +152,7 @@ export const useCharacterEditPage = (): CharacterEditPageState => {
         handleImageChange,
         handleImageRemove,
         handleCopyCharacterContext,
+        handleCopyCharacterContextWithAbilities,
         handleGeneralFieldChange: handlers.handleGeneralFieldChange,
         handleAttributeChange: handlers.handleAttributeChange,
         handleTrainingChange: handlers.handleTrainingChange,

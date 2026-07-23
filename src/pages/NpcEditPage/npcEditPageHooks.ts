@@ -446,12 +446,12 @@ export const useNpcEditPage = (): NpcEditPageState => {
     window.open(`/npcs/${npcId}/print`, '_blank')
   }
 
-  const handleCopyNpcContext = async () => {
+  const copyNpcContext = async (includeAttacks = false) => {
     setCopyingContext(true)
     setError('')
 
     try {
-      const text = buildSingleNpcContextCopyText(form, t)
+      const text = buildSingleNpcContextCopyText(form, t, { includeAttacks })
       await copyTextToClipboard(text)
       toast.success(t('pages.npcEdit.contextCopySuccess'))
     } catch (nextError) {
@@ -463,6 +463,14 @@ export const useNpcEditPage = (): NpcEditPageState => {
     } finally {
       setCopyingContext(false)
     }
+  }
+
+  const handleCopyNpcContext = async () => {
+    await copyNpcContext()
+  }
+
+  const handleCopyNpcContextWithAttacks = async () => {
+    await copyNpcContext(true)
   }
 
   const handleSpecialChange = (value: string) => {
@@ -780,6 +788,7 @@ export const useNpcEditPage = (): NpcEditPageState => {
     handleHistoryEntryCreateEmpty,
     handleHistoryEntryRemove,
     handleCopyNpcContext,
+    handleCopyNpcContextWithAttacks,
     handlePrint,
     handleResistancesChange,
     handleSpecialChange,

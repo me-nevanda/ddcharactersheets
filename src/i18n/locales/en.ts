@@ -396,6 +396,16 @@ export const en: TranslationDictionary = {
         singleEventIntro: 'I am presenting the description of event {name}. Read it and wait for further instructions.',
         singleMapIntro: 'I am presenting the description of map {name}. Read it and wait for further instructions.',
         singleMapTitle: 'Map',
+        characterStatsTitle: 'Hero stats',
+        characterAbilitiesTitle: 'Hero abilities',
+        npcStatsTitle: 'NPC stats',
+        npcAttacksTitle: 'NPC attacks',
+        monsterStatsTitle: 'Monster stats',
+        monsterAttacksTitle: 'Monster attacks',
+        monsterDamageLegendTitle: 'Damage legend',
+        monsterDamageLegend: '{low} - low: {lowDamage}; {medium} - medium: {mediumDamage}; {high} - high: {highDamage}; {custom} - custom: {customDamage}',
+        attackRangeLabel: 'Range',
+        attackAreaLabel: 'Area',
         heroesTitle: 'Hero party',
         npcGroupsTitle: 'NPC groups',
         monsterGroupsTitle: 'Monster groups',
@@ -765,6 +775,8 @@ export const en: TranslationDictionary = {
         remove: 'Remove',
       },
       actions: {
+        copyContextGroup: 'Monster context copy',
+        copyContextWithAttacks: 'Copy context with attacks',
         generateAttributes: 'Generate attributes',
       },
       generateAttributesDialog: {
@@ -882,6 +894,8 @@ export const en: TranslationDictionary = {
         remove: 'Remove',
       },
       actions: {
+        copyContextGroup: 'NPC context copy',
+        copyContextWithAttacks: 'Copy context with attacks',
         generateAttributes: 'Generate attributes',
       },
       generateAttributesDialog: {
@@ -1062,6 +1076,10 @@ export const en: TranslationDictionary = {
       imageActions: {
         uploadNew: 'New',
         remove: 'Remove',
+      },
+      actions: {
+        copyContextGroup: 'Hero context copy',
+        copyContextWithAbilities: 'Copy context with abilities',
       },
       sections: {
         general: 'General',

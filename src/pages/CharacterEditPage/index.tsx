@@ -28,7 +28,7 @@ const CharacterEditPageContent = () => {
     const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false);
     const [isPrintMenuOpen, setPrintMenuOpen] = useState(false);
     const printMenuRef = useRef<HTMLDivElement>(null);
-    const { copyingContext, error, form, handleCopyCharacterContext, handleGeneralChange, handleImageChange, handleImageRemove, handleSubmit, hasChanges, imageUrl, loading, removingImage, saving, uploadingImage } = useCharacterEditPageContext();
+    const { copyingContext, error, form, handleCopyCharacterContext, handleCopyCharacterContextWithAbilities, handleGeneralChange, handleImageChange, handleImageRemove, handleSubmit, hasChanges, imageUrl, loading, removingImage, saving, uploadingImage } = useCharacterEditPageContext();
     const activeTab = resolveActiveTab(searchParams.get('tab'));
     useEffect(() => {
         const handleDocumentPointerDown = (event: MouseEvent) => {
@@ -87,6 +87,17 @@ const CharacterEditPageContent = () => {
         setUnsavedChangesDialogOpen(false);
         navigateBack();
     };
+    const renderContextSplitButton = (className = '') => (<div className={`${styles.splitContextButton} ${className}`} role="group" aria-label={t('pages.characterEdit.actions.copyContextGroup')}>
+      <button className={styles.splitContextMainButton} type="button" onClick={() => void handleCopyCharacterContext()} disabled={loading || saving || copyingContext}>
+        <span className={styles.buttonContent}>
+          <AppIcon name="context"/>
+          <span>{copyingContext ? t('pages.characterEdit.copyingContextButton') : t('pages.characterEdit.copyContextButton')}</span>
+        </span>
+      </button>
+      <button className={styles.splitContextAddonButton} type="button" onClick={() => void handleCopyCharacterContextWithAbilities()} disabled={loading || saving || copyingContext} aria-label={t('pages.characterEdit.actions.copyContextWithAbilities')} title={t('pages.characterEdit.actions.copyContextWithAbilities')}>
+        <AppIcon name="sword"/>
+      </button>
+    </div>);
     return (<main className={styles.editorLayout}>
       <section className={styles.editorCard}>
         <div className={styles.editorHeader}>
@@ -140,19 +151,9 @@ const CharacterEditPageContent = () => {
                 </div>) : null}
             </div>
             <div className={`${styles.floatingCopyAction} ${styles.desktopOnlyAction}`}>
-              <button className={styles.secondaryButton} type="button" onClick={() => void handleCopyCharacterContext()} disabled={loading || saving || copyingContext}>
-                <span className={styles.buttonContent}>
-                  <AppIcon name="context"/>
-                  <span>{copyingContext ? t('pages.characterEdit.copyingContextButton') : t('pages.characterEdit.copyContextButton')}</span>
-                </span>
-              </button>
+              {renderContextSplitButton()}
             </div>
-            <button className={`${styles.secondaryButton} ${styles.responsiveOnlyAction}`} type="button" onClick={() => void handleCopyCharacterContext()} disabled={loading || saving || copyingContext}>
-              <span className={styles.buttonContent}>
-                <AppIcon name="context"/>
-                <span>{copyingContext ? t('pages.characterEdit.copyingContextButton') : t('pages.characterEdit.copyContextButton')}</span>
-              </span>
-            </button>
+            {renderContextSplitButton(styles.responsiveOnlyAction)}
             <div className={styles.floatingSaveAction}>
               <button className={styles.primaryButton} form="character-edit-form" type="submit" disabled={saving || !hasChanges}>
                 <span className={styles.buttonContent}>

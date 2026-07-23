@@ -422,12 +422,12 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     window.open(`/monsters/${monsterId}/print`, '_blank')
   }
 
-  const handleCopyMonsterContext = async () => {
+  const copyMonsterContext = async (includeAttacks = false) => {
     setCopyingContext(true)
     setError('')
 
     try {
-      const text = buildSingleMonsterContextCopyText(form, t)
+      const text = buildSingleMonsterContextCopyText(form, t, { includeAttacks })
       await copyTextToClipboard(text)
       toast.success(t('pages.monsterEdit.contextCopySuccess'))
     } catch (nextError) {
@@ -439,6 +439,14 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     } finally {
       setCopyingContext(false)
     }
+  }
+
+  const handleCopyMonsterContext = async () => {
+    await copyMonsterContext()
+  }
+
+  const handleCopyMonsterContextWithAttacks = async () => {
+    await copyMonsterContext(true)
   }
 
   const handleSpecialChange = (value: string) => {
@@ -702,6 +710,7 @@ export const useMonsterEditPage = (): MonsterEditPageState => {
     handleImageChange,
     handleImageRemove,
     handleCopyMonsterContext,
+    handleCopyMonsterContextWithAttacks,
     handlePrint,
     handleResistancesChange,
     handleSpecialChange,

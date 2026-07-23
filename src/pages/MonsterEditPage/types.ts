@@ -40,6 +40,7 @@ export interface MonsterEditPageState {
   handleImageChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
   handleImageRemove: () => Promise<void>
   handleCopyMonsterContext: () => Promise<void>
+  handleCopyMonsterContextWithAttacks: () => Promise<void>
   handlePrint: () => void
   handleResistancesChange: (value: string) => void
   handleSpecialChange: (value: string) => void

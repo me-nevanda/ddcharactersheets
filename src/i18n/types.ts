@@ -395,6 +395,16 @@ export interface TranslationDictionary {
         singleEventIntro: string
         singleMapIntro: string
         singleMapTitle: string
+        characterStatsTitle: string
+        characterAbilitiesTitle: string
+        npcStatsTitle: string
+        npcAttacksTitle: string
+        monsterStatsTitle: string
+        monsterAttacksTitle: string
+        monsterDamageLegendTitle: string
+        monsterDamageLegend: string
+        attackRangeLabel: string
+        attackAreaLabel: string
         heroesTitle: string
         npcGroupsTitle: string
         monsterGroupsTitle: string
@@ -765,6 +775,8 @@ export interface TranslationDictionary {
         remove: string
       }
       actions: {
+        copyContextGroup: string
+        copyContextWithAttacks: string
         generateAttributes: string
       }
       generateAttributesDialog: {
@@ -883,6 +895,8 @@ export interface TranslationDictionary {
         remove: string
       }
       actions: {
+        copyContextGroup: string
+        copyContextWithAttacks: string
         generateAttributes: string
       }
       generateAttributesDialog: {
@@ -1064,6 +1078,10 @@ export interface TranslationDictionary {
       imageActions: {
         uploadNew: string
         remove: string
+      }
+      actions: {
+        copyContextGroup: string
+        copyContextWithAbilities: string
       }
       sections: {
         general: string

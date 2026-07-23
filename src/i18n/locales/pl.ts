@@ -396,6 +396,16 @@ export const pl: TranslationDictionary = {
         singleEventIntro: 'Przedstawiam ci opis wydarzenia {name}. Przeczytaj go i czekaj na dalsze instrukcje.',
         singleMapIntro: 'Przedstawiam ci opis mapy {name}. Przeczytaj go i czekaj na dalsze instrukcje.',
         singleMapTitle: 'Mapa',
+        characterStatsTitle: 'Statystyki bohatera',
+        characterAbilitiesTitle: 'Zdolności bohatera',
+        npcStatsTitle: 'Statystyki NPC',
+        npcAttacksTitle: 'Ataki NPC',
+        monsterStatsTitle: 'Statystyki potwora',
+        monsterAttacksTitle: 'Ataki potwora',
+        monsterDamageLegendTitle: 'Legenda obrażeń',
+        monsterDamageLegend: '{low} - niskie: {lowDamage}; {medium} - średnie: {mediumDamage}; {high} - wysokie: {highDamage}; {custom} - custom: {customDamage}',
+        attackRangeLabel: 'Zasięg',
+        attackAreaLabel: 'Obszar',
         heroesTitle: 'Drużyna bohaterów',
         npcGroupsTitle: 'Grupy NPC',
         monsterGroupsTitle: 'Grupy potworów',
@@ -765,6 +775,8 @@ export const pl: TranslationDictionary = {
         remove: 'Usuń',
       },
       actions: {
+        copyContextGroup: 'Kopiowanie kontekstu potwora',
+        copyContextWithAttacks: 'Kopiuj kontekst z atakami',
         generateAttributes: 'Wygeneruj atrybuty',
       },
       generateAttributesDialog: {
@@ -882,6 +894,8 @@ export const pl: TranslationDictionary = {
         remove: 'Usuń',
       },
       actions: {
+        copyContextGroup: 'Kopiowanie kontekstu NPC',
+        copyContextWithAttacks: 'Kopiuj kontekst z atakami',
         generateAttributes: 'Wygeneruj atrybuty',
       },
       generateAttributesDialog: {
@@ -1062,6 +1076,10 @@ export const pl: TranslationDictionary = {
       imageActions: {
         uploadNew: 'Nowy',
         remove: 'Usuń',
+      },
+      actions: {
+        copyContextGroup: 'Kopiowanie kontekstu bohatera',
+        copyContextWithAbilities: 'Kopiuj kontekst ze zdolnościami',
       },
       sections: {
         general: 'Ogólne',

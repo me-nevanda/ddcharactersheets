@@ -18,7 +18,7 @@ export const MonsterEditPage = () => {
     monsterListTab: 'list',
     returnTo: '/',
   })
-  const { copyingContext, error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleCopyMonsterContext, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useMonsterEditPage()
+  const { copyingContext, error, form, handleAttackAdd, handleAttackChange, handleAttackRemove, handleArmorBonusChange, handleCancelGenerateAttributes, handleChange, handleConfirmGenerateAttributes, handleCopyMonsterContext, handleCopyMonsterContextWithAttacks, handleDescriptionChange, handleGenerateAttributes, handleImageChange, handleImageRemove, handleItemBonusFieldChange, handleItemChange, handleItemCreateEmpty, handleItemRemove, handlePrint, handleResistancesChange, handleSpecialChange, handleSubmit, handleWeaponDamageChange, hasChanges, imageUrl, isGenerateAttributesDialogOpen, loading, removingImage, saving, uploadingImage } = useMonsterEditPage()
   const [activeTab, setActiveTab] = useState<MonsterEditTabKey>('general')
   const [isUnsavedChangesDialogOpen, setUnsavedChangesDialogOpen] = useState(false)
   const bloodiedValue = Math.floor(form.hp / 2)
@@ -34,6 +34,19 @@ export const MonsterEditPage = () => {
     setUnsavedChangesDialogOpen(false)
     navigateBack()
   }
+  const renderContextSplitButton = (className = '') => (
+    <div className={`${styles.splitContextButton} ${className}`} role="group" aria-label={t('pages.monsterEdit.actions.copyContextGroup')}>
+      <button className={styles.splitContextMainButton} type="button" onClick={() => void handleCopyMonsterContext()} disabled={loading || saving || copyingContext}>
+        <span className={styles.buttonContent}>
+          <AppIcon name="context" />
+          <span>{copyingContext ? t('pages.monsterEdit.copyingContextButton') : t('pages.monsterEdit.copyContextButton')}</span>
+        </span>
+      </button>
+      <button className={styles.splitContextAddonButton} type="button" onClick={() => void handleCopyMonsterContextWithAttacks()} disabled={loading || saving || copyingContext} aria-label={t('pages.monsterEdit.actions.copyContextWithAttacks')} title={t('pages.monsterEdit.actions.copyContextWithAttacks')}>
+        <AppIcon name="sword" />
+      </button>
+    </div>
+  )
 
   return (
     <main className={styles.editorLayout}>
@@ -83,19 +96,9 @@ export const MonsterEditPage = () => {
               </button>
             </div>
             <div className={`${styles.floatingCopyAction} ${styles.desktopOnlyAction}`}>
-              <button className={styles.secondaryButton} type="button" onClick={() => void handleCopyMonsterContext()} disabled={loading || saving || copyingContext}>
-                <span className={styles.buttonContent}>
-                  <AppIcon name="context" />
-                  <span>{copyingContext ? t('pages.monsterEdit.copyingContextButton') : t('pages.monsterEdit.copyContextButton')}</span>
-                </span>
-              </button>
+              {renderContextSplitButton()}
             </div>
-            <button className={`${styles.secondaryButton} ${styles.responsiveOnlyAction}`} type="button" onClick={() => void handleCopyMonsterContext()} disabled={loading || saving || copyingContext}>
-              <span className={styles.buttonContent}>
-                <AppIcon name="context" />
-                <span>{copyingContext ? t('pages.monsterEdit.copyingContextButton') : t('pages.monsterEdit.copyContextButton')}</span>
-              </span>
-            </button>
+            {renderContextSplitButton(styles.responsiveOnlyAction)}
             <div className={styles.floatingSaveAction}>
               <button className={styles.primaryButton} form="monster-edit-form" type="submit" disabled={saving || !hasChanges}>
                 <span className={styles.buttonContent}>
